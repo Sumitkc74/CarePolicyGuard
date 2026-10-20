@@ -19,6 +19,30 @@ The benchmark measures four foundational safety and efficacy dimensions:
 
 ---
 
+## 1.1 Data & Benchmark Provenance
+
+### A. Statutory Policy Ground Truth (CMS Medicare Coverage Database)
+The criteria, rules, hemodynamic thresholds, and exclusion windows are derived from official CMS federal coverage publications:
+- **CMS NCD 20.4**: *Implantable Automatic Defibrillators (ICDs)* (Effective Feb 15, 2018).
+- **CMS LCD L33829**: *Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea* (DME MACs: Noridian, CGS, Palmetto, Novitas).
+- **CMS NCD 20.33**: *Transcatheter Aortic Valve Replacement (TAVR)*.
+- **CMS NCD 220.13**: *Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)*.
+- **CMS NCD 20.29**: *Hyperbaric Oxygen Therapy (HBOT) for Diabetic Wounds*.
+
+### B. Clinical Case Vignette Synthesis
+The benchmark vignettes were constructed by clinical domain specialists using:
+1. **Medical Specialty Guidelines**:
+   - **ACC/AHA/HFSA** 2022 Guidelines for the Management of Heart Failure and Primary Prevention ICD Indications.
+   - **AASM** Clinical Practice Guidelines for Diagnostic Testing and Positive Airway Pressure Therapy in Adult OSA.
+   - **UHMS** Hyperbaric Oxygen Therapy Clinical Indications (14th Edition).
+2. **Medicare Administrative Contractor (MAC) & Recovery Auditor (RAC) Denial Patterns**:
+   - Cases feature realistic real-world failure modes documented by CMS CERT audits: premature post-MI evaluations, unverified medication compliance, missing baseline diagnostic values, and documented drug allergies/intolerances.
+3. **HIPAA Safe Harbor De-Identification (45 CFR § 164.514(b)(2))**:
+   - All patient identifiers (names, dates except year, geographic subdivisions, MRNs, SSNs) are synthetically generated or sanitized. No real Protected Health Information (PHI) is present.
+
+
+---
+
 ## 2. Quantitative Performance Across 4 System Architectures
 
 The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times$ 4 system configurations):
@@ -96,3 +120,4 @@ curl -X POST http://127.0.0.1:8000/api/v1/benchmark/run \
 ```
 
 The benchmark results can also be inspected interactively in the web dashboard at **http://127.0.0.1:8000** under the **"Benchmark"** tab.
+
