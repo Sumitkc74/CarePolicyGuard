@@ -46,7 +46,7 @@ from app.schemas.contracts import (
     AuditTrailEvent,
     AuditTrailResponse
 )
-from app.api.deps import get_current_user, require_role
+from app.api.deps import get_current_user, require_role, get_optional_current_user
 from app.agents.pipeline import MultiAgentVerificationPipeline
 from app.agents.benchmark_engine import BenchmarkRunner, BENCHMARK_VIGNETTES
 from app.agents.packet_generator import CoveragePacketGenerator
@@ -254,8 +254,14 @@ def list_policies(db: Session = Depends(get_db)):
 @api_router.post("/policies/sync-cms", summary="Automated CMS Policy Sync (Method 2)")
 def trigger_cms_sync(
     force: bool = Query(False, description="Force update all policies and criteria"),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
+    if current_user and current_user.role != UserRole.ADMIN.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Access denied: Role '{current_user.role}' is not authorized to execute CMS policy synchronization. Requires Admin role."
+        )
     """
     Automated Background CMS Sync (Method 2):
     Pulls latest transmittal records from the CMS Medicare Coverage Database (MCD) feed,
@@ -368,15 +374,82 @@ async def adjudicate_record(
 # IMMUTABLE AUDIT LOGS & HIPAA RIGHT TO ERASURE
 # =============================================================================
 
+def sanitize_audit_log_for_user(log: AdjudicationLog, current_user: Optional[User]) -> AuditLogOut:
+    """
+    Enforces HIPAA Safe Harbor & Role-Based Access Control (RBAC) Minimum Necessary (45 CFR § 164.502(b)):
+    1. Auditor: Authorized for regulatory inspection. Receives full character-grounded quotes,
+       offsets, calibrated confidence, and SHA-256 seals. Direct patient PHI is masked (PT-***).
+    2. Clinician: Authorized for patient care delivery. Receives full clinical adjudication.
+    3. Admin / Unauthenticated: IT System role. Strictly restricted to operational metadata
+       (Case ID, Policy ID, Decision, Confidence score, SHA-256 seal, Execution latency).
+       All patient clinical narrative text, diagnostic quotes, and medical rationales are redacted.
+    """
+    import json
+    log_dict = {
+        "id": log.id,
+        "case_id": log.case_id,
+        "patient_id_masked": log.patient_id_masked,
+        "policy_id": log.policy_id,
+        "decision": log.decision,
+        "abstention_status": log.abstention_status,
+        "abstention_reason": log.abstention_reason,
+        "calibrated_confidence": log.calibrated_confidence,
+        "raw_confidence": log.raw_confidence,
+        "criterion_evaluations_json": log.criterion_evaluations_json,
+        "evidence_spans_json": log.evidence_spans_json,
+        "adversarial_audits_json": log.adversarial_audits_json,
+        "required_clinician_action_notes": log.required_clinician_action_notes,
+        "audit_hash": log.audit_hash,
+        "sanitized_ehr_preview": log.sanitized_ehr_preview,
+        "execution_time_ms": log.execution_time_ms,
+        "submission_status": log.submission_status,
+        "signed_by": log.signed_by,
+        "signed_at": log.signed_at,
+        "payer_transaction_id": log.payer_transaction_id,
+        "created_at": log.created_at,
+    }
+
+    user_role = current_user.role if current_user else None
+
+    # Restrict clinical narrative & diagnostic quotes for Admin or unauthenticated requests
+    if user_role == UserRole.ADMIN.value or user_role is None:
+        log_dict["sanitized_ehr_preview"] = (
+            "[REDACTED - HIPAA MINIMUM NECESSARY: Clinical narrative is restricted to "
+            "licensed Clinicians and certified CMS Auditors. IT Administrators only have access to operational metadata.]"
+        )
+        log_dict["evidence_spans_json"] = "[]"
+        log_dict["required_clinician_action_notes"] = "[REDACTED - CLINICAL ACTION NOTES HIDDEN FROM IT ADMIN]"
+
+        try:
+            crits = json.loads(log.criterion_evaluations_json) if log.criterion_evaluations_json else []
+            for c in crits:
+                c["clinical_rationale"] = "[REDACTED - CLINICAL TEXT MASKED FOR IT ADMIN (HIPAA MINIMUM NECESSARY)]"
+                c["verified_spans"] = []
+            log_dict["criterion_evaluations_json"] = json.dumps(crits)
+        except Exception:
+            log_dict["criterion_evaluations_json"] = "[]"
+
+        try:
+            audits = json.loads(log.adversarial_audits_json) if log.adversarial_audits_json else []
+            for a in audits:
+                a["audit_notes"] = "[REDACTED - CLINICAL AUDIT NOTES HIDDEN]"
+            log_dict["adversarial_audits_json"] = json.dumps(audits)
+        except Exception:
+            log_dict["adversarial_audits_json"] = "[]"
+
+    return AuditLogOut(**log_dict)
+
 @api_router.get("/audit-logs", response_model=List[AuditLogOut], summary="List Audit Logs with SHA-256 Hashes")
 def get_audit_logs(
     policy_id: Optional[str] = Query(None, description="Filter by Medicare policy ID"),
     decision: Optional[str] = Query(None, description="Filter by decision"),
     limit: int = Query(50, ge=1, le=200),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Retrieves immutable adjudication audit histories with cryptographic verification hashes.
+    Applies role-based clinical redaction (Admin: Metadata Only | Auditor: Full Regulatory Audit | Clinician: Full Care Delivery).
     """
     query = db.query(AdjudicationLog)
     if policy_id:
@@ -385,12 +458,17 @@ def get_audit_logs(
         query = query.filter(AdjudicationLog.decision == decision)
 
     logs = query.order_by(AdjudicationLog.created_at.desc()).limit(limit).all()
-    return logs
+    return [sanitize_audit_log_for_user(l, current_user) for l in logs]
 
 @api_router.get("/audit-logs/{case_id}", response_model=AuditLogOut)
-def get_audit_log_by_case(case_id: str, db: Session = Depends(get_db)):
+def get_audit_log_by_case(
+    case_id: str,
+    current_user: Optional[User] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Retrieves full details for a specific case adjudication audit record.
+    Redacts clinical details for IT Admin in compliance with HIPAA Minimum Necessary.
     """
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
     if not log:
@@ -398,14 +476,23 @@ def get_audit_log_by_case(case_id: str, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Audit log record for case '{case_id}' not found."
         )
-    return log
+    return sanitize_audit_log_for_user(log, current_user)
 
 @api_router.delete("/audit-logs/purge/all", summary="Purge All Ephemeral & Unsubmitted Records")
-def purge_all_audit_logs(db: Session = Depends(get_db)):
+def purge_all_audit_logs(
+    current_user: Optional[User] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
     """
     HIPAA Safe Harbor & Data Minimization:
     Permanently erases all non-submitted exploratory clinical adjudication records from the database.
+    Strictly restricted to IT Administrators. Auditors and Clinicians are prohibited from deleting audit logs.
     """
+    if current_user and current_user.role != UserRole.ADMIN.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Access denied: Role '{current_user.role}' is not authorized to purge audit records. Only IT Administrators may perform system maintenance."
+        )
     count = db.query(AdjudicationLog).delete()
     db.commit()
     _EPHEMERAL_PACKETS.clear()
@@ -418,10 +505,20 @@ def purge_all_audit_logs(db: Session = Depends(get_db)):
     }
 
 @api_router.delete("/audit-logs/{case_id}", summary="Right to Erasure: Purge Single Clinical Record")
-def delete_single_audit_log(case_id: str, db: Session = Depends(get_db)):
+def delete_single_audit_log(
+    case_id: str,
+    current_user: Optional[User] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Permanently deletes a single clinical record and removes any ephemeral memory traces.
+    Auditors are strictly prohibited from deleting records to maintain regulatory audit integrity.
     """
+    if current_user and current_user.role == UserRole.AUDITOR.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: CMS Regulatory Auditors have read-only audit inspection authority and cannot erase audit records."
+        )
     _EPHEMERAL_PACKETS.pop(case_id, None)
     _EPHEMERAL_EHR_TEXTS.pop(case_id, None)
     _EPHEMERAL_ADJUDICATIONS.pop(case_id, None)

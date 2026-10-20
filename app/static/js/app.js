@@ -2016,7 +2016,54 @@ function copyAuditHash() {
 // =============================================================================
 async function loadAuditLogs() {
     try {
-        const res = await fetch("/api/v1/audit-logs?limit=25");
+        // Enforce RBAC privacy banner & control visibility
+        const bannerElem = document.getElementById("audit-role-privacy-banner");
+        const purgeAllBtn = document.getElementById("btn-purge-all-audit");
+
+        if (purgeAllBtn) {
+            purgeAllBtn.style.display = (currentRole === "Admin") ? "inline-flex" : "none";
+        }
+
+        if (bannerElem) {
+            if (currentRole === "Admin") {
+                bannerElem.style.background = "rgba(245, 158, 11, 0.12)";
+                bannerElem.style.border = "1px solid rgba(245, 158, 11, 0.35)";
+                bannerElem.style.color = "#fbbf24";
+                bannerElem.innerHTML = `
+                    <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                    <div>
+                        <strong>🔒 HIPAA Minimum Necessary Standard (45 CFR § 164.502(b)):</strong>
+                        You are authenticated as an <em>IT Administrator</em>. In accordance with clinical data minimization, clinical narratives, diagnostic quotes, and medical rationales are <strong>REDACTED</strong>. Only operational metadata (Case ID, Policy, Decision, Latency, and SHA-256 seal) is displayed.
+                    </div>
+                `;
+            } else if (currentRole === "Auditor") {
+                bannerElem.style.background = "rgba(6, 182, 212, 0.12)";
+                bannerElem.style.border = "1px solid rgba(6, 182, 212, 0.35)";
+                bannerElem.style.color = "#67e8f9";
+                bannerElem.innerHTML = `
+                    <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                    <div>
+                        <strong>🔍 CMS RAC/MAC Regulatory Auditor Oversight:</strong>
+                        Authorized for forensic inspection. Full character-grounded clinical quotes, offsets, calibration scores, and SHA-256 cryptographic verification seals are displayed. Direct patient PHI is masked (<code>PT-***</code>) under HIPAA Safe Harbor. Audit logs are immutable; deletion and purging controls are disabled.
+                    </div>
+                `;
+            } else {
+                bannerElem.style.background = "rgba(16, 185, 129, 0.12)";
+                bannerElem.style.border = "1px solid rgba(16, 185, 129, 0.35)";
+                bannerElem.style.color = "#6ee7b7";
+                bannerElem.innerHTML = `
+                    <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>
+                    <div>
+                        <strong>🩺 Licensed Clinician Mode:</strong>
+                        Viewing prior authorization determinations for clinical care delivery and peer-to-peer appeal documentation.
+                    </div>
+                `;
+            }
+        }
+
+        const res = await fetch("/api/v1/audit-logs?limit=25", {
+            headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
+        });
         if (res.ok) {
             const logs = await res.json();
             const tbody = document.getElementById("audit-table-body");
@@ -2035,10 +2082,39 @@ async function loadAuditLogs() {
                 if (log.decision === "APPROVED") decisionChip = `<span class="badge-status met">${escapeHtml(log.decision)}</span>`;
                 else if (log.decision === "DEFERRED_TO_HUMAN") decisionChip = `<span class="badge-status insufficient">${escapeHtml(log.decision)}</span>`;
 
+                let patientCellContent = escapeHtml(log.patient_id_masked);
+                if (currentRole === "Admin") {
+                    patientCellContent += ` <span class="badge-status insufficient" style="font-size: 0.72rem; padding: 2px 6px;">Metadata Only</span>`;
+                }
+
+                let actionsCell = "";
+                if (currentRole === "Auditor") {
+                    actionsCell = `
+                        <button class="btn-icon-subtle" title="Inspect Forensic Evidence & Offsets" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                            <span class="med-icon icon-sm text-cyan"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        </button>
+                    `;
+                } else if (currentRole === "Admin") {
+                    actionsCell = `
+                        <button class="btn-icon-subtle" title="Inspect Technical Metadata" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                            <span class="med-icon icon-sm text-cyan"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        </button>
+                        <button class="btn-icon-subtle" title="Purge Record (System Maintenance)" onclick="deleteSingleAuditRecord('${escapeHtml(log.case_id)}')">
+                            <span class="med-icon icon-sm text-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                        </button>
+                    `;
+                } else {
+                    actionsCell = `
+                        <button class="btn-icon-subtle" title="View Adjudication Summary" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                            <span class="med-icon icon-sm text-cyan"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        </button>
+                    `;
+                }
+
                 tr.innerHTML = `
                     <td class="mono-cell">${ts}</td>
                     <td class="mono-cell" style="color: var(--accent-cyan); font-weight: 600;">${escapeHtml(log.case_id)}</td>
-                    <td class="mono-cell">${escapeHtml(log.patient_id_masked)}</td>
+                    <td class="mono-cell">${patientCellContent}</td>
                     <td><strong>${escapeHtml(log.policy_id)}</strong></td>
                     <td>${decisionChip}</td>
                     <td class="mono-cell">${log.abstention_status ? "<strong style='color: var(--accent-amber);'>YES</strong>" : "NO"}</td>
@@ -2046,11 +2122,7 @@ async function loadAuditLogs() {
                     <td class="mono-cell" title="${escapeHtml(log.audit_hash)}" style="cursor: pointer;" onclick="copySpecificHash('${escapeHtml(log.audit_hash)}')">
                         <span style="border-bottom: 1px dotted var(--accent-cyan);">${shortHash}</span>
                     </td>
-                    <td>
-                        <button class="btn-icon-subtle" title="Purge Record (HIPAA Right to Erasure)" onclick="deleteSingleAuditRecord('${escapeHtml(log.case_id)}')">
-                            <span class="med-icon icon-sm text-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
-                        </button>
-                    </td>
+                    <td>${actionsCell}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -2060,13 +2132,46 @@ async function loadAuditLogs() {
     }
 }
 
+async function viewAuditRecordDetails(caseId) {
+    try {
+        const res = await fetch(`/api/v1/audit-logs/${encodeURIComponent(caseId)}`, {
+            headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
+        });
+        if (!res.ok) {
+            showToast("Failed to fetch record details", true);
+            return;
+        }
+        const data = await res.json();
+        
+        let detailsMsg = `=== AUDIT RECORD: ${data.case_id} ===\n`;
+        detailsMsg += `Policy: ${data.policy_id}\n`;
+        detailsMsg += `Decision: ${data.decision}\n`;
+        detailsMsg += `Calibrated Confidence: ${(data.calibrated_confidence * 100).toFixed(1)}%\n`;
+        detailsMsg += `SHA-256 Seal: ${data.audit_hash}\n\n`;
+        
+        if (currentRole === "Admin") {
+            detailsMsg += `[PRIVACY NOTICE]: Logged in as IT Admin. Clinical details are redacted under HIPAA Minimum Necessary.\n`;
+            detailsMsg += `Clinical Narrative: ${data.sanitized_ehr_preview}\n`;
+            detailsMsg += `Evidence Spans: ${data.evidence_spans_json}\n`;
+        } else {
+            detailsMsg += `Clinical Narrative Preview: ${data.sanitized_ehr_preview}\n\n`;
+            detailsMsg += `Evidence Spans: ${data.evidence_spans_json}\n`;
+        }
+        
+        alert(detailsMsg);
+    } catch (e) {
+        showToast("Error retrieving audit record: " + e.message, true);
+    }
+}
+
 async function deleteSingleAuditRecord(caseId) {
     if (!confirm(`Permanently purge audit log for case ${caseId}? This action fulfills HIPAA Right-to-Erasure.`)) {
         return;
     }
     try {
         const res = await fetch(`/api/v1/audit-logs/${encodeURIComponent(caseId)}`, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
         });
         if (res.ok) {
             showToast(`Purged audit log for case ${caseId}.`);
@@ -2086,7 +2191,8 @@ async function purgeAllAuditRecords() {
     }
     try {
         const res = await fetch("/api/v1/audit-logs/purge/all", {
-            method: "DELETE"
+            method: "DELETE",
+            headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
         });
         if (res.ok) {
             const data = await res.json();

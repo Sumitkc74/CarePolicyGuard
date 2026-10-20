@@ -305,5 +305,62 @@ def test_api_medical_registration_gate():
     assert user_data["is_verified_medical_pro"] is True
     assert user_data["npi_number"] == "1043256787"
 
+def test_role_based_audit_ledger_privacy_and_access_control():
+    """
+    HIPAA Minimum Necessary & Separation of Duties (45 CFR § 164.502(b)):
+    - IT Admin: Sees metadata only (Case ID, Policy, Decision, Hash). All clinical narrative and quotes are REDACTED.
+    - Auditor: Receives full regulatory audit record (quotes, offsets, calibration).
+    - Auditor Purge Prohibition: Auditors are strictly forbidden from wiping audit logs (403 Forbidden).
+    - Admin Maintenance: Admins have permission to purge ephemeral test records.
+    """
+    from fastapi.testclient import TestClient
+    from main import app
+    from app.core.security import create_access_token
+    from datetime import timedelta
 
+    client = TestClient(app)
 
+    # First, run an adjudication so at least one audit record exists
+    adj_res = client.post("/api/v1/adjudicate", json={
+        "patient_id": "PT-PRIVACY-001",
+        "policy_id": "NCD-20.4",
+        "ehr_narrative": "Patient has severe ischemic cardiomyopathy with LVEF 28% confirmed on echocardiogram. Maintained on carvedilol for 6 months."
+    })
+    assert adj_res.status_code == 200
+    case_id = adj_res.json()["case_id"]
+
+    # 1. Admin JWT Token
+    admin_token = create_access_token({"sub": "admin@carepolicyguard.med", "role": "Admin"}, timedelta(minutes=15))
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    # 2. Auditor JWT Token
+    auditor_token = create_access_token({"sub": "auditor@medicare.cms.gov", "role": "Auditor"}, timedelta(minutes=15))
+    auditor_headers = {"Authorization": f"Bearer {auditor_token}"}
+
+    # 3. Admin queries audit logs -> must be REDACTED
+    admin_res = client.get("/api/v1/audit-logs", headers=admin_headers)
+    assert admin_res.status_code == 200
+    admin_logs = admin_res.json()
+    assert len(admin_logs) > 0
+    target_admin_log = next((l for l in admin_logs if l["case_id"] == case_id), admin_logs[0])
+    assert "[REDACTED - HIPAA MINIMUM NECESSARY" in target_admin_log["sanitized_ehr_preview"]
+    assert target_admin_log["evidence_spans_json"] == "[]"
+    assert "[REDACTED" in target_admin_log["criterion_evaluations_json"]
+
+    # 4. Auditor queries audit logs -> must have full clinical verification details
+    auditor_res = client.get("/api/v1/audit-logs", headers=auditor_headers)
+    assert auditor_res.status_code == 200
+    auditor_logs = auditor_res.json()
+    target_auditor_log = next((l for l in auditor_logs if l["case_id"] == case_id), auditor_logs[0])
+    assert "[REDACTED - HIPAA MINIMUM NECESSARY" not in target_auditor_log["sanitized_ehr_preview"]
+    assert "LVEF" in target_auditor_log["sanitized_ehr_preview"]
+
+    # 5. Auditor attempts to purge audit logs -> must be FORBIDDEN (403)
+    auditor_purge = client.delete("/api/v1/audit-logs/purge/all", headers=auditor_headers)
+    assert auditor_purge.status_code == 403
+    assert "not authorized to purge" in auditor_purge.json()["detail"]
+
+    # 6. Admin purges audit logs -> must SUCCEED (200)
+    admin_purge = client.delete("/api/v1/audit-logs/purge/all", headers=admin_headers)
+    assert admin_purge.status_code == 200
+    assert admin_purge.json()["status"] == "success"

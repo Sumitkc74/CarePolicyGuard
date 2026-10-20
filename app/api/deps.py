@@ -55,3 +55,27 @@ def require_role(allowed_roles: List[str]):
         return current_user
     return role_checker
 
+
+oauth2_scheme_optional = OAuth2PasswordBearer(
+    tokenUrl=f"{settings.API_V1_PREFIX}/auth/login",
+    auto_error=False
+)
+
+def get_optional_current_user(
+    token: Optional[str] = Depends(oauth2_scheme_optional),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    """
+    Returns authenticated user entity if a valid bearer token is provided,
+    or None if the request is unauthenticated.
+    """
+    if not token:
+        return None
+    try:
+        payload = decode_access_token(token)
+        username: Optional[str] = payload.get("sub")
+        if not username:
+            return None
+        return db.query(User).filter(User.username == username).first()
+    except Exception:
+        return None
