@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarePolicyGuard | Policy-Aware Multi-Agent Clinical Verification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+    <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
+    <div class="login-gate-overlay" id="login-gate-screen">
+        <div class="login-gate-card">
+            <div class="login-gate-brand">
+                <div class="shield-icon login-shield">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                </div>
+                <h2>CarePolicy<span class="brand-accent">Guard</span></h2>
+                <p class="login-gate-subtitle">Authorized Healthcare Portal &bull; CMS Prior Authorization CDS</p>
+            </div>
+
+            <div class="login-notice-banner">
+                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                <span>Restricted Access: Valid credentials required to access patient records &amp; policy determinations.</span>
+            </div>
+
+            <!-- TAB SELECTOR: SIGN IN vs REGISTER MEDICAL PRO -->
+            <div class="login-tab-strip">
+                <button class="login-tab-btn active" id="btn-tab-signin" onclick="switchLoginMode('signin')">Sign In</button>
+                <button class="login-tab-btn" id="btn-tab-register-pro" onclick="switchLoginMode('register')">Register as Medical Pro</button>
+            </div>
+
+            <!-- SECURE SIGN IN FORM -->
+            <div id="login-section-signin" class="login-section-content">
+                <form id="signin-login-form" onsubmit="handleCustomLogin(event)">
+                    <div class="login-form-group">
+                        <label for="login-username-input">Clinical Email or Username:</label>
+                        <input type="text" id="login-username-input" class="login-input" placeholder="e.g. clinician@hospital.org" required autocomplete="username">
+                    </div>
+                    <div class="login-form-group">
+                        <label for="login-password-input">Password:</label>
+                        <input type="password" id="login-password-input" class="login-input" placeholder="••••••••••••" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-primary full-width btn-login-submit" id="btn-custom-login-submit">
+                        <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg></span>
+                        Sign In &amp; Authenticate
+                    </button>
+                </form>
+
+                <!-- EVALUATION TEST ACCOUNTS HELPER -->
+                <div class="demo-creds-hint-box">
+                    <div class="demo-creds-header">
+                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+                        <span>Evaluation Accounts (Autofill Credentials):</span>
+                    </div>
+                    <div class="demo-creds-chips">
+                        <button type="button" class="btn-demo-chip" onclick="autofillLogin('doctor@hospital.org', 'password123')">
+                            <strong>Test Doctor</strong> (doctor@hospital.org / password123)
+                        </button>
+                        <button type="button" class="btn-demo-chip" onclick="autofillLogin('auditor@medicare.cms.gov', 'AuditorSecure!2026')">
+                            <strong>CMS Auditor</strong> (auditor@medicare.cms.gov)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTER VERIFIED MEDICAL PROFESSIONAL FORM -->
+            <div id="login-section-register" class="login-section-content hidden">
+                <div class="reg-pro-header">
+                    <span class="reg-pro-tag">Provider Credential Verification Required</span>
+                    <p class="reg-pro-desc">Only verified licensed clinicians (MD, DO, NP, PA-C) are authorized to register to create and sign clinical prior-authorization determinations.</p>
+                </div>
+
+                <form id="medical-register-form" onsubmit="handleMedicalRegistration(event)">
+                    <div class="login-form-row">
+                        <div class="login-form-group">
+                            <label for="reg-fullname">Provider Full Name:</label>
+                            <input type="text" id="reg-fullname" class="login-input" placeholder="e.g. Dr. Eleanor Vance" required>
+                        </div>
+                        <div class="login-form-group">
+                            <label for="reg-credential">Clinical Credential:</label>
+                            <select id="reg-credential" class="login-input login-select" required>
+                                <option value="MD">MD - Doctor of Medicine</option>
+                                <option value="DO">DO - Doctor of Osteopathic Medicine</option>
+                                <option value="NP">NP / APRN - Nurse Practitioner</option>
+                                <option value="PA-C">PA-C - Physician Assistant</option>
+                                <option value="MBBS">MBBS - Bachelor of Medicine &amp; Surgery</option>
+                                <option value="CRNA">CRNA - Certified Reg. Nurse Anesthetist</option>
+                                <option value="PharmD">PharmD - Doctor of Pharmacy</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="reg-email">Institutional Clinical Email:</label>
+                        <input type="email" id="reg-email" class="login-input" placeholder="e.g. e.vance@cardio.hospital.org" required oninput="handleEmailInputLive(this.value)">
+                        <div class="field-feedback-hint" id="email-live-hint">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+                            <span>Hospital/health system email required. Personal webmail (@gmail, @yahoo) prohibited under HIPAA.</span>
+                        </div>
+                    </div>
+
+                    <div class="login-form-row">
+                        <div class="login-form-group">
+                            <label for="reg-npi">10-Digit CMS NPI Number:</label>
+                            <div class="npi-input-wrapper">
+                                <input type="text" id="reg-npi" class="login-input" placeholder="e.g. 1043256787" maxlength="10" required oninput="handleNpiInputLive(this.value)">
+                                <span class="npi-status-badge" id="npi-live-badge">10 Digits</span>
+                            </div>
+                        </div>
+                        <div class="login-form-group">
+                            <label for="reg-license-state">State of Licensure:</label>
+                            <select id="reg-license-state" class="login-input login-select" required>
+                                <option value="CA">California (CA)</option>
+                                <option value="NY">New York (NY)</option>
+                                <option value="TX">Texas (TX)</option>
+                                <option value="FL">Florida (FL)</option>
+                                <option value="IL">Illinois (IL)</option>
+                                <option value="PA">Pennsylvania (PA)</option>
+                                <option value="OH">Ohio (OH)</option>
+                                <option value="MI">Michigan (MI)</option>
+                                <option value="NC">North Carolina (NC)</option>
+                                <option value="GA">Georgia (GA)</option>
+                                <option value="MA">Massachusetts (MA)</option>
+                                <option value="WA">Washington (WA)</option>
+                                <option value="CO">Colorado (CO)</option>
+                                <option value="AZ">Arizona (AZ)</option>
+                                <option value="MN">Minnesota (MN)</option>
+                                <option value="VA">Virginia (VA)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="login-form-row">
+                        <div class="login-form-group">
+                            <label for="reg-license-num">State Medical License #:</label>
+                            <input type="text" id="reg-license-num" class="login-input" placeholder="e.g. C194820" required>
+                        </div>
+                        <div class="login-form-group">
+                            <label for="reg-specialty">Primary Specialty:</label>
+                            <input type="text" id="reg-specialty" class="login-input" placeholder="e.g. Cardiology" required>
+                        </div>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="reg-organization">Hospital / Healthcare Organization:</label>
+                        <input type="text" id="reg-organization" class="login-input" placeholder="e.g. Memorial Hospital Health System" required>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label for="reg-password">Account Password:</label>
+                        <input type="password" id="reg-password" class="login-input" placeholder="Create strong clinical password" required minlength="8">
+                    </div>
+
+                    <div class="attestation-checkbox-group">
+                        <label class="attestation-label">
+                            <input type="checkbox" id="reg-attestation-check" required>
+                            <span>I solemnly attest under penalty of perjury that I am a licensed healthcare provider in active clinical standing with authority to generate clinical prior-authorization determinations.</span>
+                        </label>
+                    </div>
+
+                    <div id="reg-error-box" class="reg-error-banner hidden"></div>
+
+                    <button type="submit" class="btn-primary full-width btn-login-submit" id="btn-reg-pro-submit">
+                        <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></span>
+                        Verify Credentials &amp; Register Account
+                    </button>
+                </form>
+            </div>
+
+            <div class="login-gate-footer">
+                <span>CarePolicyGuard &bull; Protected under HIPAA Safe Harbor (45 CFR &sect; 164.514)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-group">
+                <div class="shield-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M9 12l2 2 4-4"/>
+                    </svg>
+                </div>
+                <h1 class="brand-title">CarePolicy<span class="brand-accent">Guard</span></h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <nav class="nav-links">
+                <button class="nav-btn active" id="tab-adjudicate-btn" onclick="switchMainTab('adjudicate')">Prior Authorization</button>
+                <button class="nav-btn" id="tab-audit-btn" onclick="switchMainTab('audit')">Audit Ledger</button>
+                <button class="nav-btn" id="tab-benchmark-btn" onclick="switchMainTab('benchmark')">Benchmark</button>
+            </nav>
+            <div class="user-profile-badge" id="user-badge" onclick="toggleAuthModal()" title="Click to view profile or sign out">
+                <span class="user-role-tag" id="user-role-label">Reviewer</span>
+                <span class="user-name" id="user-name-label">doctor@hospital.org</span>
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+            </div>
+            <button class="btn-logout-subtle" onclick="signOutToLoginGate()" title="Sign Out">
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
+                <span>Sign Out</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="main-content">
+        <!-- ========================================== -->
+        <!-- TAB 1: CLINICAL ADJUDICATION VIEW (5-SCREEN SIMPLE WIZARD) -->
+        <!-- ========================================== -->
+        <section id="adjudicate-view" class="view-panel active">
+            <!-- 4-STEP CLINICAL WORKFLOW RIBBON -->
+            <div class="guided-workflow-ribbon">
+                <div class="wf-step active" id="wf-step-1" onclick="goToWizardScreen(1)">
+                    <span class="wf-step-badge">1</span>
+                    <strong class="wf-step-label">Note</strong>
+                </div>
+                <div class="wf-arrow">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+                </div>
+                <div class="wf-step" id="wf-step-2" onclick="goToWizardScreen(2)">
+                    <span class="wf-step-badge">2</span>
+                    <strong class="wf-step-label">Policy</strong>
+                </div>
+                <div class="wf-arrow">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+                </div>
+                <div class="wf-step" id="wf-step-3" onclick="goToWizardScreen(3)">
+                    <span class="wf-step-badge">3</span>
+                    <strong class="wf-step-label">Coverage</strong>
+                </div>
+                <div class="wf-arrow">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+                </div>
+                <div class="wf-step" id="wf-step-4" onclick="goToWizardScreen(4)">
+                    <span class="wf-step-badge">4</span>
+                    <strong class="wf-step-label">Sign &amp; Review</strong>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SCREEN 1: UPLOAD CLINICAL CONSULTATION NOTE -->
+            <!-- ==================================================== -->
+            <div id="screen-step-1" class="wizard-screen active">
+                <div class="wizard-card-centered">
+                    <div class="wizard-card-header clean-header">
+                        <div class="header-with-side-action">
+                            <div>
+                                <span class="wizard-step-pill">STEP 1</span>
+                                <h2>Patient Consultation Note</h2>
+                            </div>
+                            <!-- SMALL SIDE BUTTON FOR TUTORIAL SAMPLES -->
+                            <button class="btn-side-tutorial" id="btn-open-tutorial-samples" onclick="openSampleTutorialModal()">
+                                <span class="med-icon icon-sm icon-cyan"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span>
+                                <span>Try a Sample</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AUDITOR INSPECTION MODE NOTICE -->
+                    <div id="auditor-mode-notice" class="auditor-badge-banner hidden">
+                        <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span>
+                        <span><strong>Auditor Inspection Mode:</strong> Read-only access active. Case creation &amp; prior-auth signing require a <strong>Verified Medical Professional (Clinician)</strong>.</span>
+                        <button class="btn-side-tutorial" style="margin-left: auto; padding: 4px 10px;" onclick="signOutToLoginGate()">Sign In as Clinician</button>
+                    </div>
+
+                    <!-- ACTIVE NOTE CONTEXT CALLOUT (IF SAMPLE LOADED) -->
+                    <div id="active-note-badge-banner" class="active-note-badge-banner hidden">
+                        <div class="active-badge-left">
+                            <span class="med-icon icon-sm icon-cyan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+                            <span id="active-note-description-text">Loaded Sample Note: Eleanor Vance (Cardiology)</span>
+                        </div>
+                        <button class="btn-clear-sample-link" onclick="clearLoadedSample()">Clear</button>
+                    </div>
+
+                    <!-- CLEAN DIRECT UPLOAD & PASTE CARD -->
+                    <div class="clinical-note-input-container">
+                        <!-- UPLOAD DROPZONE -->
+                        <div class="actual-upload-card" onclick="document.getElementById('actual-file-input').click()">
+                            <input type="file" id="actual-file-input" style="display: none;" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.tiff,.bmp,.webp" onchange="handleActualFileUpload(event)">
+                            <span class="med-icon icon-lg icon-cyan">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            </span>
+                            <h3 id="actual-upload-title">Drop clinical note or image (or browse)</h3>
+                            <p id="actual-upload-subtitle">PDF, Word, Text, or Scanned Image</p>
+                        </div>
+
+                        <!-- OR PASTE NOTE DIRECTLY -->
+                        <div class="note-direct-paste-box">
+                            <div class="paste-box-header">
+                                <label for="actual-paste-textarea">Or paste clinical text:</label>
+                            </div>
+                            <textarea id="actual-paste-textarea" placeholder="Paste doctor's consultation or progress note here..." oninput="syncPastedNoteToInput()"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- CLINICAL NOTE AUTHENTICITY BADGE (DOCTOR NAME & SIGNATURE CHECK) -->
+                    <div id="note-authenticity-card" class="note-authenticity-card hidden">
+                        <div class="auth-card-header">
+                            <span class="auth-icon-badge" id="auth-status-icon">
+                                <span class="med-icon icon-sm icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
+                            </span>
+                            <div class="auth-details-block">
+                                <strong id="auth-status-title">Doctor's Note Verified</strong>
+                                <span id="auth-status-desc">Attending physician name and digital signature verified.</span>
+                            </div>
+                        </div>
+                        <div class="auth-checks-grid">
+                            <div class="auth-check-item">
+                                <span class="auth-check-icon" id="auth-doc-name-icon">✓</span>
+                                <span>Physician Name: <strong id="auth-doc-name-val">Dr. Sarah Jenkins, MD</strong></span>
+                            </div>
+                            <div class="auth-check-item">
+                                <span class="auth-check-icon" id="auth-doc-sig-icon">✓</span>
+                                <span>Signature: <strong id="auth-doc-sig-val">Electronic Signature Present</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUBTLE PRIVACY CALLOUT -->
+                    <div class="privacy-compact-bar">
+                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                        <span>HIPAA Safe Harbor &bull; In-memory zero retention</span>
+                        <a href="javascript:void(0)" class="terms-link-compact" onclick="openTermsModal()">Notice</a>
+                    </div>
+
+                    <!-- HIDDEN SYSTEM INPUTS TO PREVENT VISUAL CLUTTER -->
+                    <textarea id="ehr-input" style="display: none;"></textarea>
+                    <input type="hidden" id="patient-id-input" value="PT-CARD-8821">
+                    <input type="hidden" id="policy-select" value="NCD-20.4">
+                    <input type="hidden" id="tau-input" value="0.85">
+
+                    <!-- ACTION BUTTON -->
+                    <div class="wizard-action-footer centered">
+                        <button class="btn-primary btn-wizard-hero" id="btn-step1-continue" onclick="proceedToStep2()">
+                            Continue to Policy Match
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SCREEN 2: MEDICARE POLICY MATCH & MULTI-POLICY SCAN -->
+            <!-- ==================================================== -->
+            <div id="screen-step-2" class="wizard-screen">
+                <div class="wizard-card-centered wide">
+                    <div class="wizard-card-header">
+                        <div class="header-left-group">
+                            <span class="wizard-step-pill">STEP 2</span>
+                            <h2>Medicare Policy Matching & Coverage Discovery</h2>
+                        </div>
+                        <button type="button" class="btn-subtle-scan" onclick="triggerMultiPolicyAutoScan()" title="Re-scan all policies against note">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                            Re-Scan All Policies
+                        </button>
+                    </div>
+
+                    <!-- MULTI-POLICY DISCOVERY & CO-OCCURRENCE INSIGHTS BANNER -->
+                    <div id="multi-policy-insights-banner" class="multi-policy-insights-banner hidden">
+                        <div class="insights-icon">
+                            <span class="med-icon icon-md icon-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+                        </div>
+                        <div class="insights-body">
+                            <div class="insights-title" id="multi-policy-insights-title">Multi-Policy Coverage Detected</div>
+                            <div class="insights-desc" id="multi-policy-insights-desc">Patient documentation satisfies criteria for multiple distinct Medicare coverage policies.</div>
+                        </div>
+                    </div>
+
+                    <!-- POLICY MATCH MATRIX (All policies scanned) -->
+                    <div class="policy-scan-section">
+                        <div class="scan-section-header">
+                            <span class="scan-title">Automated Multi-Policy Evaluation:</span>
+                            <span class="scan-subtitle" id="scan-summary-counter">Scanning clinical documentation across all CMS policies...</span>
+                        </div>
+                        <div class="policy-match-grid" id="policy-match-grid">
+                            <!-- Populated dynamically via app.js -->
+                        </div>
+                    </div>
+
+                    <!-- CURRENT ACTIVE POLICY DETAILS CARD -->
+                    <div class="policy-summary-card active-selection-card">
+                        <div class="active-policy-label">
+                            <span>Selected Policy for Evaluation & Coverage Packet:</span>
+                            <span class="best-match-badge hidden" id="active-best-match-pill">★ BEST EVIDENTIARY MATCH</span>
+                        </div>
+                        <div class="policy-header-row">
+                            <div class="policy-badge-icon" id="policy-badge-icon">
+                                <span class="med-icon icon-lg icon-blue">
+                                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                </span>
+                            </div>
+                            <div>
+                                <span class="policy-code" id="step2-policy-id">NCD 20.4</span>
+                                <h3 id="step2-policy-title">Implantable Automatic Defibrillators</h3>
+                                <p id="step2-patient-id" class="policy-patient-sub">Patient: Eleanor Vance (PT-CARD-8821)</p>
+                            </div>
+                        </div>
+
+                        <div class="policy-rules-box">
+                            <div class="rules-box-title">Key Coverage Requirements:</div>
+                            <div class="policy-rule-chips" id="step2-requirements-list">
+                                <span class="rule-chip">LVEF &le; 35%</span>
+                                <span class="rule-chip">NYHA Class II or III</span>
+                                <span class="rule-chip">GDMT &ge; 90 days</span>
+                                <span class="rule-chip">No MI within 40 days</span>
+                            </div>
+                        </div>
+
+                        <!-- CMS POLICY SYNC STATUS BAR -->
+                        <div class="cms-sync-indicator-bar">
+                            <div class="sync-left">
+                                <span class="pulse-dot"></span>
+                                <span id="cms-sync-status-text">CMS Coverage Database: Automated Sync Active</span>
+                            </div>
+                            <button type="button" class="btn-sync-cms-subtle" onclick="triggerUiCmsSync()" title="Check for live CMS transmittals">
+                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></span>
+                                Sync CMS Policies
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="wizard-nav-footer">
+                        <button class="btn-secondary" onclick="goToWizardScreen(1)">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+                            Back
+                        </button>
+                        <button class="btn-primary btn-wizard-hero" id="run-adjudicate-btn" onclick="executeAdjudication()">
+                            Run Coverage Check
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SCREEN 3: COVERAGE VERDICT & PLAIN-ENGLISH CHECKLIST -->
+            <!-- ==================================================== -->
+            <div id="screen-step-3" class="wizard-screen">
+                <div class="wizard-card-centered wide">
+                    <div class="wizard-card-header">
+                        <span class="wizard-step-pill">STEP 3</span>
+                        <h2>Coverage Determination</h2>
+                    </div>
+
+                    <!-- BIG FRIENDLY DECISION BANNER -->
+                    <div id="big-verdict-card" class="big-verdict-card verdict-pending">
+                        <div class="verdict-icon-bubble" id="verdict-bubble">
+                            <span class="med-icon icon-md">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </span>
+                        </div>
+                        <div class="verdict-text-block">
+                            <div class="verdict-header-line">
+                                <span class="verdict-title" id="verdict-title">Ready to Check</span>
+                                <span class="verdict-badge-pill" id="abstention-badge">Coverage Ready</span>
+                            </div>
+                            <p class="verdict-subtitle" id="verdict-subtitle">Awaiting evaluation.</p>
+                        </div>
+                    </div>
+
+                    <!-- CLEAN 1-ROW META SUMMARY -->
+                    <div class="results-compact-strip">
+                        <span class="meta-item">Evaluated Policy: <strong id="res-policy-code">NCD 20.4 &ndash; Implantable Defibrillators</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span class="meta-item">Status: <strong id="res-criteria-count">-- Met</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span class="meta-item">Evidence: <strong id="res-grounding-stat">100% Grounded</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span class="meta-item">Match: <strong id="res-conf-stat">--</strong></span>
+                    </div>
+
+                    <!-- HIDDEN BACKWARD-COMPATIBILITY HOOKS -->
+                    <span id="res-criteria-total" style="display:none;"></span>
+                    <span id="res-policy-category" style="display:none;"></span>
+                    <span id="res-next-step-title" style="display:none;"></span>
+                    <span id="res-next-step-sub" style="display:none;"></span>
+
+                    <!-- DOCTOR ATTENTION BOX IF NEEDED -->
+                    <div id="clinician-action-box" class="clinician-action-box hidden">
+                        <div class="action-box-header">
+                            <span class="action-warning-icon">
+                                <span class="med-icon icon-sm icon-amber">
+                                    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                </span>
+                            </span>
+                            <h4>Action Required:</h4>
+                        </div>
+                        <div id="clinician-action-text" class="action-box-content"></div>
+                    </div>
+
+                    <!-- CMS BILLING & MEDICAL CODING COMPLIANCE PANEL -->
+                    <div id="billing-compliance-panel" class="billing-compliance-panel hidden">
+                        <div class="billing-panel-header">
+                            <div class="billing-title-group">
+                                <span class="med-icon icon-sm icon-emerald">
+                                    <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                </span>
+                                <span class="billing-panel-title">CMS Billing &amp; Medical Coding Cross-Check</span>
+                                <span class="billing-status-badge" id="billing-status-badge">Compliant</span>
+                            </div>
+                            <div class="billing-carc-pills" id="billing-carc-pills"></div>
+                        </div>
+                        <div class="billing-codes-grid">
+                            <div class="billing-code-card">
+                                <span class="code-card-type">CPT / HCPCS Procedure</span>
+                                <div class="code-card-val" id="billing-cpt-display">33249 &ndash; Insertion of ICD Leads &amp; Generator</div>
+                            </div>
+                            <div class="billing-code-card">
+                                <span class="code-card-type">ICD-10-CM Primary Diagnosis</span>
+                                <div class="code-card-val" id="billing-icd-display">I42.0 &ndash; Dilated Cardiomyopathy</div>
+                            </div>
+                        </div>
+                        <div class="billing-advisory-text" id="billing-advisory-text"></div>
+                    </div>
+
+                    <!-- LONGITUDINAL CLINICAL TIMELINE & WAITING PERIOD PANEL -->
+                    <div id="timeline-analysis-panel" class="timeline-analysis-panel hidden">
+                        <div class="timeline-panel-header">
+                            <div class="timeline-title-group">
+                                <span class="med-icon icon-sm icon-cyan">
+                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </span>
+                                <span class="timeline-panel-title">Longitudinal Waiting Periods &amp; Clinical Milestone Reasoning</span>
+                                <span class="timeline-status-badge" id="timeline-status-badge">Satisfied</span>
+                            </div>
+                        </div>
+                        <div id="timeline-milestones-container" class="timeline-milestones-container"></div>
+                    </div>
+
+                    <!-- REQUIREMENTS LIST FOR THE EVALUATED POLICY -->
+                    <div class="criteria-audit-section">
+                        <div class="criteria-audit-header">
+                            <div class="checklist-header-titles">
+                                <span class="section-label">Policy Criteria Breakdown</span>
+                                <span class="section-sublabel">Click any criterion to open details &amp; compare policy requirements with the patient's record</span>
+                            </div>
+                            <span class="checklist-legend-chips">
+                                <span class="legend-chip met"><span class="chip-dot"></span> Met</span>
+                                <span class="legend-chip insufficient"><span class="chip-dot"></span> Needs Review</span>
+                                <span class="legend-chip not-met"><span class="chip-dot"></span> Excluded</span>
+                            </span>
+                        </div>
+                        <div class="criteria-cards-list" id="criteria-cards-list">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <!-- CHARACTER-GROUNDED CLINICAL CITATIONS VIEWER -->
+                        <div class="grounded-ehr-section" id="grounded-ehr-section">
+                            <div class="grounded-ehr-header">
+                                <div class="grounded-ehr-title-group">
+                                    <span class="med-icon icon-sm icon-emerald">
+                                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                    </span>
+                                    <span class="section-label">Character-Grounded Clinical Documentation</span>
+                                </div>
+                                <span class="badge-status met"><span class="chip-dot"></span> 100% Verifiable Text Spans</span>
+                            </div>
+                            <div class="grounded-ehr-body">
+                                <pre id="ehr-highlight-display" class="ehr-highlight-text"></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NAVIGATION -->
+                    <div class="wizard-nav-footer">
+                        <button class="btn-secondary" onclick="goToWizardScreen(2)">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+                            Back to Policy
+                        </button>
+                        <div class="step3-action-buttons-group" id="step3-action-buttons">
+                            <button class="btn-primary btn-wizard-hero" id="btn-step3-continue" onclick="goToWizardScreen(4)">
+                                Review Form &amp; Sign
+                                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SCREEN 4: REVIEW OFFICIAL CMS FORM & SIGN -->
+            <!-- ==================================================== -->
+            <div id="screen-step-4" class="wizard-screen">
+                <div class="wizard-card-centered extra-wide">
+                    <div class="wizard-card-header">
+                        <span class="wizard-step-pill">STEP 4</span>
+                        <h2 id="step4-screen-title">Prior Authorization Packet</h2>
+                        <p class="wizard-step-subtext" id="step4-screen-subtext">This is the official Medicare prior authorization document that will be submitted directly to the insurance payer.</p>
+                    </div>
+
+                    <!-- EXCLUSION / DENIAL WARNING BANNER (SHOWN ONLY IF COVERAGE IS EXCLUDED) -->
+                    <div id="step4-exclusion-warning-banner" class="denial-warning-banner hidden">
+                        <div class="denial-banner-icon">
+                            <span class="med-icon icon-lg icon-red">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                            </span>
+                        </div>
+                        <div class="denial-banner-content">
+                            <h4 class="denial-banner-title">Medicare Prior Authorization Submission Blocked</h4>
+                            <p class="denial-banner-desc">Patient meets a disqualifying exclusion criterion (e.g., active cardiogenic shock / life expectancy &lt; 1 year) or fails mandatory prerequisites. Under CMS regulations and the Federal False Claims Act (31 U.S.C. &sect;&sect; 3729&ndash;3733), this case cannot be submitted as an authorized prior authorization claim. This document is available for internal peer-to-peer clinical review only.</p>
+                        </div>
+                    </div>
+
+                    <!-- THE OFFICIAL FORM CONTAINER -->
+                    <div class="official-packet-scrollable on-page-packet document-paper-view" id="printable-packet-content">
+                        <!-- CMS FORM HEADER -->
+                        <div class="cms-form-header">
+                            <div class="form-title-block">
+                                <h4>CENTERS FOR MEDICARE & MEDICAID SERVICES (CMS)</h4>
+                                <h5>PART B PRIOR AUTHORIZATION REQUEST</h5>
+                            </div>
+                            <div class="form-id-block">
+                                <span class="form-id-tag" id="doc-packet-id">CMS-PAC-2026-PENDING</span>
+                            </div>
+                        </div>
+
+                        <!-- SECTION A: PATIENT & DOCTOR -->
+                        <div class="packet-section">
+                            <div class="section-title-bar">SECTION A: PATIENT & COVERAGE INFORMATION</div>
+                            <div class="packet-fields-grid">
+                                <div class="packet-field">
+                                    <label>Patient ID:</label>
+                                    <span id="doc-patient-id" class="field-val-mono">--</span>
+                                </div>
+                                <div class="packet-field">
+                                    <label>Date of Service:</label>
+                                    <span id="doc-dos" class="field-val">--</span>
+                                </div>
+                                <div class="packet-field">
+                                    <label>Governing Policy:</label>
+                                    <span id="doc-policy-id" class="field-val-bold">--</span>
+                                </div>
+                                <div class="packet-field">
+                                    <label>Medicare Jurisdiction:</label>
+                                    <span id="doc-jurisdiction" class="field-val">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION B: BILLING CODES -->
+                        <div class="packet-section">
+                            <div class="section-title-bar">SECTION B: DIAGNOSTIC (ICD-10) & PROCEDURE (CPT) CODES</div>
+                            <div class="packet-codes-row">
+                                <div class="code-box">
+                                    <label>Diagnosis Codes (ICD-10):</label>
+                                    <div class="code-chips" id="doc-icd-chips"></div>
+                                </div>
+                                <div class="code-box">
+                                    <label>Procedure Codes (CPT/HCPCS):</label>
+                                    <div class="code-chips" id="doc-cpt-chips"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION C: CRITERIA TABLE -->
+                        <div class="packet-section">
+                            <div class="section-title-bar">SECTION C: VERIFIED CRITERIA & QUOTED EVIDENCE</div>
+                            <table class="packet-criteria-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 28%;">Requirement</th>
+                                        <th style="width: 14%;">Status</th>
+                                        <th style="width: 38%;">Evidence from Doctor's Note</th>
+                                        <th style="width: 20%;">Attestation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="doc-criteria-tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- SECTION D: MEDICAL NECESSITY SUMMARY -->
+                        <div class="packet-section">
+                            <div class="section-title-bar">SECTION D: CLINICAL NECESSITY SUMMARY (EDITABLE)</div>
+                            <div class="summary-box">
+                                <textarea id="doc-clinical-summary" class="form-textarea document-editable-summary" rows="4" placeholder="Enter clinical necessity summary..."></textarea>
+                                <span class="editable-field-hint">You can edit or expand this clinical summary before sending to Medicare.</span>
+                            </div>
+                        </div>
+
+                        <!-- SECTION D-2: CMS STATUTORY MANDATES & PRE-AUTH VALIDITY -->
+                        <div class="packet-section" id="doc-sdm-section">
+                            <div class="section-title-bar">SECTION D-2: CMS STATUTORY MANDATES &amp; VALIDITY WINDOW</div>
+                            <div class="packet-fields-grid" style="grid-template-columns: 1fr 2fr;">
+                                <div class="packet-field">
+                                    <label>Pre-Auth Authorization Window:</label>
+                                    <span id="doc-validity-period" class="field-val-bold text-emerald">180 Calendar Days</span>
+                                </div>
+                                <div class="packet-field">
+                                    <label>CMS Shared Decision Making (SDM) Mandate:</label>
+                                    <span id="doc-sdm-text" class="field-val" style="font-size: 0.82rem; line-height: 1.45;">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION E: DOCTOR SIGNATURE -->
+                        <div class="packet-section">
+                            <div class="section-title-bar">SECTION E: PHYSICIAN DIGITAL SIGN-OFF &amp; CERTIFICATION</div>
+                            <div class="packet-fields-grid signature-fields-grid">
+                                <div class="packet-field" style="grid-column: span 2;">
+                                    <label for="doc-physician-signature">Attesting Physician Signature:</label>
+                                    <input type="text" id="doc-physician-signature" class="document-plain-input" value="Dr. Sarah Jenkins, MD, FACC">
+                                </div>
+                                <div class="packet-field">
+                                    <label>Certification Date:</label>
+                                    <span class="field-val" id="doc-signature-date">Current Date</span>
+                                </div>
+                                <div class="packet-field">
+                                    <label>Statutory Certification:</label>
+                                    <label class="checkbox-container plain-cert-check">
+                                        <input type="checkbox" id="doc-certify-check" checked>
+                                        <span class="checkmark"></span>
+                                        <span class="cert-text">Certified under False Claims Act (31 U.S.C. &sect;&sect; 3729&ndash;3733)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NAVIGATION -->
+                    <div class="wizard-nav-footer">
+                        <button class="btn-secondary" onclick="goToWizardScreen(3)">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
+                            Back to Results
+                        </button>
+                        <button class="btn-secondary" onclick="printPacketDocument()">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg></span>
+                            Print Form
+                        </button>
+                        <button class="btn-secondary" onclick="exportFhirBundle()" title="Export standard HL7 FHIR R4 Da Vinci PAS Bundle">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span>
+                            Export FHIR
+                        </button>
+                        <button class="btn-secondary btn-ehr-action" onclick="pushToHospitalEhr()" title="Direct Interoperability Push to Hospital EHR">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
+                            Push to EHR
+                        </button>
+                        <button class="btn-secondary btn-appeal-action" id="btn-step4-appeal" onclick="openPeerToPeerAppealModal()" title="Generate Peer-to-Peer Medical Reconsideration Letter">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
+                            Appeal Letter
+                        </button>
+                        <button class="btn-primary btn-wizard-hero" id="btn-final-submit-insurance" onclick="submitPacketToInsurance()">
+                            Sign & Submit to Medicare
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================================================== -->
+            <!-- SCREEN 5: SUBMISSION CONFIRMATION -->
+            <!-- ==================================================== -->
+            <div id="screen-step-5" class="wizard-screen">
+                <div class="wizard-card-centered receipt-card-screen">
+                    <div class="receipt-success-badge">
+                        <span class="med-icon icon-xl icon-green">
+                            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        </span>
+                    </div>
+                    <h2>Submitted to Medicare</h2>
+                    
+                    <div class="receipt-details-card">
+                        <div class="receipt-row">
+                            <span>Delivered To:</span>
+                            <strong id="receipt-payer">Medicare Part B Claims Processing</strong>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Electronic Receipt ID:</span>
+                            <strong class="mono text-cyan" id="receipt-tx-id">CMS-EDI-837-20261018-971D50</strong>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Patient Case:</span>
+                            <strong class="mono" id="receipt-case-id">--</strong>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Signed By:</span>
+                            <strong id="receipt-signer">--</strong>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Delivered On:</span>
+                            <strong class="mono" id="receipt-timestamp">--</strong>
+                        </div>
+                        <div class="receipt-row">
+                            <span>Current Status:</span>
+                            <strong class="badge-status met">Successfully Received</strong>
+                        </div>
+                    </div>
+
+                    <div class="wizard-nav-footer centered">
+                        <button class="btn-secondary" onclick="printPacketDocument()">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg></span>
+                            Print Receipt
+                        </button>
+                        <button class="btn-secondary" onclick="exportFhirBundle()">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span>
+                            Export FHIR Bundle
+                        </button>
+                        <button class="btn-secondary btn-ehr-action" onclick="pushToHospitalEhr()">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
+                            Sync to Hospital EHR
+                        </button>
+                        <button class="btn-primary btn-wizard-hero" onclick="startNewPatientNote()">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+                            Start Another Patient Case
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: CHAIN-OF-CUSTODY LEDGER VIEW -->
+        <!-- ========================================== -->
+        <section id="audit-view" class="view-panel">
+            <div class="audit-ledger-card">
+                <div class="card-header">
+                    <div>
+                        <h3>Immutable Adjudication Audit Ledger</h3>
+                        <p class="card-subtitle">Cryptographically verified chain-of-custody logs with SHA-256 seals</p>
+                    </div>
+                    <div class="header-action-group">
+                        <button class="btn-secondary" onclick="exportAuditTrailCsv()" title="Download official RFC 4180 CSV audit trail for Medicare RAC/MAC auditor inspection">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
+                            Export Audit CSV
+                        </button>
+                        <button class="btn-secondary" onclick="loadAuditLogs()">&#8635; Refresh Ledger</button>
+                        <button class="btn-secondary btn-danger-subtle" onclick="purgeAllAuditRecords()" title="Permanently delete all unsubmitted / test audit records (HIPAA Right-to-Erasure)">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                            Purge Records
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Case ID</th>
+                                <th>Patient (Masked)</th>
+                                <th>Policy</th>
+                                <th>Decision</th>
+                                <th>Abstained?</th>
+                                <th>Calibrated Conf</th>
+                                <th>Cryptographic SHA-256 Seal</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table-body">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: 4-CONFIGURATION BENCHMARK LAB -->
+        <!-- ========================================== -->
+        <section id="benchmark-view" class="view-panel">
+            <div class="benchmark-container">
+                <div class="benchmark-header-row">
+                    <div>
+                        <h2>4-Configuration Empirical Research Benchmark Lab</h2>
+                        <p class="section-subtitle">
+                            Comparative evaluation across Accuracy, Evidence Faithfulness, Expected Calibration Error (ECE), and Abstention Dynamics.
+                        </p>
+                    </div>
+                    <button class="btn-primary" id="run-bench-btn" onclick="runLiveBenchmark()">
+                        <span class="btn-icon">&#9881;</span> Run Benchmark Suite
+                    </button>
+                </div>
+
+                <!-- 4 ARCHITECTURE COMPARISON CARDS -->
+                <div class="benchmark-cards-grid" id="benchmark-cards-grid">
+                    <!-- Config A Card -->
+                    <div class="bench-card config-a">
+                        <div class="bench-card-badge">BASELINE</div>
+                        <h3>Config A: Zero-Shot Baseline</h3>
+                        <p class="bench-card-desc">Monolithic single-pass prompt without criteria decomposition or grounding verification.</p>
+                        <div class="bench-stats">
+                            <div class="bench-stat-row">
+                                <span>Accuracy:</span>
+                                <strong class="text-amber" id="ba-acc">66.7%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Evidence Faithfulness:</span>
+                                <strong class="text-red" id="ba-faith">48.5%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Expected Calibration Error (ECE):</span>
+                                <strong class="text-red" id="ba-ece">0.274</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Abstention Rate:</span>
+                                <strong>0.0%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Clinical Safety Score:</span>
+                                <strong class="text-red">0.420</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Config B Card -->
+                    <div class="bench-card config-b">
+                        <div class="bench-card-badge">RAG</div>
+                        <h3>Config B: Single-Pass RAG</h3>
+                        <p class="bench-card-desc">Standard policy passage retrieval injected into monolithic prompt without offset verification.</p>
+                        <div class="bench-stats">
+                            <div class="bench-stat-row">
+                                <span>Accuracy:</span>
+                                <strong class="text-amber" id="bb-acc">75.0%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Evidence Faithfulness:</span>
+                                <strong class="text-amber" id="bb-faith">69.0%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Expected Calibration Error (ECE):</span>
+                                <strong class="text-amber" id="bb-ece">0.183</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Abstention Rate:</span>
+                                <strong>5.0%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Clinical Safety Score:</span>
+                                <strong class="text-amber">0.610</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Config C Card -->
+                    <div class="bench-card config-c">
+                        <div class="bench-card-badge">MULTI-AGENT</div>
+                        <h3>Config C: Multi-Agent Extraction</h3>
+                        <p class="bench-card-desc">Criteria decomposition and entity extraction without adversarial offset audit or abstention gate.</p>
+                        <div class="bench-stats">
+                            <div class="bench-stat-row">
+                                <span>Accuracy:</span>
+                                <strong class="text-blue" id="bc-acc">83.3%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Evidence Faithfulness:</span>
+                                <strong class="text-blue" id="bc-faith">88.0%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Expected Calibration Error (ECE):</span>
+                                <strong class="text-blue" id="bc-ece">0.118</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Abstention Rate:</span>
+                                <strong>0.0%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Clinical Safety Score:</span>
+                                <strong class="text-blue">0.745</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Config D Card (CarePolicyGuard) -->
+                    <div class="bench-card config-d highlight-card">
+                        <div class="bench-card-badge gold-badge">CAREPOLICYGUARD</div>
+                        <h3>Config D: CarePolicyGuard</h3>
+                        <p class="bench-card-desc">Full 4-agent pipeline with adversarial character-level verification and calibrated abstention gate (τ=0.85).</p>
+                        <div class="bench-stats">
+                            <div class="bench-stat-row">
+                                <span>Accuracy:</span>
+                                <strong class="text-green" id="bd-acc">98.5%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Evidence Faithfulness:</span>
+                                <strong class="text-green" id="bd-faith">100.0%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Expected Calibration Error (ECE):</span>
+                                <strong class="text-green" id="bd-ece">0.032</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Abstention Rate:</span>
+                                <strong class="text-cyan">33.3%</strong>
+                            </div>
+                            <div class="bench-stat-row">
+                                <span>Clinical Safety Score:</span>
+                                <strong class="text-green">0.975</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMPARATIVE VISUALIZATION BARS -->
+                <div class="benchmark-charts-card">
+                    <h3>Empirical Metric Distribution & Reliability Comparison</h3>
+                    <div class="chart-metric-group">
+                        <div class="chart-row-header">
+                            <span>Evidence Faithfulness (% Character-Grounded Citations without Hallucination)</span>
+                            <span class="chart-goal text-green">Target: 100%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config A (Baseline):</div>
+                            <div class="bar-track"><div class="bar-fill bg-red" style="width: 48.5%">48.5%</div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config B (RAG):</div>
+                            <div class="bar-track"><div class="bar-fill bg-amber" style="width: 69%">69.0%</div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config C (Multi-Agent):</div>
+                            <div class="bar-track"><div class="bar-fill bg-blue" style="width: 88%">88.0%</div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config D (CarePolicyGuard):</div>
+                            <div class="bar-track"><div class="bar-fill bg-green" style="width: 100%">100.0%</div></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-metric-group" style="margin-top: 24px;">
+                        <div class="chart-row-header">
+                            <span>Expected Calibration Error (ECE) - 10 Confidence Bins</span>
+                            <span class="chart-goal text-green">Target: &le; 0.05 (Lower is Better)</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config A (Baseline):</div>
+                            <div class="bar-track"><div class="bar-fill bg-red" style="width: 85%">0.274 (Severe Overconfidence)</div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config B (RAG):</div>
+                            <div class="bar-track"><div class="bar-fill bg-amber" style="width: 60%">0.183 (Moderate Mismatch)</div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config C (Multi-Agent):</div>
+                            <div class="bar-track"><div class="bar-fill bg-blue" style="width: 38%">0.118 (Fair Calibration)</div></div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="bar-label">Config D (CarePolicyGuard):</div>
+                            <div class="bar-track"><div class="bar-fill bg-green" style="width: 12%">0.032 (Optimal Calibration)</div></div>
+                        </div>
+                    </div>
+
+                    <div class="benchmark-narrative-box" id="benchmark-narrative">
+                        Empirical Benchmark Findings: Config D (CarePolicyGuard) eliminates hallucinated citations (100% character grounding) and achieves the lowest Expected Calibration Error (ECE <= 0.035). By activating the Calibrated Abstention Gate (tau=0.85), it safely abstains on 20.0% of edge cases requiring human review, preventing high-liability false approvals and denials.
+                    </div>
+                </div>
+
+                <!-- PER-VIGNETTE GRANULAR EVALUATION TABLE -->
+                <div class="benchmark-vignettes-card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Medicare Case Vignette Breakdown (10 Clinical Scenarios)</h3>
+                            <p class="card-subtitle">Detailed model decisions compared across cardiology, pulmonology, structural heart, electrophysiology, and wound care</p>
+                        </div>
+                        <span class="badge-status met"><span class="chip-dot"></span> 100% Grounding Verifiable</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="audit-table benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Vignette</th>
+                                    <th>Policy</th>
+                                    <th>Clinical Scenario</th>
+                                    <th>Domain</th>
+                                    <th>Gold Standard</th>
+                                    <th>Config A (Baseline)</th>
+                                    <th>Config B (RAG)</th>
+                                    <th>Config C (Multi-Agent)</th>
+                                    <th>Config D (CarePolicyGuard)</th>
+                                    <th>Grounding Audit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="benchmark-vignettes-body">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- GLOBAL APP FOOTER (SLIM & MINIMAL) -->
+    <footer class="app-footer-slim">
+        <div class="footer-slim-inner">
+            <span class="footer-copy">&copy; 2026 CarePolicyGuard &bull; Coverage Decision Support</span>
+            <div class="footer-links-inline">
+                <a href="javascript:void(0)" onclick="openTermsModal('terms-section-cds')">CDS Notice</a>
+                <span class="sep">&bull;</span>
+                <a href="javascript:void(0)" onclick="openTermsModal('terms-section-hipaa')">HIPAA Safe Harbor</a>
+                <span class="sep">&bull;</span>
+                <a href="javascript:void(0)" onclick="openTermsModal('terms-section-zero-retention')">Zero-Retention</a>
+                <span class="sep">&bull;</span>
+                <a href="javascript:void(0)" onclick="openTermsModal('terms-section-attestation')">Attestation</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- AUTH / SESSION PROFILE MODAL -->
+    <div class="modal-overlay hidden" id="auth-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Authenticated Provider Profile</h3>
+                    <p class="modal-subtitle">Active clinical credentials and cryptographic session information.</p>
+                </div>
+                <button class="modal-close-btn" onclick="toggleAuthModal()">&times;</button>
+            </div>
+            
+            <div class="session-profile-card">
+                <div class="profile-row">
+                    <span class="profile-k">Account Identity:</span>
+                    <strong class="profile-v" id="modal-profile-user">clinician@hospital.org</strong>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-k">Authorized Role:</span>
+                    <span class="badge-role-tag" id="modal-profile-role">Clinician</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-k">Clinical Authority:</span>
+                    <span class="profile-v text-emerald" id="modal-profile-authority">Full Prior-Auth Creation &amp; Signing</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-k">Security Protocol:</span>
+                    <span class="profile-v">PBKDF2-HMAC-SHA256 &bull; JWT Bearer Token</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-k">HIPAA Access Status:</span>
+                    <span class="profile-v text-cyan">Safe Harbor Compliant (45 CFR &sect; 164.514)</span>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 16px; display: flex; gap: 10px;">
+                <button class="btn-primary full-width" onclick="signOutToLoginGate()">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
+                    Sign Out of Session
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- TERMS, PRIVACY & CLINICAL DECISION SUPPORT MODAL -->
+    <div class="modal-overlay hidden" id="terms-modal">
+        <div class="modal-card wide-modal terms-modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3>Terms of Service, HIPAA Compliance &amp; Clinical Decision Support Notice</h3>
+                    <p class="modal-subtitle">Regulatory framework, data protection standards, and physician responsibility guidelines.</p>
+                </div>
+                <button class="modal-close-btn" onclick="closeTermsModal()">&times;</button>
+            </div>
+
+            <div class="terms-modal-body">
+                <!-- Section 1: Non-Diagnostic / Assistive Disclaimer -->
+                <div class="terms-section" id="terms-section-cds">
+                    <div class="terms-section-header">
+                        <span class="med-icon text-amber"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+                        <h4>1. Clinical Decision Support (CDS) &amp; Non-Diagnostic Scope</h4>
+                    </div>
+                    <p>CarePolicyGuard is an administrative assistive platform engineered specifically to verify prior-authorization alignment against published Medicare National Coverage Determinations (NCDs) and Local Coverage Determinations (LCDs). <strong>CarePolicyGuard does not provide medical diagnosis, treatment recommendations, disease management, or clinical prescriptions.</strong></p>
+                    <p>All coverage determinations generated are purely advisory. Attending physicians and healthcare practitioners retain sole legal and medical authority for patient evaluations, clinical judgment, and insurance pre-authorization submissions.</p>
+                </div>
+
+                <!-- Section 2: HIPAA Safe Harbor De-Identification -->
+                <div class="terms-section" id="terms-section-hipaa">
+                    <div class="terms-section-header">
+                        <span class="med-icon text-blue"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                        <h4>2. HIPAA Safe Harbor De-Identification (45 CFR &sect; 164.514(b))</h4>
+                    </div>
+                    <p>In full compliance with the Health Insurance Portability and Accountability Act (HIPAA), CarePolicyGuard sanitizes direct and quasi-identifiers prior to algorithmic adjudication. The platform strips Medicare Beneficiary Identifiers (MBIs), Social Security Numbers (SSNs), patient full names, full dates of birth, street addresses, and contact numbers.</p>
+                    <p>Only essential clinical parameters (e.g., LVEF, NYHA functional class, diagnostic sleep study indices, medical therapy durations) are processed to determine coverage policy compliance.</p>
+                </div>
+
+                <!-- Section 3: Zero-Retention Architecture & Data Minimization -->
+                <div class="terms-section" id="terms-section-zero-retention">
+                    <div class="terms-section-header">
+                        <span class="med-icon text-green"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
+                        <h4>3. Data Minimization &amp; Ephemeral Zero-Retention Policy</h4>
+                    </div>
+                    <p>Under the HIPAA Security Rule principle of <em>Minimum Necessary</em> handling: <strong>Any clinical records or patient notes that do not require mandatory saving are never saved.</strong></p>
+                    <ul>
+                        <li><strong>In-Memory Processing:</strong> Interactive policy verifications operate ephemerally in volatile memory. If an evaluation is not explicitly finalized or submitted, no medical documentation is persisted to disk.</li>
+                        <li><strong>Right to Erasure (Audit Purge):</strong> Authorized users can permanently purge unsubmitted test records and audit entries at any time using the one-click purge action in the Audit Ledger.</li>
+                    </ul>
+                </div>
+
+                <!-- Section 4: Cryptographic Chain-of-Custody -->
+                <div class="terms-section" id="terms-section-crypto">
+                    <div class="terms-section-header">
+                        <span class="med-icon text-cyan"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                        <h4>4. Cryptographic Proof &amp; Chain-of-Custody (SHA-256)</h4>
+                    </div>
+                    <p>When an adjudication is recorded into the audit trail, an immutable SHA-256 cryptographic seal is generated binding the timestamp, de-identified patient criteria, exact CMS clause citations, and calibrated confidence score. This prevents retroactive tampering and ensures non-repudiation for CMS administrative audits.</p>
+                </div>
+
+                <!-- Section 5: Physician Attestation & False Claims Act -->
+                <div class="terms-section" id="terms-section-attestation">
+                    <div class="terms-section-header">
+                        <span class="med-icon text-purple"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>
+                        <h4>5. Clinician Attestation &amp; Statutory Compliance</h4>
+                    </div>
+                    <p>By using CarePolicyGuard to assemble pre-authorization packets, the user certifies that all uploaded documents reflect accurate medical records and authentic clinical observations. Users acknowledge awareness of the Federal False Claims Act (31 U.S.C. &sect;&sect; 3729&ndash;3733) and agree that final insurance claim submissions are certified under penalty of law.</p>
+                </div>
+            </div>
+
+            <div class="modal-actions space-between">
+                <button class="btn-secondary" onclick="purgeAllAuditRecords()">Purge All Cached Records</button>
+                <button class="btn-primary" onclick="closeTermsModal()">I Understand &amp; Agree</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAMPLE TUTORIAL MODAL -->
+    <div class="modal-overlay hidden" id="sample-tutorial-modal">
+        <div class="modal-card wide-modal">
+            <div class="modal-header">
+                <div>
+                    <h3>Sample Patient Cases (Interactive Tutorial)</h3>
+                    <p class="modal-subtitle">Pick any example patient scenario to see how CarePolicyGuard evaluates Medicare rules:</p>
+                </div>
+                <button class="modal-close-btn" onclick="closeSampleTutorialModal()">&times;</button>
+            </div>
+
+            <div class="patient-cases-grid modal-cases-grid">
+                <div class="patient-tile active" id="modal-tile-heart-failure" onclick="selectModalSample(this, 'preset-icd-qualifying')">
+                    <div class="tile-icon tile-blue">
+                        <span class="med-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path><path d="M3.5 12h3l2-4 3 8 2-5 2 2h4"></path></svg>
+                        </span>
+                    </div>
+                    <div class="tile-body">
+                        <strong>Eleanor Vance (Age 68) &bull; Heart Failure</strong>
+                        <p>Severe Ischemic Cardiomyopathy (LVEF 28%, NYHA III)</p>
+                        <span class="tile-tag tag-green">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></span>
+                            Meets All Coverage Rules
+                        </span>
+                    </div>
+                </div>
+
+                <div class="patient-tile" id="modal-tile-sleep-apnea" onclick="selectModalSample(this, 'preset-cpap-qualifying')">
+                    <div class="tile-icon tile-cyan">
+                        <span class="med-icon">
+                            <svg viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg>
+                        </span>
+                    </div>
+                    <div class="tile-body">
+                        <strong>Arthur Miller (Age 54) &bull; Sleep Apnea</strong>
+                        <p>Continuous PAP Evaluation (AHI 34.2 events/hr)</p>
+                        <span class="tile-tag tag-green">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></span>
+                            Meets All Coverage Rules
+                        </span>
+                    </div>
+                </div>
+
+                <div class="patient-tile" id="modal-tile-missing-duration" onclick="selectModalSample(this, 'preset-icd-inadequate-gdmt')">
+                    <div class="tile-icon tile-amber">
+                        <span class="med-icon">
+                            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        </span>
+                    </div>
+                    <div class="tile-body">
+                        <strong>Robert Thornton (Age 71) &bull; Borderline Case</strong>
+                        <p>LVEF 30% with only 3 wks GDMT (90 days required)</p>
+                        <span class="tile-tag tag-amber">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span>
+                            Needs Doctor Clarification
+                        </span>
+                    </div>
+                </div>
+
+                <div class="patient-tile" id="modal-tile-recent-mi" onclick="selectModalSample(this, 'preset-icd-disqualified')">
+                    <div class="tile-icon tile-red">
+                        <span class="med-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        </span>
+                    </div>
+                    <div class="tile-body">
+                        <strong>Harold Hayes (Age 65) &bull; Recent Heart Attack</strong>
+                        <p>Post-MI Day 18 (Medicare 40-day exclusion rule)</p>
+                        <span class="tile-tag tag-red">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>
+                            Excluded by Policy
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions space-between">
+                <button class="btn-secondary" onclick="closeSampleTutorialModal()">Cancel</button>
+                <button class="btn-primary" onclick="confirmLoadSampleAndProceed()">Load Selected Sample & Continue &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CRITERION DETAIL POPUP MODAL -->
+    <div class="modal-overlay hidden" id="criterion-detail-modal">
+        <div class="modal-card wide-modal criterion-modal-card">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-badge-row">
+                        <span id="modal-crit-status-badge" class="badge-status met">Met</span>
+                        <span id="modal-crit-code" class="criterion-code-tag">CRIT-ICD-01</span>
+                    </div>
+                    <h3 id="modal-crit-title">1. Severe LV Systolic Dysfunction</h3>
+                </div>
+                <button class="modal-close-btn" onclick="closeCriterionModal()">&times;</button>
+            </div>
+
+            <div class="criterion-modal-body">
+                <!-- 1. POLICY REQUIREMENT BOX -->
+                <div class="crit-modal-section">
+                    <div class="crit-modal-section-title">
+                        <span class="med-icon icon-xs text-cyan"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                        <span>Policy Requirement (Medicare Condition)</span>
+                    </div>
+                    <div class="crit-modal-box policy-condition-box">
+                        <p id="modal-crit-condition">Documented Left Ventricular Ejection Fraction (LVEF) &le; 35% on diagnostic echocardiography or cardiac MRI.</p>
+                        <div id="modal-crit-timing-row" class="timing-badge-row">
+                            <span class="timing-label">Required Timing:</span>
+                            <span id="modal-crit-timing" class="timing-value">Within past 12 months</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. CLINICAL EVALUATION & RATIONALE -->
+                <div class="crit-modal-section">
+                    <div class="crit-modal-section-title">
+                        <span class="med-icon icon-xs text-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+                        <span>Clinical Evaluation &amp; Explanation</span>
+                    </div>
+                    <div class="crit-modal-box rationale-box">
+                        <p id="modal-crit-rationale">LVEF documented at 28% in recent echocardiogram, meeting the primary prevention threshold of &le;35%.</p>
+                        <div id="modal-crit-missing-notice"></div>
+                    </div>
+                </div>
+
+                <!-- 3. PERSON'S RECORD (EXTRACTED EVIDENCE FROM NOTE) -->
+                <div class="crit-modal-section">
+                    <div class="crit-modal-section-title">
+                        <span class="med-icon icon-xs text-green"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                        <span>Person's Clinical Record (Extracted Evidence)</span>
+                    </div>
+                    <div id="modal-crit-evidence-container">
+                        <!-- Populated dynamically with extracted quotes or missing notice -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions space-between">
+                <span class="modal-security-note">HIPAA Safe Harbor &bull; Character-Grounded Evidence</span>
+                <button class="btn-primary" onclick="closeCriterionModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PEER-TO-PEER APPEAL LETTER MODAL -->
+    <div class="modal-overlay hidden" id="appeal-letter-modal">
+        <div class="modal-card wide-modal appeal-modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span class="modal-icon-badge icon-amber">
+                        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </span>
+                    <div>
+                        <h3>Physician Peer-to-Peer Appeal Letter</h3>
+                        <p class="modal-sub">Expedited Clinical Reconsideration &amp; Verbal Defense Talking Points</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closePeerToPeerAppealModal()">&times;</button>
+            </div>
+
+            <div class="modal-body appeal-modal-body">
+                <!-- TALKING POINTS ACCORDION -->
+                <div class="appeal-talking-points-box">
+                    <div class="talking-points-header">
+                        <span class="med-icon icon-sm icon-amber"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></span>
+                        <strong>Verbal Talking Points for Phone Call with Insurance Medical Director:</strong>
+                    </div>
+                    <ul id="appeal-talking-points-list" class="appeal-talking-points-list">
+                        <!-- Populated dynamically -->
+                    </ul>
+                </div>
+
+                <!-- FULL FORMAL LETTER TEXTAREA / DOCUMENT -->
+                <div class="appeal-letter-paper">
+                    <pre id="appeal-letter-fulltext" class="appeal-letter-text"></pre>
+                </div>
+            </div>
+
+            <div class="modal-actions space-between">
+                <button class="btn-secondary" onclick="copyAppealLetterToClipboard()">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+                    Copy Letter
+                </button>
+                <div class="modal-action-right">
+                    <button class="btn-secondary" onclick="printAppealLetter()">
+                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg></span>
+                        Print Appeal
+                    </button>
+                    <button class="btn-primary" onclick="closePeerToPeerAppealModal()">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HL7 FHIR R4 BUNDLE EXPORT MODAL -->
+    <div class="modal-overlay hidden" id="fhir-bundle-modal">
+        <div class="modal-card wide-modal fhir-modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span class="modal-icon-badge icon-cyan">
+                        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    </span>
+                    <div>
+                        <h3>HL7&reg; FHIR&reg; R4 Da Vinci PAS Bundle</h3>
+                        <p class="modal-sub">Interoperable JSON Claim, DocumentReference &amp; Provenance Resources</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeFhirModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="fhir-resource-tags">
+                    <span class="code-pill">Bundle (PAS Profile)</span>
+                    <span class="code-pill">Patient</span>
+                    <span class="code-pill">Practitioner</span>
+                    <span class="code-pill">Claim (Preauth)</span>
+                    <span class="code-pill">DocumentReference</span>
+                </div>
+                <div class="fhir-code-scrollable">
+                    <pre id="fhir-bundle-json-display" class="fhir-json-code"></pre>
+                </div>
+            </div>
+
+            <div class="modal-actions space-between">
+                <button class="btn-secondary" onclick="copyFhirJsonToClipboard()">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+                    Copy FHIR JSON
+                </button>
+                <div class="modal-action-right">
+                    <button class="btn-secondary" onclick="downloadFhirJsonFile()">
+                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
+                        Download .json
+                    </button>
+                    <button class="btn-primary" onclick="closeFhirModal()">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMART DEFICIENCY RESOLVER / CLINICAL ADDENDUM MODAL -->
+    <div class="modal-overlay hidden" id="addendum-modal">
+        <div class="modal-card wide-modal addendum-modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span class="modal-icon-badge icon-purple">
+                        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </span>
+                    <div>
+                        <h3 id="addendum-modal-title">Resolve Clinical Deficiency &bull; Chart Addendum</h3>
+                        <p class="modal-sub">Supply missing clinical facts to satisfy Medicare criteria without re-entering the entire chart note</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeAddendumModal()">&times;</button>
+            </div>
+            <div class="modal-body addendum-modal-body">
+                <div class="addendum-target-box">
+                    <span class="addendum-target-label">Addressing Criterion:</span>
+                    <strong id="addendum-criterion-label">CRIT-ICD-04: Guideline-Directed Medical Therapy (&gt; 90 Days)</strong>
+                    <p id="addendum-criterion-desc" class="addendum-criterion-desc">Documentation of optimal medical therapy for at least 90 days before elective ICD placement.</p>
+                </div>
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="addendum-narrative-input" class="form-label">
+                        Attested Clinical Note Addendum
+                        <span class="label-hint">(State dates, medication doses, and specific clinical observations)</span>
+                    </label>
+                    <textarea id="addendum-narrative-input" class="form-textarea addendum-textarea" rows="4" placeholder="e.g., Patient has been compliant on Entresto 49/51mg BID and Carvedilol 25mg BID since November 2025 (>120 days) with documented tolerance."></textarea>
+                </div>
+                <div class="addendum-signatures-row">
+                    <div class="form-group half-width">
+                        <label class="form-label">Signing Physician Name</label>
+                        <input type="text" id="addendum-physician-name" class="form-input" value="Dr. Eleanor Vance, MD" />
+                    </div>
+                    <div class="form-group half-width">
+                        <label class="form-label">10-Digit CMS NPI</label>
+                        <input type="text" id="addendum-physician-npi" class="form-input" value="1043256787" />
+                    </div>
+                </div>
+                <div class="addendum-compliance-note">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                    <span>Cryptographically signed chart amendment pursuant to HIPAA 45 CFR &sect; 164.526 &amp; Medicare Integrity Manual Ch. 3</span>
+                </div>
+            </div>
+            <div class="modal-actions space-between">
+                <button class="btn-secondary" onclick="closeAddendumModal()">Cancel</button>
+                <button class="btn-primary" id="btn-submit-addendum" onclick="submitClinicalAddendum()">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    Sign Addendum &amp; Re-Adjudicate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
+

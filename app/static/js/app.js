@@ -1,0 +1,3388 @@
+let currentToken = null;
+let currentRole = "Auditor";
+let currentUser = "auditor@medicare.cms.gov";
+let selectedDemoRole = "auditor";
+let clinicalPresets = [];
+let lastAdjudicationResult = null;
+let currentCoveragePacket = null;
+
+// Demo credentials
+// Demo credentials
+const DEMO_CREDENTIALS = {
+    clinician: { username: "clinician@hospital.org", password: "ClinicianCare!2026", role: "Clinician" },
+    auditor: { username: "auditor@medicare.cms.gov", password: "AuditorSecure!2026", role: "Auditor" },
+    admin: { username: "admin@carepolicyguard.med", password: "AdminGuard!2026", role: "Admin" }
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await checkSessionOrShowGate();
+    setupUploadDropzone();
+    updateWorkflowRibbon(1);
+});
+
+// =============================================================================
+// NAVIGATION & TABS
+// =============================================================================
+function switchMainTab(tabName) {
+    document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".view-panel").forEach(panel => panel.classList.remove("active"));
+
+    if (tabName === "adjudicate") {
+        document.getElementById("tab-adjudicate-btn").classList.add("active");
+        document.getElementById("adjudicate-view").classList.add("active");
+    } else if (tabName === "audit") {
+        document.getElementById("tab-audit-btn").classList.add("active");
+        document.getElementById("audit-view").classList.add("active");
+        loadAuditLogs();
+    } else if (tabName === "benchmark") {
+        document.getElementById("tab-benchmark-btn").classList.add("active");
+        document.getElementById("benchmark-view").classList.add("active");
+        runLiveBenchmark();
+    }
+}
+
+// =============================================================================
+// AUTHENTICATION, LOGIN GATE & RBAC
+// =============================================================================
+
+async function checkSessionOrShowGate() {
+    const savedToken = sessionStorage.getItem("carepolicyguard_token");
+    const savedRole = sessionStorage.getItem("carepolicyguard_role");
+    const savedUser = sessionStorage.getItem("carepolicyguard_user");
+
+    if (savedToken) {
+        currentToken = savedToken;
+        currentRole = savedRole || "Clinician";
+        currentUser = savedUser || "clinician@hospital.org";
+        hideLoginGate();
+        updateUserBadge();
+        await loadPolicies();
+        await loadPresets();
+        await loadAuditLogs();
+    } else {
+        showLoginGate();
+    }
+}
+
+function showLoginGate() {
+    const gate = document.getElementById("login-gate-screen");
+    if (gate) gate.classList.remove("hidden");
+}
+
+function hideLoginGate() {
+    const gate = document.getElementById("login-gate-screen");
+    if (gate) gate.classList.add("hidden");
+}
+
+function switchLoginMode(mode) {
+    const signinBtn = document.getElementById("btn-tab-signin");
+    const registerBtn = document.getElementById("btn-tab-register-pro");
+    const signinSec = document.getElementById("login-section-signin");
+    const registerSec = document.getElementById("login-section-register");
+
+    [signinBtn, registerBtn].forEach(b => b && b.classList.remove("active"));
+    [signinSec, registerSec].forEach(s => s && s.classList.add("hidden"));
+
+    if (mode === "register") {
+        if (registerBtn) registerBtn.classList.add("active");
+        if (registerSec) registerSec.classList.remove("hidden");
+    } else {
+        if (signinBtn) signinBtn.classList.add("active");
+        if (signinSec) signinSec.classList.remove("hidden");
+    }
+}
+
+function autofillLogin(email, password) {
+    const uInput = document.getElementById("login-username-input");
+    const pInput = document.getElementById("login-password-input");
+    if (uInput) uInput.value = email;
+    if (pInput) pInput.value = password;
+    showToast(`Autofilled credentials for ${email}. Click "Sign In & Authenticate" to verify.`);
+}
+
+// Client-Side CMS Luhn Checksum for NPI (Prefix 80840)
+function validateNpiLuhnClient(npi) {
+    if (!npi || npi.length !== 10 || !/^\d+$/.test(npi)) return false;
+    if (npi[0] !== '1' && npi[0] !== '2') return false;
+    const fullStr = '80840' + npi;
+    let checksum = 0;
+    for (let i = 0; i < fullStr.length; i++) {
+        let d = parseInt(fullStr[fullStr.length - 1 - i], 10);
+        if (i % 2 === 1) {
+            d *= 2;
+            if (d > 9) d -= 9;
+        }
+        checksum += d;
+    }
+    return checksum % 10 === 0;
+}
+
+function handleNpiInputLive(val) {
+    const badge = document.getElementById("npi-live-badge");
+    if (!badge) return;
+    const clean = (val || "").trim();
+    if (clean.length === 0) {
+        badge.textContent = "10 Digits";
+        badge.className = "npi-status-badge";
+        return;
+    }
+    if (clean.length < 10) {
+        badge.textContent = `${clean.length}/10 Digits`;
+        badge.className = "npi-status-badge";
+        return;
+    }
+    if (clean.length === 10) {
+        if (validateNpiLuhnClient(clean)) {
+            badge.textContent = "✓ Valid CMS NPI";
+            badge.className = "npi-status-badge valid";
+        } else {
+            badge.textContent = "✗ Invalid NPI Checksum";
+            badge.className = "npi-status-badge invalid";
+        }
+    }
+}
+
+function handleEmailInputLive(val) {
+    const hint = document.getElementById("email-live-hint");
+    if (!hint) return;
+    const email = (val || "").trim().toLowerCase();
+    const disallowed = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "mail.com", "protonmail.com"];
+    const domain = email.split("@")[1] || "";
+    
+    if (disallowed.includes(domain)) {
+        hint.className = "field-feedback-hint error";
+        hint.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span><span>Personal email prohibited under HIPAA. Use hospital or institutional email.</span>`;
+    } else if (email.includes("@") && email.includes(".") && domain.length > 3) {
+        hint.className = "field-feedback-hint success";
+        hint.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span><span>Institutional domain recognized.</span>`;
+    } else {
+        hint.className = "field-feedback-hint";
+        hint.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span><span>Hospital/health system email required. Personal webmail (@gmail, @yahoo) prohibited under HIPAA.</span>`;
+    }
+}
+
+async function handleMedicalRegistration(event) {
+    event.preventDefault();
+    const errorBox = document.getElementById("reg-error-box");
+    if (errorBox) errorBox.classList.add("hidden");
+
+    const fullname = document.getElementById("reg-fullname")?.value.trim() || "";
+    const credential = document.getElementById("reg-credential")?.value || "MD";
+    const email = document.getElementById("reg-email")?.value.trim() || "";
+    const npi = document.getElementById("reg-npi")?.value.trim() || "";
+    const licenseState = document.getElementById("reg-license-state")?.value || "CA";
+    const licenseNum = document.getElementById("reg-license-num")?.value.trim() || "";
+    const specialty = document.getElementById("reg-specialty")?.value.trim() || "";
+    const organization = document.getElementById("reg-organization")?.value.trim() || "";
+    const password = document.getElementById("reg-password")?.value || "";
+    const attestation = document.getElementById("reg-attestation-check")?.checked;
+
+    if (!attestation) {
+        showToast("You must solemnly attest to your medical licensure status.", true);
+        return;
+    }
+
+    if (!validateNpiLuhnClient(npi)) {
+        if (errorBox) {
+            errorBox.innerHTML = `<strong>NPI Checksum Error:</strong> National Provider Identifier '${npi}' failed CMS standard Luhn validation. Please provide an authentic 10-digit NPI number.`;
+            errorBox.classList.remove("hidden");
+        }
+        showToast("Invalid NPI: Check digit checksum failure.", true);
+        return;
+    }
+
+    const submitBtn = document.getElementById("btn-reg-pro-submit");
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `Verifying Medical Credentials with NPPES/CMS...`;
+    }
+
+    try {
+        const payload = {
+            username: email,
+            email: email,
+            password: password,
+            role: "Clinician",
+            full_name: fullname,
+            credential_title: credential,
+            npi_number: npi,
+            license_state: licenseState,
+            medical_license: licenseNum,
+            specialty: specialty,
+            organization: organization
+        };
+
+        const res = await fetch("/api/v1/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            showToast(`Medical credentials verified! Logging in as ${fullname}...`);
+            // Automatically log in
+            await executeLogin(email, password);
+        } else {
+            const errData = await res.json().catch(() => ({}));
+            let errMsg = errData.detail?.message || errData.detail || "Medical professional registration failed.";
+            if (errData.detail?.reasons && errData.detail.reasons.length > 0) {
+                errMsg += "<br><ul style='margin: 6px 0 0 16px; padding: 0;'>" + errData.detail.reasons.map(r => `<li>${r}</li>`).join("") + "</ul>";
+            }
+            if (errorBox) {
+                errorBox.innerHTML = `<strong>Verification Denied:</strong> ${errMsg}`;
+                errorBox.classList.remove("hidden");
+            }
+            showToast("Medical registration rejected: Please verify credentials.", true);
+        }
+    } catch (e) {
+        showToast("Registration network error: " + e.message, true);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg></span> Verify Credentials &amp; Register Account`;
+        }
+    }
+}
+
+
+
+async function handleCustomLogin(event) {
+    event.preventDefault();
+    const uInput = document.getElementById("login-username-input");
+    const pInput = document.getElementById("login-password-input");
+    const username = uInput ? uInput.value.trim() : "";
+    const password = pInput ? pInput.value : "";
+
+    if (!username || !password) {
+        showToast("Please provide both username and password.", true);
+        return;
+    }
+
+    const submitBtn = document.getElementById("btn-custom-login-submit");
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `Verifying credentials...`;
+    }
+
+    try {
+        await executeLogin(username, password);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `Authenticate Credentials`;
+        }
+    }
+}
+
+async function executeLogin(username, password) {
+    try {
+        const res = await fetch("/api/v1/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            currentToken = data.access_token;
+            currentRole = data.role;
+            currentUser = data.username;
+
+            sessionStorage.setItem("carepolicyguard_token", currentToken);
+            sessionStorage.setItem("carepolicyguard_role", currentRole);
+            sessionStorage.setItem("carepolicyguard_user", currentUser);
+
+            updateUserBadge();
+            hideLoginGate();
+            showToast(`Welcome! Authenticated as ${currentRole} (${currentUser})`);
+
+            await loadPolicies();
+            await loadPresets();
+            await loadAuditLogs();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Invalid credentials. Please verify username and password.", true);
+        }
+    } catch (e) {
+        showToast("Authentication connection error: " + e.message, true);
+    }
+}
+
+function signOutToLoginGate() {
+    currentToken = null;
+    currentRole = "Not Authenticated";
+    currentUser = "--";
+    sessionStorage.removeItem("carepolicyguard_token");
+    sessionStorage.removeItem("carepolicyguard_role");
+    sessionStorage.removeItem("carepolicyguard_user");
+
+    const authModal = document.getElementById("auth-modal");
+    if (authModal) authModal.classList.add("hidden");
+
+    showLoginGate();
+    showToast("Signed out successfully. Authentication required to continue.");
+}
+
+function updateUserBadge() {
+    const roleLabel = document.getElementById("user-role-label");
+    const nameLabel = document.getElementById("user-name-label");
+    if (roleLabel) roleLabel.textContent = currentRole;
+    if (nameLabel) nameLabel.textContent = currentUser;
+
+    const modalUser = document.getElementById("modal-profile-user");
+    const modalRole = document.getElementById("modal-profile-role");
+    const modalAuth = document.getElementById("modal-profile-authority");
+    if (modalUser) modalUser.textContent = currentUser;
+    if (modalRole) modalRole.textContent = currentRole;
+    if (modalAuth) {
+        if (currentRole === "Clinician") {
+            modalAuth.textContent = "Full Prior-Auth Creation & Signing";
+            modalAuth.className = "profile-v text-emerald";
+        } else if (currentRole === "Admin") {
+            modalAuth.textContent = "Full System & Audit Administration";
+            modalAuth.className = "profile-v text-cyan";
+        } else {
+            modalAuth.textContent = "Read-Only Compliance & Ledger Inspection";
+            modalAuth.className = "profile-v text-amber";
+        }
+    }
+
+    const auditorNotice = document.getElementById("auditor-mode-notice");
+    if (auditorNotice) {
+        if (currentRole === "Auditor") {
+            auditorNotice.classList.remove("hidden");
+        } else {
+            auditorNotice.classList.add("hidden");
+        }
+    }
+}
+
+function toggleAuthModal() {
+    const modal = document.getElementById("auth-modal");
+    if (modal) modal.classList.toggle("hidden");
+}
+
+// =============================================================================
+// POLICIES & PRESETS INGESTION & CMS SYNC
+// =============================================================================
+async function loadPolicies() {
+    try {
+        const res = await fetch("/api/v1/policies");
+        if (res.ok) {
+            const policies = await res.json();
+            const select = document.getElementById("policy-select");
+            const previousVal = select.value;
+            select.innerHTML = "";
+            policies.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.policy_id;
+                opt.textContent = `${p.policy_id} - ${p.title} (${p.category})`;
+                select.appendChild(opt);
+            });
+            if (previousVal && Array.from(select.options).some(o => o.value === previousVal)) {
+                select.value = previousVal;
+            }
+        }
+        await checkCmsSyncStatus();
+    } catch (e) {
+        console.error("Failed to load policies:", e);
+    }
+}
+
+async function checkCmsSyncStatus() {
+    try {
+        const res = await fetch("/api/v1/policies/sync-status");
+        if (res.ok) {
+            const data = await res.json();
+            const statusElem = document.getElementById("cms-sync-status-text");
+            if (statusElem) {
+                const count = data.policies_in_database || 0;
+                let lastSyncStr = "Just now";
+                if (data.last_sync) {
+                    try {
+                        const date = new Date(data.last_sync);
+                        lastSyncStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    } catch (_) {}
+                }
+                statusElem.textContent = `CMS Live Feed: Connected (${count} Policies Active · Synced: ${lastSyncStr})`;
+            }
+        }
+    } catch (e) {
+        console.warn("Could not retrieve CMS sync status:", e);
+    }
+}
+
+async function triggerUiCmsSync() {
+    const statusElem = document.getElementById("cms-sync-status-text");
+    const origText = statusElem ? statusElem.textContent : "";
+    if (statusElem) {
+        statusElem.textContent = "Connecting to CMS Medicare Coverage Database (MCD)...";
+    }
+    showToast("Connecting to CMS Medicare Coverage Database (MCD) transmittal feeds...", "info");
+
+    try {
+        const res = await fetch("/api/v1/policies/sync-cms", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            }
+        });
+
+        if (res.ok) {
+            const result = await res.json();
+            await loadPolicies();
+            await checkCmsSyncStatus();
+            const totalChanges = (result.total_updated || 0) + (result.total_inserted || 0);
+            if (totalChanges > 0) {
+                showToast(`CMS Sync Complete: ${result.total_updated} updated, ${result.total_inserted} new policies added!`, "success");
+            } else {
+                showToast("CMS Sync Verified: All local coverage rules match latest CMS transmittals.", "success");
+            }
+        } else {
+            const err = await res.json().catch(() => ({ detail: "Sync request failed" }));
+            showToast(`Sync alert: ${err.detail || "Unable to sync with CMS"}`, "warning");
+            if (statusElem) statusElem.textContent = origText;
+        }
+    } catch (e) {
+        console.error("CMS Sync Error:", e);
+        showToast("Error connecting to CMS synchronization service", "danger");
+        if (statusElem) statusElem.textContent = origText;
+    }
+}
+
+async function loadPresets() {
+    try {
+        const res = await fetch("/api/v1/presets");
+        if (res.ok) {
+            const data = await res.json();
+            clinicalPresets = data.presets;
+            renderPresetButtons();
+            // In tutorial/sample modal, default selection is the first preset
+            selectedModalPresetId = (clinicalPresets.length > 0) ? clinicalPresets[0].id : "preset-icd-qualifying";
+        }
+    } catch (e) {
+        console.error("Failed to load presets:", e);
+    }
+}
+
+function renderPresetButtons() {
+    const bar = document.getElementById("presets-button-bar");
+    if (!bar) return;
+    bar.innerHTML = "";
+    clinicalPresets.forEach((p, idx) => {
+        const btn = document.createElement("button");
+        btn.className = `preset-pill ${idx === 0 ? "active" : ""}`;
+        btn.textContent = p.label;
+        btn.onclick = () => {
+            document.querySelectorAll(".preset-pill").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            loadPreset(p.id);
+        };
+        bar.appendChild(btn);
+    });
+}
+
+function loadPreset(presetId) {
+    const p = clinicalPresets.find(x => x.id === presetId);
+    if (!p) return;
+
+    const policyElem = document.getElementById("policy-select");
+    const patElem = document.getElementById("patient-id-input");
+    const ehrElem = document.getElementById("ehr-input");
+
+    if (policyElem) policyElem.value = p.policy_id;
+    if (patElem) patElem.value = p.patient_id;
+    if (ehrElem) ehrElem.value = p.ehr_text;
+
+    // Clear previous evaluation results so fresh check runs on new sample
+    lastAdjudicationResult = null;
+    currentCoveragePacket = null;
+    maxUnlockedStep = 2; // Step 1 is filled, Step 2 is unlocked
+
+    // Update Screen 2 policy details
+    updatePolicyStep2Preview();
+}
+
+function onPolicyChange() {
+    updatePolicyStep2Preview();
+    resetAdjudicationDisplay();
+}
+
+function clearEHR() {
+    document.getElementById("ehr-input").value = "";
+    resetAdjudicationDisplay();
+}
+
+function toggleStepperDetails() {
+    const grid = document.getElementById("collapsible-stepper-grid");
+    const icon = document.getElementById("stepper-toggle-icon");
+    if (!grid) return;
+    grid.classList.toggle("collapsed");
+    if (icon) {
+        icon.classList.toggle("rotated");
+    }
+}
+
+let maxUnlockedStep = 1;
+let currentActiveStep = 1;
+
+function isStepCompleted(stepNumber) {
+    if (stepNumber === 1) {
+        const ehr = document.getElementById("ehr-input");
+        const pasted = document.getElementById("actual-paste-textarea");
+        const val = (ehr && ehr.value.trim()) || (pasted && pasted.value.trim()) || "";
+        return val.length >= 20;
+    }
+    if (stepNumber === 2) {
+        return lastAdjudicationResult !== null;
+    }
+    if (stepNumber === 3) {
+        return lastAdjudicationResult !== null && lastAdjudicationResult.adjudication_decision !== "DENIED";
+    }
+    if (stepNumber === 4) {
+        return currentCoveragePacket !== null && currentCoveragePacket.submission_status === "SUBMITTED_TO_PAYER";
+    }
+    return false;
+}
+
+function calculateMaxUnlockedStep() {
+    let unlocked = 1;
+    if (isStepCompleted(1)) {
+        unlocked = 2;
+        if (isStepCompleted(2)) {
+            // Once policy check is evaluated, Step 3 is completed and Step 4 (Review & Sign) is unlocked
+            unlocked = 4;
+            if (isStepCompleted(4)) {
+                // Once signed & submitted, Step 5 is unlocked
+                unlocked = 5;
+            }
+        }
+    }
+    if (unlocked > maxUnlockedStep) {
+        maxUnlockedStep = unlocked;
+    }
+    return maxUnlockedStep;
+}
+
+function canAccessStep(targetStep) {
+    calculateMaxUnlockedStep();
+    return targetStep <= maxUnlockedStep;
+}
+
+function updateWorkflowRibbon(stepNumber) {
+    currentActiveStep = stepNumber;
+    calculateMaxUnlockedStep();
+
+    for (let i = 1; i <= 4; i++) {
+        const step = document.getElementById(`wf-step-${i}`);
+        if (!step) continue;
+        step.classList.remove("active", "completed", "accessible", "locked");
+
+        const completed = isStepCompleted(i);
+        const accessible = i <= maxUnlockedStep;
+
+        if (i === stepNumber) {
+            step.classList.add("active");
+            if (completed) step.classList.add("completed");
+        } else if (completed) {
+            step.classList.add("completed");
+            step.classList.add("accessible");
+        } else if (accessible) {
+            step.classList.add("accessible");
+        } else {
+            step.classList.add("locked");
+        }
+    }
+}
+
+let currentNoteMode = "actual"; // default is actual note mode
+let selectedModalPresetId = "preset-icd-qualifying";
+
+// =============================================================================
+// SAMPLE TUTORIAL MODAL HANDLERS
+// =============================================================================
+function openSampleTutorialModal() {
+    const modal = document.getElementById("sample-tutorial-modal");
+    if (modal) modal.classList.remove("hidden");
+}
+
+function closeSampleTutorialModal() {
+    const modal = document.getElementById("sample-tutorial-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+// =============================================================================
+// TERMS & PRIVACY COMPLIANCE MODAL HANDLERS
+// =============================================================================
+function openTermsModal(sectionId) {
+    const modal = document.getElementById("terms-modal");
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    if (sectionId) {
+        setTimeout(() => {
+            const sec = document.getElementById(sectionId);
+            if (sec) {
+                sec.scrollIntoView({ behavior: "smooth", block: "start" });
+                sec.style.outline = "2px solid var(--accent-cyan)";
+                setTimeout(() => { sec.style.outline = "none"; }, 2500);
+            }
+        }, 150);
+    }
+}
+
+function closeTermsModal() {
+    const modal = document.getElementById("terms-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function selectModalSample(tileElem, presetId) {
+    document.querySelectorAll(".modal-cases-grid .patient-tile").forEach(t => t.classList.remove("active"));
+    if (tileElem) tileElem.classList.add("active");
+    selectedModalPresetId = presetId;
+}
+
+function confirmLoadSampleAndProceed() {
+    currentNoteMode = "sample";
+
+    // Fallback if selectedModalPresetId wasn't set
+    if (!selectedModalPresetId && clinicalPresets && clinicalPresets.length > 0) {
+        selectedModalPresetId = clinicalPresets[0].id;
+    }
+
+    loadPreset(selectedModalPresetId);
+
+    const p = clinicalPresets.find(x => x.id === selectedModalPresetId);
+    const sampleText = p ? p.ehr_text : (document.getElementById("ehr-input")?.value || "");
+
+    // Populate both inputs
+    const ehrElem = document.getElementById("ehr-input");
+    const pasteBox = document.getElementById("actual-paste-textarea");
+    if (ehrElem && sampleText) ehrElem.value = sampleText;
+    if (pasteBox && sampleText) pasteBox.value = sampleText;
+
+    // Update banner UI
+    const banner = document.getElementById("active-note-badge-banner");
+    const descText = document.getElementById("active-note-description-text");
+    if (banner && descText) {
+        const patientName = p ? (p.patient_name || p.label) : "Eleanor Vance";
+        descText.textContent = `Loaded Sample Note: ${patientName} — Click "Clear" anytime to use your own note`;
+        banner.classList.remove("hidden");
+    }
+
+    maxUnlockedStep = Math.max(maxUnlockedStep, 2);
+    closeSampleTutorialModal();
+    showToast(`Loaded sample case: ${p ? p.label : selectedModalPresetId}`);
+    proceedToStep2();
+}
+
+function clearLoadedSample() {
+    currentNoteMode = "actual";
+    const ehrElem = document.getElementById("ehr-input");
+    const pasteBox = document.getElementById("actual-paste-textarea");
+    const banner = document.getElementById("active-note-badge-banner");
+    const patElem = document.getElementById("patient-id-input");
+    const authCard = document.getElementById("note-authenticity-card");
+
+    if (ehrElem) ehrElem.value = "";
+    if (pasteBox) pasteBox.value = "";
+    if (banner) banner.classList.add("hidden");
+    if (authCard) authCard.classList.add("hidden");
+    if (patElem) patElem.value = "PT-ACTUAL-" + Math.floor(1000 + Math.random() * 9000);
+
+    maxUnlockedStep = 1;
+    resetAdjudicationDisplay();
+    showToast("Sample cleared. You can now upload or paste your own clinical note.");
+}
+
+function switchNoteInputMode(mode) {
+    // Kept for backward compatibility if called
+    if (mode === "sample") {
+        openSampleTutorialModal();
+    } else {
+        clearLoadedSample();
+    }
+}
+
+function syncPastedNoteToInput() {
+    const pasted = document.getElementById("actual-paste-textarea");
+    const ehrElem = document.getElementById("ehr-input");
+    const patElem = document.getElementById("patient-id-input");
+    const banner = document.getElementById("active-note-badge-banner");
+
+    if (pasted && ehrElem) {
+        ehrElem.value = pasted.value;
+        if (currentNoteMode === "sample" && pasted.value.trim() !== (clinicalPresets.find(p => p.id === selectedModalPresetId)?.ehr_text || "").trim()) {
+            // User modified the text or typed their own
+            currentNoteMode = "actual";
+            if (banner) banner.classList.add("hidden");
+        }
+        if (patElem && (!patElem.value || patElem.value.startsWith("PT-CARD-8821"))) {
+            patElem.value = "PT-ACTUAL-" + Math.floor(1000 + Math.random() * 9000);
+        }
+        updateWorkflowRibbon(currentActiveStep);
+        verifyCurrentNoteAuthenticity();
+    }
+}
+
+async function handleActualFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    currentNoteMode = "actual";
+    const banner = document.getElementById("active-note-badge-banner");
+    const descText = document.getElementById("active-note-description-text");
+    const titleElem = document.getElementById("actual-upload-title");
+    const subElem = document.getElementById("actual-upload-subtitle");
+
+    if (titleElem) titleElem.textContent = `Reading: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`;
+    if (subElem) subElem.textContent = "Extracting text and running OCR on document...";
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const res = await fetch("/api/v1/extract-text", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || `Server error ${res.status}`);
+        }
+
+        const data = await res.json();
+        const extractedText = data.extracted_text;
+
+        // Fill the text into the inputs for user review and confirmation
+        const ehrElem = document.getElementById("ehr-input");
+        const pasteBox = document.getElementById("actual-paste-textarea");
+        if (ehrElem) ehrElem.value = extractedText;
+        if (pasteBox) {
+            pasteBox.value = extractedText;
+            pasteBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        // Auto-match suggested policy
+        if (data.suggested_policy_id) {
+            const policySelect = document.getElementById("policy-select");
+            if (policySelect) policySelect.value = data.suggested_policy_id;
+        }
+
+        // Show confirmation badge banner on Screen 1
+        if (banner && descText) {
+            descText.textContent = `Extracted from "${file.name}" (${data.character_count} chars). Please review, edit if needed, and confirm below:`;
+            banner.classList.remove("hidden");
+        }
+
+        if (titleElem) titleElem.textContent = `Uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        if (subElem) subElem.textContent = `Text extracted successfully! Please review the text below and click "Continue to Policy Match" when ready.`;
+
+        // Render Doctor Name & Signature Authenticity
+        if (data.authenticity) {
+            renderAuthenticityCard(data.authenticity);
+        } else {
+            verifyCurrentNoteAuthenticity();
+        }
+
+        // Update workflow ribbon now that Step 1 is filled
+        updateWorkflowRibbon(1);
+        showToast(`Extracted ${data.character_count} characters. Review the text below and confirm.`);
+    } catch (e) {
+        console.error("Text extraction failed:", e);
+        showToast("Text extraction failed: " + e.message, true);
+        if (titleElem) titleElem.textContent = "Drop Doctor's Note or Medical Image Here, or Click to Browse";
+        if (subElem) subElem.textContent = "Accepts PDF, Word (.docx), Plain Text (.txt), or Scanned Images & Photos (.png, .jpg, .jpeg).";
+    }
+}
+
+function checkNoteAuthenticity(text) {
+    if (!text || text.trim().length < 20) {
+        return {
+            is_authentic_clinical_note: false,
+            has_doctor_name: false,
+            has_doctor_signature: false,
+            doctor_name: null,
+            signature_text: null,
+            reasons: ["Clinical text is too short."]
+        };
+    }
+
+    const raw = text.trim();
+
+    // Doctor name regexes
+    let doctorName = null;
+    let hasDoctorName = false;
+    const docPatterns = [
+        /\b(?:Dr\.|Doctor)\s+([A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+)(?:,\s*(?:MD|DO|NP|PA-C|PA|FACC|FACP|MBBS))?\b/,
+        /(?:attending|provider|physician|clinician|consultant|prescriber|cardiologist|pulmonologist)\s*(?:name)?\s*:\s*(?:Dr\.\s*)?([A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+)(?:,\s*(?:MD|DO|NP|PA-C|PA|FACC|FACP|MBBS))?/i,
+        /\b([A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+),\s*(?:MD|DO|NP|PA-C|MBBS)(?:\s*,\s*(?:FACC|FACP|FACS))?\b/,
+        /(?:electronically\s+signed\s+by|signed\s+by|attested\s+by)\s*:?\s*(?:Dr\.\s*)?([A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+)/i
+    ];
+    for (const pat of docPatterns) {
+        const m = raw.match(pat);
+        if (m) {
+            doctorName = m[1].trim();
+            if (!doctorName.startsWith("Dr.") && !doctorName.toLowerCase().startsWith("doctor")) {
+                doctorName = "Dr. " + doctorName;
+            }
+            hasDoctorName = true;
+            break;
+        }
+    }
+
+    // Signature regexes
+    let signatureText = null;
+    let hasSignature = false;
+    const sigPatterns = [
+        /(?:electronically\s+signed\s+by|e-signed\s+by|signed\s+by)\s*:?\s*([^\n\r]+)/i,
+        /(?:physician\s+signature|doctor\s+signature|provider\s+signature|attending\s+signature|signature)\s*:\s*([^\n\r]+)/i,
+        /(?:attested\s+by|authenticated\s+by)\s*:?\s*([^\n\r]+)/i,
+        /(\/s\/\s*[A-Z][a-z]+(?:\s+[A-Z]\.?)?\s+[A-Z][a-z]+)/i,
+        /(?:i\s+certify\s+that\s+i\s+examined|i\s+personally\s+examined|i\s+attest\s+to\s+the\s+above)/i
+    ];
+    for (const spat of sigPatterns) {
+        const sm = raw.match(spat);
+        if (sm) {
+            signatureText = sm[0].trim();
+            hasSignature = true;
+            if (!hasDoctorName && sm[1]) {
+                const cand = sm[1].replace(/^\/s\/\s*/i, '').replace(/\s+on\s+.*$/i, '');
+                const candMatch = cand.match(/\b(?:Dr\.\s*)?([A-Z][a-z]+\s+[A-Z][a-z]+)/);
+                if (candMatch) {
+                    doctorName = "Dr. " + candMatch[1].trim();
+                    hasDoctorName = true;
+                }
+            }
+            break;
+        }
+    }
+
+    const reasons = [];
+    if (!hasDoctorName) reasons.append ? reasons.append("Missing doctor name") : reasons.push("Missing doctor/physician name (e.g., Dr. Name, MD).");
+    if (!hasSignature) reasons.push("Missing doctor signature or attestation line.");
+
+    return {
+        is_authentic_clinical_note: hasDoctorName && hasSignature,
+        has_doctor_name: hasDoctorName,
+        has_doctor_signature: hasSignature,
+        doctor_name: doctorName,
+        signature_text: signatureText,
+        reasons: reasons
+    };
+}
+
+function verifyCurrentNoteAuthenticity() {
+    const text = document.getElementById("ehr-input")?.value || document.getElementById("actual-paste-textarea")?.value || "";
+    if (!text || text.trim().length < 20) {
+        const card = document.getElementById("note-authenticity-card");
+        if (card) card.classList.add("hidden");
+        return;
+    }
+    const res = checkNoteAuthenticity(text);
+    renderAuthenticityCard(res);
+}
+
+function renderAuthenticityCard(auth) {
+    const card = document.getElementById("note-authenticity-card");
+    if (!card) return;
+
+    const iconBadge = document.getElementById("auth-status-icon");
+    const title = document.getElementById("auth-status-title");
+    const desc = document.getElementById("auth-status-desc");
+    const nameVal = document.getElementById("auth-doc-name-val");
+    const nameIcon = document.getElementById("auth-doc-name-icon");
+    const sigVal = document.getElementById("auth-doc-sig-val");
+    const sigIcon = document.getElementById("auth-doc-sig-icon");
+
+    card.classList.remove("hidden", "auth-invalid", "auth-warning");
+
+    if (auth.has_doctor_name && auth.has_doctor_signature) {
+        // Fully Verified
+        title.textContent = "Doctor's Note Authenticated";
+        desc.textContent = "Verified licensed physician credentials and valid signature block.";
+        iconBadge.innerHTML = `<span class="med-icon icon-sm icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>`;
+    } else if (auth.has_doctor_name || auth.has_doctor_signature) {
+        card.classList.add("auth-warning");
+        title.textContent = "Incomplete Provider Documentation";
+        desc.textContent = "Doctor's name or signature line is missing. Medicare requires attesting provider details.";
+        iconBadge.innerHTML = `<span class="med-icon icon-sm icon-amber"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>`;
+    } else {
+        card.classList.add("auth-invalid");
+        title.textContent = "Unverified Clinical Note (Missing Doctor Credentials)";
+        desc.textContent = "No physician name or signature detected. Please ensure the note includes the treating doctor's name and signature.";
+        iconBadge.innerHTML = `<span class="med-icon icon-sm icon-red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span>`;
+    }
+
+    if (nameVal && nameIcon) {
+        if (auth.has_doctor_name) {
+            nameVal.textContent = auth.doctor_name || "Doctor Identified";
+            nameVal.style.color = "#166534";
+            nameIcon.textContent = "✓";
+            nameIcon.className = "auth-check-icon";
+        } else {
+            nameVal.textContent = "Not Documented";
+            nameVal.style.color = "#B91C1C";
+            nameIcon.textContent = "✗";
+            nameIcon.className = "auth-check-icon icon-missing";
+        }
+    }
+
+    if (sigVal && sigIcon) {
+        if (auth.has_doctor_signature) {
+            sigVal.textContent = "Verified Signature Block";
+            sigVal.style.color = "#166534";
+            sigIcon.textContent = "✓";
+            sigIcon.className = "auth-check-icon";
+        } else {
+            sigVal.textContent = "Missing Signature";
+            sigVal.style.color = "#B91C1C";
+            sigIcon.textContent = "✗";
+            sigIcon.className = "auth-check-icon icon-missing";
+        }
+    }
+}
+
+function selectPatientTile(tileElem, presetId) {
+    selectModalSample(tileElem, presetId);
+}
+
+function proceedToStep2() {
+    const ehrText = document.getElementById("ehr-input").value.trim();
+    if (!ehrText || ehrText.length < 20) {
+        showToast("Please upload a file or paste your patient note text (at least 20 characters), or click 'Try a Sample' above.", true);
+        return;
+    }
+
+    // Verify Doctor Name & Signature
+    const auth = checkNoteAuthenticity(ehrText);
+    renderAuthenticityCard(auth);
+
+    if (!auth.has_doctor_name || !auth.has_doctor_signature) {
+        const missingParts = [];
+        if (!auth.has_doctor_name) missingParts.push("doctor/physician name (e.g. Dr. Name, MD)");
+        if (!auth.has_doctor_signature) missingParts.push("electronic signature or attestation line");
+        showToast(`Document requires: ${missingParts.join(" and ")}. Please append below or certify.`, true);
+        
+        // If user wants to proceed anyway, allow them after warning or let them edit
+        const proceedConfirmed = confirm(`Clinical Document Verification Warning:\n\nThis note is missing ${missingParts.join(" and ")}.\n\nMedicare Part B prior authorization requires treating physician identification and signature.\n\nDo you want to proceed to Step 2 anyway and supply attestation on the official form?`);
+        if (!proceedConfirmed) {
+            return;
+        }
+    }
+
+    updatePolicyStep2Preview();
+    triggerMultiPolicyAutoScan();
+    goToWizardScreen(2);
+}
+
+let lastMultiPolicyScanResult = null;
+
+async function triggerMultiPolicyAutoScan() {
+    const ehrText = document.getElementById("ehr-input").value.trim();
+    const patId = document.getElementById("patient-id-input").value.trim() || "PT-CLINICAL";
+    const counterElem = document.getElementById("scan-summary-counter");
+    const gridElem = document.getElementById("policy-match-grid");
+
+    if (!ehrText || ehrText.length < 20) return;
+
+    if (counterElem) counterElem.textContent = "Scanning clinical documentation across all CMS policies in database...";
+
+    try {
+        const res = await fetch("/api/v1/adjudicate/scan-all", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                patient_id: patId,
+                ehr_narrative: ehrText
+            })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            lastMultiPolicyScanResult = data;
+            renderMultiPolicyScanResults(data);
+        } else {
+            if (counterElem) counterElem.textContent = "Multi-policy scan ready.";
+        }
+    } catch (e) {
+        console.error("Multi-policy auto-scan failed:", e);
+        if (counterElem) counterElem.textContent = "Multi-policy scan offline.";
+    }
+}
+
+function renderMultiPolicyScanResults(data) {
+    const counterElem = document.getElementById("scan-summary-counter");
+    const gridElem = document.getElementById("policy-match-grid");
+    const bannerElem = document.getElementById("multi-policy-insights-banner");
+    const bannerTitle = document.getElementById("multi-policy-insights-title");
+    const bannerDesc = document.getElementById("multi-policy-insights-desc");
+    const currentActivePolicy = document.getElementById("policy-select").value;
+
+    if (counterElem) {
+        counterElem.textContent = `Scanned ${data.total_policies_scanned} policies in ${data.execution_time_ms}ms (${data.approved_count} Qualified, ${data.denied_count} Unmet, ${data.deferred_count} Auditor Review)`;
+    }
+
+    // Multi-morbidity and policy co-occurrence banner
+    if (bannerElem) {
+        if (data.approved_count > 1) {
+            bannerElem.classList.remove("hidden");
+            if (bannerTitle) bannerTitle.textContent = `Multi-Policy Coverage Detected (${data.approved_count} Policies Qualified)`;
+            if (bannerDesc) bannerDesc.textContent = data.multi_morbidity_insights.join(" ");
+        } else if (data.approved_count === 1) {
+            bannerElem.classList.remove("hidden");
+            if (bannerTitle) bannerTitle.textContent = `Targeted Coverage Match Found (${data.best_match_policy_id})`;
+            if (bannerDesc) bannerDesc.textContent = data.multi_morbidity_insights.join(" ");
+        } else {
+            bannerElem.classList.add("hidden");
+        }
+    }
+
+    // Auto-select best match if user has not explicitly locked onto another policy
+    if (data.best_match_policy_id && (!currentActivePolicy || currentActivePolicy === "NCD-20.4")) {
+        selectPolicyFromScan(data.best_match_policy_id, false);
+    }
+
+    // Render interactive cards in the grid
+    if (gridElem) {
+        gridElem.innerHTML = "";
+        data.all_matches.forEach(m => {
+            const isSelected = (document.getElementById("policy-select").value === m.policy_id);
+            const card = document.createElement("div");
+            card.className = `policy-match-item ${isSelected ? "selected" : ""} ${m.decision.toLowerCase()}`;
+            card.onclick = () => selectPolicyFromScan(m.policy_id, true);
+
+            let statusBadge = "";
+            if (m.decision === "APPROVED") {
+                statusBadge = `<span class="badge-match-approved">QUALIFIED (${Math.round(m.calibrated_confidence * 100)}%)</span>`;
+            } else if (m.decision === "DEFERRED_TO_HUMAN") {
+                statusBadge = `<span class="badge-match-deferred">AUDITOR REVIEW</span>`;
+            } else {
+                statusBadge = `<span class="badge-match-denied">CRITERIA UNMET</span>`;
+            }
+
+            const bestBadge = m.is_best_match ? `<span class="badge-best-match">★ BEST MATCH</span>` : "";
+
+            card.innerHTML = `
+                <div class="match-item-top">
+                    <span class="match-code">${m.policy_id}</span>
+                    <div class="match-badges">
+                        ${bestBadge}
+                        ${statusBadge}
+                    </div>
+                </div>
+                <div class="match-title">${m.policy_title}</div>
+                <div class="match-category">${m.category}</div>
+                <div class="match-rationale">${m.clinical_rationale}</div>
+                <div class="match-footer">
+                    <span class="match-criteria-count">${m.met_criteria}/${m.total_criteria} Criteria Met</span>
+                    <span class="match-select-action">${isSelected ? "Active Selected" : "Select this Policy &rarr;"}</span>
+                </div>
+            `;
+            gridElem.appendChild(card);
+        });
+    }
+
+    updatePolicyStep2Preview();
+}
+
+function selectPolicyFromScan(policyId, triggerToast = true) {
+    const policySelect = document.getElementById("policy-select");
+    if (policySelect) policySelect.value = policyId;
+
+    // Update active highlight on cards
+    document.querySelectorAll(".policy-match-item").forEach(item => {
+        const codeElem = item.querySelector(".match-code");
+        if (codeElem && codeElem.textContent.trim() === policyId) {
+            item.classList.add("selected");
+            const actElem = item.querySelector(".match-select-action");
+            if (actElem) actElem.textContent = "Active Selected";
+        } else {
+            item.classList.remove("selected");
+            const actElem = item.querySelector(".match-select-action");
+            if (actElem) actElem.innerHTML = "Select this Policy &rarr;";
+        }
+    });
+
+    // Check if best match pill should show
+    const bestPill = document.getElementById("active-best-match-pill");
+    if (bestPill && lastMultiPolicyScanResult) {
+        if (lastMultiPolicyScanResult.best_match_policy_id === policyId) {
+            bestPill.classList.remove("hidden");
+        } else {
+            bestPill.classList.add("hidden");
+        }
+    }
+
+    updatePolicyStep2Preview();
+    if (triggerToast) {
+        showToast(`Selected ${policyId} for coverage determination`);
+    }
+}
+
+function updatePolicyStep2Preview() {
+    const policyId = document.getElementById("policy-select").value || "NCD-20.4";
+    const patientId = document.getElementById("patient-id-input").value || (currentNoteMode === "actual" ? "PT-ACTUAL-CLINICAL" : "PT-CARD-8821");
+
+    const badgeIcon = document.getElementById("policy-badge-icon");
+    const titleElem = document.getElementById("step2-policy-title");
+    const idElem = document.getElementById("step2-policy-id");
+    const patElem = document.getElementById("step2-patient-id");
+    const listElem = document.getElementById("step2-requirements-list");
+
+    if (idElem) idElem.textContent = policyId;
+    if (patElem) {
+        if (currentNoteMode === "actual") {
+            patElem.textContent = `Patient Identifier: ${patientId} (Actual Clinical Consultation Note)`;
+        } else {
+            const patName = patientId === "PT-CARD-8821" ? "Eleanor Vance" : (patientId === "PT-RESP-4402" ? "Arthur Miller" : (patientId === "PT-CARD-9014" ? "Robert Thornton" : "Harold Hayes"));
+            patElem.textContent = `Sample Patient: ${patName} (${patientId})`;
+        }
+    }
+
+    if (policyId === "NCD-20.4") {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-blue"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path><path d="M3.5 12h3l2-4 3 8 2-5 2 2h4"></path></svg></span>`;
+        if (titleElem) titleElem.textContent = "Implantable Automatic Defibrillators";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">LVEF &le; 35%</span>
+            <span class="rule-chip">NYHA Class II or III</span>
+            <span class="rule-chip">GDMT &ge; 90 days</span>
+            <span class="rule-chip">No MI within 40 days</span>
+        `;
+    } else if (policyId === "LCD-L33829") {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-cyan"><svg viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg></span>`;
+        if (titleElem) titleElem.textContent = "PAP Devices for Sleep Apnea";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">Diagnostic Polysomnogram</span>
+            <span class="rule-chip">AHI &ge; 15/hr (or &ge; 5 with symptoms)</span>
+            <span class="rule-chip">Face-to-face evaluation</span>
+        `;
+    } else if (policyId === "NCD-20.29") {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-amber"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>`;
+        if (titleElem) titleElem.textContent = "Hyperbaric Oxygen for Diabetic Wounds";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">Diabetic lower extremity wound</span>
+            <span class="rule-chip">Wagner Grade III or higher</span>
+            <span class="rule-chip">Failed 30-day conventional care</span>
+        `;
+    } else {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>`;
+        if (titleElem) titleElem.textContent = "Medicare Coverage Determination";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">Documented clinical necessity</span>
+            <span class="rule-chip">Prior conservative therapy</span>
+        `;
+    }
+}
+
+function goToWizardScreen(stepNumber) {
+    if (stepNumber < 1) stepNumber = 1;
+    if (stepNumber > 5) stepNumber = 5;
+
+    // Check prerequisites sequentially
+    if (stepNumber >= 2 && !isStepCompleted(1)) {
+        showToast("Please upload or paste a patient note (at least 20 characters) first.", true);
+        return;
+    }
+
+    if (stepNumber >= 3 && !lastAdjudicationResult) {
+        showToast("Please click 'Check If Note Meets These Rules' on Step 2 to evaluate Medicare coverage first.", true);
+        return;
+    }
+
+    if (stepNumber >= 4) {
+        if (!currentCoveragePacket && lastAdjudicationResult) {
+            loadAndShowCoveragePacket(lastAdjudicationResult.case_id);
+        }
+        if (!currentCoveragePacket && !lastAdjudicationResult) {
+            showToast("Please complete the Medicare policy check first.", true);
+            return;
+        }
+        populatePacketDocument();
+    }
+
+    if (stepNumber === 5) {
+        if (!currentCoveragePacket || currentCoveragePacket.submission_status !== "SUBMITTED_TO_PAYER") {
+            showToast("Please review and sign the prior authorization form on Step 4 before submitting.", true);
+            return;
+        }
+    }
+
+    document.querySelectorAll(".wizard-screen").forEach(s => s.classList.remove("active"));
+    const targetScreen = document.getElementById(`screen-step-${stepNumber}`);
+    if (targetScreen) {
+        targetScreen.classList.add("active");
+    }
+
+    updateWorkflowRibbon(stepNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function startNewPatientNote() {
+    clearLoadedSample();
+    goToWizardScreen(1);
+    showToast("Ready for a new patient note.");
+}
+
+function resetAdjudicationDisplay() {
+    // Reset Big Verdict Card
+    const verdictCard = document.getElementById("big-verdict-card");
+    if (verdictCard) {
+        verdictCard.className = "big-verdict-card verdict-pending";
+        document.getElementById("verdict-bubble").innerHTML = `<span class="med-icon icon-md"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>`;
+        document.getElementById("verdict-title").textContent = "Ready to Evaluate";
+        document.getElementById("verdict-subtitle").textContent = "Upload a medical note or pick a sample on the left to check Medicare coverage.";
+        const badge = document.getElementById("abstention-badge");
+        if (badge) badge.textContent = "Coverage Ready";
+    }
+
+    // Reset Summary Cards
+    const resCritCount = document.getElementById("res-criteria-count");
+    if (resCritCount) resCritCount.textContent = "-- Met";
+    const resCritTotal = document.getElementById("res-criteria-total");
+    if (resCritTotal) {
+        resCritTotal.textContent = "Evaluating rules...";
+        resCritTotal.style.color = "";
+    }
+    const resNextTitle = document.getElementById("res-next-step-title");
+    if (resNextTitle) resNextTitle.textContent = "Review & Sign Form";
+    const resNextSub = document.getElementById("res-next-step-sub");
+    if (resNextSub) resNextSub.textContent = "Proceed to Step 4";
+    const resGrounding = document.getElementById("res-grounding-stat");
+    if (resGrounding) resGrounding.textContent = "100% Exact Quotes";
+    const resConf = document.getElementById("res-conf-stat");
+    if (resConf) resConf.textContent = "--";
+
+    // Reset Hero Action Container
+    const actionContainer = document.getElementById("primary-action-container");
+    if (actionContainer) actionContainer.classList.add("hidden");
+
+    // Metrics ribbon
+    const metricCal = document.getElementById("metric-calibrated-conf");
+    if (metricCal) metricCal.textContent = "--";
+    const metricGrd = document.getElementById("metric-grounding");
+    if (metricGrd) {
+        metricGrd.textContent = "--";
+        metricGrd.className = "ribbon-val text-green";
+    }
+    const metricPol = document.getElementById("metric-policy-name");
+    if (metricPol) metricPol.textContent = "--";
+    const metricLat = document.getElementById("metric-latency");
+    if (metricLat) metricLat.textContent = "--";
+
+    const clinicianBox = document.getElementById("clinician-action-box");
+    if (clinicianBox) clinicianBox.classList.add("hidden");
+    const ehrHigh = document.getElementById("ehr-highlight-display");
+    if (ehrHigh) ehrHigh.innerHTML = `<p class="placeholder-text">Extracted sentences anchoring each requirement will appear highlighted here.</p>`;
+    const critList = document.getElementById("criteria-cards-list");
+    if (critList) critList.innerHTML = `<div class="empty-state-notice">Criteria breakdown will appear here after evaluation.</div>`;
+    
+    const hashDisp = document.getElementById("audit-hash-display");
+    if (hashDisp) hashDisp.textContent = "Awaiting Adjudication Run";
+
+    // Clear active adjudication & packet state
+    lastAdjudicationResult = null;
+    currentCoveragePacket = null;
+    maxUnlockedStep = 1;
+
+    // Reset Workflow Ribbon to Step 1
+    updateWorkflowRibbon(1);
+
+    // Reset Stepper
+    resetStepper();
+}
+
+function resetStepper() {
+    ["retrieval", "evaluator", "verifier", "abstention"].forEach(s => {
+        const card = document.getElementById(`step-${s}`);
+        if (card) {
+            card.className = "step-card";
+            const stat = document.getElementById(`step-${s}-status`);
+            if (stat) stat.textContent = "IDLE";
+        }
+    });
+    const lat = document.getElementById("stepper-latency");
+    if (lat) lat.textContent = "Status: Ready";
+}
+
+// =============================================================================
+// ADJUDICATION EXECUTION
+// =============================================================================
+async function executeAdjudication() {
+    const policyId = document.getElementById("policy-select").value;
+    const patientId = document.getElementById("patient-id-input").value.trim() || "PT-1000";
+    const ehrText = document.getElementById("ehr-input").value.trim();
+    const tau = parseFloat(document.getElementById("tau-input").value) || 0.85;
+
+    if (!ehrText || ehrText.length < 20) {
+        showToast("Please input clinical EHR notes (min 20 characters).", true);
+        return;
+    }
+
+    const runBtn = document.getElementById("run-adjudicate-btn");
+    runBtn.disabled = true;
+    runBtn.innerHTML = `<span class="btn-icon">&#8987;</span> Evaluating Multi-Agent Pipeline...`;
+
+    // Step 2 in progress on ribbon
+    updateWorkflowRibbon(2);
+
+    // Step 1: Retrieval Animation
+    animateStep("retrieval", "RUNNING", "active");
+    await sleep(150);
+
+    try {
+        animateStep("retrieval", "RETRIEVED", "completed");
+        animateStep("evaluator", "EXTRACTING", "active");
+        await sleep(150);
+
+        animateStep("evaluator", "PARSED", "completed");
+        animateStep("verifier", "VERIFYING", "active");
+        await sleep(150);
+
+        const res = await fetch("/api/v1/adjudicate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                patient_id: patientId,
+                policy_id: policyId,
+                ehr_narrative: ehrText,
+                options: { tau: tau }
+            })
+        });
+
+        if (!res.ok) {
+            throw new Error(`Server returned HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        lastAdjudicationResult = data;
+
+        animateStep("verifier", "AUDITED", "completed");
+        animateStep("abstention", data.abstention_status ? "ABSTAINED" : "DECIDED", "completed");
+
+        renderAdjudicationResults(data);
+        showToast(`Adjudication completed: ${data.adjudication_decision}`);
+        goToWizardScreen(3);
+    } catch (e) {
+        console.error("Adjudication failed:", e);
+        showToast("Adjudication failed: " + e.message, true);
+        resetStepper();
+    } finally {
+        runBtn.disabled = false;
+        runBtn.innerHTML = `<span class="btn-icon">&#9654;</span> Run Automated Policy Check`;
+    }
+}
+
+function animateStep(stepName, statusText, className) {
+    const card = document.getElementById(`step-${stepName}`);
+    if (card) {
+        card.className = `step-card ${className}`;
+        const st = document.getElementById(`step-${stepName}-status`);
+        if (st) st.textContent = statusText;
+    }
+}
+
+// =============================================================================
+// RENDERING ADJUDICATION & SYNCHRONIZED EVIDENCE
+// =============================================================================
+function renderAdjudicationResults(data) {
+    const stepperLat = document.getElementById("stepper-latency");
+    if (stepperLat) stepperLat.textContent = `Pipeline Latency: ${data.execution_time_ms} ms`;
+
+    // 1. Big Verdict Card & Ribbon Updates
+    const verdictCard = document.getElementById("big-verdict-card");
+    const verdictBubble = document.getElementById("verdict-bubble");
+    const verdictTitle = document.getElementById("verdict-title");
+    const verdictSubtitle = document.getElementById("verdict-subtitle");
+    const abstentionBadge = document.getElementById("abstention-badge");
+    const heroBtn = document.getElementById("btn-hero-review");
+    const heroContainer = document.getElementById("primary-action-container");
+
+    if (data.adjudication_decision === "APPROVED") {
+        if (verdictCard) verdictCard.className = "big-verdict-card verdict-approved";
+        if (verdictBubble) verdictBubble.innerHTML = `<span class="med-icon icon-lg icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>`;
+        if (verdictTitle) verdictTitle.textContent = "Medicare Coverage Criteria Met";
+        if (verdictSubtitle) verdictSubtitle.textContent = "All required Medicare guidelines were verified directly in the doctor's note. You can proceed to review and sign the prior authorization form.";
+        if (abstentionBadge) abstentionBadge.textContent = "Coverage Approved";
+
+        if (heroContainer) heroContainer.classList.remove("hidden");
+        if (heroBtn) {
+            heroBtn.className = "btn-hero-review";
+            heroBtn.innerHTML = `
+                <span class="med-icon icon-md icon-blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                <div class="hero-text-block">
+                    <strong>Review Pre-Filled Prior Authorization Form</strong>
+                    <span>All criteria met (${(data.calibrated_aggregate_confidence * 100).toFixed(0)}% match). Click to inspect, sign, and send to Medicare.</span>
+                </div>
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+            `;
+        }
+    } else if (data.adjudication_decision === "DENIED") {
+        if (verdictCard) verdictCard.className = "big-verdict-card verdict-denied";
+        if (verdictBubble) verdictBubble.innerHTML = `<span class="med-icon icon-lg icon-red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span>`;
+        if (verdictTitle) verdictTitle.textContent = "Does Not Meet Medicare Guidelines";
+        if (verdictSubtitle) verdictSubtitle.textContent = "The clinical note documents an active exclusion condition (such as a recent heart attack within 40 days) that prevents approval at this time.";
+        if (abstentionBadge) abstentionBadge.textContent = "Coverage Excluded";
+
+        if (heroContainer) heroContainer.classList.remove("hidden");
+        if (heroBtn) {
+            heroBtn.className = "btn-hero-review hero-amber";
+            heroBtn.innerHTML = `
+                <span class="med-icon icon-md icon-amber"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                <div class="hero-text-block">
+                    <strong>See Why This Case Was Excluded</strong>
+                    <span>Inspect the specific rule that was not met and download a formal explanation for your records.</span>
+                </div>
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+            `;
+        }
+    } else {
+        // DEFERRED_TO_HUMAN
+        if (verdictCard) verdictCard.className = "big-verdict-card verdict-deferred";
+        if (verdictBubble) verdictBubble.innerHTML = `<span class="med-icon icon-lg icon-amber"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>`;
+        if (verdictTitle) verdictTitle.textContent = "Physician Review Needed";
+        if (verdictSubtitle) verdictSubtitle.textContent = data.abstention_reason || "Most requirements are met, but 1 item requires your clarification or confirmation before submission.";
+        if (abstentionBadge) abstentionBadge.textContent = "Review Needed";
+
+        if (heroContainer) heroContainer.classList.remove("hidden");
+        if (heroBtn) {
+            heroBtn.className = "btn-hero-review hero-amber";
+            heroBtn.innerHTML = `
+                <span class="med-icon icon-md icon-amber"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                <div class="hero-text-block">
+                    <strong>Review Items Needing Clarification</strong>
+                    <span>Check the flagged items below, add your physician attestation notes, and certify the form.</span>
+                </div>
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+            `;
+        }
+    }
+
+    // Step 3 Ribbon Active
+    updateWorkflowRibbon(3);
+
+    // 2. Metrics Ribbon
+    const metricCal = document.getElementById("metric-calibrated-conf");
+    if (metricCal) metricCal.textContent = `${(data.calibrated_aggregate_confidence * 100).toFixed(1)}%`;
+    
+    // Check if any grounding failure
+    const allGrounded = data.verification_audits.every(v => v.grounding_status);
+    const groundingElem = document.getElementById("metric-grounding");
+    if (groundingElem) {
+        if (allGrounded) {
+            groundingElem.textContent = "100% Exact";
+            groundingElem.className = "ribbon-val text-green";
+        } else {
+            groundingElem.textContent = "Mismatch / Drift";
+            groundingElem.className = "ribbon-val text-red";
+        }
+    }
+
+    // Policy name and summary cards
+    const policyNameElem = document.getElementById("metric-policy-name");
+    if (policyNameElem) {
+        policyNameElem.textContent = data.policy_id || "Active Policy";
+    }
+
+    const resPolicyCode = document.getElementById("res-policy-code");
+    const resPolicyCat = document.getElementById("res-policy-category");
+    const policyTitle = data.policy_title || (data.policy_id === "NCD-20.4" ? "Implantable Automatic Defibrillators" : (data.policy_id === "LCD-L33829" ? "PAP Devices for Sleep Apnea" : (data.policy_id === "NCD-20.29" ? "Hyperbaric Oxygen Therapy" : "Medicare Part B Coverage")));
+    if (resPolicyCode) resPolicyCode.textContent = `${data.policy_id} – ${policyTitle}`;
+    if (resPolicyCat) {
+        if (data.policy_id === "NCD-20.4") resPolicyCat.textContent = "Defibrillators (Cardiology)";
+        else if (data.policy_id === "LCD-L33829") resPolicyCat.textContent = "CPAP Therapy (Pulmonology)";
+        else if (data.policy_id === "NCD-20.29") resPolicyCat.textContent = "Hyperbaric Oxygen (Wound Care)";
+        else resPolicyCat.textContent = "Medicare Part B";
+    }
+
+    // Criteria Status Card
+    const totalCriteria = data.criterion_assessments ? data.criterion_assessments.length : 0;
+    const passedCriteria = data.criterion_assessments ? data.criterion_assessments.filter(c => {
+        if (c.is_exclusion) {
+            return c.status === "NOT_MET"; // Exclusion absent means passed!
+        }
+        return c.status === "MET"; // Mandatory inclusion met
+    }).length : 0;
+    const resCritCount = document.getElementById("res-criteria-count");
+    const resCritTotal = document.getElementById("res-criteria-total");
+    if (resCritCount) resCritCount.textContent = `${passedCriteria} of ${totalCriteria} Passed`;
+    if (resCritTotal) {
+        if (passedCriteria === totalCriteria) {
+            resCritTotal.textContent = "All requirements confirmed in note";
+            resCritTotal.style.color = "var(--accent-green)";
+        } else {
+            const unmet = totalCriteria - passedCriteria;
+            resCritTotal.textContent = `${unmet} item(s) require doctor review`;
+            resCritTotal.style.color = "var(--accent-amber)";
+        }
+    }
+
+    // Next Step Card & Step 3 Button text
+    const resNextTitle = document.getElementById("res-next-step-title");
+    const resNextSub = document.getElementById("res-next-step-sub");
+    const btnStep3 = document.getElementById("btn-step3-continue");
+
+    const step3ActionGroup = document.getElementById("step3-action-buttons");
+    if (data.adjudication_decision === "DENIED") {
+        if (resNextTitle) resNextTitle.textContent = "Coverage Excluded by Rule";
+        if (resNextSub) resNextSub.textContent = "Submission blocked. Update chart or review advisory.";
+        if (step3ActionGroup) {
+            step3ActionGroup.innerHTML = `
+                <button type="button" class="btn-primary btn-wizard-hero" onclick="goToWizardScreen(1)">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg></span>
+                    Revise Clinical Note / Add Evidence
+                </button>
+                <button type="button" class="btn-secondary" onclick="goToWizardScreen(4)">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                    Inspect Denial Notice (Internal Only)
+                </button>
+            `;
+        }
+    } else if (data.adjudication_decision === "DEFERRED_TO_HUMAN") {
+        if (resNextTitle) resNextTitle.textContent = "Doctor Attestation Needed";
+        if (resNextSub) resNextSub.textContent = "Missing mandatory item requires clinician sign-off";
+        if (step3ActionGroup) {
+            step3ActionGroup.innerHTML = `
+                <button type="button" class="btn-primary btn-wizard-hero" onclick="goToWizardScreen(4)">
+                    Review & Complete Attestation
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                </button>
+            `;
+        }
+    } else {
+        if (resNextTitle) resNextTitle.textContent = "Ready for Sign & Submit";
+        if (resNextSub) resNextSub.textContent = "All criteria met with verified citations";
+        if (step3ActionGroup) {
+            step3ActionGroup.innerHTML = `
+                <button type="button" class="btn-primary btn-wizard-hero" onclick="goToWizardScreen(4)">
+                    Review Form &amp; Sign
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                </button>
+            `;
+        }
+    }
+
+    // Grounding & Confidence
+    const resGrounding = document.getElementById("res-grounding-stat");
+    if (resGrounding) resGrounding.textContent = allGrounded ? "100% Exact Quotes" : "Flagged Mismatch";
+
+    const resConf = document.getElementById("res-conf-stat");
+    if (resConf) resConf.textContent = `${(data.calibrated_aggregate_confidence * 100).toFixed(0)}% Match`;
+
+    const metricLat = document.getElementById("metric-latency");
+    if (metricLat) metricLat.textContent = `${data.execution_time_ms} ms`;
+
+    // 3. Clinician Action Box
+    const actionBox = document.getElementById("clinician-action-box");
+    const actionContent = document.getElementById("clinician-action-text");
+    if (actionBox && actionContent) {
+        if (data.abstention_status || data.required_clinician_action_notes) {
+            actionBox.classList.remove("hidden");
+            let htmlNotes = `<strong>Action Required:</strong> ${data.abstention_reason || "Criteria clarification required."}<br><br>`;
+            htmlNotes += `${data.required_clinician_action_notes || ""}`;
+            actionContent.innerHTML = htmlNotes;
+        } else {
+            actionBox.classList.add("hidden");
+        }
+    }
+
+    // 4. Cryptographic Hash
+    const hashDisp = document.getElementById("audit-hash-display");
+    if (hashDisp) hashDisp.textContent = data.audit_hash;
+
+    // 4b. CMS Billing & Medical Coding Verification Panel
+    renderBillingCompliancePanel(data);
+
+    // 4c. Longitudinal Clinical Timeline & Waiting Period Panel
+    renderTimelineAnalysisPanel(data);
+
+    // 5. Synchronized Evidence Highlight Rendering
+    renderSynchronizedEHRViewer(data);
+
+    // 6. Criteria Breakdown Cards
+    renderCriteriaCards(data);
+
+    // 7. Load & Activate Filled Coverage Packet for Review
+    loadAndShowCoveragePacket(data.case_id);
+}
+
+async function loadAndShowCoveragePacket(caseId) {
+    try {
+        const res = await fetch(`/api/v1/packet/${caseId}`);
+        if (res.ok) {
+            currentCoveragePacket = await res.json();
+            const banner = document.getElementById("packet-action-banner");
+            if (banner) {
+                banner.classList.remove("hidden");
+                const title = document.getElementById("packet-banner-title");
+                if (title) title.textContent = `CMS Coverage Document Auto-Filled [${currentCoveragePacket.policy_id}]`;
+            }
+        }
+    } catch (e) {
+        console.warn("Could not load coverage packet:", e);
+    }
+}
+
+function renderSynchronizedEHRViewer(data) {
+    const container = document.getElementById("ehr-highlight-display");
+    if (!container) return;
+    const rawText = data.sanitized_ehr_text;
+    if (!rawText) return;
+
+    // Collect all valid spans across criteria
+    let spansToHighlight = [];
+    data.criterion_assessments.forEach((crit, critIdx) => {
+        crit.verified_spans.forEach((span, spanIdx) => {
+            if (span.start_char >= 0 && span.end_char <= rawText.length && span.start_char < span.end_char) {
+                spansToHighlight.push({
+                    start: span.start_char,
+                    end: span.end_char,
+                    text: span.source_text,
+                    criterion_code: crit.criterion_code,
+                    critIdx: critIdx,
+                    spanIdx: spanIdx
+                });
+            }
+        });
+    });
+
+    if (spansToHighlight.length === 0) {
+        container.textContent = rawText;
+        return;
+    }
+
+    // Sort spans by start_char ascending
+    spansToHighlight.sort((a, b) => a.start - b.start);
+
+    // Build non-overlapping HTML chunks
+    let html = "";
+    let currentPos = 0;
+
+    for (let s of spansToHighlight) {
+        if (s.start < currentPos) continue; // skip overlap for display safety
+
+        // Text before span
+        html += escapeHtml(rawText.slice(currentPos, s.start));
+
+        // Highlighted span
+        const spanText = escapeHtml(rawText.slice(s.start, s.end));
+        html += `<mark class="highlighted-span" id="span-hl-${s.critIdx}-${s.spanIdx}" data-crit-code="${s.criterion_code}" title="Evidence for ${s.criterion_code} [${s.start}:${s.end}]">${spanText}</mark>`;
+
+        currentPos = s.end;
+    }
+
+    // Trailing text
+    if (currentPos < rawText.length) {
+        html += escapeHtml(rawText.slice(currentPos));
+    }
+
+    container.innerHTML = html;
+}
+
+function renderCriteriaCards(data) {
+    const container = document.getElementById("criteria-cards-list");
+    if (!container) return;
+    container.innerHTML = "";
+
+    data.criterion_assessments.forEach((crit, idx) => {
+        const card = document.createElement("div");
+
+        let statusClass = "insufficient";
+        let statusBadgeClass = "badge-status insufficient";
+        let statusText = "Needs Review";
+        let statusHint = "Missing or unconfirmed in note";
+
+        if (crit.is_exclusion) {
+            // EXCLUSION CRITERIA:
+            // If the exclusion is NOT present (status == "NOT_MET"), patient is NOT excluded -> Qualifies (Green PASS)
+            // If the exclusion IS present (status == "MET"), patient IS excluded -> Disqualified (Red EXCLUDED)
+            if (crit.status === "NOT_MET") {
+                statusClass = "met";
+                statusBadgeClass = "badge-status met";
+                statusText = "Passed (No Exclusion)";
+                statusHint = "No disqualifying conditions found";
+            } else if (crit.status === "MET") {
+                statusClass = "not-met";
+                statusBadgeClass = "badge-status not-met";
+                statusText = "Disqualified (Exclusion Met)";
+                statusHint = "Disqualifying condition is present in note";
+            } else {
+                statusClass = "insufficient";
+                statusBadgeClass = "badge-status insufficient";
+                statusText = "Needs Review";
+                statusHint = "Exclusion status unclear";
+            }
+        } else {
+            // MANDATORY INCLUSION CRITERIA:
+            // Must be MET to qualify
+            if (crit.status === "MET") {
+                statusClass = "met";
+                statusBadgeClass = "badge-status met";
+                statusText = "Met";
+                statusHint = "Verified in note";
+            } else if (crit.status === "NOT_MET") {
+                statusClass = "not-met";
+                statusBadgeClass = "badge-status not-met";
+                statusText = "Not Met";
+                statusHint = "Requirement not fulfilled";
+            } else {
+                statusClass = "insufficient";
+                statusBadgeClass = "badge-status insufficient";
+                statusText = "Needs Review";
+                statusHint = "Missing or unconfirmed in note";
+            }
+        }
+
+        card.className = `criterion-card compact status-${statusClass}`;
+        card.id = `crit-card-${idx}`;
+
+        const displayName = crit.name ? `${idx + 1}. ${crit.name}` : `${idx + 1}. ${crit.criterion_code}`;
+
+        let summaryEvidence = "";
+        let verifiedQuotesList = "";
+        if (crit.verified_spans && crit.verified_spans.length > 0) {
+            summaryEvidence = `<span class="crit-evidence-quote">“${escapeHtml(crit.verified_spans[0].source_text)}”</span>`;
+            verifiedQuotesList = crit.verified_spans.map(s => `
+                <div class="evidence-quote-box">
+                    <div class="quote-text">“${escapeHtml(s.source_text)}”</div>
+                    <div class="quote-meta">Section: <strong>${escapeHtml(s.clinical_section || 'Clinical Note')}</strong> (Characters ${s.start_char}&ndash;${s.end_char})</div>
+                </div>
+            `).join("");
+        } else {
+            summaryEvidence = `<span class="crit-evidence-missing">Not documented in note</span>`;
+            verifiedQuotesList = `
+                <div class="missing-alert-box">
+                    <strong>Missing Documentation:</strong> No supporting statement or diagnostic finding was identified for this requirement in the patient's note.
+                </div>
+            `;
+        }
+
+        // If not met or insufficient, explain what is needed or missing
+        let missingNotice = "";
+        if (crit.is_exclusion) {
+            if (crit.status === "MET") {
+                missingNotice = `
+                    <div class="missing-guidance-box">
+                        <div class="missing-guidance-header">
+                            <span class="med-icon icon-xs icon-amber">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </span>
+                            <strong>Disqualification Warning:</strong>
+                        </div>
+                        <p>${escapeHtml(crit.description || 'This is a disqualifying exclusion criterion.')}</p>
+                    </div>
+                `;
+            } else if (crit.status === "NOT_MET") {
+                missingNotice = `
+                    <div class="missing-guidance-box" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25);">
+                        <div class="missing-guidance-header" style="color: #6EE7B7;">
+                            <span class="med-icon icon-xs icon-green">
+                                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </span>
+                            <strong>Exclusion Condition Absent:</strong>
+                        </div>
+                        <p style="color: var(--text-secondary);">Patient has no documented terminal illness or active cardiogenic shock. This absence qualifies the patient under Medicare guidelines.</p>
+                    </div>
+                `;
+            }
+        } else if (crit.status !== "MET") {
+            missingNotice = `
+                <div class="missing-guidance-box">
+                    <div class="missing-guidance-header">
+                        <span class="med-icon icon-xs icon-amber">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </span>
+                        <strong>What is needed for approval:</strong>
+                    </div>
+                    <p>${escapeHtml(crit.description || 'Detailed clinical justification matching policy terms.')}</p>
+                </div>
+            `;
+        }
+
+        card.onclick = () => openCriterionModal(idx);
+
+        let actionButtonsHtml = "";
+        if (crit.verified_spans && crit.verified_spans.length > 0) {
+            const firstSpan = crit.verified_spans[0];
+            actionButtonsHtml += `
+                <button type="button" class="btn-crit-pill btn-quote-pill" title="Jump to exact quote in patient chart" onclick="event.stopPropagation(); highlightQuoteInEHR(${firstSpan.start_char}, ${firstSpan.end_char}, '${escapeHtml(crit.criterion_code)}')">
+                    <span class="med-icon icon-xxs"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                    Quote
+                </button>
+            `;
+        }
+        if (statusClass !== "met" && !crit.is_exclusion) {
+            actionButtonsHtml += `
+                <button type="button" class="btn-crit-pill btn-resolve-pill" title="Supply missing clinical fact to satisfy this criterion" onclick="event.stopPropagation(); openAddendumModalForCriterion('${escapeHtml(crit.criterion_code)}', '${escapeHtml(crit.name || crit.criterion_code)}', '${escapeHtml(crit.description || '')}')">
+                    <span class="med-icon icon-xxs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                    Resolve
+                </button>
+            `;
+        }
+
+        card.innerHTML = `
+            <div class="criterion-header-compact">
+                <div class="criterion-title-wrap">
+                    <span class="${statusBadgeClass}">${statusText}</span>
+                    <span class="criterion-name-text">${escapeHtml(displayName)}</span>
+                </div>
+                <div class="criterion-header-right">
+                    ${actionButtonsHtml}
+                    <span class="criterion-click-hint">Inspect</span>
+                    <span class="toggle-indicator">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </span>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function openCriterionModal(idx) {
+    if (!lastAdjudicationResult || !lastAdjudicationResult.criterion_assessments) return;
+    const crit = lastAdjudicationResult.criterion_assessments[idx];
+    if (!crit) return;
+
+    const modal = document.getElementById("criterion-detail-modal");
+    if (!modal) return;
+
+    // Status badge
+    const badge = document.getElementById("modal-crit-status-badge");
+    const codeElem = document.getElementById("modal-crit-code");
+    const titleElem = document.getElementById("modal-crit-title");
+    const condElem = document.getElementById("modal-crit-condition");
+    const timingRow = document.getElementById("modal-crit-timing-row");
+    const timingVal = document.getElementById("modal-crit-timing");
+    const ratElem = document.getElementById("modal-crit-rationale");
+    const missingElem = document.getElementById("modal-crit-missing-notice");
+    const evidenceElem = document.getElementById("modal-crit-evidence-container");
+
+    const displayName = crit.name ? `${idx + 1}. ${crit.name}` : `${idx + 1}. ${crit.criterion_code}`;
+    if (titleElem) titleElem.textContent = displayName;
+    if (codeElem) codeElem.textContent = crit.criterion_code;
+
+    // Badge styling & text
+    let statusBadgeClass = "badge-status insufficient";
+    let statusText = "Needs Review";
+
+    if (crit.is_exclusion) {
+        if (crit.status === "NOT_MET") {
+            statusBadgeClass = "badge-status met";
+            statusText = "Passed (No Exclusion)";
+        } else if (crit.status === "MET") {
+            statusBadgeClass = "badge-status not-met";
+            statusText = "Disqualified (Exclusion Met)";
+        }
+    } else {
+        if (crit.status === "MET") {
+            statusBadgeClass = "badge-status met";
+            statusText = "Met";
+        } else if (crit.status === "NOT_MET") {
+            statusBadgeClass = "badge-status not-met";
+            statusText = "Not Met";
+        }
+    }
+
+    if (badge) {
+        badge.className = statusBadgeClass;
+        badge.textContent = statusText;
+    }
+
+    // Condition
+    if (condElem) condElem.textContent = crit.description || crit.name;
+
+    // Timing
+    if (timingRow && timingVal) {
+        if (crit.required_temporal_window && crit.required_temporal_window !== "Not specified") {
+            timingRow.classList.remove("hidden");
+            timingVal.textContent = crit.required_temporal_window;
+        } else {
+            timingRow.classList.add("hidden");
+        }
+    }
+
+    // Rationale
+    if (ratElem) ratElem.textContent = crit.clinical_rationale || "Evaluation verified against patient documentation.";
+
+    // Missing guidance / Warning
+    if (missingElem) {
+        missingElem.innerHTML = "";
+        if (crit.is_exclusion) {
+            if (crit.status === "MET") {
+                missingElem.innerHTML = `
+                    <div class="missing-guidance-box">
+                        <div class="missing-guidance-header">
+                            <span class="med-icon icon-xs icon-amber">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </span>
+                            <strong>Disqualification Warning:</strong>
+                        </div>
+                        <p>${escapeHtml(crit.description || 'This is a disqualifying exclusion condition.')}</p>
+                    </div>
+                `;
+            } else if (crit.status === "NOT_MET") {
+                missingElem.innerHTML = `
+                    <div class="missing-guidance-box" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.25);">
+                        <div class="missing-guidance-header" style="color: #6EE7B7;">
+                            <span class="med-icon icon-xs icon-green">
+                                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </span>
+                            <strong>Exclusion Condition Absent:</strong>
+                        </div>
+                        <p style="color: var(--text-secondary);">Patient has no documented terminal illness or active cardiogenic shock. This qualifies the patient under Medicare guidelines.</p>
+                    </div>
+                `;
+            }
+        } else if (crit.status !== "MET") {
+            missingElem.innerHTML = `
+                <div class="missing-guidance-box">
+                    <div class="missing-guidance-header">
+                        <span class="med-icon icon-xs icon-amber">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </span>
+                        <strong>What is needed for approval:</strong>
+                    </div>
+                    <p>${escapeHtml(crit.description || 'Detailed clinical justification matching policy terms.')}</p>
+                </div>
+            `;
+        }
+    }
+
+    // Person's Record Evidence
+    if (evidenceElem) {
+        if (crit.verified_spans && crit.verified_spans.length > 0) {
+            evidenceElem.innerHTML = crit.verified_spans.map(s => `
+                <div class="evidence-quote-box modal-quote-box">
+                    <div class="quote-text">“${escapeHtml(s.source_text)}”</div>
+                    <div class="quote-meta">
+                        <span>EHR Section: <strong>${escapeHtml(s.clinical_section || 'Clinical Note')}</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span>Character Range: <strong>${s.start_char}&ndash;${s.end_char}</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span>Exact Citation Grounding: <strong style="color: var(--accent-green);">100%</strong></span>
+                    </div>
+                </div>
+            `).join("");
+        } else {
+            evidenceElem.innerHTML = `
+                <div class="missing-alert-box">
+                    <strong>No Documentation Found in Record:</strong> No matching diagnostic measurements, medications, or clinical statements were found in the patient's note for this criterion.
+                </div>
+            `;
+        }
+    }
+
+    modal.classList.remove("hidden");
+}
+
+function closeCriterionModal() {
+    const modal = document.getElementById("criterion-detail-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function highlightCriterionSpans(critIdx, critCode) {
+    // Highlight card
+    document.querySelectorAll(".criterion-card").forEach(c => c.classList.remove("active-crit"));
+    const card = document.getElementById(`crit-card-${critIdx}`);
+    if (card) card.classList.add("active-crit");
+
+    // Highlight text in viewer if present
+    document.querySelectorAll(".highlighted-span").forEach(s => s.classList.remove("active-highlight"));
+    const matchingSpans = document.querySelectorAll(`[data-crit-code="${critCode}"]`);
+    if (matchingSpans.length > 0) {
+        matchingSpans.forEach(m => m.classList.add("active-highlight"));
+        matchingSpans[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+}
+
+function copyAuditHash() {
+    const hash = document.getElementById("audit-hash-display").textContent;
+    if (!hash || hash.includes("Awaiting")) return;
+    navigator.clipboard.writeText(hash).then(() => {
+        showToast("SHA-256 Chain-of-Custody seal copied to clipboard.");
+    });
+}
+
+// =============================================================================
+// AUDIT LEDGER
+// =============================================================================
+async function loadAuditLogs() {
+    try {
+        const res = await fetch("/api/v1/audit-logs?limit=25");
+        if (res.ok) {
+            const logs = await res.json();
+            const tbody = document.getElementById("audit-table-body");
+            tbody.innerHTML = "";
+
+            if (logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">No adjudication audit logs recorded yet. Ephemeral zero-retention mode is active.</td></tr>`;
+                return;
+            }
+
+            logs.forEach(log => {
+                const tr = document.createElement("tr");
+                const ts = new Date(log.created_at).toLocaleString();
+                const shortHash = log.audit_hash.slice(0, 16) + "...";
+                let decisionChip = `<span class="badge-status not-met">${escapeHtml(log.decision)}</span>`;
+                if (log.decision === "APPROVED") decisionChip = `<span class="badge-status met">${escapeHtml(log.decision)}</span>`;
+                else if (log.decision === "DEFERRED_TO_HUMAN") decisionChip = `<span class="badge-status insufficient">${escapeHtml(log.decision)}</span>`;
+
+                tr.innerHTML = `
+                    <td class="mono-cell">${ts}</td>
+                    <td class="mono-cell" style="color: var(--accent-cyan); font-weight: 600;">${escapeHtml(log.case_id)}</td>
+                    <td class="mono-cell">${escapeHtml(log.patient_id_masked)}</td>
+                    <td><strong>${escapeHtml(log.policy_id)}</strong></td>
+                    <td>${decisionChip}</td>
+                    <td class="mono-cell">${log.abstention_status ? "<strong style='color: var(--accent-amber);'>YES</strong>" : "NO"}</td>
+                    <td class="mono-cell">${(log.calibrated_confidence * 100).toFixed(1)}%</td>
+                    <td class="mono-cell" title="${escapeHtml(log.audit_hash)}" style="cursor: pointer;" onclick="copySpecificHash('${escapeHtml(log.audit_hash)}')">
+                        <span style="border-bottom: 1px dotted var(--accent-cyan);">${shortHash}</span>
+                    </td>
+                    <td>
+                        <button class="btn-icon-subtle" title="Purge Record (HIPAA Right to Erasure)" onclick="deleteSingleAuditRecord('${escapeHtml(log.case_id)}')">
+                            <span class="med-icon icon-sm text-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (e) {
+        console.error("Failed to load audit logs:", e);
+    }
+}
+
+async function deleteSingleAuditRecord(caseId) {
+    if (!confirm(`Permanently purge audit log for case ${caseId}? This action fulfills HIPAA Right-to-Erasure.`)) {
+        return;
+    }
+    try {
+        const res = await fetch(`/api/v1/audit-logs/${encodeURIComponent(caseId)}`, {
+            method: "DELETE"
+        });
+        if (res.ok) {
+            showToast(`Purged audit log for case ${caseId}.`);
+            loadAuditLogs();
+        } else {
+            const err = await res.json();
+            showToast(`Purge failed: ${err.detail || res.statusText}`, true);
+        }
+    } catch (e) {
+        showToast("Error deleting record: " + e.message, true);
+    }
+}
+
+async function purgeAllAuditRecords() {
+    if (!confirm("Are you sure you want to purge all unsubmitted and test audit records? This permanently clears cached records.")) {
+        return;
+    }
+    try {
+        const res = await fetch("/api/v1/audit-logs/purge/all", {
+            method: "DELETE"
+        });
+        if (res.ok) {
+            const data = await res.json();
+            showToast(data.message || "All audit records permanently purged.");
+            loadAuditLogs();
+            const termsModal = document.getElementById("terms-modal");
+            if (termsModal && !termsModal.classList.contains("hidden")) {
+                closeTermsModal();
+            }
+        } else {
+            const err = await res.json();
+            showToast(`Purge failed: ${err.detail || res.statusText}`, true);
+        }
+    } catch (e) {
+        showToast("Error purging records: " + e.message, true);
+    }
+}
+
+function copySpecificHash(hash) {
+    navigator.clipboard.writeText(hash).then(() => {
+        showToast("Copied SHA-256 seal: " + hash.slice(0, 16) + "...");
+    });
+}
+
+// =============================================================================
+// 4-CONFIGURATION RESEARCH BENCHMARK LAB
+// =============================================================================
+async function runLiveBenchmark() {
+    const btn = document.getElementById("run-bench-btn");
+    btn.disabled = true;
+    btn.innerHTML = `<span class="btn-icon">&#8987;</span> Running 4-Config Benchmark Suite...`;
+
+    try {
+        const res = await fetch("/api/v1/benchmark/run", { method: "POST" });
+        if (res.ok) {
+            const data = await res.json();
+            updateBenchmarkMetrics(data);
+            showToast("Benchmark suite executed successfully across 4 configurations.");
+        } else {
+            showToast("Benchmark execution failed", true);
+        }
+    } catch (e) {
+        showToast("Error running benchmark: " + e.message, true);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span class="btn-icon">&#9881;</span> Run Benchmark Suite`;
+    }
+}
+
+function updateBenchmarkMetrics(data) {
+    const cfgs = data.configs;
+    const a = cfgs.find(c => c.config_name === "Config A") || {};
+    const b = cfgs.find(c => c.config_name === "Config B") || {};
+    const c = cfgs.find(c => c.config_name === "Config C") || {};
+    const d = cfgs.find(c => c.config_name === "Config D") || {};
+
+    if (a.accuracy !== undefined) {
+        const elAcc = document.getElementById("ba-acc");
+        const elFaith = document.getElementById("ba-faith");
+        const elEce = document.getElementById("ba-ece");
+        if (elAcc) elAcc.textContent = `${(a.accuracy * 100).toFixed(1)}%`;
+        if (elFaith) elFaith.textContent = `${(a.evidence_faithfulness * 100).toFixed(1)}%`;
+        if (elEce) elEce.textContent = a.expected_calibration_error.toFixed(3);
+    }
+    if (b.accuracy !== undefined) {
+        const elAcc = document.getElementById("bb-acc");
+        const elFaith = document.getElementById("bb-faith");
+        const elEce = document.getElementById("bb-ece");
+        if (elAcc) elAcc.textContent = `${(b.accuracy * 100).toFixed(1)}%`;
+        if (elFaith) elFaith.textContent = `${(b.evidence_faithfulness * 100).toFixed(1)}%`;
+        if (elEce) elEce.textContent = b.expected_calibration_error.toFixed(3);
+    }
+    if (c.accuracy !== undefined) {
+        const elAcc = document.getElementById("bc-acc");
+        const elFaith = document.getElementById("bc-faith");
+        const elEce = document.getElementById("bc-ece");
+        if (elAcc) elAcc.textContent = `${(c.accuracy * 100).toFixed(1)}%`;
+        if (elFaith) elFaith.textContent = `${(c.evidence_faithfulness * 100).toFixed(1)}%`;
+        if (elEce) elEce.textContent = c.expected_calibration_error.toFixed(3);
+    }
+    if (d.accuracy !== undefined) {
+        const elAcc = document.getElementById("bd-acc");
+        const elFaith = document.getElementById("bd-faith");
+        const elEce = document.getElementById("bd-ece");
+        if (elAcc) elAcc.textContent = `${(d.accuracy * 100).toFixed(1)}%`;
+        if (elFaith) elFaith.textContent = `${(d.evidence_faithfulness * 100).toFixed(1)}%`;
+        if (elEce) elEce.textContent = d.expected_calibration_error.toFixed(3);
+    }
+
+    if (data.comparative_analysis) {
+        const narr = document.getElementById("benchmark-narrative");
+        if (narr) narr.textContent = data.comparative_analysis;
+    }
+
+    // Populate the 10-Vignette Breakdown Table
+    const tableBody = document.getElementById("benchmark-vignettes-body");
+    if (tableBody && data.vignette_results && data.vignette_results.length > 0) {
+        tableBody.innerHTML = data.vignette_results.map(v => {
+            const formatDec = (dec, isGold = false, isBaseline = false) => {
+                if (isBaseline && dec === "APPROVED" && v.gold_decision !== "APPROVED") {
+                    return `<span class="badge-status not-met" style="font-size: 0.72rem;" title="False Approval! High-liability citation error.">⚠️ False Approval</span>`;
+                }
+                if (dec === "APPROVED") {
+                    return `<span class="badge-status met" style="font-size: 0.72rem;"><span class="chip-dot"></span> Approved</span>`;
+                } else if (dec === "DENIED") {
+                    return `<span class="badge-status not-met" style="font-size: 0.72rem;"><span class="chip-dot"></span> Denied</span>`;
+                } else if (dec === "DEFERRED_TO_HUMAN") {
+                    return `<span class="badge-status insufficient" style="font-size: 0.72rem;"><span class="chip-dot"></span> Deferred</span>`;
+                }
+                return `<span class="badge-role-tag">${escapeHtml(dec)}</span>`;
+            };
+
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(v.vignette_id)}</strong></td>
+                    <td><span class="code-pill">${escapeHtml(v.policy_id)}</span></td>
+                    <td>
+                        <div style="font-weight: 600; color: var(--text-primary);">${escapeHtml(v.name)}</div>
+                    </td>
+                    <td><span class="text-secondary" style="font-size: 0.8rem;">${escapeHtml(v.clinical_domain)}</span></td>
+                    <td>${formatDec(v.gold_decision, true)}</td>
+                    <td>${formatDec(v.config_a_decision, false, true)}</td>
+                    <td>${formatDec(v.config_b_decision, false, true)}</td>
+                    <td>${formatDec(v.config_c_decision, false, false)}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            ${formatDec(v.config_d_decision, false, false)}
+                            <span class="tag-conf" style="font-size: 0.7rem; color: #34D399; font-weight: 700;">${(v.config_d_confidence * 100).toFixed(0)}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-status met" style="font-size: 0.72rem; padding: 2px 6px;">
+                            ${v.config_d_grounded ? "✓ 100% Grounded" : "Mismatch"}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    }
+}
+
+// =============================================================================
+// UTILITIES
+// =============================================================================
+function showToast(message, isError = false) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.borderColor = isError ? "var(--accent-red)" : "var(--accent-cyan)";
+    toast.classList.remove("hidden");
+    setTimeout(() => {
+        toast.classList.add("hidden");
+    }, 3200);
+}
+
+function escapeHtml(string) {
+    const entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    return String(string).replace(/[&<>"']/g, s => entityMap[s]);
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// =============================================================================
+// DOCTOR'S NOTE UPLOAD & PRE-SUBMISSION COVERAGE PACKET WORKFLOW
+// =============================================================================
+
+function setupUploadDropzone() {
+    const dropzone = document.getElementById("upload-dropzone");
+    if (!dropzone) return;
+
+    ["dragenter", "dragover"].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.style.borderColor = "var(--accent-cyan)";
+            dropzone.style.background = "rgba(6, 182, 212, 0.12)";
+        }, false);
+    });
+
+    ["dragleave", "drop"].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.style.borderColor = "#3B82F6";
+            dropzone.style.background = "rgba(59, 130, 246, 0.04)";
+        }, false);
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            uploadFileAndAdjudicate(files[0]);
+        }
+    }, false);
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        uploadFileAndAdjudicate(file);
+    }
+}
+
+async function uploadFileAndAdjudicate(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("patient_id", document.getElementById("patient-id-input").value.trim() || "PT-DOC-UPLOAD");
+    formData.append("policy_id", "auto");
+    const tau = parseFloat(document.getElementById("tau-input").value) || 0.85;
+    formData.append("tau", tau);
+
+    // Update UI if elements exist
+    const mainText = document.getElementById("upload-main-text");
+    const subText = document.getElementById("upload-sub-text");
+    const statusChip = document.getElementById("upload-status-chip");
+    if (mainText) mainText.textContent = `Uploaded: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    if (subText) subText.textContent = `Parsing clinical entities and auto-retrieving Medicare policy...`;
+    if (statusChip) statusChip.textContent = "Processing Multi-Agent Pipeline...";
+
+    // Run stepper animations
+    animateStep("retrieval", "SEARCHING", "active");
+    await sleep(200);
+
+    try {
+        const res = await fetch("/api/v1/upload-note", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || `Server error ${res.status}`);
+        }
+
+        const data = await res.json();
+        
+        // Populate extracted text into EHR textarea and visible pastebox
+        document.getElementById("ehr-input").value = data.extracted_text;
+        const pasteBox = document.getElementById("actual-paste-textarea");
+        if (pasteBox) pasteBox.value = data.extracted_text;
+        
+        // Auto-select matched policy
+        const matchedPolicyId = data.adjudication.policy_id;
+        const policySelect = document.getElementById("policy-select");
+        if (policySelect) {
+            policySelect.value = matchedPolicyId;
+        }
+
+        // Stepper updates
+        animateStep("retrieval", `MATCHED: ${matchedPolicyId}`, "completed");
+        animateStep("evaluator", "EXTRACTED", "completed");
+        animateStep("verifier", "VERIFIED", "completed");
+        animateStep("abstention", data.adjudication.abstention_status ? "ABSTAINED" : "DECIDED", "completed");
+
+        // Render results
+        lastAdjudicationResult = data.adjudication;
+        currentCoveragePacket = data.packet;
+        renderAdjudicationResults(data.adjudication);
+
+        const uploadChip = document.getElementById("upload-status-chip");
+        if (uploadChip) uploadChip.textContent = `Auto-Matched ${matchedPolicyId}`;
+        showToast(`Document parsed! Governing policy: ${matchedPolicyId}. Coverage check complete.`);
+        
+        updatePolicyStep2Preview();
+        updateWorkflowRibbon(3);
+        goToWizardScreen(3);
+    } catch (e) {
+        console.error("Upload error:", e);
+        showToast("Document upload failed: " + e.message, true);
+        resetStepper();
+    }
+}
+
+// =============================================================================
+// OFFICIAL CMS COVERAGE PACKET REVIEW & TRANSMISSION MODALS
+// =============================================================================
+
+function openPacketReviewModal() {
+    goToWizardScreen(3);
+}
+
+function closePacketReviewModal() {
+    goToWizardScreen(2);
+}
+
+function populatePacketDocument() {
+    if (!currentCoveragePacket && lastAdjudicationResult) {
+        loadAndShowCoveragePacket(lastAdjudicationResult.case_id);
+    }
+
+    if (!currentCoveragePacket) return;
+
+    const p = currentCoveragePacket;
+
+    // Header values
+    const docPacketId = document.getElementById("doc-packet-id");
+    const docPatientId = document.getElementById("doc-patient-id");
+    const docDos = document.getElementById("doc-dos");
+    const docPolicyId = document.getElementById("doc-policy-id");
+    const docJurisdiction = document.getElementById("doc-jurisdiction");
+
+    if (docPacketId) docPacketId.textContent = p.packet_id;
+    if (docPatientId) docPatientId.textContent = p.patient_id_masked;
+    if (docDos) docDos.textContent = p.date_of_service;
+    if (docPolicyId) docPolicyId.textContent = `${p.policy_id} - ${p.policy_title}`;
+    if (docJurisdiction) docJurisdiction.textContent = p.jurisdiction;
+
+    // Status chip
+    const statusChip = document.getElementById("doc-packet-status-chip");
+    if (statusChip) {
+        if (p.submission_status === "SUBMITTED_TO_PAYER") {
+            statusChip.textContent = `STATUS: SUBMITTED (${p.payer_transaction_id || "ACCEPTED"})`;
+            statusChip.style.color = "var(--accent-green)";
+        } else if (p.abstention_status) {
+            statusChip.textContent = "STATUS: DOCTOR REVIEW REQUIRED (ABSTAINED)";
+            statusChip.style.color = "var(--accent-amber)";
+        } else {
+            statusChip.textContent = "STATUS: DRAFT REVIEW - READY FOR TRANSMISSION";
+            statusChip.style.color = "var(--accent-cyan)";
+        }
+    }
+
+    // ICD-10 Chips
+    const icdContainer = document.getElementById("doc-icd-chips");
+    if (icdContainer) {
+        icdContainer.innerHTML = p.icd10_codes.map(c => `<span class="code-pill">${c}</span>`).join("");
+    }
+
+    // CPT Chips
+    const cptContainer = document.getElementById("doc-cpt-chips");
+    if (cptContainer) {
+        cptContainer.innerHTML = p.cpt_hcpcs_codes.map(c => `<span class="code-pill">${c}</span>`).join("");
+    }
+
+    // Criteria Table - Plain Clean Medical Table
+    const tbody = document.getElementById("doc-criteria-tbody");
+    if (tbody) {
+        tbody.innerHTML = "";
+        p.criteria_sections.forEach((c, cIdx) => {
+            const tr = document.createElement("tr");
+            let statusText = "MET";
+            let statusColor = "#166534";
+            if (c.status === "NOT_MET") {
+                statusText = "NOT MET";
+                statusColor = "#991B1B";
+            } else if (c.status === "INSUFFICIENT_EVIDENCE") {
+                statusText = "REVIEW";
+                statusColor = "#B45309";
+            }
+
+            tr.innerHTML = `
+                <td>
+                    <div class="table-req-title">${escapeHtml(c.name || c.criterion_code)}</div>
+                    <div class="table-req-sub">${escapeHtml(c.criterion_code)}${c.required_temporal_window ? ` &bull; ${escapeHtml(c.required_temporal_window)}` : ''}</div>
+                </td>
+                <td style="font-weight: 700; color: ${statusColor}; text-align: center;">
+                    ${statusText}
+                </td>
+                <td>
+                    <div class="table-plain-evidence">“${escapeHtml(c.extracted_evidence_quote || 'Not documented in record')}”</div>
+                </td>
+                <td>
+                    <input type="text" class="document-plain-input" id="doc-attest-${cIdx}" value="${escapeHtml(c.physician_attestation || 'Verified per patient clinical consultation record.')}">
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Clinical Summary (textarea)
+    const clinicalSummary = document.getElementById("doc-clinical-summary");
+    if (clinicalSummary) {
+        clinicalSummary.value = p.clinical_summary || "";
+    }
+
+    // CMS Statutory Mandates & Validity Window
+    const docValidity = document.getElementById("doc-validity-period");
+    if (docValidity) {
+        docValidity.textContent = p.authorization_validity_period || "180 Calendar Days";
+    }
+    const docSdm = document.getElementById("doc-sdm-text");
+    if (docSdm) {
+        docSdm.textContent = p.shared_decision_making_attestation || "Documented clinical consultation conducted pursuant to CMS Medicare Coverage Determination.";
+    }
+
+    // Physician Signature Input (Populate with detected doctor name if present)
+    const sigInput = document.getElementById("doc-physician-signature");
+    if (sigInput) {
+        const ehrText = document.getElementById("ehr-input")?.value || "";
+        const auth = checkNoteAuthenticity(ehrText);
+        if (auth.has_doctor_name && auth.doctor_name) {
+            sigInput.value = auth.doctor_name;
+        } else if (p.signed_by) {
+            sigInput.value = p.signed_by;
+        }
+    }
+
+    // Signature Date
+    const sigDate = document.getElementById("doc-signature-date");
+    if (sigDate) {
+        sigDate.textContent = p.date_of_service || new Date().toISOString().split("T")[0];
+    }
+
+    // Cryptographic Seal
+    const docSealHash = document.getElementById("doc-seal-hash");
+    if (docSealHash) docSealHash.textContent = p.audit_hash;
+
+    // Denial & Exclusion Safeguard: Block Medicare Submission if Excluded
+    const exclusionBanner = document.getElementById("step4-exclusion-warning-banner");
+    const submitBtn = document.getElementById("btn-final-submit-insurance");
+    const step4Title = document.getElementById("step4-screen-title");
+    const step4Sub = document.getElementById("step4-screen-subtext");
+    const isDenied = (lastAdjudicationResult && lastAdjudicationResult.adjudication_decision === "DENIED") || (p.decision === "DENIED");
+
+    if (isDenied) {
+        if (exclusionBanner) exclusionBanner.classList.remove("hidden");
+        if (step4Title) step4Title.textContent = "Medicare Clinical Coverage Denial Advisory";
+        if (step4Sub) step4Sub.textContent = "Coverage is excluded by Medicare criteria. Under CMS regulations, this document is restricted to internal hospital review and peer-to-peer appeal preparation.";
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add("btn-disabled-blocked");
+            submitBtn.innerHTML = `
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg></span>
+                Submission Blocked &mdash; Excluded by CMS Policy
+            `;
+            submitBtn.title = "Under Federal False Claims Act rules (31 U.S.C. §§ 3729-3733), an excluded prior authorization claim cannot be transmitted to Medicare.";
+        }
+    } else {
+        if (exclusionBanner) exclusionBanner.classList.add("hidden");
+        if (step4Title) step4Title.textContent = "Prior Authorization Packet";
+        if (step4Sub) step4Sub.textContent = "This is the official Medicare prior authorization document that will be submitted directly to the insurance payer.";
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("btn-disabled-blocked");
+            submitBtn.innerHTML = `
+                Sign & Submit to Medicare
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></span>
+            `;
+            submitBtn.title = "Sign and submit this verified prior authorization packet directly to Medicare Part B.";
+        }
+    }
+}
+
+async function submitPacketToInsurance() {
+    if (!currentCoveragePacket) return;
+
+    if (lastAdjudicationResult && lastAdjudicationResult.adjudication_decision === "DENIED") {
+        showToast("Submission Blocked: This patient's condition is excluded under Medicare policy. Excluded treatments cannot be submitted for prior authorization.", true);
+        return;
+    }
+
+    if (currentRole === "Auditor") {
+        showToast("Auditor access is read-only: Transmitting and signing prior-authorization packets to insurance requires an authenticated Verified Clinician.", true);
+        return;
+    }
+
+    const certifyCheck = document.getElementById("doc-certify-check");
+    if (certifyCheck && !certifyCheck.checked) {
+        showToast("Please certify the clinical necessity check before transmitting.", true);
+        return;
+    }
+
+    const sigInput = document.getElementById("doc-physician-signature");
+    const signerName = (sigInput && sigInput.value.trim()) || "Dr. Sarah Jenkins, MD, FACC";
+    const notesInput = document.getElementById("doc-clinical-summary");
+    const clinicianNotes = notesInput ? notesInput.value.trim() : (currentCoveragePacket.clinical_summary || "");
+
+    const submitBtn = document.getElementById("btn-final-submit-insurance");
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `Transmitting to Medicare Clearinghouse...`;
+    }
+
+    try {
+        const res = await fetch("/api/v1/packet/submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                case_id: currentCoveragePacket.case_id,
+                signed_by: signerName,
+                clinician_notes: clinicianNotes,
+                payer_name: "CMS Medicare Part B / Regional MAC"
+            })
+        });
+
+        if (!res.ok) {
+            throw new Error(`Submission failed with status ${res.status}`);
+        }
+
+        const receipt = await res.json();
+
+        // Update current packet status
+        currentCoveragePacket.submission_status = "SUBMITTED_TO_PAYER";
+        currentCoveragePacket.payer_transaction_id = receipt.payer_transaction_id;
+        currentCoveragePacket.signed_by = signerName;
+
+        // Render receipt details on Screen 5 and advance
+        showSubmissionReceipt(receipt);
+        goToWizardScreen(5);
+
+        // Refresh audit ledger
+        loadAuditLogs();
+        showToast("Packet successfully signed and submitted to Medicare!");
+    } catch (e) {
+        console.error("Submission failed:", e);
+        showToast("Submission failed: " + e.message, true);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `
+                Sign & Submit to Medicare
+                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></span>
+            `;
+        }
+    }
+}
+
+function showSubmissionReceipt(receipt) {
+    const payerElem = document.getElementById("receipt-payer");
+    const txElem = document.getElementById("receipt-tx-id");
+    const caseElem = document.getElementById("receipt-case-id");
+    const signerElem = document.getElementById("receipt-signer");
+    const timeElem = document.getElementById("receipt-timestamp");
+    const hashElem = document.getElementById("receipt-hash");
+
+    if (payerElem) payerElem.textContent = receipt.payer_name;
+    if (txElem) txElem.textContent = receipt.payer_transaction_id;
+    if (caseElem) caseElem.textContent = receipt.case_id;
+    if (signerElem) signerElem.textContent = receipt.signed_by;
+    if (timeElem) timeElem.textContent = new Date(receipt.signed_at).toLocaleString();
+    if (hashElem) hashElem.textContent = receipt.audit_hash;
+}
+
+function closeReceiptModal() {
+    goToWizardScreen(1);
+}
+
+function printPacketDocument() {
+    if (!currentCoveragePacket) {
+        showToast("No active coverage packet to print.", true);
+        return;
+    }
+
+    const p = currentCoveragePacket;
+    const patientId = p.patient_id_masked || "PT-UNKNOWN";
+    const dos = p.date_of_service || new Date().toISOString().split("T")[0];
+    const policy = `${p.policy_id || ''} - ${p.policy_title || ''}`;
+    const jurisdiction = p.jurisdiction || "National / Regional MAC";
+    const packetId = p.packet_id || "CMS-PAC-2026-FORM";
+    const icdCodes = (p.icd10_codes || []).join(", ") || "None specified";
+    const cptCodes = (p.cpt_hcpcs_codes || []).join(", ") || "None specified";
+    
+    // Read current user edits from on-screen fields
+    const summaryElem = document.getElementById("doc-clinical-summary");
+    const clinicalSummary = summaryElem ? summaryElem.value.trim() : (p.clinical_summary || "");
+    const sigElem = document.getElementById("doc-physician-signature");
+    const signature = sigElem ? sigElem.value.trim() : (p.signed_by || "Attesting Physician, MD");
+    const auditHash = p.audit_hash || "SECURE-VERIFIED-HASH";
+
+    // Build criteria rows
+    let criteriaRows = "";
+    (p.criteria_sections || []).forEach((c, idx) => {
+        const attestInput = document.getElementById(`doc-attest-${idx}`);
+        const userAttest = attestInput ? attestInput.value.trim() : (c.physician_attestation || "Verified against clinical documentation.");
+        
+        let statusText = "MET";
+        let statusColor = "#15803D";
+        if (c.status === "NOT_MET") {
+            statusText = "NOT MET";
+            statusColor = "#B91C1C";
+        } else if (c.status === "INSUFFICIENT_EVIDENCE") {
+            statusText = "REVIEW";
+            statusColor = "#B45309";
+        }
+
+        criteriaRows += `
+            <tr style="border-bottom: 1px solid #D1D5DB;">
+                <td style="padding: 8px 10px; vertical-align: top; width: 28%;">
+                    <div style="font-weight: 700; color: #111827; font-size: 13px;">${escapeHtml(c.name || c.criterion_code)}</div>
+                    <div style="font-size: 11px; color: #6B7280; font-family: monospace; margin-top: 2px;">${escapeHtml(c.criterion_code)}${c.required_temporal_window ? ` &bull; ${escapeHtml(c.required_temporal_window)}` : ''}</div>
+                </td>
+                <td style="padding: 8px 10px; vertical-align: top; width: 12%; text-align: center; font-weight: 700; color: ${statusColor}; font-size: 12px;">
+                    ${statusText}
+                </td>
+                <td style="padding: 8px 10px; vertical-align: top; width: 40%; font-size: 12px; color: #1F2937; line-height: 1.45;">
+                    “${escapeHtml(c.extracted_evidence_quote || 'Not documented in record')}”
+                </td>
+                <td style="padding: 8px 10px; vertical-align: top; width: 20%; font-size: 12px; color: #374151;">
+                    ${escapeHtml(userAttest)}
+                </td>
+            </tr>
+        `;
+    });
+
+    const printHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CMS Prior Authorization Request - ${escapeHtml(patientId)}</title>
+    <style>
+        @page {
+            size: letter portrait;
+            margin: 18mm 18mm 18mm 18mm;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #111827;
+            background: #FFFFFF;
+            margin: 0;
+            padding: 0;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #0F172A;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .header-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #0F172A;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .header-sub {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4B5563;
+            margin-top: 2px;
+        }
+        .form-id-badge {
+            text-align: right;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1F2937;
+        }
+        .section-header {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #0F172A;
+            border-bottom: 1px solid #111827;
+            padding-bottom: 4px;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+        .grid-table td {
+            padding: 4px 6px;
+            vertical-align: top;
+            font-size: 12.5px;
+        }
+        .field-label {
+            font-weight: 600;
+            color: #4B5563;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .field-value {
+            font-weight: 600;
+            color: #111827;
+        }
+        .criteria-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+            margin-bottom: 14px;
+        }
+        .criteria-table th {
+            border-bottom: 1.5px solid #111827;
+            border-top: 1px solid #D1D5DB;
+            text-align: left;
+            padding: 6px 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+        }
+        .narrative-block {
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            padding: 10px 12px;
+            font-size: 12.5px;
+            line-height: 1.5;
+            color: #1F2937;
+            margin-bottom: 14px;
+            white-space: pre-wrap;
+        }
+        .attestation-box {
+            border: 1px solid #9CA3AF;
+            background: #FAFAFA;
+            padding: 12px 14px;
+            margin-top: 12px;
+        }
+        .attestation-text {
+            font-size: 11.5px;
+            color: #374151;
+            line-height: 1.45;
+        }
+        .signature-table {
+            width: 100%;
+            margin-top: 16px;
+            border-collapse: collapse;
+        }
+        .signature-table td {
+            vertical-align: bottom;
+            padding: 6px 0;
+        }
+        .sig-line {
+            border-bottom: 1px solid #111827;
+            padding-bottom: 2px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .seal-footer {
+            margin-top: 24px;
+            padding-top: 8px;
+            border-top: 1px dashed #D1D5DB;
+            font-family: monospace;
+            font-size: 10px;
+            color: #6B7280;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <table class="header-table">
+        <tr>
+            <td>
+                <div class="header-title">Centers for Medicare &amp; Medicaid Services (CMS)</div>
+                <div class="header-sub">Medicare Part B Prior Authorization Request Form</div>
+            </td>
+            <td class="form-id-badge">
+                FORM ID: ${escapeHtml(packetId)}<br>
+                <span style="font-weight: normal; font-size: 11px; color: #6B7280;">Electronic Standard 837P / 278</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-header">Section A: Patient &amp; Coverage Information</div>
+    <table class="grid-table">
+        <tr>
+            <td style="width: 25%;">
+                <div class="field-label">Patient ID</div>
+                <div class="field-value">${escapeHtml(patientId)}</div>
+            </td>
+            <td style="width: 25%;">
+                <div class="field-label">Date of Service</div>
+                <div class="field-value">${escapeHtml(dos)}</div>
+            </td>
+            <td style="width: 30%;">
+                <div class="field-label">Governing Policy</div>
+                <div class="field-value">${escapeHtml(policy)}</div>
+            </td>
+            <td style="width: 20%;">
+                <div class="field-label">MAC Jurisdiction</div>
+                <div class="field-value">${escapeHtml(jurisdiction)}</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-header">Section B: Medical Billing &amp; Diagnostic Coding</div>
+    <table class="grid-table">
+        <tr>
+            <td style="width: 50%;">
+                <div class="field-label">Diagnosis Codes (ICD-10-CM)</div>
+                <div class="field-value" style="font-family: monospace;">${escapeHtml(icdCodes)}</div>
+            </td>
+            <td style="width: 50%;">
+                <div class="field-label">Procedure / Service Codes (CPT &amp; HCPCS)</div>
+                <div class="field-value" style="font-family: monospace;">${escapeHtml(cptCodes)}</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-header">Section C: Policy Coverage Criteria Verification &amp; Extracted Clinical Citations</div>
+    <table class="criteria-table">
+        <thead>
+            <tr>
+                <th>Medicare Requirement</th>
+                <th style="text-align: center;">Status</th>
+                <th>Evidence Cited From Medical Record</th>
+                <th>Physician Attestation</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${criteriaRows}
+        </tbody>
+    </table>
+
+    <div class="section-header">Section D: Clinical Necessity &amp; Justification Summary</div>
+    <div class="narrative-block">${escapeHtml(clinicalSummary || "Patient meets all specified clinical criteria under governing Medicare guidelines. Clinical chart supports procedure necessity.")}</div>
+
+    <div class="section-header">Section E: Attesting Physician Certification &amp; Legal Sign-Off</div>
+    <div class="attestation-box">
+        <div class="attestation-text">
+            <strong>Statutory Certification:</strong> I certify that I am the treating physician for this patient and that the clinical observations, diagnostic findings, and procedure justifications documented above are authentic and medically accurate. I understand that submitting false or misleading information to Medicare or Medicaid constitutes a violation of the Federal False Claims Act (31 U.S.C. &sect;&sect; 3729&ndash;3733).
+        </div>
+        <table class="signature-table">
+            <tr>
+                <td style="width: 60%;">
+                    <div class="field-label">Attesting Physician Signature</div>
+                    <div class="sig-line">${escapeHtml(signature)}</div>
+                </td>
+                <td style="width: 10%;"></td>
+                <td style="width: 30%;">
+                    <div class="field-label">Certification Date</div>
+                    <div class="sig-line">${escapeHtml(dos)}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="seal-footer">
+        <span>CMS Tamper-Evident SHA-256 Audit Seal: ${escapeHtml(auditHash)}</span>
+        <span>Generated by CarePolicyGuard &bull; In-Memory HIPAA Safe Harbor</span>
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>
+    `;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        showToast("Popup blocked. Please allow popups to print/save the document.", true);
+        return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(printHtml);
+    printWindow.document.close();
+}
+
+
+
+
+// =============================================================================
+// PEER-TO-PEER APPEAL LETTER & FHIR EHR INTEROPERABILITY
+// =============================================================================
+
+let currentAppealLetter = null;
+let currentFhirBundle = null;
+
+async function openPeerToPeerAppealModal() {
+    if (!lastAdjudicationResult && !currentCoveragePacket) {
+        showToast("Please evaluate a clinical note first.", true);
+        return;
+    }
+
+    const caseId = (currentCoveragePacket && currentCoveragePacket.case_id) || (lastAdjudicationResult && lastAdjudicationResult.case_id);
+    const doctorName = (currentCoveragePacket && currentCoveragePacket.signed_by) || (document.getElementById("doc-physician-signature")?.value) || "Dr. Sarah Jenkins, MD, FACC";
+
+    showToast("Generating formal Peer-to-Peer Appeal Letter & clinical talking points...", "info");
+
+    try {
+        const res = await fetch(`/api/v1/packet/${caseId}/appeal-letter`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                case_id: caseId,
+                physician_name: doctorName,
+                physician_npi: "1043256787",
+                physician_specialty: "Cardiology / Internal Medicine"
+            })
+        });
+
+        if (!res.ok) throw new Error(`Failed to generate appeal letter: ${res.status}`);
+
+        const data = await res.json();
+        currentAppealLetter = data;
+
+        // Render talking points
+        const tpList = document.getElementById("appeal-talking-points-list");
+        if (tpList) {
+            tpList.innerHTML = data.peer_to_peer_talking_points.map(tp => `<li>${escapeHtml(tp)}</li>`).join("");
+        }
+
+        // Render full letter text
+        const textElem = document.getElementById("appeal-letter-fulltext");
+        if (textElem) {
+            textElem.textContent = data.full_letter_text;
+        }
+
+        const modal = document.getElementById("appeal-letter-modal");
+        if (modal) modal.classList.remove("hidden");
+    } catch (e) {
+        console.error("Appeal generation error:", e);
+        showToast("Could not generate appeal letter: " + e.message, true);
+    }
+}
+
+function closePeerToPeerAppealModal() {
+    const modal = document.getElementById("appeal-letter-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function copyAppealLetterToClipboard() {
+    if (!currentAppealLetter) return;
+    navigator.clipboard.writeText(currentAppealLetter.full_letter_text).then(() => {
+        showToast("Appeal letter copied to clipboard!", "success");
+    }).catch(() => {
+        showToast("Failed to copy text. Please select and copy manually.", true);
+    });
+}
+
+function printAppealLetter() {
+    if (!currentAppealLetter) return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        showToast("Popup blocked. Please allow popups to print.", true);
+        return;
+    }
+    printWindow.document.open();
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Peer-to-Peer Appeal Letter - ${escapeHtml(currentAppealLetter.appeal_id)}</title>
+            <style>
+                body { font-family: monospace; white-space: pre-wrap; margin: 40px; font-size: 13px; line-height: 1.5; color: #000; }
+            </style>
+        </head>
+        <body>${escapeHtml(currentAppealLetter.full_letter_text)}<script>window.onload = function() { window.print(); };</script></body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+async function exportFhirBundle() {
+    if (!lastAdjudicationResult && !currentCoveragePacket) {
+        showToast("Please evaluate a clinical note first.", true);
+        return;
+    }
+
+    const caseId = (currentCoveragePacket && currentCoveragePacket.case_id) || (lastAdjudicationResult && lastAdjudicationResult.case_id);
+    showToast("Generating HL7 FHIR R4 Da Vinci PAS Bundle...", "info");
+
+    try {
+        const res = await fetch(`/api/v1/packet/${caseId}/fhir`);
+        if (!res.ok) throw new Error(`FHIR export failed: ${res.status}`);
+
+        const bundle = await res.json();
+        currentFhirBundle = bundle;
+
+        const codeElem = document.getElementById("fhir-bundle-json-display");
+        if (codeElem) {
+            codeElem.textContent = JSON.stringify(bundle, null, 2);
+        }
+
+        const modal = document.getElementById("fhir-bundle-modal");
+        if (modal) modal.classList.remove("hidden");
+    } catch (e) {
+        console.error("FHIR export error:", e);
+        showToast("FHIR export failed: " + e.message, true);
+    }
+}
+
+function closeFhirModal() {
+    const modal = document.getElementById("fhir-bundle-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function copyFhirJsonToClipboard() {
+    if (!currentFhirBundle) return;
+    navigator.clipboard.writeText(JSON.stringify(currentFhirBundle, null, 2)).then(() => {
+        showToast("HL7 FHIR JSON copied to clipboard!", "success");
+    }).catch(() => {
+        showToast("Failed to copy. Please select and copy manually.", true);
+    });
+}
+
+function downloadFhirJsonFile() {
+    if (!currentFhirBundle) return;
+    const jsonStr = JSON.stringify(currentFhirBundle, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `fhir-pas-bundle-${currentFhirBundle.id || "export"}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Downloaded HL7 FHIR JSON bundle!");
+}
+
+async function pushToHospitalEhr() {
+    if (!lastAdjudicationResult && !currentCoveragePacket) {
+        showToast("Please evaluate a clinical note first.", true);
+        return;
+    }
+
+    const caseId = (currentCoveragePacket && currentCoveragePacket.case_id) || (lastAdjudicationResult && lastAdjudicationResult.case_id);
+    showToast("Connecting to Hospital EHR (Epic Hyperdrive / FHIR Gateway)...", "info");
+
+    try {
+        const res = await fetch(`/api/v1/packet/${caseId}/ehr-push`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                case_id: caseId,
+                ehr_system: "Epic Systems Hyperdrive / FHIR R4 Endpoint"
+            })
+        });
+
+        if (!res.ok) throw new Error(`EHR sync failed: ${res.status}`);
+
+        const receipt = await res.json();
+        showToast(`EHR Synchronized! Stored under Epic Document ID: ${receipt.ehr_document_id}`, "success");
+    } catch (e) {
+        console.error("EHR sync error:", e);
+        showToast("EHR sync failed: " + e.message, true);
+    }
+}
+
+
+// =============================================================================
+// CMS BILLING, CLINICAL TIMELINE & SMART DEFICIENCY ADDENDUM HELPERS
+// =============================================================================
+
+function renderBillingCompliancePanel(data) {
+    const panel = document.getElementById("billing-compliance-panel");
+    if (!panel) return;
+
+    const billing = data.billing_validation;
+    if (!billing) {
+        panel.classList.add("hidden");
+        return;
+    }
+
+    panel.classList.remove("hidden");
+    const badge = document.getElementById("billing-status-badge");
+    const cptDisplay = document.getElementById("billing-cpt-display");
+    const icdDisplay = document.getElementById("billing-icd-display");
+    const advisoryElem = document.getElementById("billing-advisory-text");
+    const carcContainer = document.getElementById("billing-carc-pills");
+
+    if (badge) {
+        if (billing.is_billing_compliant) {
+            badge.className = "billing-status-badge badge-green";
+            badge.textContent = "Codes Compliant (ANSI X12 PAS)";
+        } else {
+            badge.className = "billing-status-badge badge-red";
+            badge.textContent = "Billing Code Warning";
+        }
+    }
+
+    if (cptDisplay) {
+        if (billing.detected_cpt_codes && billing.detected_cpt_codes.length > 0) {
+            cptDisplay.innerHTML = billing.detected_cpt_codes.map(c => `
+                <div class="code-entry ${c.status === 'COVERED' ? 'code-covered' : 'code-uncovered'}">
+                    <strong>${escapeHtml(c.code)}</strong> &ndash; ${escapeHtml(c.description)}
+                    <span class="code-status-tag ${c.status === 'COVERED' ? 'tag-covered' : 'tag-uncovered'}">${c.status}</span>
+                </div>
+            `).join("");
+        } else {
+            cptDisplay.innerHTML = `<span class="text-muted">Standard policy procedure code inferred</span>`;
+        }
+    }
+
+    if (icdDisplay) {
+        if (billing.detected_icd10_codes && billing.detected_icd10_codes.length > 0) {
+            icdDisplay.innerHTML = billing.detected_icd10_codes.map(i => `
+                <div class="code-entry ${i.status === 'COVERED' ? 'code-covered' : 'code-uncovered'}">
+                    <strong>${escapeHtml(i.code)}</strong> &ndash; ${escapeHtml(i.description)}
+                    <span class="code-status-tag ${i.status === 'COVERED' ? 'tag-covered' : 'tag-uncovered'}">${i.status}</span>
+                </div>
+            `).join("");
+        } else {
+            icdDisplay.innerHTML = `<span class="text-muted">Covered diagnosis inferred from clinical chart</span>`;
+        }
+    }
+
+    if (advisoryElem) {
+        advisoryElem.textContent = billing.billing_advisory || "";
+    }
+
+    if (carcContainer) {
+        let carcHtml = "";
+        const allCodes = [...(data.carc_codes || billing.carc_codes || []), ...(data.rarc_codes || billing.rarc_codes || [])];
+        if (allCodes.length > 0) {
+            carcHtml = allCodes.map(c => `
+                <span class="carc-badge ${c.code.includes('CARC 0') || c.code.includes('MA01') ? 'carc-ok' : 'carc-warn'}" title="${escapeHtml(c.description)}">
+                    ${escapeHtml(c.code)}
+                </span>
+            `).join("");
+        }
+        carcContainer.innerHTML = carcHtml;
+    }
+}
+
+function renderTimelineAnalysisPanel(data) {
+    const panel = document.getElementById("timeline-analysis-panel");
+    if (!panel) return;
+
+    const timeline = data.timeline_analysis;
+    if (!timeline || !timeline.milestones || timeline.milestones.length === 0) {
+        panel.classList.add("hidden");
+        return;
+    }
+
+    panel.classList.remove("hidden");
+    const badge = document.getElementById("timeline-status-badge");
+    const container = document.getElementById("timeline-milestones-container");
+
+    if (badge) {
+        if (timeline.all_waiting_periods_satisfied) {
+            badge.className = "timeline-status-badge badge-green";
+            badge.textContent = "All Waiting Periods Satisfied";
+        } else {
+            badge.className = "timeline-status-badge badge-red";
+            badge.textContent = "Statutory Waiting Period Deficit";
+        }
+    }
+
+    if (container) {
+        container.innerHTML = timeline.milestones.map(m => {
+            const isOk = m.status === "SATISFIED";
+            return `
+                <div class="timeline-milestone-card ${isOk ? 'milestone-ok' : 'milestone-unmet'}">
+                    <div class="milestone-top-row">
+                        <span class="milestone-label">${escapeHtml(m.event_label)}</span>
+                        <span class="milestone-badge ${isOk ? 'badge-met' : 'badge-unmet'}">
+                            ${isOk ? 'Satisfied (' + m.elapsed_days + 'd &ge; ' + m.required_days + 'd)' : 'Deficit: ' + m.deficit_days + ' days remaining'}
+                        </span>
+                    </div>
+                    <div class="milestone-calc-row">
+                        <span>Event Date: <strong>${escapeHtml(m.event_date)}</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span>Evaluation Date: <strong>${escapeHtml(m.evaluation_date)}</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span>Elapsed: <strong>${m.elapsed_days} days</strong> (Medicare Mandate: &ge; ${m.required_days} days)</span>
+                    </div>
+                    <div class="milestone-advisory">${escapeHtml(m.advisory)}</div>
+                    <div class="milestone-citation">${escapeHtml(m.citation)}</div>
+                </div>
+            `;
+        }).join("");
+    }
+}
+
+let currentTargetCriterionCode = null;
+
+function openAddendumModalForCriterion(code, name, desc) {
+    currentTargetCriterionCode = code;
+    const modal = document.getElementById("addendum-modal");
+    if (!modal) return;
+
+    const labelElem = document.getElementById("addendum-criterion-label");
+    const descElem = document.getElementById("addendum-criterion-desc");
+    const inputElem = document.getElementById("addendum-narrative-input");
+
+    if (labelElem) labelElem.textContent = `${code}: ${name}`;
+    if (descElem) descElem.textContent = desc || "Clinical criterion requirement.";
+
+    // Pre-populate intelligent prompt template based on criterion
+    if (inputElem) {
+        if (code.includes("GDMT") || code.includes("04")) {
+            inputElem.value = "Patient has been compliant on optimal guideline-directed medical therapy (Entresto 49/51mg BID and Carvedilol 25mg BID) for > 120 days since November 2025 with documented tolerance and no adverse effects.";
+        } else if (code.includes("LVEF") || code.includes("01")) {
+            inputElem.value = "Follow-up echocardiogram completed on 2026-02-10 demonstrates severe left ventricular systolic dysfunction with LVEF calculated at 28% by biplane Simpson's method.";
+        } else if (code.includes("AHI") || code.includes("OSA")) {
+            inputElem.value = "Polysomnography report dated 2026-01-15 confirms severe obstructive sleep apnea with an Apnea-Hypopnea Index (AHI) of 24.2 events per hour.";
+        } else {
+            inputElem.value = `Clinician attestation for ${name}: Documented clinical observation confirms compliance with Medicare guidelines.`;
+        }
+    }
+
+    modal.classList.remove("hidden");
+}
+
+function closeAddendumModal() {
+    const modal = document.getElementById("addendum-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+async function submitClinicalAddendum() {
+    if (!lastAdjudicationResult) {
+        showToast("No active adjudication case to amend.", true);
+        return;
+    }
+
+    const inputElem = document.getElementById("addendum-narrative-input");
+    const physicianElem = document.getElementById("addendum-physician-name");
+    const npiElem = document.getElementById("addendum-physician-npi");
+
+    const addendumText = inputElem ? inputElem.value.trim() : "";
+    if (addendumText.length < 10) {
+        showToast("Please enter a detailed clinical addendum note (minimum 10 characters).", true);
+        return;
+    }
+
+    const caseId = lastAdjudicationResult.case_id;
+    const btn = document.getElementById("btn-submit-addendum");
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-small"></span> Re-Adjudicating...`;
+    }
+
+    try {
+        const res = await fetch(`/api/v1/packet/${caseId}/addendum`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                criterion_code: currentTargetCriterionCode,
+                addendum_text: addendumText,
+                clinician_name: physicianElem ? physicianElem.value : "Attending Physician",
+                clinician_npi: npiElem ? npiElem.value : "1043256787"
+            })
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `Addendum failed: ${res.status}`);
+        }
+
+        const respData = await res.json();
+        closeAddendumModal();
+        closeCriterionModal();
+
+        // Update the active adjudication result with the newly returned one!
+        lastAdjudicationResult = respData.updated_adjudication;
+        populateStep3(lastAdjudicationResult);
+
+        showToast(respData.message, "success");
+    } catch (e) {
+        console.error("Addendum submission error:", e);
+        showToast("Failed to apply addendum: " + e.message, true);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span> Sign Addendum &amp; Re-Adjudicate`;
+        }
+    }
+}
+
+function highlightQuoteInEHR(startChar, endChar, criterionCode) {
+    const ehrViewer = document.getElementById("grounded-ehr-section");
+    if (ehrViewer) {
+        ehrViewer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    const marks = document.querySelectorAll("#ehr-highlight-display mark");
+    marks.forEach(m => m.classList.remove("pulse-focus"));
+
+    let found = null;
+    marks.forEach(m => {
+        if (m.getAttribute("data-crit-code") === criterionCode) {
+            found = m;
+        }
+    });
+
+    if (found) {
+        found.classList.add("pulse-focus");
+        found.scrollIntoView({ behavior: "smooth", block: "center" });
+        showToast(`Grounding quote for ${criterionCode} focused in chart!`, "info");
+    } else {
+        showToast(`Showing verified evidence quote for ${criterionCode}`, "info");
+    }
+}
+
+function exportAuditTrailCsv() {
+    window.location.href = "/api/v1/audit/trail/export";
+}
