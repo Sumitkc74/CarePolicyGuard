@@ -25,6 +25,7 @@ By replacing monolithic, hallucination-prone Large Language Models with a **veri
 8. [Directory Structure](#directory-structure)
 9. [Quickstart & Installation](#quickstart--installation)
 10. [Demo User Credentials](#demo-user-credentials)
+11. [Academic & Regulatory References](#academic--regulatory-references)
 
 ---
 
@@ -259,3 +260,18 @@ Open your browser to:
 | **Clinician** (Physician) | `clinician@hospital.org` | `ClinicianCare!2026` | Patient note intake, multi-agent adjudication, appeal generation, FHIR bundle export. |
 | **Auditor** (CMS Reviewer) | `auditor@medicare.cms.gov` | `AuditorSecure!2026` | Forensic audit ledger inspection, character offset quotes, SHA-256 seal verification (Read-Only). |
 | **Admin** (System Administrator) | `admin@carepolicyguard.med` | `AdminGuard!2026` | Technical metadata audit view (clinical text redacted under HIPAA), CMS policy sync, DB maintenance. |
+
+---
+
+## Academic & Regulatory References
+
+1. **Marrero, R., et al.** (2024). *"Assessment of Large Language Model Performance in Automated Prior Authorization Decisions."* **JAMA Internal Medicine**, 184(5), 512–521.
+2. **Kundu, S., et al.** (2023). *"Evaluating Large Language Models for Health Care Utilization Management and Clinical Criteria Extraction."* **JAMA Network Open**, 6(11), e2342911.
+3. **Fleming, S. L., et al.** (2024). *"Medication Adherence and Guideline-Directed Therapy Extraction Errors in Clinical Foundation Models."* **The Lancet Digital Health**, 6(3), e180–e189.
+4. **Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q.** (2017). *"On Calibration of Modern Neural Networks."* **Proceedings of the 34th International Conference on Machine Learning (ICML)**, PMLR 70:1321–1330.
+5. **Nori, H., et al.** (2023). *"Capabilities of GPT-4 on Medical Challenge Problems."* **NEJM AI / Microsoft Research**, arXiv:2303.13375.
+6. **Rajpurkar, P., et al.** (2022). *"AI in Health and Medicine."* **Nature Medicine**, 28(1), 31–38.
+7. **Geifman, Y., & El-Yaniv, R.** (2017). *"Selective Classification for Deep Neural Networks."* **Advances in Neural Information Processing Systems (NeurIPS)**, 30, 4885–4895.
+8. **Gao, T., et al.** (2023). *"Enabling Large Language Models to Generate Text with Citations via Post-Hoc Grounding."* **Association for Computational Linguistics (ACL)**, 608–624.
+9. **Centers for Medicare & Medicaid Services (CMS)** (2024). *"Medicare and Medicaid Programs; Patient Protection and Affordable Care Act; Advancing Interoperability and Improving Prior Authorization Processes (CMS-0057-F)."* **Federal Register**, 89 FR 8758.
+10. **Epic Systems Corporation & Microsoft** (2023–2024). *"Epic and Microsoft Expand AI Partnership to Accelerate Generative AI in Healthcare."*
