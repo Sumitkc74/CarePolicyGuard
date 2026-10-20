@@ -95,19 +95,21 @@ flowchart TD
     subgraph TIER3["Tier 3: Data, Integration & Audit Tier (Relational SQL & Ledger)"]
         SQL_DB[("🗄️ Relational Database (app/db/models.py)<br/>SQLite (Local Dev) / PostgreSQL (Enterprise Cloud)<br/>• ACID Transactions & Relational Foreign Keys<br/>• Longitudinal Encounter Provenance<br/>• CMS Policies, Criteria & User Credentials")]
         
-        CRYPTO_LEDGER["⛓️ Cryptographic Audit Ledger (app/services/audit_service.py)<br/>Immutable SHA-256 Chain-of-Custody Hash Seals<br/>Hash = SHA256(PatientID ∥ PolicyID ∥ Decision ∥ Offsets ∥ Timestamp)<br/>Federal CMS-0057-F Compliance Standard"]
+        CRYPTO_LEDGER["⛓️ Cryptographic Audit Ledger (app/services/audit_service.py)<br/>Immutable SHA-256 Chain-of-Custody Hash Seals<br/>Hash = SHA256(PatientID + PolicyID + Decision + Offsets + Timestamp)<br/>Federal CMS-0057-F Compliance Standard"]
         
         FHIR_EXPORTER["🏥 HL7 Da Vinci FHIR R4 Bundle Exporter (app/services/fhir_exporter.py)<br/>• PriorAuthorizationBundle (CRD / DTR / PAS)<br/>• Claim, ClaimResponse & Coverage Requirements"]
     end
 
     %% Data Flow Connections
-    UI & SWAGGER & RBAC_VIEWS <== "HTTPS / REST JSON" ==> API_GATEWAY
+    UI -->|HTTPS / REST| API_GATEWAY
+    SWAGGER -->|Interactive Docs| API_GATEWAY
+    RBAC_VIEWS -->|Role Requests| API_GATEWAY
     API_GATEWAY --> SEC_LAYER
     SEC_LAYER --> AGENT_PIPELINE
     AGENT_PIPELINE <--> SERVICES
-    AGENT_PIPELINE <== "SQLAlchemy ORM (SessionPool)" ==> SQL_DB
-    AGENT_PIPELINE ==> "Cryptographic Chaining" ==> CRYPTO_LEDGER
-    AGENT_PIPELINE ==> "Export Electronic Prior Auth" ==> FHIR_EXPORTER
+    AGENT_PIPELINE -->|SQLAlchemy ORM| SQL_DB
+    AGENT_PIPELINE -->|Cryptographic Chaining| CRYPTO_LEDGER
+    AGENT_PIPELINE -->|Export Electronic Prior Auth| FHIR_EXPORTER
 ```
 
 ### Multi-Agent Role Specifications (5 Specialized Agents)
@@ -231,9 +233,13 @@ flowchart TD
         FHIR["HL7 Da Vinci FHIR R4 Bundle Exporter (CRD / DTR / PAS Claim Specs)"]
     end
 
-    UI & Swagger <--> API
-    API --> Sec --> Agents
-    Agents --> DB & Ledger & FHIR
+    UI -->|HTTP / JSON| API
+    Swagger -->|API Specs| API
+    API --> Sec
+    Sec --> Agents
+    Agents --> DB
+    Agents --> Ledger
+    Agents --> FHIR
 ```
 
 ### 1. Architectural Model: 3-Tier Enterprise Clinical Architecture
