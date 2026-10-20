@@ -17,13 +17,13 @@ By replacing monolithic, hallucination-prone Large Language Models with a **veri
 ## Table of Contents
 1. [The Healthcare Problem](#the-healthcare-problem)
 2. [Data & Benchmark Provenance](#data--benchmark-provenance)
-3. [System Architecture & 4-Agent Pipeline](#system-architecture--4-agent-pipeline)
+3. [3-Tier Enterprise Clinical Architecture & Multi-Agent Pipeline](#3-tier-enterprise-clinical-architecture--multi-agent-pipeline)
 4. [4-Configuration Empirical Research Benchmark](#4-configuration-empirical-research-benchmark)
 5. [Case-by-Case Benchmark Breakdown (10 Vignettes)](#case-by-case-benchmark-breakdown-10-vignettes)
 6. [Security, Privacy & HIPAA Minimum Necessary (RBAC)](#security-privacy--hipaa-minimum-necessary)
 7. [Enterprise Clinical Automation Features](#enterprise-clinical-automation-features)
 8. [Architectural Decisions & Technology Stack Justifications](#architectural-decisions--technology-stack-justifications)
-9. [Head-to-Head Comparison with Present Healthcare Systems](#head-to-head-comparison-with-present-healthcare-systems)
+9. [Head-to-Head Comparison with the Two Closest Present Systems](#head-to-head-comparison-with-the-two-closest-present-systems)
 10. [Directory Structure](#directory-structure)
 11. [Quickstart & Installation](#quickstart--installation)
 12. [Demo User Credentials](#demo-user-credentials)
@@ -61,27 +61,56 @@ The **10 benchmark clinical vignettes** (`BENCH-01` through `BENCH-10`) were eng
 
 ---
 
-## System Architecture & 4-Agent Pipeline
+## 3-Tier Enterprise Clinical Architecture & Multi-Agent Pipeline
+
+CarePolicyGuard is structured as an enterprise-grade **3-Tier Clinical Architecture** designed to separate client presentation, neuro-symbolic multi-agent orchestration, and cryptographic data governance:
 
 ```mermaid
 flowchart TD
-    EHR["Unstructured Patient EHR Narrative"] --> PHI["Compliance Layer: HIPAA PHI Sanitization & Auto-Masking"]
-    PHI --> A1["Agent 1: Policy Retrieval Agent<br/>(Passage Chunking & Hybrid Semantic/Lexical Matching)"]
-    A1 --> A2["Agent 2: Criteria Evaluation Agent<br/>(Entity & Temporal Precondition Extraction + Offset Slices)"]
-    A2 --> A3["Agent 3: Adversarial Verification Agent<br/>(Programmatic Slice Checks + Negative Omission Audits)"]
-    A3 --> A4{"Agent 4: Calibrated Abstention Gate<br/>(τ = 0.85 & Grounding Integrity Check)"}
-    
-    A4 -- "Confidence < τ OR Grounding Failure OR Omission" --> DEFER["DEFERRED_TO_HUMAN<br/>Actionable Clinician Checklist"]
-    A4 -- "All Inclusions MET & Exclusions NOT_MET" --> APP["APPROVED<br/>Autonomous Coverage Seal"]
-    A4 -- "Inclusions NOT_MET OR Exclusions MET" --> DEN["DENIED<br/>Autonomous Denial Seal"]
+    %% TIER 1: PRESENTATION TIER
+    subgraph TIER1["Tier 1: Presentation Tier (Client & Clinician Interfaces)"]
+        UI["🖥️ Cyber-Medical Web Dashboard (app/static/)<br/>• Real-time Agent Pipeline Stepper & Note Intake<br/>• Synchronized Character-Offset Highlighter<br/>• Smart Addendum & Appeal Letter Editor"]
+        SWAGGER["📑 OpenAPI 3.1 & ReDoc Client (/docs, /redoc)<br/>• Interactive REST API Explorer<br/>• External EHR/Payer Integration Pipes"]
+        RBAC_VIEWS["👥 Role-Based Client Views<br/>• Clinician: Clinical Intake & Appeals<br/>• Auditor: Read-Only Forensic Ledger<br/>• Admin: Technical Metadata (PHI Redacted)"]
+    end
 
-    DEFER --> COC["Deterministic SHA-256 Chain-of-Custody Cryptographic Seal"]
-    APP --> COC
-    DEN --> COC
-    COC --> DB[("Immutable Audit Ledger<br/>(SQLite / PostgreSQL)")]
+    %% TIER 2: APPLICATION TIER
+    subgraph TIER2["Tier 2: Application Tier (FastAPI & Multi-Agent Engine)"]
+        API_GATEWAY["⚡ FastAPI Async REST Gateway (Python 3.12)<br/>app/api/routes.py & deps.py"]
+        
+        SEC_LAYER["🛡️ Compliance & Security Gate (app/core/security.py)<br/>• PBKDF2 Password Hashing & JWT Bearer Tokens<br/>• HIPAA Safe Harbor PHI Sanitizer (De-Identification)<br/>• NPI Luhn Algorithm Check & Medical Registration Gate"]
+        
+        subgraph AGENT_PIPELINE["5-Stage Neuro-Symbolic Multi-Agent Pipeline (app/agents/pipeline.py)"]
+            A1["Agent 1: Policy Retriever (policy_retriever.py)<br/>Hybrid Lexical-Semantic Matching on CMS NCDs/LCDs"]
+            A2["Agent 2: Criteria Evaluator (criteria_evaluator.py)<br/>Entity Parsing & Deterministic Python/SQL Math (LVEF, AHI)"]
+            A3["Agent 3: Adversarial Verifier (adversarial_verifier.py)<br/>Exact Character-Slice Check: note[start:end] == quote"]
+            A4["Agent 4: Calibrated Abstention Gate (abstention_gate.py)<br/>Selective Classification: τ >= 0.85 (ECE = 0.064)"]
+            A5["Agent 5: Defense Packet & Appeal Generator (packet_generator.py)<br/>Peer-to-Peer Appeal Letters & CARC/RARC Billing Codes"]
+        end
+
+        SERVICES["⚙️ Clinical Business Logic Services<br/>• Timeline Analyzer: Calculates Δt against CMS waiting periods<br/>• Billing Validator: CPT/HCPCS vs ICD-10 cross-walk<br/>• CMS Policy Sync: Real-time transmittal updates from CMS MCD"]
+    end
+
+    %% TIER 3: DATA & COMPLIANCE TIER
+    subgraph TIER3["Tier 3: Data, Integration & Audit Tier (Relational SQL & Ledger)"]
+        SQL_DB[("🗄️ Relational Database (app/db/models.py)<br/>SQLite (Local Dev) / PostgreSQL (Enterprise Cloud)<br/>• ACID Transactions & Relational Foreign Keys<br/>• Longitudinal Encounter Provenance<br/>• CMS Policies, Criteria & User Credentials")]
+        
+        CRYPTO_LEDGER["⛓️ Cryptographic Audit Ledger (app/services/audit_service.py)<br/>Immutable SHA-256 Chain-of-Custody Hash Seals<br/>Hash = SHA256(PatientID ∥ PolicyID ∥ Decision ∥ Offsets ∥ Timestamp)<br/>Federal CMS-0057-F Compliance Standard"]
+        
+        FHIR_EXPORTER["🏥 HL7 Da Vinci FHIR R4 Bundle Exporter (app/services/fhir_exporter.py)<br/>• PriorAuthorizationBundle (CRD / DTR / PAS)<br/>• Claim, ClaimResponse & Coverage Requirements"]
+    end
+
+    %% Data Flow Connections
+    UI & SWAGGER & RBAC_VIEWS <== "HTTPS / REST JSON" ==> API_GATEWAY
+    API_GATEWAY --> SEC_LAYER
+    SEC_LAYER --> AGENT_PIPELINE
+    AGENT_PIPELINE <--> SERVICES
+    AGENT_PIPELINE <== "SQLAlchemy ORM (SessionPool)" ==> SQL_DB
+    AGENT_PIPELINE ==> "Cryptographic Chaining" ==> CRYPTO_LEDGER
+    AGENT_PIPELINE ==> "Export Electronic Prior Auth" ==> FHIR_EXPORTER
 ```
 
-### Multi-Agent Role Specifications
+### Multi-Agent Role Specifications (5 Specialized Agents)
 
 | Agent | Module | Core Functionality |
 | :--- | :--- | :--- |
@@ -89,6 +118,7 @@ flowchart TD
 | **Agent 2: Criteria Evaluation** | `app.agents.criteria_evaluator` | Evaluates criteria using deterministic clinical extractors. Detects heart failure phenotypes (HFrEF vs HFpEF), validates imaging modalities (TTE, TEE, CMR, MUGA), computes longitudinal timelines, and extracts character offsets (`[start_char:end_char]`). |
 | **Agent 3: Adversarial Verifier** | `app.agents.adversarial_verifier` | Programmatically verifies character slices (`assert ehr[start:end] == span.text`) to catch hallucinations and offset drifts. Audits potential negative omissions and recalibrates confidence scores via penalization. |
 | **Agent 4: Abstention Gate** | `app.agents.abstention_gate` | Enforces calibrated safety threshold ($\tau = 0.85$). If any criterion exhibits hallucination, negative omission, or drops below $\tau$, the engine withholds autonomous decisions and safely defers to human clinical review. |
+| **Agent 5: Defense Packet & Appeal Generator** | `app.agents.packet_generator` | Synthesizes official CMS prior-authorization defense packets, character-offset audit exhibits, and formal physician peer-to-peer appeal letters mapped to CARC/RARC billing codes. |
 
 ---
 
