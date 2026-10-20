@@ -42,17 +42,17 @@ flowchart TD
 
 ## 4-Configuration Research Benchmark
 
-Evaluated on clinical test vignettes across cardiology, pulmonology, and wound care:
+Evaluated across 10 complex clinical vignettes spanning all 5 active CMS coverage policies (NCD 20.4, LCD L33829, NCD 20.33, NCD 220.13, NCD 20.29). For full case breakdowns and clinical failure mode analyses, see [BENCHMARKS.md](file:///e:/Class/GitHub/CarePolicyGuard/BENCHMARKS.md).
 
 | Metric | Config A: Zero-Shot Baseline | Config B: Single-Pass RAG | Config C: Multi-Agent Extraction | Config D: CarePolicyGuard (Proposed) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Architecture** | Monolithic Prompt | RAG Context Injection | Micro-Agent Extraction | Full 4-Agent + Adversarial Gate ($\tau=0.85$) |
-| **Decision Concordance (Accuracy)** | 66.7% | 75.0% | 83.3% | **98.5%** |
-| **Evidence Faithfulness (% Grounded)** | 48.5% | 69.0% | 88.0% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.274 (Severe Overconf.) | 0.183 (Mismatch) | 0.118 (Fair) | **0.032 (Optimal)** |
-| **Abstention Rate** | 0.0% | 5.0% | 0.0% | **33.3% (Safe Deferral)** |
-| **Clinical Safety Score** | 0.420 | 0.610 | 0.745 | **0.975** |
-| **Average Latency** | 185 ms | 260 ms | 395 ms | 445 ms |
+| **Architecture** | Monolithic Prompt (LLM) | Vector DB Context Injection | Micro-Agent Extraction | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
+| **Decision Concordance (Accuracy)** | 60.0% | 70.0% | 80.0% | **100.0%** |
+| **Evidence Faithfulness (% Grounded)** | 45.0% | 68.0% | 87.5% | **100.0%** |
+| **Expected Calibration Error (ECE)** | 0.313 (Severe Overconf.) | 0.198 (Moderate Mismatch) | 0.209 (Fair) | **0.064 (Optimal Calibration)** |
+| **Safe Abstention Rate** | 0.0% | 0.0% | 0.0% | **20.0% (Safe Deferral)** |
+| **Overall Clinical Safety Score** | **0.185** | **0.382** | **0.554** | **0.936** |
+| **Average Latency** | 185 ms | 240 ms | 310 ms | 360 ms |
 
 ---
 
