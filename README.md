@@ -67,51 +67,50 @@ The **10 benchmark clinical vignettes** (`BENCH-01` through `BENCH-10`) were eng
 
 CarePolicyGuard is structured as an enterprise-grade **3-Tier Clinical Architecture** designed to separate client presentation, neuro-symbolic multi-agent orchestration, and cryptographic data governance:
 
-```mermaid
-flowchart TD
-    %% TIER 1: PRESENTATION TIER
-    subgraph TIER1["Tier 1: Presentation Tier (Client & Clinician Interfaces)"]
-        UI["Cyber-Medical Web Dashboard (app/static/)<br/>• Real-time Agent Pipeline Stepper & Note Intake<br/>• Synchronized Character-Offset Highlighter<br/>• Smart Addendum & Appeal Letter Editor"]
-        SWAGGER["OpenAPI 3.1 & ReDoc Client (/docs, /redoc)<br/>• Interactive REST API Explorer<br/>• External EHR/Payer Integration Pipes"]
-        RBAC_VIEWS["Role-Based Client Views<br/>• Clinician: Clinical Intake & Appeals<br/>• Auditor: Read-Only Forensic Ledger<br/>• Admin: Technical Metadata (PHI Redacted)"]
-    end
-
-    %% TIER 2: APPLICATION TIER
-    subgraph TIER2["Tier 2: Application Tier (FastAPI & Multi-Agent Engine)"]
-        API_GATEWAY["FastAPI Async REST Gateway (Python 3.12)<br/>app/api/routes.py & deps.py"]
-        
-        SEC_LAYER["Compliance & Security Gate (app/core/security.py)<br/>• PBKDF2 Password Hashing & JWT Bearer Tokens<br/>• HIPAA Safe Harbor PHI Sanitizer (De-Identification)<br/>• NPI Luhn Algorithm Check & Medical Registration Gate"]
-        
-        subgraph AGENT_PIPELINE["5-Stage Neuro-Symbolic Multi-Agent Pipeline (app/agents/pipeline.py)"]
-            A1["Agent 1: Policy Retriever (policy_retriever.py)<br/>Hybrid Lexical-Semantic Matching on CMS NCDs/LCDs"]
-            A2["Agent 2: Criteria Evaluator (criteria_evaluator.py)<br/>Entity Parsing & Deterministic Python/SQL Math (LVEF, AHI)"]
-            A3["Agent 3: Adversarial Verifier (adversarial_verifier.py)<br/>Exact Character-Slice Check: note[start:end] == quote"]
-            A4["Agent 4: Calibrated Abstention Gate (abstention_gate.py)<br/>Selective Classification: τ >= 0.85 (ECE = 0.064)"]
-            A5["Agent 5: Defense Packet & Appeal Generator (packet_generator.py)<br/>Peer-to-Peer Appeal Letters & CARC/RARC Billing Codes"]
-        end
-
-        SERVICES["Clinical Business Logic Services<br/>• Timeline Analyzer: Calculates Δt against CMS waiting periods<br/>• Billing Validator: CPT/HCPCS vs ICD-10 cross-walk<br/>• CMS Policy Sync: Real-time transmittal updates from CMS MCD"]
-    end
-
-    %% TIER 3: DATA & COMPLIANCE TIER
-    subgraph TIER3["Tier 3: Data, Integration & Audit Tier (Relational SQL & Ledger)"]
-        SQL_DB[("Relational Database (app/db/models.py)<br/>SQLite (Local Dev) / PostgreSQL (Enterprise Cloud)<br/>• ACID Transactions & Relational Foreign Keys<br/>• Longitudinal Encounter Provenance<br/>• CMS Policies, Criteria & User Credentials")]
-        
-        CRYPTO_LEDGER["Cryptographic Audit Ledger (app/services/audit_service.py)<br/>Immutable SHA-256 Chain-of-Custody Hash Seals<br/>Hash = SHA256(PatientID + PolicyID + Decision + Offsets + Timestamp)<br/>Federal CMS-0057-F Compliance Standard"]
-        
-        FHIR_EXPORTER["HL7 Da Vinci FHIR R4 Bundle Exporter (app/services/fhir_exporter.py)<br/>• PriorAuthorizationBundle (CRD / DTR / PAS)<br/>• Claim, ClaimResponse & Coverage Requirements"]
-    end
-
-    %% Data Flow Connections
-    UI -->|HTTPS / REST| API_GATEWAY
-    SWAGGER -->|Interactive Docs| API_GATEWAY
-    RBAC_VIEWS -->|Role Requests| API_GATEWAY
-    API_GATEWAY --> SEC_LAYER
-    SEC_LAYER --> AGENT_PIPELINE
-    AGENT_PIPELINE <--> SERVICES
-    AGENT_PIPELINE -->|SQLAlchemy ORM| SQL_DB
-    AGENT_PIPELINE -->|Cryptographic Chaining| CRYPTO_LEDGER
-    AGENT_PIPELINE -->|Export Electronic Prior Auth| FHIR_EXPORTER
+```
++------------------------------------+
+| 1. FRONTEND                        |
+| Technology: HTML5, CSS, JS         |
+| Role: Web Dashboard & Note Entry   |
++-----------------+------------------+
+                  |
+                  |  [Submits Patient Note]
+                  v
++-----------------+------------------+
+| 2. BACKEND API                     |
+| Technology: FastAPI, Python 3.12   |
+| Role: Async Gateway & HIPAA Masking|
++--------+------------------+--------+
+         |                  |
+         | [Top Branch]     | [Bottom Branch]
+         v                  v
++--------+---------+   +----+--------------+
+| 3A. RAG ENGINE   |   | 3B. AI AGENTS     |
+| Technology:      |   | Technology:       |
+| Hybrid Lexical-  |   | Gemini 1.5, GPT-4 |
+| Semantic Engine  |   | Python Math Engine|
+| Role:            |   | Role:             |
+| CMS NCD/LCD Rules|   | Extraction & Math |
++--------+---------+   +----+--------------+
+         |                  |
+         | [Merges Here]    | [Merges Here]
+         +--------+---------+
+                  |
+                  v
++-----------------+------------------+
+| 4. CALIBRATED GATE                 |
+| Technology: Python Substring Slice |
+| Role: Offset Check & tau >= 0.85   |
++-----------------+------------------+
+                  |
+                  |  [Stores & Exports]
+                  v
++-----------------+------------------+
+| 5. DATA AND EXPORT                 |
+| Technology: SQLAlchemy, SHA-256,   |
+|             HL7 FHIR R4 JSON       |
+| Role: Relational DB & Audit Ledger |
++------------------------------------+
 ```
 
 ### Multi-Agent Role Specifications (5 Specialized Agents)
