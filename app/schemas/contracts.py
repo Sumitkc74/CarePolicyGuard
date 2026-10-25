@@ -45,6 +45,8 @@ class VerificationAuditResult(BaseModel):
     hallucination_flag: bool = Field(..., description="True if claimed evidence does not exist in EHR note")
     unverified_omission_flag: bool = Field(..., description="True if criterion was marked NOT_MET but salient clinical terms exist in note without citation")
     offset_drift_detected: bool = Field(..., description="True if text exists but start/end offsets drift from slice")
+    discordance_flag: bool = Field(default=False, description="True if conflicting diagnostic measurements or internal contradictions exist across sections")
+    healed_offset_drift: bool = Field(default=False, description="True if offset drift was autonomously healed by feedback loop")
     audit_notes: str = Field(..., description="Detailed adversarial verification audit findings")
     calibrated_confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence recalibrated after adversarial penalization")
 
@@ -162,6 +164,7 @@ class AdjudicationRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+    mfa_code: Optional[str] = None
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -428,5 +431,44 @@ class AuditTrailResponse(BaseModel):
     total_events: int
     system_mode: str
     events: List[AuditTrailEvent]
+
+class BatchAdjudicationItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    patient_id: Optional[str] = Field(default=None, description="Patient identifier (will be masked under HIPAA Safe Harbor)")
+    policy_id: str = Field(..., description="Target policy ID, e.g. NCD-20.4 or LCD-L33829")
+    clinical_narrative: str = Field(..., min_length=15, description="De-identified or raw clinical progress note")
+    requested_procedure_code: Optional[str] = Field(default=None, description="CPT/HCPCS code, e.g. 33249")
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Custom metadata or roster tags")
+
+class BatchAdjudicationRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    batch_name: Optional[str] = Field(default="Clinical Roster Batch", description="Label for this multi-patient cohort")
+    items: List[BatchAdjudicationItem] = Field(..., min_length=1, max_length=50, description="List of patient notes to adjudicate")
+    webhook_url: Optional[str] = Field(default=None, description="Optional outbound HTTPS webhook URL for notification upon batch completion")
+    webhook_secret: Optional[str] = Field(default=None, description="Shared secret for signing webhook payload with HMAC-SHA256")
+
+class BatchAdjudicationItemResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    index: int
+    patient_id_masked: str
+    policy_id: str
+    decision: AdjudicationDecision
+    calibrated_confidence: float
+    raw_confidence: float
+    abstention_status: bool
+    adjudication: FinalAdjudication
+
+class BatchAdjudicationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    batch_id: str
+    batch_name: str
+    total_patients: int
+    approved_count: int
+    denied_count: int
+    deferred_count: int
+    processing_time_ms: float
+    timestamp: str
+    webhook_delivered: Optional[bool] = Field(default=None, description="Whether the outbound completion webhook was successfully dispatched")
+    results: List[BatchAdjudicationItemResult]
 
 

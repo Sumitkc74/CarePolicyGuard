@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: carepolicyguard-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: carepolicyguard
+      POSTGRES_USER: careguard
+      POSTGRES_PASSWORD: careguard_secure_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U careguard -d carepolicyguard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  carepolicyguard-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: carepolicyguard:latest
+    container_name: carepolicyguard-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=carepolicyguard-deterministic-clinical-secret-key-3849104812
+      - ABSTENTION_THRESHOLD=0.85
+      - ENABLE_PHI_MASKING=true
+      - DATABASE_URL=postgresql://careguard:careguard_secure_pass@db:5432/carepolicyguard
+    volumes:
+      - cpg-data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  cpg-data:
+    driver: local
+  pgdata:
+    driver: local
+

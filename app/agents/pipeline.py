@@ -84,6 +84,18 @@ class MultiAgentVerificationPipeline:
             audit_result = self.verifier_agent.audit_assessment(assessment, crit_def, sanitized_ehr)
             verification_audits.append(audit_result)
 
+        # 4b. Autonomous Offset Drift Healing Feedback Loop
+        for assessment, audit in zip(criteria_assessments, verification_audits):
+            if audit.offset_drift_detected and not audit.hallucination_flag:
+                for span in assessment.verified_spans:
+                    healed = self.verifier_agent.heal_offset_drift(span, sanitized_ehr)
+                    if healed:
+                        audit.offset_drift_detected = False
+                        audit.healed_offset_drift = True
+                        audit.grounding_status = True
+                        audit.calibrated_confidence = assessment.raw_confidence
+                        audit.audit_notes += " [AUTONOMOUSLY HEALED: Offset drift corrected to true text position.]"
+
         # 5. Agent 4: Calibrated Abstention Gate
         gate = CalibratedAbstentionGate(tau=custom_tau or settings.ABSTENTION_THRESHOLD)
         (
@@ -414,6 +426,39 @@ class MultiAgentVerificationPipeline:
                     "required_temporal_window": "Prior to diagnostic test",
                     "keywords": ["face-to-face", "in-person", "clinical evaluation"],
                     "min_score": 0.75
+                }
+            ]
+        elif policy_id == "NCD-20.7":
+            return [
+                {
+                    "criterion_code": "CRIT-CAS-01",
+                    "name": "Severe Carotid Stenosis (>= 70% Symptomatic or >= 80% Asymptomatic)",
+                    "description": "Documented carotid artery stenosis >= 70% in symptomatic patients or >= 80% in asymptomatic patients verified by carotid duplex ultrasound, CTA, MRA, or angiography.",
+                    "clinical_intent": "Establish severe anatomical carotid narrowing threshold",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Within past 6 months",
+                    "keywords": ["carotid stenosis", "70%", "80%", "carotid duplex", "cta", "mra", "angiography", "ica"],
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-CAS-02",
+                    "name": "Documented High Surgical Risk for Carotid Endarterectomy (CEA)",
+                    "description": "Patient has documented clinical or anatomical features placing them at high risk for open CEA (e.g., hostile neck, prior radiation, tracheostomy, severe COPD, STS score >= 8%).",
+                    "clinical_intent": "Justify percutaneous stenting over surgical endarterectomy",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Current pre-procedure evaluation",
+                    "keywords": ["high risk for cea", "hostile neck", "radiation", "tracheostomy", "severe copd", "high risk"],
+                    "min_score": 0.80
+                },
+                {
+                    "criterion_code": "CRIT-CAS-03",
+                    "name": "Mandatory FDA-Approved Embolic Protection Device (EPD)",
+                    "description": "Procedure plan includes deployment of an FDA-approved distal embolic protection device (filter or flow reversal system) during stent deployment.",
+                    "clinical_intent": "Prevent distal embolic stroke during stenting",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Procedure plan and equipment verification",
+                    "keywords": ["embolic protection device", "epd", "distal filter", "embolic protection", "stent"],
+                    "min_score": 0.85
                 }
             ]
         else:

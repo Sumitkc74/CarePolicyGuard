@@ -23,6 +23,21 @@ class Settings(BaseSettings):
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["*"]
     
+    # Live Email Delivery (SMTP)
+    SMTP_ENABLED: bool = os.getenv("SMTP_ENABLED", "false").lower() in ("true", "1", "yes")
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
+    SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "auth@carepolicyguard.med")
+
+    # OAuth Single Sign-On (Google & Apple)
+    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
+    APPLE_CLIENT_ID: str = os.getenv("APPLE_CLIENT_ID", "")
+    APPLE_TEAM_ID: str = os.getenv("APPLE_TEAM_ID", "")
+    APPLE_KEY_ID: str = os.getenv("APPLE_KEY_ID", "")
+
     # Default Demo Credentials
     DEFAULT_ADMIN_USER: str = "admin@carepolicyguard.med"
     DEFAULT_ADMIN_PASS: str = "AdminGuard!2026"

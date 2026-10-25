@@ -1,12 +1,12 @@
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.db.session import engine, SessionLocal, Base
+from app.db.session import engine, SessionLocal, Base, get_db
 from app.db.seed import seed_database
 from app.api.routes import api_router
 
@@ -30,7 +30,10 @@ async def lifespan(app: FastAPI):
                 ("specialty", "VARCHAR(100)"),
                 ("organization", "VARCHAR(150)"),
                 ("is_verified_medical_pro", "BOOLEAN DEFAULT 0"),
-                ("verification_method", "VARCHAR(100)")
+                ("verification_method", "VARCHAR(100)"),
+                ("mfa_enabled_methods", "VARCHAR(100) DEFAULT 'email_otp'"),
+                ("oauth_provider", "VARCHAR(50)"),
+                ("oauth_sub", "VARCHAR(255)")
             ]
             for col_name, col_type in new_cols:
                 if cols and col_name not in cols:
@@ -71,6 +74,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# OWASP & HIPAA Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
+    return response
+
 # API Routes
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
@@ -97,6 +112,24 @@ def health_check():
         "tau_threshold": settings.ABSTENTION_THRESHOLD,
         "phi_masking": settings.ENABLE_PHI_MASKING
     }
+
+@app.get("/metrics", tags=["System"], include_in_schema=False)
+def root_metrics(db=Depends(get_db)):
+    """Root Prometheus scraper alias."""
+    from app.api.metrics_routes import get_prometheus_metrics
+    return get_prometheus_metrics(db)
+
+@app.get("/metrics/json", tags=["System"], include_in_schema=False)
+def root_metrics_json(db=Depends(get_db)):
+    """Root operational metrics JSON alias."""
+    from app.api.metrics_routes import get_metrics_json
+    return get_metrics_json(db)
+
+@app.get("/cds-services", tags=["HL7 Da Vinci CRD"], include_in_schema=False)
+def root_cds_discovery():
+    """Root HL7 Da Vinci CRD discovery alias."""
+    from app.api.cds_hooks_routes import cds_services_discovery
+    return cds_services_discovery()
 
 if __name__ == "__main__":
     import uvicorn

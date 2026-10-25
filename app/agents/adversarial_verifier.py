@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from app.schemas.contracts import (
     CriterionAssessment,
     VerificationAuditResult,
@@ -128,13 +128,54 @@ class AdversarialVerificationAgent:
 
         return omission_flag, omission_note
 
+    def audit_discordance(
+        self,
+        assessment: CriterionAssessment,
+        ehr_text: str
+    ) -> Tuple[bool, Optional[str]]:
+        """
+        Detects internal diagnostic contradictions across the patient chart.
+        For example: Conflicting LVEF measurements (e.g. 24% vs 52%) or contradictory NYHA classes.
+        """
+        code_lower = (assessment.criterion_code + " " + (assessment.name or "") + " " + (assessment.description or "")).lower()
+        if "lvef" in code_lower or "ejection fraction" in code_lower:
+            matches = list(re.finditer(r'(?i)\b(?:lvef|left ventricular ejection fraction)\s*(?::|of|is)?\s*([<>]?=?\s*(\d{1,2}))%', ehr_text))
+            if len(matches) >= 2:
+                values = [int(m.group(2)) for m in matches]
+                diff = max(values) - min(values)
+                if diff >= 15:
+                    return True, f"CLINICAL DISCORDANCE: Multiple conflicting LVEF measurements found in chart ({min(values)}% vs {max(values)}%). Requires clinician reconciliation."
+        elif "nyha" in code_lower:
+            nyha_matches = list(re.finditer(r'(?i)\bnyha\s*(?:class|functional class)?\s*([iv]+)\b', ehr_text))
+            if len(nyha_matches) >= 2:
+                classes = set(m.group(1).upper() for m in nyha_matches)
+                if len(classes) > 1 and ({"I", "II"} & classes) and ({"III", "IV"} & classes):
+                    return True, f"CLINICAL DISCORDANCE: Conflicting NYHA functional classes documented ({', '.join(sorted(classes))})."
+        return False, None
+
+    def heal_offset_drift(
+        self,
+        span: ClinicalEvidenceSpan,
+        ehr_text: str
+    ) -> bool:
+        """
+        Autonomously resolves offset drift by anchoring the span to its true position in the raw text.
+        """
+        if span.source_text in ehr_text:
+            pos = ehr_text.find(span.source_text)
+            span.start_char = pos
+            span.end_char = pos + len(span.source_text)
+            return True
+        return False
+
     def recalibrate_confidence(
         self,
         raw_confidence: float,
         grounding_status: bool,
         hallucination_flag: bool,
         offset_drift_detected: bool,
-        unverified_omission_flag: bool
+        unverified_omission_flag: bool,
+        discordance_flag: bool = False
     ) -> float:
         """
         Recalibrates confidence using adversarial penalization:
@@ -154,6 +195,9 @@ class AdversarialVerificationAgent:
 
         if unverified_omission_flag:
             score *= 0.45
+
+        if discordance_flag:
+            score *= 0.50
 
         return round(max(0.05, min(0.99, score)), 4)
 
@@ -177,17 +221,22 @@ class AdversarialVerificationAgent:
             ehr_text
         )
 
+        discordance_flag, discordance_note = self.audit_discordance(assessment, ehr_text)
+
         calibrated_conf = self.recalibrate_confidence(
             assessment.raw_confidence,
             all_grounded,
             hallucination_flag,
             offset_drift,
-            omission_flag
+            omission_flag,
+            discordance_flag=discordance_flag
         )
 
         audit_summary_parts = span_notes.copy()
         if omission_flag:
             audit_summary_parts.append(omission_note)
+        if discordance_flag and discordance_note:
+            audit_summary_parts.append(discordance_note)
 
         audit_notes = " | ".join(audit_summary_parts) if audit_summary_parts else "Adversarial verification passed: evidence fully grounded."
 
@@ -197,6 +246,8 @@ class AdversarialVerificationAgent:
             hallucination_flag=hallucination_flag,
             unverified_omission_flag=omission_flag,
             offset_drift_detected=offset_drift,
+            discordance_flag=discordance_flag,
+            healed_offset_drift=False,
             audit_notes=audit_notes,
             calibrated_confidence=calibrated_conf
         )

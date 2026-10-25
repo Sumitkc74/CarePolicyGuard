@@ -2,6 +2,16 @@ import re
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.db.models import MedicarePolicy, PolicyCriterion
+from app.core.cache import policy_cache
+
+
+CLINICAL_TAXONOMY_MAP = {
+    "NCD-20.33": ["mitraclip", "teer", "transcatheter edge-to-edge repair", "transcatheter mitral valve", "mitral regurgitation", "clip"],
+    "NCD-20.7": ["carotid artery stenting", "cas", "carotid endarterectomy", "cea", "carotid stenosis", "carotid angioplasty"],
+    "NCD-20.4": ["implantable cardioverter defibrillator", "icd", "crt-d", "biventricular defibrillator", "defibrillator", "lvef"],
+    "NCD-240.1": ["continuous positive airway pressure", "cpap", "bipap", "polysomnography", "apnea hypopnea index", "ahi", "sleep apnea"],
+    "LCD-L33829": ["sacral nerve stimulation", "sns", "interstim", "urinary incontinence", "fecal incontinence", "bladder neuromodulation"]
+}
 
 class PolicyRetrievalAgent:
     """
@@ -59,6 +69,14 @@ class PolicyRetrievalAgent:
                         if kw not in matched_terms:
                             matched_terms.append(kw)
 
+            # 4. Clinical Taxonomy Acronym and Synonym Cross-Referencing
+            tax_terms = CLINICAL_TAXONOMY_MAP.get(pol.policy_id, [])
+            for tt in tax_terms:
+                if tt in cleaned_text:
+                    score += 3.0
+                    if tt not in matched_terms:
+                        matched_terms.append(tt)
+
             # Normalize score
             max_possible = max(1.0, len(pol.criteria) * 2.0 + 4.0)
             norm_score = min(1.0, score / max_possible)
@@ -79,7 +97,13 @@ class PolicyRetrievalAgent:
     def get_structured_criteria(self, policy_id: str) -> List[Dict[str, Any]]:
         """
         Retrieves normalized criteria definitions for evaluation.
+        Utilizes policy_cache for high-throughput sub-millisecond retrieval.
         """
+        cache_key = f"criteria:{policy_id}"
+        cached = policy_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         policy = self.retrieve_policy(policy_id)
         if not policy:
             return []
@@ -97,5 +121,6 @@ class PolicyRetrievalAgent:
                 "keywords": [k.strip().lower() for k in c.keywords.split(",") if k.strip()],
                 "min_score": c.min_score
             })
-        return criteria_list
 
+        policy_cache.set(cache_key, criteria_list, ttl_seconds=3600)
+        return criteria_list

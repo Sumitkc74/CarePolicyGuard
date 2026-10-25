@@ -1,4 +1,4 @@
-# CarePolicyGuard: Empirical Clinical Benchmark & Reliability Analysis 📊🩺
+# CarePolicyGuard: Empirical Clinical Benchmark & Reliability Analysis 
 
 ## 1. Executive Summary
 
@@ -84,15 +84,15 @@ To provide a focused, rigorous benchmark, CarePolicyGuard is compared directly a
 | Case ID | Clinical Presentation & Governing Policy | CMS Gold Standard | Config A (Zero-Shot) | Config B (Single-Pass RAG) | Config C (Multi-Agent) | Config D (CarePolicyGuard) | Character-Grounded Evidence & Audit Verification |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **BENCH-01** | Post-MI ICM, LVEF 28%, NYHA II, >90d GDMT (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 28%"` at chars 194–202. SHA-256 sealed. |
-| **BENCH-02** | Acute MI at Day 14 (<40-day CMS exclusion) (`NCD-20.4`) | **DENIED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"myocardial infarction occurred 14 days ago"`. Exclusion flagged. |
+| **BENCH-02** | Acute MI at Day 14 (<40-day CMS exclusion) (`NCD-20.4`) | **DENIED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"myocardial infarction occurred 14 days ago"`. Exclusion flagged. |
 | **BENCH-03** | Severe OSA, AHI 34.2, documented face-to-face (`LCD-L33829`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AHI 34.2 events/hr"` at chars 155–171. |
-| **BENCH-04** | Borderline AHI 11.4, No Documented Comorbidity (`LCD-L33829`) | **DENIED** | 🚨 **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DENIED** | Grounded: `"AHI 11.4"`. Insufficient for mild OSA without comorbidity. |
-| **BENCH-05** | Ambiguous Heart Failure Note, Missing LVEF (`NCD-20.4`) | **DEFERRED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Raw conf 0.60 < $\tau=0.85$. Safely routed to human medical director. |
-| **BENCH-06** | Severe OSA, CPAP Intolerance, Missing BiPAP (`LCD-L33829`) | **DEFERRED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Missing trial adherence data. Calibrated gate triggered deferral. |
+| **BENCH-04** | Borderline AHI 11.4, No Documented Comorbidity (`LCD-L33829`) | **DENIED** |  **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DENIED** | Grounded: `"AHI 11.4"`. Insufficient for mild OSA without comorbidity. |
+| **BENCH-05** | Ambiguous Heart Failure Note, Missing LVEF (`NCD-20.4`) | **DEFERRED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Raw conf 0.60 < $\tau=0.85$. Safely routed to human medical director. |
+| **BENCH-06** | Severe OSA, CPAP Intolerance, Missing BiPAP (`LCD-L33829`) | **DEFERRED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Missing trial adherence data. Calibrated gate triggered deferral. |
 | **BENCH-07** | Severe Symptomatic AS for TAVR (`NCD-20.33`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AVA 0.65 cm²"`, `"mean gradient 48 mmHg"`, `"Heart Team"`. |
-| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | 🚨 **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc 4"`, `"HAS-BLED 4"`, `"intracranial hemorrhage"`. |
-| **BENCH-09** | Premature Post-MI Evaluation at Day 18 (`NCD-20.4`) | **DENIED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"PCI performed 18 days ago"`. Waiting period violation. |
-| **BENCH-10** | Wagner Grade III DFU Failing Standard Care >30d (`NCD-20.29`) | **APPROVED** | 🚨 **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"osteomyelitis"`, `">30 days standard care"`. |
+| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** |  **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc 4"`, `"HAS-BLED 4"`, `"intracranial hemorrhage"`. |
+| **BENCH-09** | Premature Post-MI Evaluation at Day 18 (`NCD-20.4`) | **DENIED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"PCI performed 18 days ago"`. Waiting period violation. |
+| **BENCH-10** | Wagner Grade III DFU Failing Standard Care >30d (`NCD-20.29`) | **APPROVED** |  **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"osteomyelitis"`, `">30 days standard care"`. |
 
 ---
 

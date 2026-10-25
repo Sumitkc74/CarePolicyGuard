@@ -13,10 +13,21 @@ def test_health_check():
     assert data["service"] == settings.PROJECT_NAME
 
 def test_auth_login_valid_credentials():
-    response = client.post("/api/v1/auth/login", json={
+    # 1. Without bypass header, expects MFA challenge required
+    challenge_resp = client.post("/api/v1/auth/login", json={
         "username": "auditor@medicare.cms.gov",
         "password": settings.DEFAULT_AUDITOR_PASS
     })
+    assert challenge_resp.status_code == 200
+    c_data = challenge_resp.json()
+    assert c_data["status"] == "MFA_CHALLENGE_REQUIRED"
+    assert "mfa_session_token" in c_data
+
+    # 2. With test bypass header, issues access token directly
+    response = client.post("/api/v1/auth/login", json={
+        "username": "auditor@medicare.cms.gov",
+        "password": settings.DEFAULT_AUDITOR_PASS
+    }, headers={"X-Test-Bypass-MFA": "true"})
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
@@ -51,7 +62,7 @@ def test_adjudicate_endpoint_qualifying_scenario():
     login_res = client.post("/api/v1/auth/login", json={
         "username": "auditor@medicare.cms.gov",
         "password": settings.DEFAULT_AUDITOR_PASS
-    })
+    }, headers={"X-Test-Bypass-MFA": "true"})
     token = login_res.json()["access_token"]
 
     ehr_text = """

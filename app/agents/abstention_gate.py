@@ -15,8 +15,9 @@ class CalibratedAbstentionGate:
     the gate abstains from autonomous coverage determination and defers to clinician/auditor review.
     """
 
-    def __init__(self, tau: Optional[float] = None):
+    def __init__(self, tau: Optional[float] = None, tau_floor: float = 0.65):
         self.tau = tau if tau is not None else settings.ABSTENTION_THRESHOLD
+        self.tau_floor = tau_floor
 
     def evaluate(
         self,
@@ -75,6 +76,27 @@ class CalibratedAbstentionGate:
             codes = ", ".join([a.criterion_code for a in insufficient_crit])
             action_items.append(f"Obtain supplementary documentation for missing mandatory criteria: [{codes}].")
 
+        # Check for Internal Clinical Discordances
+        discordances = [audit for audit in audit_results if getattr(audit, "discordance_flag", False)]
+        if discordances:
+            codes = ", ".join([d.criterion_code for d in discordances])
+            abstention_triggers.append(f"Adversarial audit detected clinical contradiction or discordance in: {codes}.")
+            action_items.append(f"Clinician reconciliation required for conflicting measurements in [{codes}].")
+
+        # Check Weakest-Link Safety Floor (no mandatory inclusion criterion may fall below tau_floor)
+        sub_floor_mandatory = [
+            (crit, audit) for crit, audit in zip(criteria_assessments, audit_results)
+            if not crit.is_exclusion
+            and crit.status == DeterminationStatus.MET
+            and audit.calibrated_confidence < self.tau_floor
+        ]
+        if sub_floor_mandatory:
+            codes = ", ".join([f"{c.criterion_code} ({a.calibrated_confidence:.2f})" for c, a in sub_floor_mandatory])
+            abstention_triggers.append(
+                f"Weakest-link safety floor breached: Mandatory inclusion criteria fall below floor ({self.tau_floor:.2f}): [{codes}]."
+            )
+            action_items.append(f"Obtain stronger documentation to elevate low-confidence criteria: [{codes}].")
+
         # Check threshold tau
         if calibrated_aggregate_conf < self.tau:
             abstention_triggers.append(
@@ -82,7 +104,7 @@ class CalibratedAbstentionGate:
             )
 
         # 3. Decision Routing
-        if abstention_triggers or hallucinations or omissions:
+        if abstention_triggers or hallucinations or omissions or discordances or sub_floor_mandatory:
             decision = AdjudicationDecision.DEFERRED_TO_HUMAN
             abstention_status = True
             abstention_reason = " | ".join(abstention_triggers)

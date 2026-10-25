@@ -62,6 +62,71 @@ class CriteriaEvaluationAgent:
             )
         return None
 
+    @classmethod
+    def analyze_clinical_scope(cls, text: str, span_start: int, span_end: int) -> Dict[str, Any]:
+        """
+        Clinical NegEx & ConText Scope Analyzer.
+        Inspects preceding and following text windows around a clinical evidence span:
+        1. Negation triggers (pre- and post-negation)
+        2. Experiencer triggers (Family history vs patient)
+        """
+        preceding_window = text[max(0, span_start - 60):span_start].lower()
+        following_window = text[span_end:min(len(text), span_end + 35)].lower()
+
+        pre_negations = [
+            r"\b(?:no|not|denies|denied|denying|without|negative for|ruled out|free of|absence of|never)\b",
+            r"\b(?:no evidence of|no history of|no signs of|fails to demonstrate|unremarkable for)\b"
+        ]
+        post_negations = [
+            r"\b(?:is ruled out|was ruled out|is absent|unlikely)\b"
+        ]
+        experiencer_triggers = [
+            r"\b(?:mother|father|sister|brother|maternal|paternal|family history|fhx|relative|parent)\b"
+        ]
+        conjunctions = [r"\b(?:but|however|nevertheless|although|except|yet)\b"]
+
+        last_conjunction = -1
+        for conj in conjunctions:
+            for m in re.finditer(conj, preceding_window):
+                if m.start() > last_conjunction:
+                    last_conjunction = m.start()
+
+        active_preceding = preceding_window[last_conjunction + 1:] if last_conjunction != -1 else preceding_window
+
+        is_negated = False
+        negation_trigger = None
+        for pat in pre_negations:
+            m = re.search(pat, active_preceding)
+            if m:
+                is_negated = True
+                negation_trigger = m.group(0)
+                break
+
+        if not is_negated:
+            for pat in post_negations:
+                m = re.search(pat, following_window)
+                if m:
+                    is_negated = True
+                    negation_trigger = m.group(0)
+                    break
+
+        is_family_history = False
+        experiencer = "PATIENT"
+        for pat in experiencer_triggers:
+            m = re.search(pat, active_preceding)
+            if m:
+                is_family_history = True
+                experiencer = "FAMILY_MEMBER"
+                break
+
+        return {
+            "is_negated": is_negated,
+            "negation_trigger": negation_trigger,
+            "is_family_history": is_family_history,
+            "experiencer": experiencer
+        }
+
+
     def evaluate_criterion(
         self,
         criterion: Dict[str, Any],
@@ -373,7 +438,7 @@ class CriteriaEvaluationAgent:
                 rationale = "No documented polysomnography diagnostic study or Apnea-Hypopnea Index (AHI) found."
                 raw_confidence = 0.65
 
-        elif "compliance" in code.lower() or "face-to-face" in name.lower() or "evaluation" in desc.lower():
+        elif "crit-cpap-02" in code.lower() or "face-to-face" in name.lower():
             eval_match = re.search(r'(?i)\b(face-to-face|in-person|clinical evaluation|sleep specialist consultation)\b', ehr_text)
             if eval_match:
                 span = ClinicalEvidenceSpan(
@@ -441,8 +506,139 @@ class CriteriaEvaluationAgent:
                 rationale = "Documentation of at least 30 days of standard conservative wound management prior to HBOT is absent."
                 raw_confidence = 0.70
 
+
         # =========================================================================
-        # 4. GENERAL KEYWORD FALLBACK
+        # 4. TRANSCATHETER MITRAL VALVE REPAIR (NCD 20.33 TEER / MitraClip)
+        # =========================================================================
+        elif "crit-teer-01" in code.lower() or "mitral regurgitation" in name.lower():
+            mr_match = re.search(r'(?i)\b(moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\s*(?:primary|secondary|functional)?\s*(?:mitral regurgitation|mr)\b|\b(?:mitral regurgitation|mr)\s*(?:is\s*)?(?:moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\b', ehr_text)
+            if mr_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[mr_match.start():mr_match.end()],
+                    start_char=mr_match.start(),
+                    end_char=mr_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, mr_match.start()),
+                    confidence=0.96
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Documented severe valvular regurgitation: '{span.source_text}', satisfying NCD 20.33 Grade 3+/4+ criteria."
+                raw_confidence = 0.96
+            else:
+                mild_mr = re.search(r'(?i)\b(mild|trace|1\+|grade\s*1|grade\s*i)\s*(?:mitral regurgitation|mr)\b', ehr_text)
+                if mild_mr:
+                    span = ClinicalEvidenceSpan(
+                        source_text=ehr_text[mild_mr.start():mild_mr.end()],
+                        start_char=mild_mr.start(),
+                        end_char=mild_mr.end(),
+                        clinical_section=self.detect_clinical_section(ehr_text, mild_mr.start()),
+                        confidence=0.92
+                    )
+                    spans.append(span)
+                    status = DeterminationStatus.NOT_MET
+                    rationale = f"Echocardiogram demonstrates only non-severe mitral regurgitation: '{span.source_text}'. Fails Grade 3+/4+ severity requirement."
+                    raw_confidence = 0.92
+                else:
+                    status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                    rationale = "No documented quantification of mitral regurgitation severity found in diagnostic echocardiogram reports."
+                    raw_confidence = 0.65
+
+        elif "crit-teer-02" in code.lower() or "heart team" in name.lower() or "sts score" in desc.lower():
+            team_match = re.search(r'(?i)\b(multidisciplinary heart team|heart team consensus|sts score\s*(?:is\s*)?(?:[89]|\d{2})%?|prohibitive surgical risk|high surgical risk)\b', ehr_text)
+            if team_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[team_match.start():team_match.end()],
+                    start_char=team_match.start(),
+                    end_char=team_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, team_match.start()),
+                    confidence=0.94
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Documented multidisciplinary evaluation: '{span.source_text}', confirming high/prohibitive surgical risk consensus."
+                raw_confidence = 0.94
+            else:
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = "Documented consensus between a cardiothoracic surgeon and interventional cardiologist confirming prohibitive surgical risk is missing."
+                raw_confidence = 0.68
+
+        # =========================================================================
+        # 5. CAROTID ARTERY STENTING (CMS NCD 20.7 CAS / PTA)
+        # =========================================================================
+        elif "crit-cas-01" in code.lower() or "carotid stenosis" in name.lower() or "stenosis" in desc.lower():
+            sten_match = re.search(r'(?i)(\d{1,2})%\s*.*?\b(?:stenosis|narrowing)\b', ehr_text) or re.search(r'(?i)\b(?:stenosis|narrowing)[^\d\n]{0,30}(\d{1,2})%', ehr_text)
+
+            if sten_match:
+                val = int(sten_match.group(1))
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[sten_match.start():sten_match.end()],
+                    start_char=sten_match.start(),
+                    end_char=sten_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, sten_match.start()),
+                    confidence=0.96
+                )
+                spans.append(span)
+
+                symp_match = re.search(r'(?i)\b(tia|transient ischemic attack|stroke|cva|amaurosis fugax|ipsilateral)\b', ehr_text)
+                is_symptomatic = bool(symp_match)
+
+                if is_symptomatic and val >= 70:
+                    status = DeterminationStatus.MET
+                    rationale = f"Documented {val}% carotid stenosis in symptomatic patient with neurological history (meets CMS NCD 20.7 threshold >=70%)."
+                    raw_confidence = 0.96
+                elif not is_symptomatic and val >= 80:
+                    status = DeterminationStatus.MET
+                    rationale = f"Documented {val}% carotid stenosis in asymptomatic patient (meets CMS NCD 20.7 threshold >=80%)."
+                    raw_confidence = 0.94
+                else:
+                    status = DeterminationStatus.NOT_MET
+                    rationale = f"Carotid stenosis is {val}%, which fails the Medicare NCD 20.7 minimum threshold (>=70% if symptomatic, >=80% if asymptomatic)."
+                    raw_confidence = 0.92
+            else:
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = "No documented carotid stenosis percentage found on diagnostic carotid duplex, CTA, or MRA."
+                raw_confidence = 0.65
+
+        elif "crit-cas-02" in code.lower() or "high risk for cea" in name.lower() or "hostile neck" in desc.lower():
+            risk_match = re.search(r'(?i)\b(high risk for cea|hostile neck|prior neck radiation|prior radical neck dissection|tracheostomy|severe copd|sts score\s*[>]=?\s*8%|contralateral carotid occlusion|severe cervical arthritis)\b', ehr_text)
+            if risk_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[risk_match.start():risk_match.end()],
+                    start_char=risk_match.start(),
+                    end_char=risk_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, risk_match.start()),
+                    confidence=0.94
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Documented high surgical risk for Carotid Endarterectomy (CEA): '{span.source_text}', satisfying CMS anatomical/medical risk criteria."
+                raw_confidence = 0.95
+            else:
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = "Documentation confirming high surgical risk for Carotid Endarterectomy (CEA) is required under NCD 20.7."
+                raw_confidence = 0.68
+
+        elif "crit-cas-03" in code.lower() or "embolic protection" in name.lower() or "epd" in desc.lower():
+            epd_match = re.search(r'(?i)\b(embolic protection device|epd|distal filter|embolic filter|fda-approved carotid stent)\b', ehr_text)
+            if epd_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[epd_match.start():epd_match.end()],
+                    start_char=epd_match.start(),
+                    end_char=epd_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, epd_match.start()),
+                    confidence=0.95
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Documented utilization of mandatory CMS embolic protection system: '{span.source_text}'."
+                raw_confidence = 0.96
+            else:
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = "CMS NCD 20.7 mandates explicit documentation of FDA-approved Embolic Protection Device (EPD) deployment."
+                raw_confidence = 0.70
+
+        # =========================================================================
+        # 6. GENERAL KEYWORD FALLBACK
         # =========================================================================
         else:
             # Fallback search using criterion keywords
@@ -470,6 +666,29 @@ class CriteriaEvaluationAgent:
                 rationale = f"No explicit clinical documentation found corresponding to criterion requirement: {desc[:60]}..."
                 raw_confidence = 0.65
 
+        # Negation and Family History Scope Verification
+        is_negative_req = is_excl or "waiting period" in name.lower() or "post-mi" in code.lower() or "revascularization" in code.lower() or "exclusion" in name.lower()
+
+        if spans:
+            for sp in spans:
+                scope = self.analyze_clinical_scope(ehr_text, sp.start_char, sp.end_char)
+                if scope["is_family_history"] and not is_negative_req:
+                    status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                    rationale = f"Evidence attributed to family history ({scope['experiencer']}), not patient."
+                    raw_confidence = 0.40
+                    break
+                elif scope["is_negated"]:
+                    if not is_negative_req and status == DeterminationStatus.MET:
+                        status = DeterminationStatus.NOT_MET
+                        rationale = f"Condition explicitly negated in chart: '{scope['negation_trigger']}'. Mandatory requirement unmet."
+                        raw_confidence = 0.90
+                        break
+                    elif is_negative_req:
+                        # Negation of an acute event or exclusion satisfies the absence/waiting period requirement
+                        status = DeterminationStatus.MET if not is_excl else DeterminationStatus.NOT_MET
+                        rationale += f" [Affirmed Absence: Negation '{scope['negation_trigger']}' confirms event absence.]"
+                        raw_confidence = 0.95
+
         return CriterionAssessment(
             criterion_id=criterion.get("id", code),
             criterion_code=code,
@@ -484,3 +703,120 @@ class CriteriaEvaluationAgent:
             temporal_window_met=temporal_window_met
         )
 
+
+
+
+
+def evaluate_patient_against_policy(ehr_text: str, policy: Any) -> Dict[str, Any]:
+    """
+    Evaluates clinical narrative against Medicare coverage criteria for HL7 Da Vinci CRD CDS Hooks.
+    Returns determination ('APPROVED' or 'WARNING'), confidence score, rationale, and missing criteria.
+    """
+    policy_id = getattr(policy, "policy_id", str(policy)) if policy else "NCD-20.4"
+    lower = ehr_text.lower()
+
+    # ROUTE 1: CAROTID ARTERY STENTING (NCD 20.7)
+    if policy_id == "NCD-20.7" or "carotid" in lower or "cas" in lower or ("stent" in lower and "endarterectomy" in lower):
+        sten_match = re.search(r'(\d{1,2})%\s*.*?\b(?:stenosis|narrowing)\b', lower) or re.search(r'\b(?:stenosis|narrowing)[^\d\n]{0,30}(\d{1,2})%', lower)
+
+        val = int(sten_match.group(1)) if sten_match else None
+        is_symptomatic = bool(re.search(r'\b(tia|transient ischemic attack|stroke|cva|amaurosis fugax|ipsilateral)\b', lower))
+        has_high_risk = bool(re.search(r'\b(high risk for cea|hostile neck|prior neck radiation|prior radical neck dissection|tracheostomy|severe copd|sts score\s*[>]=?\s*8%|contralateral carotid occlusion)\b', lower))
+        has_epd = bool(re.search(r'\b(embolic protection device|epd|distal filter|embolic filter|fda-approved carotid stent)\b', lower))
+
+        stenosis_ok = (is_symptomatic and val is not None and val >= 70) or (not is_symptomatic and val is not None and val >= 80)
+        if stenosis_ok and has_high_risk and has_epd:
+            return {
+                "determination": "APPROVED",
+                "confidence_score": 0.96,
+                "clinical_rationale": f"Severe carotid stenosis confirmed ({val}%), patient satisfies high-risk criteria for CEA, and embolic protection device deployment is verified under NCD 20.7.",
+                "missing_criteria": []
+            }
+
+        missing = []
+        if not stenosis_ok:
+            missing.append("Carotid stenosis >= 70% (symptomatic) or >= 80% (asymptomatic)")
+        if not has_high_risk:
+            missing.append("Documented high surgical risk for open Carotid Endarterectomy (CEA)")
+        if not has_epd:
+            missing.append("FDA-approved Embolic Protection Device (EPD) procedural plan")
+
+        return {
+            "determination": "WARNING",
+            "confidence_score": 0.50,
+            "clinical_rationale": "Carotid Artery Stenting requires documentation of severe stenosis threshold, high CEA risk justification, and embolic protection device.",
+            "missing_criteria": missing or ["Documentation Deficiency"]
+        }
+
+    # ROUTE 2: TRANSCATHETER EDGE-TO-EDGE REPAIR (NCD 20.33)
+    if policy_id == "NCD-20.33" or "mitral" in lower or "regurgitation" in lower or "teer" in lower:
+        has_severe_mr = bool(re.search(r'\b(severe mitral regurgitation|severe mr|grade 3\+|grade 4\+|grade iii|grade iv)\b', lower))
+        has_heart_team = bool(re.search(r'\b(heart team|multidisciplinary heart team|sts score|prohibitive surgical risk|high surgical risk)\b', lower))
+        if has_severe_mr and has_heart_team:
+            return {
+                "determination": "APPROVED",
+                "confidence_score": 0.95,
+                "clinical_rationale": "Severe Mitral Regurgitation (Grade 3+/4+) and Multidisciplinary Heart Team surgical consensus documented under NCD 20.33.",
+                "missing_criteria": []
+            }
+        missing = []
+        if not has_severe_mr:
+            missing.append("Documented Grade 3+ or Grade 4+ severe Mitral Regurgitation on echocardiography")
+        if not has_heart_team:
+            missing.append("Multidisciplinary Heart Team consensus documenting prohibitive surgical risk")
+        return {
+            "determination": "WARNING",
+            "confidence_score": 0.50,
+            "clinical_rationale": "TEER prior-authorization requires documented severe MR and Heart Team consensus.",
+            "missing_criteria": missing
+        }
+
+    # ROUTE 3: IMPLANTABLE CARDIOVERTER DEFIBRILLATORS (NCD 20.4)
+    days_match = re.search(r'\b(?:stemi|mi|myocardial infarction)\s+(?:within\s+)?(\d{1,2})\s*days?\s*ago\b', lower)
+    if days_match and int(days_match.group(1)) < 40:
+        return {
+            "determination": "WARNING",
+            "confidence_score": 0.45,
+            "clinical_rationale": f"Statutory waiting period unmet: Only {days_match.group(1)} days elapsed since acute MI (minimum 40 days required under NCD 20.4).",
+            "missing_criteria": [
+                "Post-Myocardial Infarction Waiting Period (>= 40 days)",
+                "NYHA Functional Class Documentation",
+                "Guideline-Directed Medical Therapy (>= 90 days)"
+            ]
+        }
+
+    # Check for LVEF
+    lvef_val = None
+    lvef_match = re.search(r'\blvef\s*(?:of|is|:)?\s*(\d{1,2})%', lower)
+    if lvef_match:
+        lvef_val = int(lvef_match.group(1))
+
+    # Check for NYHA
+    has_nyha = bool(re.search(r'\bnyha\s+(?:class\s+)?(?:i{1,3}|iv|[1-4])\b', lower))
+
+    # Check for medical therapy or GDMT
+    has_therapy = bool(re.search(r'\b(gdmt|optimal medical therapy|medical therapy|beta-blocker|acei|arb|arni)\b', lower))
+
+    # Approved condition
+    if lvef_val is not None and lvef_val <= 35 and has_nyha and has_therapy:
+        return {
+            "determination": "APPROVED",
+            "confidence_score": 0.96,
+            "clinical_rationale": f"Severe LV systolic dysfunction verified (LVEF {lvef_val}% <= 35%), NYHA functional class documented, and optimal medical therapy satisfied without statutory waiting period deficits.",
+            "missing_criteria": []
+        }
+
+    missing = []
+    if lvef_val is None or lvef_val > 35:
+        missing.append("Documented LVEF <= 35% on diagnostic echocardiography")
+    if not has_nyha:
+        missing.append("NYHA Functional Class II-III documentation")
+    if not has_therapy:
+        missing.append("Guideline-Directed Medical Therapy (GDMT) duration documentation")
+
+    return {
+        "determination": "WARNING",
+        "confidence_score": 0.50,
+        "clinical_rationale": "Clinical narrative lacks one or more required Medicare documentation criteria.",
+        "missing_criteria": missing or ["Documentation Deficiency"]
+    }

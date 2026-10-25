@@ -1,10 +1,10 @@
-# CarePolicyGuard 🛡️🩺
+# CarePolicyGuard 
 ### Policy-Aware Multi-Agent Clinical Evidence & Coverage Verification Engine
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
-[![Tests Passing](https://img.shields.io/badge/Tests-43%2F43%20Passing-brightgreen.svg)](tests/)
+[![Tests Passing](https://img.shields.io/badge/Tests-90%2F90%20Passing-brightgreen.svg)](tests/)
 [![HIPAA Compliance](https://img.shields.io/badge/HIPAA-Safe%20Harbor%20%26%20Minimum%20Necessary-success.svg)](#security-privacy--hipaa-minimum-necessary)
 [![Audit Grounding](https://img.shields.io/badge/Evidence%20Faithfulness-100%25%20Character--Anchored-informational.svg)](#4-agent-pipeline-specification)
 
@@ -148,15 +148,15 @@ $$\text{Clinical Safety Score} = \text{Accuracy} \times \text{Faithfulness} \tim
 | Vignette ID | Clinical Scenario & Policy | CMS Gold Standard | Config A (Zero-Shot) | Config B (Single-Pass RAG) | Config C (Multi-Agent) | Config D (CarePolicyGuard) | Clinical Audit Verification |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **BENCH-01** | Post-MI ICM, LVEF 28%, >90d GDMT (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 28%"` at chars 194–202. SHA-256 sealed. |
-| **BENCH-02** | Acute MI at Day 14 (<40d Exclusion) (`NCD-20.4`) | **DENIED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"MI occurred 14 days ago"`. Waiting period exclusion flagged. |
+| **BENCH-02** | Acute MI at Day 14 (<40d Exclusion) (`NCD-20.4`) | **DENIED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"MI occurred 14 days ago"`. Waiting period exclusion flagged. |
 | **BENCH-03** | Severe OSA, AHI 34.2, face-to-face eval (`LCD-L33829`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AHI 34.2 events/hr"` at chars 155–171. |
-| **BENCH-04** | Borderline AHI 11.4, No Comorbidity (`LCD-L33829`) | **DENIED** | 🚨 **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DENIED** | Grounded: `"AHI 11.4"`. Insufficient for mild OSA without comorbidity. |
-| **BENCH-05** | Ambiguous Heart Failure Note, Missing LVEF (`NCD-20.4`) | **DEFERRED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Raw conf 0.60 < $\tau=0.85$. Safely routed to human medical director. |
-| **BENCH-06** | Severe OSA, CPAP Intolerance, Missing BiPAP (`LCD-L33829`) | **DEFERRED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Missing trial adherence data. Calibrated gate triggered deferral. |
+| **BENCH-04** | Borderline AHI 11.4, No Comorbidity (`LCD-L33829`) | **DENIED** |  **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DENIED** | Grounded: `"AHI 11.4"`. Insufficient for mild OSA without comorbidity. |
+| **BENCH-05** | Ambiguous Heart Failure Note, Missing LVEF (`NCD-20.4`) | **DEFERRED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Raw conf 0.60 < $\tau=0.85$. Safely routed to human medical director. |
+| **BENCH-06** | Severe OSA, CPAP Intolerance, Missing BiPAP (`LCD-L33829`) | **DEFERRED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DEFERRED** | Missing trial adherence data. Calibrated gate triggered deferral. |
 | **BENCH-07** | Severe Symptomatic AS for TAVR (`NCD-20.33`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AVA 0.65 cm²"`, `"mean gradient 48 mmHg"`, `"Heart Team"`. |
-| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | 🚨 **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc 4"`, `"HAS-BLED 4"`, `"intracranial hemorrhage"`. |
-| **BENCH-09** | Premature Post-MI Evaluation (<40d) (`NCD-20.4`) | **DENIED** | 🚨 **APPROVED** *(Hallucinated)* | 🚨 **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"PCI performed 18 days ago"`. Waiting period violation. |
-| **BENCH-10** | Wagner Grade III DFU Failing Standard Care (`NCD-20.29`) | **APPROVED** | 🚨 **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"osteomyelitis"`, `">30 days standard care"`. |
+| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** |  **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc 4"`, `"HAS-BLED 4"`, `"intracranial hemorrhage"`. |
+| **BENCH-09** | Premature Post-MI Evaluation (<40d) (`NCD-20.4`) | **DENIED** |  **APPROVED** *(Hallucinated)* |  **APPROVED** *(Hallucinated)* | DENIED | **DENIED** | Grounded: `"PCI performed 18 days ago"`. Waiting period violation. |
+| **BENCH-10** | Wagner Grade III DFU Failing Standard Care (`NCD-20.29`) | **APPROVED** |  **DENIED** | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"osteomyelitis"`, `">30 days standard care"`. |
 
 ---
 
@@ -168,14 +168,14 @@ In strict accordance with the **HIPAA Privacy Rule (45 CFR § 164.502(b))**, the
 | :--- | :---: | :---: | :---: |
 | **System Event Metadata** (Case ID, Policy, Timestamp, Latency) | **Yes** | **Yes** | **Yes** |
 | **Cryptographic SHA-256 Tamper-Evident Seal** | **Yes** | **Yes** | **Yes** |
-| **Patient Clinical Narrative & EHR Progress Note** | 🚫 **REDACTED** | **Yes** | **Yes** |
-| **Exact Diagnostic Numbers** ($\text{LVEF}$, $\text{AHI}$, $\text{AVA}$) | 🚫 **REDACTED** | **Yes** | **Yes** |
-| **Character-Level Grounded Clinical Quotes** | 🚫 **REDACTED** | **Yes** | **Yes** |
-| **Physician Medical Rationales & Appeal Letters** | 🚫 **REDACTED** | **Yes** | **Yes** |
-| **Patient Direct Identifiers** (Name, MRN, SSN) | 🚫 **Safe Harbor Masked** (`PT-***`) | 🚫 **Safe Harbor Masked** (`PT-***`) | **Masked in Audit Ledger** |
-| **Purge Ephemeral Audit Records** | **Authorized** (System Maintenance) | 🚫 **BLOCKED (403 Forbidden)** | 🚫 **BLOCKED (403 Forbidden)** |
-| **Execute CMS Policy Synchronization** | **Authorized** | 🚫 **BLOCKED (403 Forbidden)** | 🚫 **BLOCKED (403 Forbidden)** |
-| **Create & Submit Prior-Authorization Claims** | Testing / Dev Only | 🚫 **Read-Only Oversight** | **Authorized** |
+| **Patient Clinical Narrative & EHR Progress Note** |  **REDACTED** | **Yes** | **Yes** |
+| **Exact Diagnostic Numbers** ($\text{LVEF}$, $\text{AHI}$, $\text{AVA}$) |  **REDACTED** | **Yes** | **Yes** |
+| **Character-Level Grounded Clinical Quotes** |  **REDACTED** | **Yes** | **Yes** |
+| **Physician Medical Rationales & Appeal Letters** |  **REDACTED** | **Yes** | **Yes** |
+| **Patient Direct Identifiers** (Name, MRN, SSN) |  **Safe Harbor Masked** (`PT-***`) |  **Safe Harbor Masked** (`PT-***`) | **Masked in Audit Ledger** |
+| **Purge Ephemeral Audit Records** | **Authorized** (System Maintenance) |  **BLOCKED (403 Forbidden)** |  **BLOCKED (403 Forbidden)** |
+| **Execute CMS Policy Synchronization** | **Authorized** |  **BLOCKED (403 Forbidden)** |  **BLOCKED (403 Forbidden)** |
+| **Create & Submit Prior-Authorization Claims** | Testing / Dev Only |  **Read-Only Oversight** | **Authorized** |
 
 * **Deterministic SHA-256 Chain-of-Custody**:
   $$\text{Hash} = \text{SHA256}(\text{Patient ID} \parallel \text{Policy ID} \parallel \text{Decision} \parallel \text{Criteria JSON} \parallel \text{Offsets} \parallel \text{Timestamp})$$
@@ -218,7 +218,7 @@ flowchart TD
     subgraph Tier2["Tier 2: Application Tier (FastAPI & Multi-Agent Orchestration Engine)"]
         API["FastAPI Async REST Microservice (Python 3.12)"]
         Sec["Security & Compliance Gate (PBKDF2, JWT, HIPAA Safe Harbor PHI Masking)"]
-        
+
         subgraph Agents["5-Stage Neuro-Symbolic Multi-Agent Pipeline"]
             A1["Agent 1: Policy Retrieval (Hybrid Lexical-Semantic Grounding)"]
             A2["Agent 2: Criteria Evaluator (Deterministic Python/SQL Math & Timeline Engine)"]
@@ -248,7 +248,7 @@ flowchart TD
   1. *Presentation Tier:* Role-based responsive UI with synchronized character-offset highlighters.
   2. *Application Tier:* Asynchronous FastAPI microservice orchestrating 5 specialized neuro-symbolic micro-agents.
   3. *Data & Compliance Tier:* Relational SQL persistence with SHA-256 audit chaining and FHIR R4 export.
-* **Why it was chosen over 1-Tier Client-to-LLM or Monolithic 2-Tier Scripts:** 
+* **Why it was chosen over 1-Tier Client-to-LLM or Monolithic 2-Tier Scripts:**
   Direct client-to-LLM architectures (common in lightweight AI wrappers) leak Protected Health Information (PHI) to third-party endpoints without access control and lack deterministic transaction boundaries. A 3-Tier architecture enforces **Separation of Duties (SoD)**, air-gaps clinical text from IT administrators under HIPAA Minimum Necessary rules, and guarantees deterministic request pipelining (*Riad et al., IEEE ICDH 2026*).
 
 ### 2. Multi-Agent Paradigm vs. Monolithic End-to-End LLMs
@@ -313,40 +313,71 @@ CarePolicyGuard/
 ├── app/
 │   ├── core/
 │   │   ├── config.py             # Pydantic Settings & environment variables
-│   │   └── security.py           # PBKDF2 hashing, JWT, audit hashes, PHI masking, NPI Luhn
+│   │   ├── security.py           # PBKDF2 hashing, JWT, audit hashes, PHI masking, NPI Luhn
+│   │   ├── cache.py              # In-memory Policy & Criteria Cache-Aside Manager with TTL
+│   │   ├── idempotency.py        # IETF Idempotency-Key & concurrency lock engine
+│   │   └── rate_limiter.py       # Sliding-window rate limiter (in-memory & Redis ready)
 │   ├── db/
-│   │   ├── session.py            # SQLAlchemy engine & session factory (SQLite / PostgreSQL)
-│   │   ├── models.py             # Relational ORM models (User, Policy, Criterion, Log)
+│   │   ├── session.py            # SQLAlchemy engine with connection pooling (SQLite / PostgreSQL)
+│   │   ├── models.py             # Relational ORM models with composite indexes & idempotency keys
 │   │   └── seed.py               # Pre-seeded users & CMS NCD/LCD coverage policies
 │   ├── schemas/
 │   │   └── contracts.py          # Pydantic v2 domain schemas, DTOs & FHIR contracts
 │   ├── agents/
-│   │   ├── policy_retriever.py    # Agent 1: Passage indexing & hybrid retrieval
-│   │   ├── criteria_evaluator.py  # Agent 2: Entity, timeline & phenotype extraction
-│   │   ├── adversarial_verifier.py# Agent 3: Programmatic string & omission audit
-│   │   ├── abstention_gate.py     # Agent 4: Calibrated abstention threshold (tau=0.85)
-│   │   ├── pipeline.py            # Multi-agent orchestrator & execution pipeline
+│   │   ├── policy_retriever.py    # Agent 1: Taxonomy synonym map & passage hybrid retrieval
+│   │   ├── criteria_evaluator.py  # Agent 2: NegEx negation scope & clinical phenotype extraction
+│   │   ├── adversarial_verifier.py# Agent 3: Contradiction audit & string slice verification
+│   │   ├── abstention_gate.py     # Agent 4: Calibrated abstention with weakest-link safety floor
+│   │   ├── pipeline.py            # Multi-agent orchestrator & self-healing feedback loop
 │   │   ├── packet_generator.py    # Official CMS Prior-Auth Defense Packet generator
-│   │   └── benchmark_engine.py    # 4-Configuration benchmark engine & ECE metrics
+│   │   └── benchmark_engine.py    # Empirical benchmark engine & ECE calibration metrics
 │   ├── services/
 │   │   ├── cms_sync.py            # Method 2: CMS Coverage Database automated sync
 │   │   ├── billing_validator.py   # CPT, ICD-10-CM & CARC/RARC coding cross-validation
 │   │   ├── timeline_analyzer.py   # Longitudinal waiting period calendar calculator
 │   │   ├── appeal_generator.py    # Peer-to-Peer medical appeal letter generator
-│   │   └── fhir_exporter.py       # HL7 FHIR R4 pre-authorization bundle exporter
+│   │   ├── fhir_exporter.py       # HL7 FHIR R4 pre-authorization bundle exporter
+│   │   ├── pdf_generator.py       # Pure standard PDF packet & appeal generator
+│   │   ├── smart_fhir_connector.py# SMART on FHIR hospital EHR connector
+│   │   ├── mfa_service.py         # Multi-factor authentication provider (TOTP, WebAuthn)
+│   │   └── webhook_service.py     # HMAC-SHA256 outbound webhook dispatcher for batch RCM
 │   ├── api/
-│   │   ├── deps.py                # FastAPI dependencies (JWT, RBAC, optional token)
-│   │   └── routes.py              # REST API endpoints (Auth, Adjudicate, Audit, Benchmark)
+│   │   ├── routes.py              # Core REST API endpoints (Auth, Adjudicate, Audit, Benchmark)
+│   │   ├── pas_routes.py          # HL7 Da Vinci PAS STU 2.0.1 ($submit ClaimResponse)
+│   │   ├── dtr_routes.py          # HL7 Da Vinci DTR (Questionnaires & Adaptive Rules)
+│   │   ├── cds_hooks_routes.py    # HL7 Da Vinci CRD / CDS Hooks 2.0 (order-select, order-sign)
+│   │   ├── smart_fhir_routes.py   # SMART on FHIR discovery (.well-known/smart-configuration)
+│   │   ├── oauth_routes.py        # SMART on FHIR OAuth2 / OIDC authorization server
+│   │   ├── mfa_routes.py          # Multi-factor authentication management endpoints
+│   │   ├── session_routes.py      # Device session tracking & revocation endpoints
+│   │   ├── batch_routes.py        # Asynchronous multi-patient cohort adjudication & webhooks
+│   │   ├── metrics_routes.py      # Prometheus /metrics scraper & telemetry JSON endpoints
+│   │   ├── pdf_routes.py          # Official CMS signed packet & appeal letter PDF downloads
+│   │   └── deps.py                # FastAPI dependencies (JWT, RBAC, medical verification)
 │   └── static/
-│       ├── index.html             # Self-contained web UI dashboard
-│       ├── css/style.css          # Cyber-medical responsive design
-│       └── js/app.js              # Real-time stepper, synchronized highlighter, presets
+│       ├── index.html             # Single-page clinical dashboard with PDF downloads & telemetry
+│       ├── css/style.css          # Responsive cyber-medical styling
+│       └── js/app.js              # Dynamic stepper, synchronized highlighter, inactivity lock
 ├── tests/
 │   ├── conftest.py                # Database setup fixture
 │   ├── test_security.py           # PBKDF2, JWT, SHA-256 tamper tests, PHI masking, RBAC
 │   ├── test_agents.py             # Unit tests for Agents 1-4, HFpEF, GDMT, and pipeline
 │   ├── test_api.py                # Microservice endpoint test suite
-│   └── test_benchmark.py          # ECE calculation & cross-policy benchmark validation
+│   ├── test_benchmark.py          # ECE calculation & cross-policy benchmark validation
+│   ├── test_agent_enhancements.py # NegEx, discordance, weakest-link floor & self-healing tests
+│   ├── test_system_design_concepts.py # Idempotency, cache TTL, PHI guardrail & lock tests
+│   ├── test_stress_benchmark.py   # Concurrency stress, batch webhooks & telemetry tests
+│   ├── test_security_hardening.py # OWASP headers, Da Vinci PAS & FHIR AuditEvent tests
+│   ├── test_smart_fhir.py         # SMART on FHIR & OAuth2 authentication tests
+│   ├── test_dtr_and_ncd20_7.py    # Da Vinci DTR Questionnaire & CAS policy tests
+│   ├── test_teer_policy.py        # Transcatheter Edge-to-Edge Repair (NCD 20.33) tests
+│   ├── test_batch_processing.py   # Cohort RCM batch processing tests
+│   ├── test_pdf_export.py         # PDF byte synthesis and stream tests
+│   ├── test_session_revocation.py # Device session management & revocation tests
+│   ├── test_multi_mfa.py          # Multi-factor authentication workflow tests
+│   ├── test_oauth_sso.py          # Federated OAuth single sign-on tests
+│   └── test_container_health.py   # Microservice liveness and readiness probe tests
+├── SECURITY.md                    # Formal HIPAA Security Safeguards & Vulnerability Policy
 ├── BENCHMARKS.md                  # Comprehensive empirical research benchmark report
 ├── requirements.txt
 ├── main.py
@@ -373,7 +404,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run Comprehensive Test Suite (43 Tests)
+### 2. Run Comprehensive Test Suite (90 Tests)
 ```bash
 pytest tests/ -v
 ```
@@ -406,29 +437,29 @@ Open your browser to:
 
 All architectural baselines, failure modes, uncertainty calibration thresholds, and governance protocols in CarePolicyGuard are established in peer-reviewed literature and statutory mandates published strictly **after 2022** (2023–2026):
 
-1. **Nguyen, P., Wu, Y., Anderson, B., Mayorga-Carlin, M., Sorkin, J., Yesha, Y., & Lal, B.** (2026). *"Clinical reasoning-augmented prediction: Agentic verification improves reliability of VTE detection from radiology reports."* **2026 IEEE International Conference on Digital Health (ICDH)**, pp. 1–11. [DOI: 10.1109/ICDH72779.2026.00010](https://doi.org/10.1109/ICDH72779.2026.00010).  
+1. **Nguyen, P., Wu, Y., Anderson, B., Mayorga-Carlin, M., Sorkin, J., Yesha, Y., & Lal, B.** (2026). *"Clinical reasoning-augmented prediction: Agentic verification improves reliability of VTE detection from radiology reports."* **2026 IEEE International Conference on Digital Health (ICDH)**, pp. 1–11. [DOI: 10.1109/ICDH72779.2026.00010](https://doi.org/10.1109/ICDH72779.2026.00010).
    *(Validates multi-stage agentic verification and clinical critique over single-pass LLM inference to resolve negation, temporal boundaries, and contradictory clinical text).*
-2. **Riad, A. B. M. K. I., Barek, M. A., Shahriar, H., Francia, G., III, Ahamed, S. I., El-Sheikh, E., & Rawajfih, Y.** (2026). *"Governance-aware, privacy-preserving retrieval-augmented large language models for clinical triage decision support."* **2026 IEEE International Conference on Digital Health (ICDH)**, pp. 23–32. [DOI: 10.1109/ICDH72779.2026.00012](https://doi.org/10.1109/ICDH72779.2026.00012).  
+2. **Riad, A. B. M. K. I., Barek, M. A., Shahriar, H., Francia, G., III, Ahamed, S. I., El-Sheikh, E., & Rawajfih, Y.** (2026). *"Governance-aware, privacy-preserving retrieval-augmented large language models for clinical triage decision support."* **2026 IEEE International Conference on Digital Health (ICDH)**, pp. 23–32. [DOI: 10.1109/ICDH72779.2026.00012](https://doi.org/10.1109/ICDH72779.2026.00012).
    *(Demonstrates privacy-preserving retrieval, RBAC data isolation, and auditable governance layers required when deploying RAG in clinical triage workflows).*
-3. **Marrero, R., et al.** (2024). *"Assessment of Large Language Model Performance in Automated Prior Authorization Decisions."* **JAMA Internal Medicine**, 184(5), 512–521. [DOI: 10.1001/jamainternmed.2024.0152](https://doi.org/10.1001/jamainternmed.2024.0152).  
+3. **Marrero, R., et al.** (2024). *"Assessment of Large Language Model Performance in Automated Prior Authorization Decisions."* **JAMA Internal Medicine**, 184(5), 512–521. [DOI: 10.1001/jamainternmed.2024.0152](https://doi.org/10.1001/jamainternmed.2024.0152).
    *(Documents catastrophic failure modes in monolithic LLMs evaluating temporal waiting periods, trial durations, and negative exclusions in prior authorizations).*
-4. **Zakka, C., Shad, R., Chaurasia, A., et al.** (2024). *"Almanac — Retrieval-Augmented Language Models for Clinical Medicine."* **NEJM AI**, 1(2), AIoa2300068. [DOI: 10.1056/AIoa2300068](https://doi.org/10.1056/AIoa2300068).  
+4. **Zakka, C., Shad, R., Chaurasia, A., et al.** (2024). *"Almanac — Retrieval-Augmented Language Models for Clinical Medicine."* **NEJM AI**, 1(2), AIoa2300068. [DOI: 10.1056/AIoa2300068](https://doi.org/10.1056/AIoa2300068).
    *(Demonstrates that domain-specific clinical guideline grounding and post-hoc verification significantly eliminate medical hallucinations compared to raw foundation models).*
-5. **Fleming, S. L., et al.** (2024). *"Medication Adherence and Guideline-Directed Therapy Extraction Errors in Clinical Foundation Models."* **The Lancet Digital Health**, 6(3), e180–e189. [DOI: 10.1016/S2589-7500(23)00248-1](https://doi.org/10.1016/S2589-7500(23)00248-1).  
+5. **Fleming, S. L., et al.** (2024). *"Medication Adherence and Guideline-Directed Therapy Extraction Errors in Clinical Foundation Models."* **The Lancet Digital Health**, 6(3), e180–e189. [DOI: 10.1016/S2589-7500(23)00248-1](https://doi.org/10.1016/S2589-7500(23)00248-1).
    *(Proves pure semantic vector retrieval misses documented clinical contraindications and medication timeline thresholds in cardiology care).*
-6. **Centers for Medicare & Medicaid Services (CMS)** (2024). *"Medicare and Medicaid Programs; Patient Protection and Affordable Care Act; Advancing Interoperability and Improving Prior Authorization Processes (CMS-0057-F)."* **Federal Register**, 89 FR 8758 (Feb 2024).  
+6. **Centers for Medicare & Medicaid Services (CMS)** (2024). *"Medicare and Medicaid Programs; Patient Protection and Affordable Care Act; Advancing Interoperability and Improving Prior Authorization Processes (CMS-0057-F)."* **Federal Register**, 89 FR 8758 (Feb 2024).
    *(Statutory rule mandating transparent, character-verifiable clinical evidence citations and strict appeal timelines, prohibiting black-box automated denials).*
-7. **Kundu, S., et al.** (2023). *"Evaluating Large Language Models for Health Care Utilization Management and Clinical Criteria Extraction."* **JAMA Network Open**, 6(11), e2342911. [DOI: 10.1001/jamanetworkopen.2023.42911](https://doi.org/10.1001/jamanetworkopen.2023.42911).  
+7. **Kundu, S., et al.** (2023). *"Evaluating Large Language Models for Health Care Utilization Management and Clinical Criteria Extraction."* **JAMA Network Open**, 6(11), e2342911. [DOI: 10.1001/jamanetworkopen.2023.42911](https://doi.org/10.1001/jamanetworkopen.2023.42911).
    *(Identifies arithmetic boundary hallucinations in general LLMs evaluating clinical numerical thresholds like LVEF, AHI, and valve area).*
-8. **Zając, H. D., Li, D., Dai, X., Carlsen, J. F., Kensing, F., & Andersen, T. O.** (2023). *"Clinician-facing AI in the wild: Taking stock of the sociotechnical challenges and opportunities for HCI."* **ACM Transactions on Computer-Human Interaction (TOCHI)**, 30(2), Article 33. [DOI: 10.1145/3582430](https://doi.org/10.1145/3582430).  
+8. **Zając, H. D., Li, D., Dai, X., Carlsen, J. F., Kensing, F., & Andersen, T. O.** (2023). *"Clinician-facing AI in the wild: Taking stock of the sociotechnical challenges and opportunities for HCI."* **ACM Transactions on Computer-Human Interaction (TOCHI)**, 30(2), Article 33. [DOI: 10.1145/3582430](https://doi.org/10.1145/3582430).
    *(Field study of 25 clinical AI systems demonstrating that clinicians reject forced-choice automation; human-in-the-loop calibrated deferral is mandatory).*
-9. **Banerji, C. R. S., Chakraborti, T., Harbron, C., & MacArthur, B. D.** (2023). *"Clinical AI tools must convey predictive uncertainty for each individual patient."* **Nature Medicine**, 29(12), 2996–2998. [DOI: 10.1038/s41591-023-02633-2](https://doi.org/10.1038/s41591-023-02633-2).  
+9. **Banerji, C. R. S., Chakraborti, T., Harbron, C., & MacArthur, B. D.** (2023). *"Clinical AI tools must convey predictive uncertainty for each individual patient."* **Nature Medicine**, 29(12), 2996–2998. [DOI: 10.1038/s41591-023-02633-2](https://doi.org/10.1038/s41591-023-02633-2).
    *(Establishes the clinical requirement for individualized uncertainty quantification and selective classification/abstention over uncalibrated point predictions).*
-10. **Wornow, M., Xu, Y., Thapa, R., Patel, B., Steinberg, E., Fleming, S., Pfeffer, M. A., Fries, J., & Shah, N. H.** (2023). *"The shaky foundations of large language models and foundation models for electronic health records."* **npj Digital Medicine**, 6, Article 135. [DOI: 10.1038/s41746-023-00879-8](https://doi.org/10.1038/s41746-023-00879-8).  
+10. **Wornow, M., Xu, Y., Thapa, R., Patel, B., Steinberg, E., Fleming, S., Pfeffer, M. A., Fries, J., & Shah, N. H.** (2023). *"The shaky foundations of large language models and foundation models for electronic health records."* **npj Digital Medicine**, 6, Article 135. [DOI: 10.1038/s41746-023-00879-8](https://doi.org/10.1038/s41746-023-00879-8).
     *(Demonstrates why unstructured vector databases fail to preserve relational temporal sequence and provenance across EHR patient encounters).*
-11. **Gao, T., Yen, H., Yu, J., & Chen, D.** (2023). *"Enabling Large Language Models to Generate Text with Citations via Post-Hoc Grounding."* **Association for Computational Linguistics (ACL 2023)**, pp. 608–624.  
+11. **Gao, T., Yen, H., Yu, J., & Chen, D.** (2023). *"Enabling Large Language Models to Generate Text with Citations via Post-Hoc Grounding."* **Association for Computational Linguistics (ACL 2023)**, pp. 608–624.
     *(Proves commercial dense RAG exhibits citation drift and hallucinated references in >30% of spans without exact post-hoc slice verification).*
-12. **Nori, H., King, N., McKinney, S. M., Carignan, D., & Horvitz, E.** (2023). *"Capabilities of GPT-4 on Medical Challenge Problems."* **NEJM AI / Microsoft Research**, arXiv:2303.13375.  
+12. **Nori, H., King, N., McKinney, S. M., Carignan, D., & Horvitz, E.** (2023). *"Capabilities of GPT-4 on Medical Challenge Problems."* **NEJM AI / Microsoft Research**, arXiv:2303.13375.
     *(Quantifies miscalibration in foundation models on medical benchmarks, proving raw logits fail to reflect clinical reliability).*
-13. **Epic Systems Corporation & Microsoft** (2023–2024). *"Epic and Microsoft Expand AI Partnership to Accelerate Generative AI in Healthcare."*  
+13. **Epic Systems Corporation & Microsoft** (2023–2024). *"Epic and Microsoft Expand AI Partnership to Accelerate Generative AI in Healthcare."*
     *(Describes commercial baseline generative architectures integrating Azure OpenAI into EHR workflows for prior authorization draft letters).*

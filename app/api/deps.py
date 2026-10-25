@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import datetime, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -6,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.security import decode_access_token, UserRole
 from app.db.session import get_db
-from app.db.models import User
+from app.db.models import User, UserSession
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_PREFIX}/auth/login"
@@ -17,16 +18,33 @@ def get_current_user(
     db: Session = Depends(get_db)
 ) -> User:
     """
-    Decodes JWT bearer token and returns authenticated User entity from database.
+    Decodes JWT bearer token, checks session revocation status,
+    and returns authenticated User entity from database.
     """
     payload = decode_access_token(token)
     username: Optional[str] = payload.get("sub")
+    session_id: Optional[str] = payload.get("sid")
+
     if username is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials: sub claim missing.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    # Check if session was revoked remotely from another device
+    if session_id:
+        sess = db.query(UserSession).filter(UserSession.session_id == session_id).first()
+        if sess and sess.is_revoked:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Session has been terminated from another device. Please sign in again.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        elif sess:
+            sess.last_active_at = datetime.now(timezone.utc)
+            db.commit()
+
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise HTTPException(
@@ -66,7 +84,7 @@ def get_optional_current_user(
     db: Session = Depends(get_db)
 ) -> Optional[User]:
     """
-    Returns authenticated user entity if a valid bearer token is provided,
+    Returns authenticated user entity if a valid bearer token is provided and not revoked,
     or None if the request is unauthenticated.
     """
     if not token:
@@ -74,8 +92,13 @@ def get_optional_current_user(
     try:
         payload = decode_access_token(token)
         username: Optional[str] = payload.get("sub")
+        session_id: Optional[str] = payload.get("sid")
         if not username:
             return None
+        if session_id:
+            sess = db.query(UserSession).filter(UserSession.session_id == session_id).first()
+            if sess and sess.is_revoked:
+                return None
         return db.query(User).filter(User.username == username).first()
     except Exception:
         return None

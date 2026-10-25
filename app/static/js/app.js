@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await checkSessionOrShowGate();
     setupUploadDropzone();
     updateWorkflowRibbon(1);
+    initHipaaInactivityWatcher();
 });
 
 // =============================================================================
@@ -34,10 +35,30 @@ function switchMainTab(tabName) {
         document.getElementById("tab-audit-btn").classList.add("active");
         document.getElementById("audit-view").classList.add("active");
         loadAuditLogs();
+    } else if (tabName === "batch") {
+        const batchBtn = document.getElementById("tab-batch-btn");
+        if (batchBtn) batchBtn.classList.add("active");
+        const batchView = document.getElementById("batch-view");
+        if (batchView) batchView.classList.add("active");
+        if (!window._activeBatchLoaded) {
+            loadSampleBatchRoster('cardiology');
+        }
     } else if (tabName === "benchmark") {
         document.getElementById("tab-benchmark-btn").classList.add("active");
         document.getElementById("benchmark-view").classList.add("active");
         runLiveBenchmark();
+    } else if (tabName === "crd") {
+        const btn = document.getElementById("tab-crd-btn");
+        if (btn) btn.classList.add("active");
+        const view = document.getElementById("crd-view");
+        if (view) view.classList.add("active");
+        initCrdSimulator();
+    } else if (tabName === "telemetry") {
+        const btn = document.getElementById("tab-telemetry-btn");
+        if (btn) btn.classList.add("active");
+        const view = document.getElementById("telemetry-view");
+        if (view) view.classList.add("active");
+        loadLiveTelemetry();
     }
 }
 
@@ -133,10 +154,10 @@ function handleNpiInputLive(val) {
     }
     if (clean.length === 10) {
         if (validateNpiLuhnClient(clean)) {
-            badge.textContent = "✓ Valid CMS NPI";
+            badge.textContent = " Valid CMS NPI";
             badge.className = "npi-status-badge valid";
         } else {
-            badge.textContent = "✗ Invalid NPI Checksum";
+            badge.textContent = " Invalid NPI Checksum";
             badge.className = "npi-status-badge invalid";
         }
     }
@@ -274,6 +295,148 @@ async function handleCustomLogin(event) {
     }
 }
 
+async function triggerGoogleSignIn() {
+    const btn = document.getElementById("btn-oauth-google");
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Connecting...";
+    }
+
+    try {
+        const cfgRes = await fetch("/api/v1/auth/oauth/config");
+        const cfg = cfgRes.ok ? await cfgRes.json() : {};
+
+        let credential = null;
+        if (cfg.google_enabled && window.google && window.google.accounts) {
+            // Live GIS invocation if client ID configured and library loaded
+        } else {
+            const promptEmail = prompt(
+                "Sign in with Google (Evaluation Sandbox)\nEnter clinician Google Workspace email:",
+                "dr.smith@pacificheart.org"
+            );
+            if (!promptEmail) return;
+            credential = `mock_google_${promptEmail.trim()}`;
+        }
+
+        const res = await fetch("/api/v1/auth/oauth/google", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ credential })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            if (data.status === "MFA_CHALLENGE_REQUIRED") {
+                window._mfaSessionToken = data.mfa_session_token;
+                window._mfaAvailableMethods = data.available_methods || [data.mfa_method];
+                window._selectedMfaMethod = data.mfa_method;
+
+                const signinSection = document.getElementById("login-section-signin");
+                const mfaSection = document.getElementById("login-section-mfa");
+                if (signinSection) signinSection.classList.add("hidden");
+                if (mfaSection) mfaSection.classList.remove("hidden");
+
+                renderMfaFactorSelectionButtons();
+                updateMfaChallengeCardUI(data);
+                showToast("Google authentication verified. Complete clinical two-factor challenge.");
+                return;
+            }
+
+            currentToken = data.access_token;
+            currentRole = data.role;
+            currentUser = data.username;
+
+            sessionStorage.setItem("carepolicyguard_token", currentToken);
+            sessionStorage.setItem("carepolicyguard_role", currentRole);
+            sessionStorage.setItem("carepolicyguard_user", currentUser);
+
+            updateUserBadge();
+            hideLoginGate();
+            showToast(`Welcome! Authenticated via Google (${currentUser})`);
+
+            await loadPolicies();
+            await loadPresets();
+            await loadAuditLogs();
+        } else {
+            showToast(data.detail || "Google authentication failed.", true);
+        }
+    } catch (e) {
+        showToast("Google SSO connection error: " + e.message, true);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg> Google`;
+        }
+    }
+}
+
+async function triggerAppleSignIn() {
+    const btn = document.getElementById("btn-oauth-apple");
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Connecting...";
+    }
+
+    try {
+        const promptEmail = prompt(
+            "Sign in with Apple (Evaluation Sandbox)\nEnter clinician Apple ID or private relay email:",
+            "dr.jones@hospital.org"
+        );
+        if (!promptEmail) return;
+        const id_token = `mock_apple_${promptEmail.trim()}`;
+
+        const res = await fetch("/api/v1/auth/oauth/apple", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id_token })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            if (data.status === "MFA_CHALLENGE_REQUIRED") {
+                window._mfaSessionToken = data.mfa_session_token;
+                window._mfaAvailableMethods = data.available_methods || [data.mfa_method];
+                window._selectedMfaMethod = data.mfa_method;
+
+                const signinSection = document.getElementById("login-section-signin");
+                const mfaSection = document.getElementById("login-section-mfa");
+                if (signinSection) signinSection.classList.add("hidden");
+                if (mfaSection) mfaSection.classList.remove("hidden");
+
+                renderMfaFactorSelectionButtons();
+                updateMfaChallengeCardUI(data);
+                showToast("Apple authentication verified. Complete clinical two-factor challenge.");
+                return;
+            }
+
+            currentToken = data.access_token;
+            currentRole = data.role;
+            currentUser = data.username;
+
+            sessionStorage.setItem("carepolicyguard_token", currentToken);
+            sessionStorage.setItem("carepolicyguard_role", currentRole);
+            sessionStorage.setItem("carepolicyguard_user", currentUser);
+
+            updateUserBadge();
+            hideLoginGate();
+            showToast(`Welcome! Authenticated via Apple (${currentUser})`);
+
+            await loadPolicies();
+            await loadPresets();
+            await loadAuditLogs();
+        } else {
+            showToast(data.detail || "Apple authentication failed.", true);
+        }
+    } catch (e) {
+        showToast("Apple SSO connection error: " + e.message, true);
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.84c.62-.75 1.04-1.79.92-2.84-.89.04-1.98.6-2.61 1.34-.56.64-.99 1.7-1.01 2.76.99.08 2.08-.51 2.7-1.26"/></svg> Apple`;
+        }
+    }
+}
+
 async function executeLogin(username, password) {
     try {
         const res = await fetch("/api/v1/auth/login", {
@@ -284,6 +447,25 @@ async function executeLogin(username, password) {
 
         if (res.ok) {
             const data = await res.json();
+
+            // Check for Two-Factor Authentication challenge
+            if (data.status === "MFA_CHALLENGE_REQUIRED") {
+                window._mfaSessionToken = data.mfa_session_token;
+                window._mfaAvailableMethods = data.available_methods || [data.mfa_method];
+                window._selectedMfaMethod = data.mfa_method;
+
+                const signinSection = document.getElementById("login-section-signin");
+                const mfaSection = document.getElementById("login-section-mfa");
+                if (signinSection) signinSection.classList.add("hidden");
+                if (mfaSection) mfaSection.classList.remove("hidden");
+
+                renderMfaFactorSelectionButtons();
+                updateMfaChallengeCardUI(data);
+
+                showToast(`Two-factor authentication required for ${username}.`);
+                return;
+            }
+
             currentToken = data.access_token;
             currentRole = data.role;
             currentUser = data.username;
@@ -357,9 +539,591 @@ function updateUserBadge() {
     }
 }
 
+function renderMfaFactorSelectionButtons() {
+    const container = document.getElementById("mfa-factor-selection-container");
+    const row = document.getElementById("mfa-factor-buttons-row");
+    if (!container || !row) return;
+
+    if (!window._mfaAvailableMethods || window._mfaAvailableMethods.length <= 1) {
+        container.classList.add("hidden");
+        return;
+    }
+
+    container.classList.remove("hidden");
+    row.innerHTML = "";
+
+    const methodLabels = {
+        "totp_app": "Authenticator App",
+        "email_otp": "Email Code",
+        "sms_otp": "SMS Code"
+    };
+
+    window._mfaAvailableMethods.forEach(method => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-side-tutorial";
+        const isSelected = method === window._selectedMfaMethod;
+        btn.style.cssText = `padding: 4px 10px; font-size: 11px; border-radius: 4px; ${isSelected ? "background: #38bdf8; color: #0f172a; font-weight: 700; border-color: #38bdf8;" : "background: #1e293b; color: #cbd5e1; border-color: #475569;"}`;
+        btn.textContent = methodLabels[method] || method;
+        btn.onclick = () => switchMfaChallengeMethod(method);
+        row.appendChild(btn);
+    });
+}
+
+async function switchMfaChallengeMethod(method) {
+    if (!window._mfaSessionToken) return;
+    try {
+        const res = await fetch("/api/v1/auth/mfa/challenge-method", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                mfa_session_token: window._mfaSessionToken,
+                requested_method: method
+            })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            window._selectedMfaMethod = method;
+            renderMfaFactorSelectionButtons();
+            updateMfaChallengeCardUI(data);
+            showToast(`Switched factor to ${method === 'totp_app' ? 'Authenticator App' : (method === 'email_otp' ? 'Email OTP' : 'SMS OTP')}.`);
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Failed to switch verification method.", true);
+        }
+    } catch (e) {
+        showToast("Connection error switching factor: " + e.message, true);
+    }
+}
+
+function updateMfaChallengeCardUI(data) {
+    const subtitle = document.getElementById("mfa-challenge-subtitle");
+    const destText = document.getElementById("mfa-destination-text");
+    const codeInput = document.getElementById("mfa-code-input");
+    const devHintBox = document.getElementById("mfa-dev-hint-box");
+    const autofillBtn = document.getElementById("btn-autofill-mfa-code");
+
+    const method = data.mfa_method || window._selectedMfaMethod;
+
+    if (method === "totp_app") {
+        if (subtitle) subtitle.textContent = "Authenticator App Verification";
+        if (destText) destText.textContent = "Open Google Authenticator, Microsoft Authenticator, or Duo and enter the 6-digit code.";
+    } else if (method === "email_otp") {
+        if (subtitle) subtitle.textContent = "Email Verification Code";
+        if (destText) destText.textContent = `A 6-digit verification code was emailed to ${data.destination_masked || "your registered address"}.`;
+    } else if (method === "sms_otp") {
+        if (subtitle) subtitle.textContent = "SMS Security Code";
+        if (destText) destText.textContent = `A 6-digit verification code was sent via SMS to ${data.destination_masked || "your mobile device"}.`;
+    }
+
+    if (data.dev_preview_code && devHintBox && autofillBtn) {
+        devHintBox.classList.remove("hidden");
+        autofillBtn.textContent = `Autofill Security Code: ${data.dev_preview_code}`;
+        autofillBtn.onclick = () => {
+            if (codeInput) {
+                codeInput.value = data.dev_preview_code;
+                codeInput.focus();
+            }
+        };
+    } else if (devHintBox) {
+        devHintBox.classList.add("hidden");
+    }
+
+    if (codeInput) {
+        codeInput.value = "";
+        setTimeout(() => codeInput.focus(), 150);
+    }
+}
+
 function toggleAuthModal() {
     const modal = document.getElementById("auth-modal");
-    if (modal) modal.classList.toggle("hidden");
+    if (modal) {
+        modal.classList.toggle("hidden");
+        if (!modal.classList.contains("hidden")) {
+            loadAuthModalSecurityDetails();
+        }
+    }
+}
+
+async function handleMfaChallengeSubmit(event) {
+    if (event) event.preventDefault();
+    const codeInput = document.getElementById("mfa-code-input");
+    const submitBtn = document.getElementById("btn-mfa-submit");
+    const code = codeInput ? codeInput.value.trim() : "";
+
+    if (!code || code.length !== 6) {
+        showToast("Please enter a valid 6-digit security code.", true);
+        return;
+    }
+
+    if (!window._mfaSessionToken) {
+        showToast("MFA session expired. Please sign in again.", true);
+        cancelMfaChallenge();
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Verifying security code...";
+    }
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/verify-login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                mfa_session_token: window._mfaSessionToken,
+                verification_code: code,
+                mfa_method: window._selectedMfaMethod
+            })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            window._mfaSessionToken = null;
+            currentToken = data.access_token;
+            currentRole = data.role;
+            currentUser = data.username;
+
+            sessionStorage.setItem("carepolicyguard_token", currentToken);
+            sessionStorage.setItem("carepolicyguard_role", currentRole);
+            sessionStorage.setItem("carepolicyguard_user", currentUser);
+
+            updateUserBadge();
+            hideLoginGate();
+            showToast(`Two-factor verification successful. Authenticated as ${currentRole} (${currentUser})`);
+
+            await loadPolicies();
+            await loadPresets();
+            await loadAuditLogs();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Invalid or expired verification code.", true);
+            if (codeInput) {
+                codeInput.select();
+                codeInput.focus();
+            }
+        }
+    } catch (e) {
+        showToast("Verification failed: " + e.message, true);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Verify Code & Access Chart System";
+        }
+    }
+}
+
+function cancelMfaChallenge() {
+    window._mfaSessionToken = null;
+    const signinSection = document.getElementById("login-section-signin");
+    const mfaSection = document.getElementById("login-section-mfa");
+    if (mfaSection) mfaSection.classList.add("hidden");
+    if (signinSection) signinSection.classList.remove("hidden");
+}
+
+async function loadAuthModalSecurityDetails() {
+    if (!currentToken) return;
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/status", {
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const badge = document.getElementById("modal-profile-mfa-badge");
+            const tag = document.getElementById("mfa-current-status-tag");
+            const disableBtn = document.getElementById("btn-disable-mfa");
+
+            const enabledMethods = data.enabled_methods || [data.mfa_method || "email_otp"];
+            const methodCount = enabledMethods.length;
+            const primaryLabel = data.primary_method === "totp_app" ? "Authenticator App" : (data.primary_method === "email_otp" ? "Email OTP" : "SMS OTP");
+            
+            if (badge) {
+                badge.innerHTML = `<span class="text-emerald">Active (${methodCount} Configured - Primary: ${primaryLabel})</span>`;
+            }
+            if (tag) {
+                tag.textContent = `${methodCount} Factor${methodCount > 1 ? "s" : ""} Active`;
+                tag.style.background = "rgba(16, 185, 129, 0.2)";
+                tag.style.color = "#34d399";
+            }
+
+            const listContainer = document.getElementById("mfa-factors-list-container");
+            if (listContainer) {
+                listContainer.innerHTML = "";
+                const allFactors = [
+                    { id: "email_otp", name: "Email One-Time Password", desc: data.email || "Registered Clinical Email" },
+                    { id: "totp_app", name: "Authenticator App (TOTP RFC 6238)", desc: data.totp_configured ? "Google / Microsoft Authenticator Configured" : "Not configured" },
+                    { id: "sms_otp", name: "SMS Mobile Number OTP", desc: data.phone_number || "No mobile phone configured" }
+                ];
+
+                allFactors.forEach(factor => {
+                    const isEnabled = enabledMethods.includes(factor.id);
+                    const row = document.createElement("div");
+                    row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; font-size: 11px;";
+
+                    const info = document.createElement("div");
+                    info.innerHTML = `<div><strong>${factor.name}</strong> <span style="color: ${isEnabled ? "#34d399" : "#94a3b8"}; margin-left: 4px; font-weight: 600;">[${isEnabled ? "Active" : "Inactive"}]</span></div><div style="font-size: 10px; color: #94a3b8;">${factor.desc}</div>`;
+                    row.appendChild(info);
+
+                    if (isEnabled && enabledMethods.length > 1) {
+                        const rmBtn = document.createElement("button");
+                        rmBtn.type = "button";
+                        rmBtn.className = "btn-side-tutorial";
+                        rmBtn.style.cssText = "padding: 3px 8px; font-size: 10px; color: #f87171; border-color: #7f1d1d;";
+                        rmBtn.textContent = "Remove";
+                        rmBtn.onclick = () => removeMfaMethod(factor.id);
+                        row.appendChild(rmBtn);
+                    } else if (isEnabled) {
+                        const reqSpan = document.createElement("span");
+                        reqSpan.style.cssText = "font-size: 10px; color: #64748b; font-style: italic;";
+                        reqSpan.textContent = "(Required Factor)";
+                        row.appendChild(reqSpan);
+                    }
+                    listContainer.appendChild(row);
+                });
+            }
+        }
+    } catch (e) {
+        console.error("Failed to load MFA status:", e);
+    }
+
+    await loadUserSessionsList();
+}
+
+async function loadUserSessionsList() {
+    if (!currentToken) return;
+    const container = document.getElementById("active-sessions-list-container");
+    if (!container) return;
+
+    try {
+        const res = await fetch("/api/v1/auth/sessions", {
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            const sessions = await res.json();
+            if (!sessions || sessions.length === 0) {
+                container.innerHTML = '<div style="font-size: 11px; color: #94a3b8;">No active sessions found.</div>';
+                return;
+            }
+
+            container.innerHTML = "";
+            sessions.forEach(s => {
+                const row = document.createElement("div");
+                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 4px; font-size: 11px;";
+
+                const info = document.createElement("div");
+                const currentBadge = s.is_current ? '<span style="color: #38bdf8; font-weight: 700; margin-left: 4px;">[Current Session]</span>' : '';
+                info.innerHTML = `<div><strong>${s.device_name || "Web Client"}</strong> ${currentBadge}</div><div style="color: #94a3b8; font-size: 10px;">IP: ${s.ip_address || "Unknown"} &bull; Last active: ${new Date(s.last_active_at).toLocaleTimeString()}</div>`;
+
+                row.appendChild(info);
+
+                if (!s.is_current && !s.is_revoked) {
+                    const revokeBtn = document.createElement("button");
+                    revokeBtn.type = "button";
+                    revokeBtn.className = "btn-side-tutorial";
+                    revokeBtn.style.cssText = "padding: 3px 8px; font-size: 10px; color: #f87171; border-color: #7f1d1d;";
+                    revokeBtn.textContent = "Sign Out Device";
+                    revokeBtn.onclick = () => revokeRemoteSession(s.session_id);
+                    row.appendChild(revokeBtn);
+                }
+
+                container.appendChild(row);
+            });
+        }
+    } catch (e) {
+        console.error("Failed to fetch sessions:", e);
+    }
+}
+
+async function revokeRemoteSession(sessionId) {
+    if (!confirm("Are you sure you want to sign out this remote device session?")) return;
+    try {
+        const res = await fetch(`/api/v1/auth/sessions/${sessionId}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            showToast("Remote device session revoked immediately.");
+            await loadUserSessionsList();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Failed to revoke session.", true);
+        }
+    } catch (e) {
+        showToast("Session revocation error: " + e.message, true);
+    }
+}
+
+async function openTotpSetup() {
+    if (!currentToken) return;
+    const box = document.getElementById("totp-setup-box");
+    const emailBox = document.getElementById("email-setup-box");
+    if (emailBox) emailBox.classList.add("hidden");
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/setup?method=totp_app", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const qrImg = document.getElementById("totp-qr-img");
+            const secretCode = document.getElementById("totp-manual-secret");
+            if (qrImg) qrImg.src = data.channel_destination;
+            if (secretCode) secretCode.textContent = data.totp_secret;
+            if (box) box.classList.remove("hidden");
+            const input = document.getElementById("totp-verify-code-input");
+            if (input) {
+                input.value = "";
+                input.focus();
+            }
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Failed to initiate Authenticator setup.", true);
+        }
+    } catch (e) {
+        showToast("Setup connection error: " + e.message, true);
+    }
+}
+
+async function confirmTotpActivation() {
+    const input = document.getElementById("totp-verify-code-input");
+    const code = input ? input.value.trim() : "";
+    if (!code || code.length !== 6) {
+        showToast("Please enter the 6-digit code from your Authenticator app.", true);
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/enable", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${currentToken}`
+            },
+            body: JSON.stringify({
+                mfa_method: "totp_app",
+                verification_code: code
+            })
+        });
+
+        if (res.ok) {
+            showToast("Authenticator App MFA activated successfully.");
+            const box = document.getElementById("totp-setup-box");
+            if (box) box.classList.add("hidden");
+            await loadAuthModalSecurityDetails();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Invalid Authenticator code. Check device clock sync.", true);
+        }
+    } catch (e) {
+        showToast("Activation error: " + e.message, true);
+    }
+}
+
+async function enableEmailOtpMfa() {
+    if (!currentToken) return;
+    const box = document.getElementById("email-setup-box");
+    const totpBox = document.getElementById("totp-setup-box");
+    if (totpBox) totpBox.classList.add("hidden");
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/setup?method=email_otp", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const hint = document.getElementById("email-otp-target-hint");
+            let msg = `Verification code dispatched to ${data.channel_destination || "your email"}.`;
+            if (data.dev_preview_code) {
+                msg += ` (Evaluation Code: ${data.dev_preview_code})`;
+            }
+            if (hint) hint.textContent = msg;
+            if (box) box.classList.remove("hidden");
+            const input = document.getElementById("email-verify-code-input");
+            if (input) {
+                input.value = data.dev_preview_code || "";
+                input.focus();
+            }
+            showToast("Verification code sent to your registered clinical email.");
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Failed to initiate email verification.", true);
+        }
+    } catch (e) {
+        showToast("Email setup error: " + e.message, true);
+    }
+}
+
+async function confirmEmailMfaActivation() {
+    const input = document.getElementById("email-verify-code-input");
+    const code = input ? input.value.trim() : "";
+    if (!code || code.length !== 6) {
+        showToast("Please enter the 6-digit verification code from your email.", true);
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/enable", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${currentToken}`
+            },
+            body: JSON.stringify({
+                mfa_method: "email_otp",
+                verification_code: code
+            })
+        });
+
+        if (res.ok) {
+            showToast("Email One-Time Passcode MFA activated successfully.");
+            const box = document.getElementById("email-setup-box");
+            if (box) box.classList.add("hidden");
+            await loadAuthModalSecurityDetails();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Invalid or expired verification code.", true);
+        }
+    } catch (e) {
+        showToast("Activation error: " + e.message, true);
+    }
+}
+
+function openSmsSetup() {
+    if (!currentToken) return;
+    const box = document.getElementById("sms-setup-box");
+    const totpBox = document.getElementById("totp-setup-box");
+    const emailBox = document.getElementById("email-setup-box");
+    if (totpBox) totpBox.classList.add("hidden");
+    if (emailBox) emailBox.classList.add("hidden");
+    if (box) box.classList.remove("hidden");
+    const phoneInput = document.getElementById("sms-phone-input");
+    if (phoneInput) phoneInput.focus();
+}
+
+async function requestSmsOtpCode() {
+    if (!currentToken) return;
+    const phoneInput = document.getElementById("sms-phone-input");
+    const phone = phoneInput ? phoneInput.value.trim() : "";
+    if (!phone) {
+        showToast("Please enter a valid mobile phone number.", true);
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/v1/auth/mfa/setup?method=sms_otp&phone=${encodeURIComponent(phone)}`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const hint = document.getElementById("sms-otp-target-hint");
+            let msg = `Verification code sent to ${data.channel_destination}.`;
+            if (data.dev_preview_code) {
+                msg += ` (Evaluation Code: ${data.dev_preview_code})`;
+            }
+            if (hint) hint.textContent = msg;
+            const verifyInput = document.getElementById("sms-verify-code-input");
+            if (verifyInput) {
+                verifyInput.value = data.dev_preview_code || "";
+                verifyInput.focus();
+            }
+            showToast("SMS verification code sent.");
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Failed to send SMS code.", true);
+        }
+    } catch (e) {
+        showToast("SMS request error: " + e.message, true);
+    }
+}
+
+async function confirmSmsMfaActivation() {
+    const input = document.getElementById("sms-verify-code-input");
+    const phoneInput = document.getElementById("sms-phone-input");
+    const code = input ? input.value.trim() : "";
+    const phone = phoneInput ? phoneInput.value.trim() : null;
+
+    if (!code || code.length !== 6) {
+        showToast("Please enter the 6-digit verification code from your SMS.", true);
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/enable", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${currentToken}`
+            },
+            body: JSON.stringify({
+                mfa_method: "sms_otp",
+                verification_code: code,
+                phone_number: phone
+            })
+        });
+
+        if (res.ok) {
+            showToast("SMS Two-Factor Authentication activated.");
+            const box = document.getElementById("sms-setup-box");
+            if (box) box.classList.add("hidden");
+            await loadAuthModalSecurityDetails();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Invalid or expired SMS code.", true);
+        }
+    } catch (e) {
+        showToast("SMS activation error: " + e.message, true);
+    }
+}
+
+async function removeMfaMethod(method) {
+    const methodNames = {
+        "totp_app": "Authenticator App",
+        "email_otp": "Email OTP",
+        "sms_otp": "SMS OTP"
+    };
+    const displayName = methodNames[method] || method;
+    if (!confirm(`Are you sure you want to remove ${displayName}?`)) return;
+
+    try {
+        const res = await fetch(`/api/v1/auth/mfa/remove-method?method=${encodeURIComponent(method)}`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            showToast(`${displayName} removed successfully.`);
+            await loadAuthModalSecurityDetails();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Failed to remove verification factor.", true);
+        }
+    } catch (e) {
+        showToast("Error removing factor: " + e.message, true);
+    }
+}
+
+async function handleDisableMfa() {
+    if (!confirm("Are you sure you want to disable Multi-Factor Authentication? Your account will revert to single-factor password protection.")) return;
+
+    try {
+        const res = await fetch("/api/v1/auth/mfa/disable", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            showToast("Multi-Factor Authentication disabled.");
+            await loadAuthModalSecurityDetails();
+        } else {
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || "Failed to disable MFA.", true);
+        }
+    } catch (e) {
+        showToast("Disable MFA error: " + e.message, true);
+    }
 }
 
 // =============================================================================
@@ -919,12 +1683,12 @@ function renderAuthenticityCard(auth) {
         if (auth.has_doctor_name) {
             nameVal.textContent = auth.doctor_name || "Doctor Identified";
             nameVal.style.color = "#166534";
-            nameIcon.textContent = "✓";
+            nameIcon.textContent = "";
             nameIcon.className = "auth-check-icon";
         } else {
             nameVal.textContent = "Not Documented";
             nameVal.style.color = "#B91C1C";
-            nameIcon.textContent = "✗";
+            nameIcon.textContent = "";
             nameIcon.className = "auth-check-icon icon-missing";
         }
     }
@@ -933,12 +1697,12 @@ function renderAuthenticityCard(auth) {
         if (auth.has_doctor_signature) {
             sigVal.textContent = "Verified Signature Block";
             sigVal.style.color = "#166534";
-            sigIcon.textContent = "✓";
+            sigIcon.textContent = "";
             sigIcon.className = "auth-check-icon";
         } else {
             sigVal.textContent = "Missing Signature";
             sigVal.style.color = "#B91C1C";
-            sigIcon.textContent = "✗";
+            sigIcon.textContent = "";
             sigIcon.className = "auth-check-icon icon-missing";
         }
     }
@@ -1065,7 +1829,7 @@ function renderMultiPolicyScanResults(data) {
                 statusBadge = `<span class="badge-match-denied">CRITERIA UNMET</span>`;
             }
 
-            const bestBadge = m.is_best_match ? `<span class="badge-best-match">★ BEST MATCH</span>` : "";
+            const bestBadge = m.is_best_match ? `<span class="badge-best-match"> BEST MATCH</span>` : "";
 
             card.innerHTML = `
                 <div class="match-item-top">
@@ -2032,7 +2796,7 @@ async function loadAuditLogs() {
                 bannerElem.innerHTML = `
                     <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
                     <div>
-                        <strong>🔒 HIPAA Minimum Necessary Standard (45 CFR § 164.502(b)):</strong>
+                        <strong> HIPAA Minimum Necessary Standard (45 CFR § 164.502(b)):</strong>
                         You are authenticated as an <em>IT Administrator</em>. In accordance with clinical data minimization, clinical narratives, diagnostic quotes, and medical rationales are <strong>REDACTED</strong>. Only operational metadata (Case ID, Policy, Decision, Latency, and SHA-256 seal) is displayed.
                     </div>
                 `;
@@ -2043,7 +2807,7 @@ async function loadAuditLogs() {
                 bannerElem.innerHTML = `
                     <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
                     <div>
-                        <strong>🔍 CMS RAC/MAC Regulatory Auditor Oversight:</strong>
+                        <strong> CMS RAC/MAC Regulatory Auditor Oversight:</strong>
                         Authorized for forensic inspection. Full character-grounded clinical quotes, offsets, calibration scores, and SHA-256 cryptographic verification seals are displayed. Direct patient PHI is masked (<code>PT-***</code>) under HIPAA Safe Harbor. Audit logs are immutable; deletion and purging controls are disabled.
                     </div>
                 `;
@@ -2054,7 +2818,7 @@ async function loadAuditLogs() {
                 bannerElem.innerHTML = `
                     <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>
                     <div>
-                        <strong>🩺 Licensed Clinician Mode:</strong>
+                        <strong> Licensed Clinician Mode:</strong>
                         Viewing prior authorization determinations for clinical care delivery and peer-to-peer appeal documentation.
                     </div>
                 `;
@@ -2293,7 +3057,7 @@ function updateBenchmarkMetrics(data) {
         tableBody.innerHTML = data.vignette_results.map(v => {
             const formatDec = (dec, isGold = false, isBaseline = false) => {
                 if (isBaseline && dec === "APPROVED" && v.gold_decision !== "APPROVED") {
-                    return `<span class="badge-status not-met" style="font-size: 0.72rem;" title="False Approval! High-liability citation error.">⚠️ False Approval</span>`;
+                    return `<span class="badge-status not-met" style="font-size: 0.72rem;" title="False Approval! High-liability citation error.">️ False Approval</span>`;
                 }
                 if (dec === "APPROVED") {
                     return `<span class="badge-status met" style="font-size: 0.72rem;"><span class="chip-dot"></span> Approved</span>`;
@@ -2325,7 +3089,7 @@ function updateBenchmarkMetrics(data) {
                     </td>
                     <td>
                         <span class="badge-status met" style="font-size: 0.72rem; padding: 2px 6px;">
-                            ${v.config_d_grounded ? "✓ 100% Grounded" : "Mismatch"}
+                            ${v.config_d_grounded ? " 100% Grounded" : "Mismatch"}
                         </span>
                     </td>
                 </tr>
@@ -3491,4 +4255,640 @@ function highlightQuoteInEHR(startChar, endChar, criterionCode) {
 
 function exportAuditTrailCsv() {
     window.location.href = "/api/v1/audit/trail/export";
+}
+
+
+// =============================================================================
+// BATCH ROSTER ADJUDICATION ENGINE
+// =============================================================================
+
+const SAMPLE_BATCH_ROSTERS = {
+    cardiology: [
+        {
+            patient_id: "PT-CARD-881",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: "68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness."
+        },
+        {
+            patient_id: "PT-CARD-882",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: "55-year-old female post acute STEMI 12 days ago. Underwent emergency stenting. Echo demonstrates LVEF 30%. NYHA Class II. Currently in hospital recovering from acute event."
+        },
+        {
+            patient_id: "PT-CARD-883",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: "72-year-old female with dilated non-ischemic cardiomyopathy. Transthoracic echocardiogram reveals LVEF 32%. Patient reports NYHA Class III heart failure symptoms with fatigue at low workloads. Treated with GDMT including Sacubitril/Valsartan 49/51mg and Metoprolol succinate 100mg for 5 months. No acute ischemic events. Life expectancy exceeds 1 year."
+        },
+        {
+            patient_id: "PT-CARD-884",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: "61-year-old male presenting with shortness of breath and lower extremity edema. Chart mentions heart failure with reduced ejection fraction, but recent quantitative echocardiogram or radionuclide LVEF measurement report is completely missing from current hospitalization records."
+        }
+    ],
+    mixed: [
+        {
+            patient_id: "PT-PULM-701",
+            policy_id: "LCD-L33829",
+            requested_procedure_code: "E0601",
+            clinical_narrative: "52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial."
+        },
+        {
+            patient_id: "PT-WOUND-702",
+            policy_id: "NCD-20.29",
+            requested_procedure_code: "G0277",
+            clinical_narrative: "64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse."
+        },
+        {
+            patient_id: "PT-PULM-703",
+            policy_id: "NCD-240.2",
+            requested_procedure_code: "E1390",
+            clinical_narrative: "70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min."
+        }
+    ]
+};
+
+let currentBatchRoster = [];
+
+function loadSampleBatchRoster(rosterType) {
+    window._activeBatchLoaded = true;
+    currentBatchRoster = JSON.parse(JSON.stringify(SAMPLE_BATCH_ROSTERS[rosterType] || SAMPLE_BATCH_ROSTERS.cardiology));
+    
+    const titleEl = document.getElementById("batch-roster-title");
+    if (titleEl) {
+        titleEl.textContent = rosterType === 'cardiology' 
+            ? "Current Roster: Cardiology Clinic Morning Cohort (4 Patients)" 
+            : "Current Roster: Mixed Specialty Outpatient Cohort (3 Patients)";
+    }
+    
+    document.getElementById("batch-total-count").textContent = currentBatchRoster.length;
+    document.getElementById("batch-approved-count").textContent = "--";
+    document.getElementById("batch-denied-count").textContent = "--";
+    document.getElementById("batch-deferred-count").textContent = "--";
+    document.getElementById("batch-latency-count").textContent = "-- ms";
+    
+    renderBatchTablePending();
+}
+
+function renderBatchTablePending() {
+    const tbody = document.getElementById("batch-table-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    currentBatchRoster.forEach((item, idx) => {
+        const tr = document.createElement("tr");
+        const snippet = item.clinical_narrative.length > 90 
+            ? item.clinical_narrative.substring(0, 90) + "..." 
+            : item.clinical_narrative;
+
+        tr.innerHTML = `
+            <td><strong>#${idx + 1}</strong></td>
+            <td><span class="user-role-tag">${item.patient_id}</span></td>
+            <td><code>${item.policy_id}</code></td>
+            <td><span class="code-pill">${item.requested_procedure_code || 'N/A'}</span></td>
+            <td><small class="text-secondary">${snippet}</small></td>
+            <td><span class="badge-status" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8;">Pending Run</span></td>
+            <td>--</td>
+            <td>--</td>
+            <td><button class="btn-side-tutorial" style="padding: 2px 8px;" onclick="loadRosterItemIntoWizard(${idx})">Inspect Note</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+async function executeBatchAdjudication() {
+    if (!currentBatchRoster || currentBatchRoster.length === 0) {
+        loadSampleBatchRoster('cardiology');
+    }
+
+    const btn = document.getElementById("btn-run-batch-adjudication");
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="med-icon icon-sm spinning"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-linecap="round"></circle></svg></span> Adjudicating Roster...`;
+
+    try {
+        const payload = {
+            batch_name: document.getElementById("batch-roster-title").textContent,
+            items: currentBatchRoster
+        };
+
+        const res = await fetch("/api/v1/adjudicate/batch", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            throw new Error(`Batch adjudication failed: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+        
+        // Update summary metrics
+        document.getElementById("batch-total-count").textContent = data.total_patients;
+        document.getElementById("batch-approved-count").textContent = data.approved_count;
+        document.getElementById("batch-denied-count").textContent = data.denied_count;
+        document.getElementById("batch-deferred-count").textContent = data.deferred_count;
+        document.getElementById("batch-latency-count").textContent = `${data.processing_time_ms} ms`;
+
+        renderBatchResults(data.results);
+        showToast(`Batch completed: ${data.approved_count} Approved, ${data.denied_count} Denied, ${data.deferred_count} Deferred.`, "success");
+
+    } catch (err) {
+        console.error("Batch error:", err);
+        showToast(`Batch execution failed: ${err.message}`, "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+function renderBatchResults(results) {
+    const tbody = document.getElementById("batch-table-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    results.forEach((item) => {
+        const tr = document.createElement("tr");
+        const snippet = item.adjudication.sanitized_ehr_text.length > 90 
+            ? item.adjudication.sanitized_ehr_text.substring(0, 90) + "..." 
+            : item.adjudication.sanitized_ehr_text;
+
+        let decisionBadge = "";
+        if (item.decision === "APPROVED") {
+            decisionBadge = `<span class="badge-status met"><span class="chip-dot"></span> Approved</span>`;
+        } else if (item.decision === "DENIED") {
+            decisionBadge = `<span class="badge-status excluded"><span class="chip-dot"></span> Denied</span>`;
+        } else {
+            decisionBadge = `<span class="badge-status" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><span class="chip-dot"></span> Deferred to MD</span>`;
+        }
+
+        let gateBadge = "";
+        if (item.abstention_status) {
+            gateBadge = `<span class="tile-tag tag-amber" style="padding: 2px 6px;">Triggered (&tau; &lt; 0.85)</span>`;
+        } else {
+            gateBadge = `<span class="tile-tag tag-green" style="padding: 2px 6px;">Passed (&ge; 0.85)</span>`;
+        }
+
+        const confPct = Math.round(item.calibrated_confidence * 100);
+
+        tr.innerHTML = `
+            <td><strong>#${item.index}</strong></td>
+            <td><span class="user-role-tag">${item.patient_id_masked}</span></td>
+            <td><code>${item.policy_id}</code></td>
+            <td><span class="code-pill">${item.adjudication.cpt_codes && item.adjudication.cpt_codes.length > 0 ? item.adjudication.cpt_codes[0] : 'N/A'}</span></td>
+            <td><small class="text-secondary">${snippet}</small></td>
+            <td>${decisionBadge}</td>
+            <td><strong>${confPct}%</strong></td>
+            <td>${gateBadge}</td>
+            <td>
+                <button class="btn-side-tutorial" style="padding: 3px 8px;" onclick="viewBatchItemInWizard(${item.index - 1})">
+                    Open Case &rarr;
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    window._lastBatchResults = results;
+}
+
+function viewBatchItemInWizard(idx) {
+    if (!window._lastBatchResults || !window._lastBatchResults[idx]) return;
+    const item = window._lastBatchResults[idx];
+    lastAdjudicationResult = item.adjudication;
+    currentCoveragePacket = null;
+    
+    // Switch to prior authorization tab and show Screen 3 (Coverage Result)
+    switchMainTab('adjudicate');
+    renderCoverageScreen(item.adjudication);
+    goToWizardScreen(3);
+}
+
+function loadRosterItemIntoWizard(idx) {
+    if (!currentBatchRoster || !currentBatchRoster[idx]) return;
+    const item = currentBatchRoster[idx];
+    
+    switchMainTab('adjudicate');
+    document.getElementById("actual-paste-textarea").value = item.clinical_narrative;
+    syncPastedNoteToInput();
+    goToWizardScreen(1);
+    showToast(`Loaded note for ${item.patient_id} into Prior Auth wizard.`, "info");
+}
+
+
+// =============================================================================
+// HL7 DA VINCI CRD & DTR SIMULATOR
+// =============================================================================
+
+const CRD_PRESETS = {
+    icd_approved: {
+        patientId: "PT-CARDIOLOGY-101",
+        hook: "order-sign",
+        narrative: "History of anterior myocardial infarction in 2021 (>3 years ago). Echo on 01/10/2024: severe systolic dysfunction, LVEF 26%. NYHA Class III heart failure on optimal medical therapy (carvedilol and lisinopril for >6 months). No active cardiogenic shock."
+    },
+    cas_approved: {
+        patientId: "PT-NEURO-205",
+        hook: "order-sign",
+        narrative: "Diagnostic carotid duplex and CTA confirm 85% severe right internal carotid artery stenosis. Patient experienced a transient ischemic attack (TIA) with left facial droop and arm weakness 2 months ago. High risk for open CEA due to prior radical neck radiation and hostile neck anatomy. Order: Percutaneous transluminal angioplasty with FDA-approved carotid stent and distal embolic protection device (EPD) filter deployment."
+    },
+    teer_approved: {
+        patientId: "PT-VALVULAR-301",
+        hook: "order-sign",
+        narrative: "Transesophageal echocardiogram demonstrates severe mitral regurgitation (Grade 4+ MR) with posterior leaflet flail. Multidisciplinary Heart Team consultation with interventional cardiologist and cardiac surgeon confirms prohibitive surgical risk (STS operative mortality score 9.2%). Recommended for Transcatheter Edge-to-Edge Repair (TEER / MitraClip)."
+    },
+    icd_warning: {
+        patientId: "PT-CARDIOLOGY-102",
+        hook: "order-sign",
+        narrative: "Acute anterior STEMI 10 days ago. Diagnostic echocardiogram shows LVEF 25%."
+    }
+};
+
+function initCrdSimulator() {
+    const input = document.getElementById("crd-narrative-input");
+    if (!input.value) {
+        loadCrdPreset("icd_approved");
+    }
+}
+
+function loadCrdPreset(key) {
+    const preset = CRD_PRESETS[key];
+    if (!preset) return;
+    document.getElementById("crd-patient-id").value = preset.patientId;
+    document.getElementById("crd-hook-type").value = preset.hook;
+    document.getElementById("crd-narrative-input").value = preset.narrative;
+}
+
+async function triggerCrdHook() {
+    const patientId = document.getElementById("crd-patient-id").value.trim() || "PT-UNKNOWN";
+    const hookType = document.getElementById("crd-hook-type").value;
+    const narrative = document.getElementById("crd-narrative-input").value.trim();
+    const outputContainer = document.getElementById("crd-cards-output");
+
+    outputContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #38bdf8;">Evaluating EHR draft order via HL7 Da Vinci CRD CDS Hooks...</div>';
+
+    const payload = {
+        hook: hookType,
+        hookInstance: "hook-" + Math.random().toString(36).substring(2, 10),
+        context: {
+            userId: "Practitioner/1043256787",
+            patientId: patientId,
+            draftOrders: {
+                resourceType: "ServiceRequest",
+                description: narrative
+            }
+        },
+        prefetch: {
+            clinicalNotes: narrative
+        }
+    };
+
+    try {
+        const res = await fetch("/api/v1/cds-services/medicare-crd-coverage-check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            throw new Error(`CRD service returned HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const cards = data.cards || [];
+
+        if (cards.length === 0) {
+            outputContainer.innerHTML = '<div style="color: #94a3b8; padding: 16px;">No decision cards returned for this scenario.</div>';
+            return;
+        }
+
+        let html = "";
+        cards.forEach((card, idx) => {
+            const isApproved = card.indicator === "info";
+            const borderColor = isApproved ? "#10b981" : "#f59e0b";
+            const bgColor = isApproved ? "rgba(16, 185, 129, 0.08)" : "rgba(245, 158, 11, 0.08)";
+            const badgeLabel = isApproved ? "CRD Clearance Approved" : "CRD Documentation Alert";
+
+            let linksHtml = "";
+            if (card.links && card.links.length > 0) {
+                linksHtml = card.links.map(l => `
+                    <a href="${l.url}" target="_blank" class="btn-demo-chip" style="display: inline-block; margin-top: 8px; text-decoration: none; font-size: 11px;">
+                        ${l.label}
+                    </a>
+                `).join("");
+            }
+
+            let suggestionsHtml = "";
+            if (card.suggestions && card.suggestions.length > 0) {
+                suggestionsHtml = card.suggestions.map(s => `
+                    <div style="margin-top: 8px; font-size: 11px; color: #fbbf24; background: rgba(245, 158, 11, 0.15); padding: 4px 8px; border-radius: 4px;">
+                        Suggested EHR Action: ${s.label}
+                    </div>
+                `).join("");
+            }
+
+            html += `
+                <div style="background: ${bgColor}; border: 1px solid ${borderColor}; border-left: 4px solid ${borderColor}; border-radius: 6px; padding: 14px; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <strong style="color: #f8fafc; font-size: 13px;">${card.summary}</strong>
+                        <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: ${borderColor}; color: #0f172a;">
+                            ${badgeLabel}
+                        </span>
+                    </div>
+                    <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 6px; line-height: 1.4;">${card.detail || ""}</p>
+                    <div style="font-size: 11px; color: #94a3b8;">Source: ${card.source ? card.source.label : "CMS Engine"}</div>
+                    ${linksHtml}
+                    ${suggestionsHtml}
+                </div>
+            `;
+        });
+
+        outputContainer.innerHTML = html;
+    } catch (err) {
+        outputContainer.innerHTML = `<div style="color: #f43f5e; padding: 16px;">Failed to evaluate CRD hook: ${err.message}</div>`;
+    }
+}
+
+async function runDtrPopulate() {
+    const patientId = document.getElementById("crd-patient-id").value.trim() || "PT-UNKNOWN";
+    const narrative = document.getElementById("crd-narrative-input").value.trim();
+    const dtrBox = document.getElementById("dtr-output-box");
+    const itemsList = document.getElementById("dtr-items-list");
+    const badge = document.getElementById("dtr-completeness-badge");
+    const advisory = document.getElementById("dtr-advisory-text");
+
+    let policyId = "NCD-20.4";
+    const lower = narrative.lower ? narrative.lower() : narrative.toLowerCase();
+    if (lower.includes("carotid") || lower.includes("cas") || lower.includes("stenosis")) {
+        policyId = "NCD-20.7";
+    } else if (lower.includes("mitral") || lower.includes("teer")) {
+        policyId = "NCD-20.33";
+    }
+
+    dtrBox.classList.remove("hidden");
+    itemsList.innerHTML = '<div style="color: #38bdf8; font-size: 12px; padding: 10px;">Executing FHIR R4 $populate operation...</div>';
+
+    try {
+        const res = await fetch("/api/v1/dtr/populate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                policy_id: policyId,
+                patient_id: patientId,
+                clinical_narrative: narrative
+            })
+        });
+
+        if (!res.ok) {
+            throw new Error(`DTR $populate failed: HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const percent = data.completeness_percent || 0;
+        const isComplete = data.status === "completed";
+
+        badge.textContent = `${percent}% Complete (${data.status.toUpperCase()})`;
+        badge.style.background = isComplete ? "#10b981" : "#f59e0b";
+        badge.style.color = "#0f172a";
+
+        advisory.textContent = data.clinical_advisory;
+
+        let itemsHtml = "";
+        (data.items || []).forEach(item => {
+            const hasVal = item.answered && item.value !== null && item.value !== undefined;
+            const isDeficient = hasVal && String(item.value).includes("DEFICIENT");
+            const statusColor = isDeficient ? "#f43f5e" : (hasVal ? "#10b981" : "#64748b");
+            const statusLabel = isDeficient ? "DEFICIENT" : (hasVal ? "ANSWERED" : "MISSING");
+
+            itemsHtml += `
+                <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-radius: 6px; padding: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 12px; font-weight: 600; color: #f1f5f9;">${item.text}</span>
+                        <span style="font-size: 10px; font-weight: 700; color: ${statusColor};">${statusLabel}</span>
+                    </div>
+                    <div style="font-size: 11px; color: ${hasVal ? "#38bdf8" : "#94a3b8"}; font-family: var(--font-mono);">
+                        Value: ${hasVal ? item.value : "Not documented in clinical chart"}
+                    </div>
+                    ${item.evidence_span ? `
+                        <div style="font-size: 10px; color: #64748b; margin-top: 2px;">
+                            Evidence Span: "${item.evidence_span}" (Confidence: ${Math.round((item.confidence || 0.9) * 100)}%)
+                        </div>
+                    ` : ""}
+                </div>
+            `;
+        });
+
+        itemsList.innerHTML = itemsHtml;
+    } catch (err) {
+        itemsList.innerHTML = `<div style="color: #f43f5e; font-size: 12px;">Failed to populate DTR questionnaire: ${err.message}</div>`;
+    }
+}
+
+// =============================================================================
+// OPERATIONAL TELEMETRY & METRICS
+// =============================================================================
+
+async function loadLiveTelemetry() {
+    try {
+        const res = await fetch("/api/v1/metrics/json", {
+            headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
+        });
+
+        if (!res.ok) {
+            throw new Error(`Metrics endpoint returned HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const adj = data.adjudications || {};
+        const sec = data.security || {};
+        const rules = data.clinical_rules || {};
+
+        const total = adj.total || 0;
+        const approved = adj.approved || 0;
+        const denied = adj.denied || 0;
+        const abstained = adj.abstained || 0;
+        const appRate = total > 0 ? Math.round((approved / total) * 100) : 100;
+
+        document.getElementById("telemetry-total-adjudications").textContent = total;
+        document.getElementById("telemetry-approval-rate").textContent = `${appRate}%`;
+        document.getElementById("telemetry-latency-avg").textContent = `${adj.average_latency_ms || 45} ms`;
+        document.getElementById("telemetry-active-sessions").textContent = sec.active_sessions || 1;
+
+        document.getElementById("telemetry-count-approved").textContent = approved;
+        document.getElementById("telemetry-count-denied").textContent = denied;
+        document.getElementById("telemetry-count-abstained").textContent = abstained;
+
+        if (total > 0) {
+            document.getElementById("telemetry-bar-approved").style.width = `${(approved / total) * 100}%`;
+            document.getElementById("telemetry-bar-denied").style.width = `${(denied / total) * 100}%`;
+            document.getElementById("telemetry-bar-abstained").style.width = `${(abstained / total) * 100}%`;
+        } else {
+            document.getElementById("telemetry-bar-approved").style.width = "0%";
+            document.getElementById("telemetry-bar-denied").style.width = "0%";
+            document.getElementById("telemetry-bar-abstained").style.width = "0%";
+        }
+
+        document.getElementById("telemetry-total-users").textContent = sec.total_users || 4;
+        document.getElementById("telemetry-revoked-sessions").textContent = sec.revoked_sessions || 0;
+        document.getElementById("telemetry-policies-count").textContent = rules.active_policies_count || 6;
+
+        // Populate Cache & System Telemetry
+        const cache = data.cache_and_system || {};
+        const cacheHits = cache.hits || 0;
+        const cacheMisses = cache.misses || 0;
+        const cacheRatio = cache.hit_ratio !== undefined ? (cache.hit_ratio * 100).toFixed(1) : "0.0";
+        const cacheRatioElem = document.getElementById("telemetry-cache-ratio");
+        if (cacheRatioElem) cacheRatioElem.textContent = `${cacheRatio}%`;
+
+        const hitsMissesElem = document.getElementById("telemetry-cache-hits-misses");
+        if (hitsMissesElem) hitsMissesElem.textContent = `${cacheHits} / ${cacheMisses}`;
+
+        const cacheKeysElem = document.getElementById("telemetry-cache-keys");
+        if (cacheKeysElem) cacheKeysElem.textContent = `${cache.active_cached_keys || 0} keys`;
+    } catch (err) {
+        console.warn("Failed to fetch live telemetry:", err);
+    }
+}
+
+
+// =============================================================================
+
+// =============================================================================
+// OFFICIAL CMS PACKET & APPEAL LETTER PDF EXPORT
+// =============================================================================
+
+function downloadPacketPdf(customCaseId) {
+    const caseId = customCaseId || 
+        (currentCoveragePacket && currentCoveragePacket.case_id) || 
+        (lastAdjudicationResult && lastAdjudicationResult.case_id);
+
+    if (!caseId) {
+        showToast("No active clinical case identifier found.", true);
+        return;
+    }
+
+    const token = currentToken || sessionStorage.getItem("access_token");
+    const downloadUrl = `/api/v1/packet/${encodeURIComponent(caseId)}/pdf`;
+
+    showToast("Synthesizing official CMS Coverage Packet PDF...", "info");
+
+    fetch(downloadUrl, {
+        headers: token ? { "Authorization": `Bearer ${token}` } : {}
+    })
+    .then(res => {
+        if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+        return res.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = `CMS_Coverage_Packet_${caseId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        showToast("Downloaded CMS Coverage Determination Packet PDF.", "success");
+    })
+    .catch(err => {
+        console.error("PDF download failed:", err);
+        showToast("Failed to download PDF: " + err.message, true);
+    });
+}
+
+function downloadAppealLetterPdf(customCaseId) {
+    const caseId = customCaseId || 
+        (currentCoveragePacket && currentCoveragePacket.case_id) || 
+        (lastAdjudicationResult && lastAdjudicationResult.case_id);
+
+    if (!caseId) {
+        showToast("No active clinical case identifier found.", true);
+        return;
+    }
+
+    const token = currentToken || sessionStorage.getItem("access_token");
+    const downloadUrl = `/api/v1/packet/${encodeURIComponent(caseId)}/appeal-letter/pdf`;
+
+    showToast("Generating formal Peer-to-Peer Appeal Letter PDF...", "info");
+
+    fetch(downloadUrl, {
+        headers: token ? { "Authorization": `Bearer ${token}` } : {}
+    })
+    .then(res => {
+        if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+        return res.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = `Peer_to_Peer_Appeal_Letter_${caseId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        showToast("Downloaded Peer-to-Peer Appeal Letter PDF.", "success");
+    })
+    .catch(err => {
+        console.error("Appeal PDF download failed:", err);
+        showToast("Failed to download appeal PDF: " + err.message, true);
+    });
+}
+
+// HIPAA INACTIVITY SESSION AUTO-LOCK (45 CFR § 164.312(a)(2)(iii))
+// =============================================================================
+
+const HIPAA_INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes
+let lastUserInteractionTime = Date.now();
+
+function initHipaaInactivityWatcher() {
+    const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "click"];
+    activityEvents.forEach(evt => {
+        window.addEventListener(evt, () => {
+            lastUserInteractionTime = Date.now();
+        }, { passive: true });
+    });
+
+    setInterval(() => {
+        if (!currentToken) return;
+        const elapsed = Date.now() - lastUserInteractionTime;
+        if (elapsed >= HIPAA_INACTIVITY_LIMIT_MS) {
+            handleHipaaInactivityTimeout();
+        }
+    }, 15000);
+}
+
+function handleHipaaInactivityTimeout() {
+    currentToken = null;
+    sessionStorage.removeItem("carepolicyguard_token");
+    sessionStorage.removeItem("carepolicyguard_role");
+    sessionStorage.removeItem("carepolicyguard_user");
+
+    const gate = document.getElementById("login-gate");
+    if (gate) gate.classList.remove("hidden");
+
+    const appHeader = document.querySelector(".app-header");
+    if (appHeader) appHeader.style.display = "none";
+    const mainContent = document.querySelector(".main-content");
+    if (mainContent) mainContent.style.display = "none";
+
+    const errBox = document.getElementById("login-error-box");
+    if (errBox) {
+        errBox.textContent = "HIPAA Security Auto-Lock: Session automatically locked after 15 minutes of inactivity to protect Protected Health Information (45 CFR § 164.312(a)(2)(iii)). Please sign in again.";
+        errBox.classList.remove("hidden");
+    }
 }

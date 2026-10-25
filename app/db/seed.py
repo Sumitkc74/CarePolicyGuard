@@ -13,13 +13,17 @@ def seed_database(db: Session):
             "username": "admin@carepolicyguard.med",
             "email": "admin@carepolicyguard.med",
             "password": settings.DEFAULT_ADMIN_PASS,
-            "role": UserRole.ADMIN.value
+            "role": UserRole.ADMIN.value,
+            "mfa_enabled": True,
+            "mfa_method": "email_otp"
         },
         {
             "username": "auditor@medicare.cms.gov",
             "email": "auditor@medicare.cms.gov",
             "password": settings.DEFAULT_AUDITOR_PASS,
-            "role": UserRole.AUDITOR.value
+            "role": UserRole.AUDITOR.value,
+            "mfa_enabled": True,
+            "mfa_method": "email_otp"
         },
         {
             "username": "clinician@hospital.org",
@@ -33,7 +37,9 @@ def seed_database(db: Session):
             "specialty": "Cardiology & Electrophysiology",
             "organization": "Pacific Heart & Vascular Institute",
             "is_verified_medical_pro": True,
-            "verification_method": "NPPES_API_VERIFIED"
+            "verification_method": "NPPES_API_VERIFIED",
+            "mfa_enabled": True,
+            "mfa_method": "email_otp"
         },
         {
             "username": "doctor@hospital.org",
@@ -47,7 +53,11 @@ def seed_database(db: Session):
             "specialty": "Cardiology",
             "organization": "General Hospital",
             "is_verified_medical_pro": True,
-            "verification_method": "NPPES_API_VERIFIED"
+            "verification_method": "NPPES_API_VERIFIED",
+            "mfa_enabled": True,
+            "mfa_method": "email_otp",
+            "mfa_enabled_methods": "email_otp,totp_app",
+            "totp_secret": "JBSWY3DPEHPK3PXP"
         }
     ]
 
@@ -67,6 +77,8 @@ def seed_database(db: Session):
                 organization=u_data.get("organization"),
                 is_verified_medical_pro=u_data.get("is_verified_medical_pro", False),
                 verification_method=u_data.get("verification_method"),
+                mfa_enabled=u_data.get("mfa_enabled", False),
+                mfa_method=u_data.get("mfa_method"),
                 is_active=True
             )
             db.add(user)
@@ -80,6 +92,12 @@ def seed_database(db: Session):
                 existing.organization = u_data.get("organization")
                 existing.is_verified_medical_pro = u_data.get("is_verified_medical_pro", False)
                 existing.verification_method = u_data.get("verification_method")
+            if "mfa_enabled" in u_data:
+                existing.mfa_enabled = u_data["mfa_enabled"]
+                existing.mfa_method = u_data["mfa_method"]
+                existing.mfa_enabled_methods = u_data.get("mfa_enabled_methods", "email_otp")
+                if u_data.get("totp_secret"):
+                    existing.totp_secret = u_data["totp_secret"]
 
     db.commit()
 
@@ -231,6 +249,76 @@ def seed_database(db: Session):
                     "is_exclusion": False,
                     "required_temporal_window": "Within 30 days of order",
                     "keywords": "pao2, spo2, oxygen saturation, hypoxemia, room air, 88%",
+                    "min_score": 0.85
+                }
+            ]
+        },
+        {
+            "policy_id": "NCD-20.33",
+            "title": "Transcatheter Edge-to-Edge Repair (TEER) for Mitral Regurgitation",
+            "jurisdiction": "National Coverage Determination (CMS)",
+            "effective_date": "2024-07-01",
+            "category": "Cardiology",
+            "description": "CMS coverage for Transcatheter Edge-to-Edge Repair (TEER / MitraClip) for treatment of significant symptomatic severe mitral regurgitation in high surgical risk patients. Requires documented multidisciplinary Heart Team consensus evaluation.",
+            "criteria": [
+                {
+                    "criterion_code": "CRIT-TEER-01",
+                    "name": "Severe Mitral Regurgitation (Grade 3+ to 4+)",
+                    "description": "Documented moderate-to-severe (Grade 3+) or severe (Grade 4+) primary or functional mitral regurgitation on comprehensive echocardiogram.",
+                    "clinical_intent": "Establish severe valvular regurgitation threshold",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Within past 6 months",
+                    "keywords": "mitral regurgitation, mr, grade 3+, grade 4+, severe mr, echo",
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-TEER-02",
+                    "name": "Multidisciplinary Heart Team Consensus",
+                    "description": "Independent evaluation by a cardiac surgeon and an interventional cardiologist confirming prohibited or high surgical risk (STS score >= 8% or documented prohibitive risk factors).",
+                    "clinical_intent": "Ensure multi-specialty surgical risk consensus per CMS mandate",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Prior to procedure scheduling",
+                    "keywords": "heart team, cardiothoracic surgeon, high risk, sts score, prohibitive risk",
+                    "min_score": 0.80
+                }
+            ]
+        },
+        {
+            "policy_id": "NCD-20.7",
+            "title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+            "jurisdiction": "National Coverage Determination (CMS)",
+            "effective_date": "2023-10-11",
+            "category": "Interventional Neurology & Cardiology",
+            "description": "CMS coverage for Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS) for patients with symptomatic or asymptomatic severe carotid stenosis at high risk for carotid endarterectomy (CEA). Mandatory deployment of FDA-approved embolic protection systems.",
+            "criteria": [
+                {
+                    "criterion_code": "CRIT-CAS-01",
+                    "name": "Severe Carotid Stenosis (>= 70% Symptomatic or >= 80% Asymptomatic)",
+                    "description": "Documented carotid artery stenosis >= 70% in symptomatic patients or >= 80% in asymptomatic patients verified by carotid duplex ultrasound, CTA, MRA, or angiography.",
+                    "clinical_intent": "Establish severe anatomical carotid narrowing threshold",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Within past 6 months",
+                    "keywords": "carotid stenosis, 70%, 80%, carotid duplex, cta, mra, angiography, ica",
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-CAS-02",
+                    "name": "Documented High Surgical Risk for Carotid Endarterectomy (CEA)",
+                    "description": "Patient has documented clinical or anatomical features placing them at high risk for open CEA (e.g., hostile neck, prior radiation, tracheostomy, severe COPD, STS score >= 8%).",
+                    "clinical_intent": "Justify percutaneous stenting over surgical endarterectomy",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Current pre-procedure evaluation",
+                    "keywords": "high risk for cea, hostile neck, radiation, tracheostomy, severe copd, high risk",
+                    "min_score": 0.80
+                },
+                {
+                    "criterion_code": "CRIT-CAS-03",
+                    "name": "Mandatory FDA-Approved Embolic Protection Device (EPD)",
+                    "description": "Procedure plan includes deployment of an FDA-approved distal embolic protection device (filter or flow reversal system) during stent deployment.",
+                    "clinical_intent": "Prevent distal embolic stroke during stenting",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Procedure plan and equipment verification",
+                    "keywords": "embolic protection device, epd, distal filter, embolic protection, stent",
                     "min_score": 0.85
                 }
             ]

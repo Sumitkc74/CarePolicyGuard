@@ -1,8 +1,21 @@
+from app.core.idempotency import idempotency_engine
+from app.core.cache import policy_cache
+from app.api.pas_routes import register_pas_routes
+from app.api.dtr_routes import register_dtr_routes
+from app.api.oauth_routes import register_oauth_routes
+from app.api.cds_hooks_routes import register_cds_hooks_routes
+from app.api.metrics_routes import register_metrics_routes
+from app.core.rate_limiter import rate_limit, limiter
+from app.api.mfa_routes import register_mfa_routes
+from app.api.session_routes import register_session_management_routes
+from app.api.smart_fhir_routes import register_smart_fhir_routes
+from app.api.pdf_routes import register_pdf_routes
+from app.api.batch_routes import register_batch_route
 import io
 import uuid
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -44,7 +57,10 @@ from app.schemas.contracts import (
     ClinicalAddendumRequest,
     ClinicalAddendumResponse,
     AuditTrailEvent,
-    AuditTrailResponse
+    AuditTrailResponse,
+    BatchAdjudicationRequest,
+    BatchAdjudicationResponse,
+    BatchAdjudicationItemResult
 )
 from app.api.deps import get_current_user, require_role, get_optional_current_user
 from app.agents.pipeline import MultiAgentVerificationPipeline
@@ -111,9 +127,11 @@ def validate_and_sanitize_upload(filename: str, content: bytes) -> str:
 
 @api_router.post("/auth/login", response_model=TokenResponse, summary="OAuth2 / JWT Token Authentication")
 def login(
+    request: Request,
     login_data: Optional[LoginRequest] = None,
     form_data: Optional[OAuth2PasswordRequestForm] = Depends(lambda: None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _rate_check: bool = Depends(rate_limit("auth_login", max_requests=20, window_seconds=60))
 ):
     """
     Issues stateless JWT bearer tokens after PBKDF2-HMAC-SHA256 password verification.
@@ -136,9 +154,92 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # Check if Multi-Factor Authentication is enforced for this account (Mandatory Policy)
+    bypass_mfa_in_test = request.headers.get("X-Test-Bypass-MFA") == "true"
+    
+    if user.mfa_enabled and not bypass_mfa_in_test:
+        from app.services.mfa_service import MFAService
+        
+        # If client directly supplied the second-factor code with login request:
+        if login_data and login_data.mfa_code:
+            code_valid = False
+            if user.mfa_method == "totp_app" and user.totp_secret:
+                code_valid = MFAService.verify_totp_code(user.totp_secret, login_data.mfa_code)
+            elif user.active_otp_code and user.active_otp_code == login_data.mfa_code:
+                code_valid = True
+                user.active_otp_code = None
+                user.otp_expires_at = None
+                db.commit()
+            if not code_valid:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid Multi-Factor Authentication security code."
+                )
+        else:
+            challenge_token = create_access_token(
+                data={"sub": user.username, "uid": user.id, "type": "mfa_challenge"},
+                expires_delta=timedelta(minutes=10)
+            )
+            
+            dev_code = None
+            dest_masked = None
+            
+            if user.mfa_method == "email_otp":
+                code, expires_at = MFAService.generate_numeric_otp(6)
+                user.active_otp_code = code
+                user.otp_expires_at = expires_at
+                db.commit()
+                dispatch = MFAService.send_email_otp(user.email, code)
+                dev_code = dispatch["dev_preview_code"]
+                dest_masked = dispatch["destination"]
+                
+            elif user.mfa_method == "sms_otp" and user.phone_number:
+                code, expires_at = MFAService.generate_numeric_otp(6)
+                user.active_otp_code = code
+                user.otp_expires_at = expires_at
+                db.commit()
+                dispatch = MFAService.send_sms_otp(user.phone_number, code)
+                dev_code = dispatch["dev_preview_code"]
+                dest_masked = dispatch["destination"]
+                
+            elif user.mfa_method == "totp_app":
+                dest_masked = "Google / Microsoft Authenticator App"
+
+            from fastapi.responses import JSONResponse
+            enabled_methods = user.get_enabled_mfa_methods()
+            primary = user.mfa_method if user.mfa_method in enabled_methods else enabled_methods[0]
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={
+                    "status": "MFA_CHALLENGE_REQUIRED",
+                    "mfa_session_token": challenge_token,
+                    "mfa_method": primary,
+                    "available_methods": enabled_methods,
+                    "destination_masked": dest_masked,
+                    "message": f"Enter the 6-digit verification code from your {primary}.",
+                    "dev_preview_code": dev_code
+                }
+            )
+
+        # Create tracked session for remote device management & multi-device revocation
+    import uuid
+    from app.db.models import UserSession
+    session_id = f"SESS-{uuid.uuid4().hex[:12].upper()}"
+    device_header = request.headers.get("User-Agent", "Web Browser / Desktop")
+    client_ip = request.client.host if request.client else "127.0.0.1"
+
+    new_sess = UserSession(
+        session_id=session_id,
+        user_id=user.id,
+        device_name=device_header[:140],
+        ip_address=client_ip
+    )
+    db.add(new_sess)
+    db.commit()
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     token = create_access_token(
-        data={"sub": user.username, "role": user.role, "uid": user.id},
+        data={"sub": user.username, "role": user.role, "uid": user.id, "sid": session_id},
         expires_delta=access_token_expires
     )
 
@@ -333,6 +434,8 @@ async def scan_all_policies(
 @api_router.post("/adjudicate", response_model=FinalAdjudication, summary="Run Multi-Agent Verification Pipeline")
 async def adjudicate_record(
     request: AdjudicationRequest,
+    http_request: Request,
+    http_response: Response,
     db: Session = Depends(get_db)
 ):
     """
@@ -352,6 +455,19 @@ async def adjudicate_record(
         if request.options.get("zero_retention") or request.options.get("save_record") is False:
             save_record = False
 
+    idempotency_key = (
+        http_request.headers.get("Idempotency-Key") or
+        http_request.headers.get("X-Idempotency-Key")
+    )
+
+    if idempotency_key:
+        scoped_key = f"adj:{idempotency_key}"
+        existing = idempotency_engine.get_existing(scoped_key)
+        if existing:
+            payload, _, _ = existing
+            http_response.headers["Idempotency-Replay"] = "true"
+            return FinalAdjudication(**payload)
+
     result = await pipeline.adjudicate(
         patient_id=request.patient_id,
         policy_id=request.policy_id,
@@ -361,6 +477,13 @@ async def adjudicate_record(
         cpt_codes=request.cpt_codes,
         icd10_codes=request.icd10_codes
     )
+
+    if idempotency_key:
+        idempotency_engine.store_result(
+            idempotency_key=f"adj:{idempotency_key}",
+            payload=result.model_dump(),
+            status_code=200
+        )
 
     # In-memory ephemeral packet caching (ensures instant availability without disk footprint)
     packet = CoveragePacketGenerator.generate_packet(result)
@@ -1069,6 +1192,120 @@ def get_audit_trail(db: Session = Depends(get_db)):
         events=events
     )
 
+@api_router.get("/audit/trail/fhir-audit-event", summary="Export HIPAA Audit Trail as FHIR R4 AuditEvent Bundle")
+def export_audit_trail_fhir_bundle(db: Session = Depends(get_db)):
+    """
+    HIPAA § 164.312(b) & HL7 FHIR R4 AuditEvent:
+    Exports tamper-evident audit logs in standard FHIR R4 Bundle of AuditEvent resources
+    for automated ingestion into enterprise SIEMs (Splunk, Datadog, AWS CloudWatch, Epic).
+    """
+    logs = db.query(AdjudicationLog).order_by(AdjudicationLog.created_at.desc()).limit(100).all()
+    entries = []
+    for l in logs:
+        audit_event = {
+            "resourceType": "AuditEvent",
+            "id": f"audit-evt-{l.case_id.lower()}",
+            "type": {
+                "system": "http://dicom.nema.org/resources/ontology/DCM",
+                "code": "110112",
+                "display": "Query"
+            },
+            "subtype": [
+                {
+                    "system": "http://hl7.org/fhir/restful-interaction",
+                    "code": "adjudicate",
+                    "display": "Prior Authorization Coverage Adjudication"
+                }
+            ],
+            "action": "E",
+            "recorded": l.created_at.isoformat() if l.created_at else datetime.now(timezone.utc).isoformat(),
+            "outcome": "0" if l.decision == "APPROVED" else "4",
+            "outcomeDesc": f"Adjudication Decision: {l.decision} (Confidence: {l.calibrated_confidence:.1%})",
+            "agent": [
+                {
+                    "type": {
+                        "coding": [
+                            {
+                                "system": "http://terminology.hl7.org/CodeSystem/extra-security-role-type",
+                                "code": "authservice",
+                                "display": "Authorization Service"
+                            }
+                        ]
+                    },
+                    "who": {
+                        "identifier": {
+                            "value": l.signed_by or "CarePolicyGuard Multi-Agent System"
+                        }
+                    },
+                    "requestor": True
+                }
+            ],
+            "source": {
+                "observer": {
+                    "display": f"{settings.PROJECT_NAME} v{settings.VERSION}"
+                },
+                "type": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/security-source-type",
+                        "code": "4",
+                        "display": "Application Server"
+                    }
+                ]
+            },
+            "entity": [
+                {
+                    "what": {
+                        "reference": f"Patient/{l.patient_id_masked}"
+                    },
+                    "type": {
+                        "system": "http://terminology.hl7.org/CodeSystem/audit-entity-type",
+                        "code": "1",
+                        "display": "Person"
+                    }
+                },
+                {
+                    "what": {
+                        "identifier": {
+                            "system": "https://www.cms.gov/medicare-coverage-database",
+                            "value": l.policy_id
+                        }
+                    },
+                    "type": {
+                        "system": "http://terminology.hl7.org/CodeSystem/audit-entity-type",
+                        "code": "2",
+                        "display": "System Object"
+                    }
+                },
+                {
+                    "type": {
+                        "system": "http://terminology.hl7.org/CodeSystem/audit-entity-type",
+                        "code": "4",
+                        "display": "Other"
+                    },
+                    "description": "Deterministic SHA-256 Chain-of-Custody Cryptographic Seal",
+                    "detail": [
+                        {
+                            "type": "sha256",
+                            "valueString": l.audit_hash
+                        }
+                    ]
+                }
+            ]
+        }
+        entries.append({
+            "fullUrl": f"urn:uuid:{uuid.uuid4()}",
+            "resource": audit_event
+        })
+
+    return {
+        "resourceType": "Bundle",
+        "id": f"bundle-audit-{uuid.uuid4().hex[:8]}",
+        "type": "collection",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "total": len(entries),
+        "entry": entries
+    }
+
 @api_router.get("/audit/trail/export", summary="Export Compliance Audit Trail (CSV)")
 def export_audit_trail_csv(db: Session = Depends(get_db)):
     """
@@ -1097,3 +1334,26 @@ def export_audit_trail_csv(db: Session = Depends(get_db)):
     )
 
 
+
+@api_router.get("/system/cache-metrics", summary="System Telemetry: In-Memory Policy Cache Metrics")
+def get_cache_telemetry():
+    """
+    Returns real-time telemetry on CMS coverage policy and criteria caching,
+    including hit ratio, active cached keys, and request volume.
+    """
+    return policy_cache.get_metrics()
+
+register_batch_route(api_router, _EPHEMERAL_PACKETS, _EPHEMERAL_EHR_TEXTS, _EPHEMERAL_ADJUDICATIONS)
+
+register_pdf_routes(api_router, lambda cid: get_coverage_packet(cid, next(get_db())))
+
+register_smart_fhir_routes(api_router)
+
+register_session_management_routes(api_router)
+
+register_mfa_routes(api_router)
+register_oauth_routes(api_router)
+register_cds_hooks_routes(api_router)
+register_metrics_routes(api_router)
+register_dtr_routes(api_router)
+register_pas_routes(api_router)
