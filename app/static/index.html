@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_13">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_14">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -1554,7 +1554,7 @@
             <div class="modal-header">
                 <div>
                     <h3>Authenticated Provider Profile</h3>
-                    <p class="modal-subtitle">Active clinical credentials and cryptographic session information.</p>
+                    <p class="modal-subtitle">Active clinician credentials and security settings.</p>
                 </div>
                 <button class="modal-close-btn" onclick="toggleAuthModal()">&times;</button>
             </div>
@@ -1617,13 +1617,11 @@
                             <div class="profile-field-group">
                                 <label class="profile-field-label" for="inp-profile-name">Legal Physician Name &amp; Title</label>
                                 <input type="text" id="inp-profile-name" class="form-input" placeholder="e.g. Dr. Eleanor Vance, MD" />
-                                <span class="profile-field-hint">Used on all electronic prior authorization signatures and CMS attestations.</span>
                             </div>
 
                             <div class="profile-field-group">
                                 <label class="profile-field-label" for="inp-profile-npi">10-Digit CMS National Provider Identifier (NPI)</label>
                                 <input type="text" id="inp-profile-npi" class="form-input mono" maxlength="10" placeholder="10 numeric digits (e.g. 1043256787)" />
-                                <span class="profile-field-hint">Required for Medicare MAC claims and Da Vinci PAS FHIR Practitioner bundles.</span>
                             </div>
 
                             <div class="profile-field-group">
@@ -1639,7 +1637,6 @@
                             <div class="profile-field-group">
                                 <label class="profile-field-label" for="inp-profile-pin">Clinician Signing PIN (4 Digits)</label>
                                 <input type="password" id="inp-profile-pin" class="form-input mono" maxlength="4" placeholder="4 digits" />
-                                <span class="profile-field-hint">Entered before final Medicare transmission to satisfy non-repudiation.</span>
                             </div>
                         </div>
 
@@ -1662,14 +1659,6 @@
                             <span class="badge-role-tag" id="modal-profile-role">Clinician</span>
                         </div>
                         <div class="profile-row">
-                            <span class="profile-k">Clinical Authority:</span>
-                            <span class="profile-v text-emerald" id="modal-profile-authority">Full Prior-Auth Creation &amp; Signing</span>
-                        </div>
-                        <div class="profile-row">
-                            <span class="profile-k">Security Protocol:</span>
-                            <span class="profile-v">PBKDF2-HMAC-SHA256 &bull; JWT Bearer Token</span>
-                        </div>
-                        <div class="profile-row">
                             <span class="profile-k">Two-Factor Authentication:</span>
                             <span class="profile-v" id="modal-profile-mfa-badge" style="font-weight: 600;">Checking status...</span>
                         </div>
@@ -1680,11 +1669,6 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <strong style="color: #f1f5f9; font-size: 13px;">Multi-Factor Authentication (MFA) Settings</strong>
                             <span id="mfa-current-status-tag" style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #334155; color: #94a3b8;">Loading...</span>
-                        </div>
-                        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 10px 0;">Protect patient charts and clinical signatures with RFC 6238 TOTP Authenticator apps or Email verification.</p>
-
-                        <div style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; padding: 6px 10px; margin-bottom: 10px; font-size: 11px; color: #cbd5e1; border-radius: 0 4px 4px 0;">
-                            <strong>Multi-Factor Security Policy:</strong> You may have multiple MFA factors active simultaneously and pick which to use at login. At least one factor must remain active.
                         </div>
 
                         <div id="mfa-factors-list-container" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
@@ -2411,7 +2395,7 @@
                 </div>
 
                 <div class="pin-legal-note">
-                    Cryptographic digital signature with non-repudiation pursuant to 42 CFR &sect; 495 &amp; False Claims Act (31 U.S.C. &sect; 3729).
+                    Electronic clinician signature pursuant to 42 CFR &sect; 495.
                 </div>
             </div>
 
@@ -2428,7 +2412,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_13"></script>
+    <script src="/static/js/app.js?v=20261026_14"></script>
 </body>
 </html>
 

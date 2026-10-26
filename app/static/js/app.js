@@ -677,21 +677,8 @@ function updateUserBadge() {
 
     const modalUser = document.getElementById("modal-profile-user");
     const modalRole = document.getElementById("modal-profile-role");
-    const modalAuth = document.getElementById("modal-profile-authority");
     if (modalUser) modalUser.textContent = currentUser;
     if (modalRole) modalRole.textContent = currentRole;
-    if (modalAuth) {
-        if (currentRole === "Clinician") {
-            modalAuth.textContent = "Full Prior-Auth Creation & Signing";
-            modalAuth.className = "profile-v text-emerald";
-        } else if (currentRole === "Admin") {
-            modalAuth.textContent = "Full System & Audit Administration";
-            modalAuth.className = "profile-v text-cyan";
-        } else {
-            modalAuth.textContent = "Read-Only Compliance & Ledger Inspection";
-            modalAuth.className = "profile-v text-amber";
-        }
-    }
 
     const auditorNotice = document.getElementById("auditor-mode-notice");
     if (auditorNotice) {
