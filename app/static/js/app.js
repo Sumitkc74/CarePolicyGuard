@@ -4894,3 +4894,27 @@ function handleHipaaInactivityTimeout() {
         errBox.classList.remove("hidden");
     }
 }
+
+
+// Global modal backdrop click & Escape key handler
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (typeof closeAddendumModal === 'function') closeAddendumModal();
+        if (typeof closeCriterionModal === 'function') closeCriterionModal();
+        if (typeof closeSampleTutorialModal === 'function') closeSampleTutorialModal();
+        if (typeof closeTermsModal === 'function') closeTermsModal();
+        if (typeof closePeerToPeerAppealModal === 'function') closePeerToPeerAppealModal();
+        if (typeof closeFhirModal === 'function') closeFhirModal();
+    }
+});
+
+document.addEventListener('click', (e) => {
+    if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+        if (e.target.id === 'addendum-modal' && typeof closeAddendumModal === 'function') closeAddendumModal();
+        else if (e.target.id === 'criterion-detail-modal' && typeof closeCriterionModal === 'function') closeCriterionModal();
+        else if (e.target.id === 'sample-tutorial-modal' && typeof closeSampleTutorialModal === 'function') closeSampleTutorialModal();
+        else if (e.target.id === 'terms-modal' && typeof closeTermsModal === 'function') closeTermsModal();
+        else if (e.target.id === 'appeal-letter-modal' && typeof closePeerToPeerAppealModal === 'function') closePeerToPeerAppealModal();
+        else if (e.target.id === 'fhir-bundle-modal' && typeof closeFhirModal === 'function') closeFhirModal();
+    }
+});
