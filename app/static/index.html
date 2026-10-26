@@ -432,21 +432,30 @@
             <!-- ==================================================== -->
             <!-- SCREEN 2: MEDICARE POLICY MATCH & MULTI-POLICY SCAN -->
             <!-- ==================================================== -->
-                        <div id="screen-step-2" class="wizard-screen">
+            <div id="screen-step-2" class="wizard-screen">
                 <div class="wizard-card-centered wide step2-clean-container">
                     <div class="wizard-card-header">
                         <div class="header-left-group">
                             <span class="wizard-step-pill">STEP 2</span>
                             <div>
                                 <h2>Select Medicare Policy Directive</h2>
-                                <p class="step2-subtitle">Review candidate policies matched to your clinical documentation. The best evidentiary match is pre-selected.</p>
+                                <p class="step2-subtitle">Candidate policies evaluated against clinical documentation. Best match is featured below.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- CLEAN POLICY MATCH GRID -->
-                    <div class="policy-scan-section">
-                        <div class="policy-match-grid" id="policy-match-grid">
+                    <!-- FEATURED POLICY (BIGGER HERO CARD) -->
+                    <div id="featured-policy-slot" class="featured-policy-slot">
+                        <!-- Populated dynamically via app.js -->
+                    </div>
+
+                    <!-- OTHER CANDIDATE POLICIES (SMALLER CARDS) -->
+                    <div class="other-candidates-section" id="other-candidates-section">
+                        <div class="other-candidates-header">
+                            <span class="other-candidates-title">Other Candidate Policies</span>
+                            <span class="other-candidates-hint">Click any card to select as active directive</span>
+                        </div>
+                        <div class="other-policy-grid" id="policy-match-grid">
                             <!-- Populated dynamically via app.js -->
                         </div>
                     </div>

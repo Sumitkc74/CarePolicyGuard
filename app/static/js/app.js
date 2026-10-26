@@ -1780,75 +1780,94 @@ async function triggerMultiPolicyAutoScan() {
 }
 
 function renderMultiPolicyScanResults(data) {
-    const counterElem = document.getElementById("scan-summary-counter");
+    const featuredSlot = document.getElementById("featured-policy-slot");
     const gridElem = document.getElementById("policy-match-grid");
-    const bannerElem = document.getElementById("multi-policy-insights-banner");
-    const bannerTitle = document.getElementById("multi-policy-insights-title");
-    const bannerDesc = document.getElementById("multi-policy-insights-desc");
-    const currentActivePolicy = document.getElementById("policy-select").value;
+    const policySelect = document.getElementById("policy-select");
 
-    if (counterElem) {
-        counterElem.textContent = `Scanned ${data.total_policies_scanned} policies in ${data.execution_time_ms}ms (${data.approved_count} Qualified, ${data.denied_count} Unmet, ${data.deferred_count} Auditor Review)`;
+    // Auto-select best match if none chosen or on initial scan
+    if (data.best_match_policy_id && (!policySelect.value || policySelect.value === "NCD-20.4")) {
+        policySelect.value = data.best_match_policy_id;
     }
 
-    // Multi-morbidity and policy co-occurrence banner
-    if (bannerElem) {
-        if (data.approved_count > 1) {
-            bannerElem.classList.remove("hidden");
-            if (bannerTitle) bannerTitle.textContent = `Multi-Policy Coverage Detected (${data.approved_count} Policies Qualified)`;
-            if (bannerDesc) bannerDesc.textContent = data.multi_morbidity_insights.join(" ");
-        } else if (data.approved_count === 1) {
-            bannerElem.classList.remove("hidden");
-            if (bannerTitle) bannerTitle.textContent = `Targeted Coverage Match Found (${data.best_match_policy_id})`;
-            if (bannerDesc) bannerDesc.textContent = data.multi_morbidity_insights.join(" ");
+    const currentId = policySelect.value || data.best_match_policy_id || "NCD-20.4";
+    const featuredMatch = (data.all_matches && data.all_matches.length > 0)
+        ? (data.all_matches.find(m => m.policy_id === currentId) || data.all_matches[0])
+        : null;
+    const otherMatches = (data.all_matches && featuredMatch)
+        ? data.all_matches.filter(m => m.policy_id !== featuredMatch.policy_id)
+        : [];
+
+    // 1. Render Featured (Bigger Hero Card)
+    if (featuredSlot && featuredMatch) {
+        const pct = Math.round(featuredMatch.calibrated_confidence * 100);
+        let statusBadge = "";
+        if (featuredMatch.decision === "APPROVED") {
+            statusBadge = `<span class="badge-featured-status approved"><span class="badge-dot" style="background:#10b981;"></span>QUALIFIED (${pct}%)</span>`;
+        } else if (featuredMatch.decision === "DEFERRED_TO_HUMAN") {
+            statusBadge = `<span class="badge-featured-status deferred"><span class="badge-dot" style="background:#f59e0b;"></span>AUDITOR REVIEW (${pct}%)</span>`;
         } else {
-            bannerElem.classList.add("hidden");
+            statusBadge = `<span class="badge-featured-status unmet"><span class="badge-dot" style="background:#64748b;"></span>CRITERIA UNMET (${pct}%)</span>`;
         }
-    }
 
-    // Auto-select best match if user has not explicitly locked onto another policy
-    if (data.best_match_policy_id && (!currentActivePolicy || currentActivePolicy === "NCD-20.4")) {
-        selectPolicyFromScan(data.best_match_policy_id, false);
-    }
+        const bestBadge = featuredMatch.is_best_match 
+            ? `<span class="badge-best-featured"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> BEST MATCH</span>` 
+            : "";
 
-    // Render interactive cards in the grid
-    if (gridElem) {
-        gridElem.innerHTML = "";
-        data.all_matches.forEach(m => {
-            const isSelected = (document.getElementById("policy-select").value === m.policy_id);
-            const card = document.createElement("div");
-            card.className = `policy-match-item ${isSelected ? "selected" : ""} ${m.decision.toLowerCase()}`;
-            card.onclick = () => selectPolicyFromScan(m.policy_id, true);
-
-            let statusBadge = "";
-            if (m.decision === "APPROVED") {
-                statusBadge = `<span class="badge-match-approved">QUALIFIED (${Math.round(m.calibrated_confidence * 100)}%)</span>`;
-            } else if (m.decision === "DEFERRED_TO_HUMAN") {
-                statusBadge = `<span class="badge-match-deferred">AUDITOR REVIEW</span>`;
-            } else {
-                statusBadge = `<span class="badge-match-denied">CRITERIA UNMET</span>`;
-            }
-
-            const bestBadge = m.is_best_match ? `<span class="badge-best-match"> BEST MATCH</span>` : "";
-
-            card.innerHTML = `
-                <div class="match-item-top">
-                    <div class="match-code-group">
-                        <span class="match-code">${m.policy_id}</span>
-                        <span class="match-category">${m.category}</span>
+        featuredSlot.innerHTML = `
+            <div class="featured-hero-card ${featuredMatch.decision.toLowerCase()}">
+                <div class="featured-top-row">
+                    <div class="featured-meta-group">
+                        <span class="featured-code">${featuredMatch.policy_id}</span>
+                        <span class="featured-dot">&bull;</span>
+                        <span class="featured-category">${featuredMatch.category}</span>
                     </div>
-                    <div class="match-badges">
+                    <div class="featured-badges">
                         ${bestBadge}
                         ${statusBadge}
                     </div>
                 </div>
-                <div class="match-title">${m.policy_title}</div>
-                <div class="match-footer">
-                    <span class="match-criteria-count">
+                <div class="featured-title">${featuredMatch.policy_title}</div>
+                <div class="featured-bottom-row">
+                    <div class="featured-criteria-count">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>${featuredMatch.met_criteria}/${featuredMatch.total_criteria} Criteria Satisfied</span>
+                    </div>
+                    <span class="featured-active-pill">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        ${m.met_criteria}/${m.total_criteria} Criteria Satisfied
+                        Selected Directive
                     </span>
-                    <span class="match-select-action ${isSelected ? "active" : ""}">${isSelected ? "Selected" : "Select &rarr;"}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // 2. Render Other Candidates (Smaller Cards)
+    if (gridElem) {
+        gridElem.innerHTML = "";
+        otherMatches.forEach(m => {
+            const card = document.createElement("div");
+            card.className = `mini-policy-card ${m.decision.toLowerCase()}`;
+            card.onclick = () => selectPolicyFromScan(m.policy_id, true);
+
+            let statusPill = "";
+            const pct = Math.round(m.calibrated_confidence * 100);
+            if (m.decision === "APPROVED") {
+                statusPill = `<span class="mini-status approved">Qualified ${pct}%</span>`;
+            } else if (m.decision === "DEFERRED_TO_HUMAN") {
+                statusPill = `<span class="mini-status deferred">Review ${pct}%</span>`;
+            } else {
+                statusPill = `<span class="mini-status unmet">Unmet</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="mini-top-row">
+                    <span class="mini-code">${m.policy_id}</span>
+                    ${statusPill}
+                </div>
+                <div class="mini-title" title="${m.policy_title}">${m.policy_title}</div>
+                <div class="mini-footer">
+                    <span class="mini-crit-count">${m.met_criteria}/${m.total_criteria} Met</span>
+                    <span class="mini-select-btn">Select &rarr;</span>
                 </div>
             `;
             gridElem.appendChild(card);
@@ -1862,36 +1881,9 @@ function selectPolicyFromScan(policyId, triggerToast = true) {
     const policySelect = document.getElementById("policy-select");
     if (policySelect) policySelect.value = policyId;
 
-    // Update active highlight on cards
-    document.querySelectorAll(".policy-match-item").forEach(item => {
-        const codeElem = item.querySelector(".match-code");
-        if (codeElem && codeElem.textContent.trim() === policyId) {
-            item.classList.add("selected");
-            const actElem = item.querySelector(".match-select-action");
-            if (actElem) {
-                actElem.textContent = "Selected";
-                actElem.classList.add("active");
-            }
-        } else {
-            item.classList.remove("selected");
-            const actElem = item.querySelector(".match-select-action");
-            if (actElem) {
-                actElem.innerHTML = "Select &rarr;";
-                actElem.classList.remove("active");
-            }
-        }
-    });
-
-    // Check if best match pill should show
-    const bestPill = document.getElementById("active-best-match-pill");
-    if (bestPill && lastMultiPolicyScanResult) {
-        if (lastMultiPolicyScanResult.best_match_policy_id === policyId) {
-            bestPill.classList.remove("hidden");
-        } else {
-            bestPill.classList.add("hidden");
-        }
+    if (lastMultiPolicyScanResult) {
+        renderMultiPolicyScanResults(lastMultiPolicyScanResult);
     }
-
     updatePolicyStep2Preview();
     if (triggerToast) {
         showToast(`Selected ${policyId} for coverage determination`);
