@@ -6522,8 +6522,10 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
-}
-
+}
+
+
+
 /* ========================================================================== */
 /* CLINICIAN SIGNING PIN MODAL STYLES                                         */
 /* ========================================================================== */
@@ -6712,4 +6714,66 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* ========================================================================== */
+/* CLINICIAN CREDENTIALS & PROFILE EDITING STYLES                             */
+/* ========================================================================== */
+
+.profile-tab-strip {
+    display: flex;
+    gap: 6px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 14px;
+}
+
+.profile-tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #94A3B8);
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.profile-tab-btn:hover {
+    color: #F8FAFC;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.profile-tab-btn.active {
+    background: #3B82F6;
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+
+.profile-edit-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.profile-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-field-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary, #CBD5E1);
+}
+
+.profile-field-hint {
+    font-size: 0.7rem;
+    color: var(--text-muted, #94A3B8);
 }

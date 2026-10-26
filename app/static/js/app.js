@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateWorkflowRibbon(1);
     initHipaaInactivityWatcher();
     setupPinInputListeners();
+    renderClinicianProfile();
 });
 
 // =============================================================================
@@ -507,11 +508,167 @@ function signOutToLoginGate() {
     showToast("Signed out successfully. Authentication required to continue.");
 }
 
+// =============================================================================
+// CLINICIAN PERSONAL DETAILS & CREDENTIAL MANAGEMENT
+// =============================================================================
+
+const DEFAULT_CLINICIAN_PROFILE = {
+    full_name: "Dr. Eleanor Vance, MD",
+    npi: "1043256787",
+    specialty: "Cardiology / Electrophysiology",
+    facility: "MetroHealth Heart & Vascular Institute"
+};
+
+function getClinicianProfile() {
+    try {
+        const stored = localStorage.getItem("carepolicyguard_clinician_profile");
+        if (stored) {
+            return { ...DEFAULT_CLINICIAN_PROFILE, ...JSON.parse(stored) };
+        }
+    } catch (e) {
+        console.warn("Could not parse stored clinician profile:", e);
+    }
+    return { ...DEFAULT_CLINICIAN_PROFILE };
+}
+
+function switchProfileModalTab(tabName) {
+    const btnCreds = document.getElementById("btn-tab-profile-creds");
+    const btnSec = document.getElementById("btn-tab-profile-security");
+    const contentCreds = document.getElementById("profile-tab-content-credentials");
+    const contentSec = document.getElementById("profile-tab-content-security");
+
+    if (tabName === "credentials") {
+        if (btnCreds) btnCreds.classList.add("active");
+        if (btnSec) btnSec.classList.remove("active");
+        if (contentCreds) contentCreds.classList.remove("hidden");
+        if (contentSec) contentSec.classList.add("hidden");
+    } else {
+        if (btnSec) btnSec.classList.add("active");
+        if (btnCreds) btnCreds.classList.remove("active");
+        if (contentSec) contentSec.classList.remove("hidden");
+        if (contentCreds) contentCreds.classList.add("hidden");
+    }
+}
+
+function renderClinicianProfile() {
+    const profile = getClinicianProfile();
+
+    const dispName = document.getElementById("disp-profile-name");
+    const dispNpi = document.getElementById("disp-profile-npi");
+    const dispSpec = document.getElementById("disp-profile-specialty");
+    const dispFac = document.getElementById("disp-profile-facility");
+
+    if (dispName) dispName.textContent = profile.full_name;
+    if (dispNpi) dispNpi.textContent = profile.npi;
+    if (dispSpec) dispSpec.textContent = profile.specialty;
+    if (dispFac) dispFac.textContent = profile.facility;
+
+    // Sync top navigation display name if role is Clinician
+    const nameLabel = document.getElementById("user-name-label");
+    if (nameLabel && currentRole === "Clinician") {
+        nameLabel.textContent = profile.full_name;
+    }
+
+    // Sync Step 4 physician signature input
+    const docSigInput = document.getElementById("doc-physician-signature");
+    if (docSigInput && (!docSigInput.value || docSigInput.value.includes("Jenkins") || docSigInput.value.includes("Vance"))) {
+        docSigInput.value = profile.full_name;
+    }
+
+    // Sync Addendum modal signer fields
+    const addendumName = document.getElementById("addendum-physician-name");
+    const addendumNpi = document.getElementById("addendum-physician-npi");
+    if (addendumName) addendumName.value = profile.full_name;
+    if (addendumNpi) addendumNpi.value = profile.npi;
+}
+
+function enableClinicianProfileEditMode() {
+    const profile = getClinicianProfile();
+
+    const inpName = document.getElementById("inp-profile-name");
+    const inpNpi = document.getElementById("inp-profile-npi");
+    const inpSpec = document.getElementById("inp-profile-specialty");
+    const inpFac = document.getElementById("inp-profile-facility");
+    const inpPin = document.getElementById("inp-profile-pin");
+
+    if (inpName) inpName.value = profile.full_name;
+    if (inpNpi) inpNpi.value = profile.npi;
+    if (inpSpec) inpSpec.value = profile.specialty;
+    if (inpFac) inpFac.value = profile.facility;
+    if (inpPin) inpPin.value = getClinicianSigningPin();
+
+    const viewBox = document.getElementById("profile-creds-view-box");
+    const editBox = document.getElementById("profile-creds-edit-box");
+    if (viewBox) viewBox.classList.add("hidden");
+    if (editBox) editBox.classList.remove("hidden");
+
+    if (inpName) inpName.focus();
+}
+
+function cancelClinicianProfileEdit() {
+    const viewBox = document.getElementById("profile-creds-view-box");
+    const editBox = document.getElementById("profile-creds-edit-box");
+    if (viewBox) viewBox.classList.remove("hidden");
+    if (editBox) editBox.classList.add("hidden");
+}
+
+function saveClinicianProfileChanges() {
+    const inpName = document.getElementById("inp-profile-name");
+    const inpNpi = document.getElementById("inp-profile-npi");
+    const inpSpec = document.getElementById("inp-profile-specialty");
+    const inpFac = document.getElementById("inp-profile-facility");
+    const inpPin = document.getElementById("inp-profile-pin");
+
+    const name = inpName ? inpName.value.trim() : "";
+    const npi = inpNpi ? inpNpi.value.trim() : "";
+    const specialty = inpSpec ? inpSpec.value.trim() : "";
+    const facility = inpFac ? inpFac.value.trim() : "";
+    const pin = inpPin ? inpPin.value.trim() : "";
+
+    if (!name || name.length < 3) {
+        showToast("Please enter a valid physician legal name.", "error");
+        if (inpName) inpName.focus();
+        return;
+    }
+
+    if (!/^\d{10}$/.test(npi)) {
+        showToast("CMS National Provider Identifier (NPI) must be exactly 10 numeric digits.", "error");
+        if (inpNpi) inpNpi.focus();
+        return;
+    }
+
+    if (pin && !/^\d{4}$/.test(pin)) {
+        showToast("Clinician Signing PIN must be exactly 4 numeric digits.", "error");
+        if (inpPin) inpPin.focus();
+        return;
+    }
+
+    const updatedProfile = {
+        full_name: name,
+        npi: npi,
+        specialty: specialty || "General Medicine",
+        facility: facility || "Outpatient Clinical Center"
+    };
+
+    localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(updatedProfile));
+    if (pin) {
+        localStorage.setItem("clinician_signing_pin", pin);
+    }
+
+    renderClinicianProfile();
+    cancelClinicianProfileEdit();
+    showToast("Clinician personal credentials updated and synchronized across claim workflows.", "success");
+}
+
 function updateUserBadge() {
     const roleLabel = document.getElementById("user-role-label");
     const nameLabel = document.getElementById("user-name-label");
+    const profile = getClinicianProfile();
+
     if (roleLabel) roleLabel.textContent = currentRole;
-    if (nameLabel) nameLabel.textContent = currentUser;
+    if (nameLabel) {
+        nameLabel.textContent = (currentRole === "Clinician") ? profile.full_name : currentUser;
+    }
 
     const modalUser = document.getElementById("modal-profile-user");
     const modalRole = document.getElementById("modal-profile-role");
@@ -642,6 +799,8 @@ function toggleAuthModal() {
     if (modal) {
         modal.classList.toggle("hidden");
         if (!modal.classList.contains("hidden")) {
+            renderClinicianProfile();
+            cancelClinicianProfileEdit();
             loadAuthModalSecurityDetails();
         }
     }

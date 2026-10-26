@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_10">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_11">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -1563,7 +1563,101 @@
                 <button class="modal-close-btn" onclick="toggleAuthModal()">&times;</button>
             </div>
             
-            <div class="session-profile-card">
+            
+            <!-- MODAL TAB STRIP -->
+            <div class="profile-tab-strip">
+                <button type="button" class="profile-tab-btn active" id="btn-tab-profile-creds" onclick="switchProfileModalTab('credentials')">
+                    Clinician Credentials
+                </button>
+                <button type="button" class="profile-tab-btn" id="btn-tab-profile-security" onclick="switchProfileModalTab('security')">
+                    Security &amp; MFA
+                </button>
+            </div>
+
+            <!-- TAB 1: CLINICIAN CREDENTIALS & PERSONAL DETAILS -->
+            <div id="profile-tab-content-credentials">
+                <!-- VIEW MODE -->
+                <div class="session-profile-card" id="profile-creds-view-box">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span class="med-icon icon-sm icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
+                            <span style="font-size:0.85rem;font-weight:600;color:#F8FAFC;">Practitioner Identity (Legal Sign-Off)</span>
+                        </div>
+                        <button type="button" class="btn-subtle-pill" onclick="enableClinicianProfileEditMode()">
+                            Edit Details
+                        </button>
+                    </div>
+
+                    <div class="profile-row">
+                        <span class="profile-k">Legal Treating Physician:</span>
+                        <strong class="profile-v" id="disp-profile-name" style="color:#F8FAFC;">Dr. Eleanor Vance, MD</strong>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-k">10-Digit CMS NPI:</span>
+                        <strong class="profile-v mono" id="disp-profile-npi" style="color:#38BDF8;">1043256787</strong>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-k">Primary Specialty:</span>
+                        <span class="profile-v" id="disp-profile-specialty">Cardiology / Electrophysiology</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-k">Healthcare Facility:</span>
+                        <span class="profile-v" id="disp-profile-facility">MetroHealth Heart &amp; Vascular Institute</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-k">Signing PIN:</span>
+                        <span class="profile-v"><span class="mono">••••</span> <span style="font-size:0.75rem;color:#10B981;font-weight:600;">(4-Digit Attestation Active)</span></span>
+                    </div>
+                </div>
+
+                <!-- EDIT MODE -->
+                <div class="session-profile-card hidden" id="profile-creds-edit-box">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <strong style="color:#38BDF8;font-size:0.85rem;">Edit Clinician Personal Details</strong>
+                        <span style="font-size:0.72rem;color:var(--text-muted);">Syncs across claims, addenda &amp; EHR signatures</span>
+                    </div>
+
+                    <div class="profile-edit-grid">
+                        <div class="profile-field-group">
+                            <label class="profile-field-label" for="inp-profile-name">Legal Physician Name &amp; Title</label>
+                            <input type="text" id="inp-profile-name" class="form-input" placeholder="e.g. Dr. Eleanor Vance, MD" />
+                            <span class="profile-field-hint">Used on all electronic prior authorization signatures and CMS attestations.</span>
+                        </div>
+
+                        <div class="profile-field-group">
+                            <label class="profile-field-label" for="inp-profile-npi">10-Digit CMS National Provider Identifier (NPI)</label>
+                            <input type="text" id="inp-profile-npi" class="form-input mono" maxlength="10" placeholder="10 numeric digits (e.g. 1043256787)" />
+                            <span class="profile-field-hint">Required for Medicare MAC claims and Da Vinci PAS FHIR Practitioner bundles.</span>
+                        </div>
+
+                        <div class="profile-field-group">
+                            <label class="profile-field-label" for="inp-profile-specialty">Clinical Specialty</label>
+                            <input type="text" id="inp-profile-specialty" class="form-input" placeholder="e.g. Cardiology / Electrophysiology" />
+                        </div>
+
+                        <div class="profile-field-group">
+                            <label class="profile-field-label" for="inp-profile-facility">Practice / Healthcare Facility</label>
+                            <input type="text" id="inp-profile-facility" class="form-input" placeholder="e.g. MetroHealth Heart &amp; Vascular Institute" />
+                        </div>
+
+                        <div class="profile-field-group">
+                            <label class="profile-field-label" for="inp-profile-pin">Clinician Signing PIN (4 Digits)</label>
+                            <input type="password" id="inp-profile-pin" class="form-input mono" maxlength="4" placeholder="4 digits" />
+                            <span class="profile-field-hint">Entered before final Medicare transmission to satisfy non-repudiation.</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
+                        <button type="button" class="btn-secondary" onclick="cancelClinicianProfileEdit()">Cancel</button>
+                        <button type="button" class="btn-primary" onclick="saveClinicianProfileChanges()">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: SECURITY, SESSION & MFA -->
+            <div id="profile-tab-content-security" class="hidden">
+
+<div class="session-profile-card">
                 <div class="profile-row">
                     <span class="profile-k">Account Identity:</span>
                     <strong class="profile-v" id="modal-profile-user">clinician@hospital.org</strong>
@@ -2337,7 +2431,10 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_10"></script>
+    <script src="/static/js/app.js?v=20261026_11"></script>
 </body>
 </html>
 
+            </div>
+
+            
