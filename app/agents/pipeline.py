@@ -263,7 +263,11 @@ class MultiAgentVerificationPipeline:
             )
 
             total_crit = len(adjudication.criterion_assessments)
-            met_crit = sum(1 for c in adjudication.criterion_assessments if c.status == DeterminationStatus.MET)
+            met_crit = sum(
+                1 for c in adjudication.criterion_assessments
+                if (c.status == DeterminationStatus.MET and not getattr(c, "is_exclusion", False)) or
+                   (c.status == DeterminationStatus.NOT_MET and getattr(c, "is_exclusion", False))
+            )
             unmet_crit = total_crit - met_crit
 
             if adjudication.adjudication_decision == AdjudicationDecision.APPROVED:
@@ -271,7 +275,11 @@ class MultiAgentVerificationPipeline:
             elif adjudication.adjudication_decision == AdjudicationDecision.DEFERRED_TO_HUMAN:
                 rationale = f"Confidence ({adjudication.calibrated_aggregate_confidence:.1%}) below safety threshold or requires human auditor review."
             else:
-                unmet_names = [c.name or c.criterion_code for c in adjudication.criterion_assessments if c.status != DeterminationStatus.MET]
+                unmet_names = [
+                    c.name or c.criterion_code for c in adjudication.criterion_assessments
+                    if (c.status != DeterminationStatus.MET and not getattr(c, "is_exclusion", False)) or
+                       (c.status == DeterminationStatus.MET and getattr(c, "is_exclusion", False))
+                ]
                 rationale = f"Missing mandatory criteria: {', '.join(unmet_names[:3])}."
 
             match_summary = PolicyMatchSummary(
