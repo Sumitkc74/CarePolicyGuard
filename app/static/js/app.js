@@ -4510,25 +4510,25 @@ const SAMPLE_BATCH_ROSTERS = {
             patient_id: "PT-CARD-881",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness."
+            clinical_narrative: "68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
         },
         {
             patient_id: "PT-CARD-882",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "55-year-old female post acute STEMI 12 days ago. Underwent emergency stenting. Echo demonstrates LVEF 30%. NYHA Class II. Currently in hospital recovering from acute event."
+            clinical_narrative: "55-year-old female post acute STEMI 12 days ago. Underwent emergency stenting. Echo demonstrates LVEF 30%. NYHA Class II. Currently in hospital recovering from acute event.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
         },
         {
             patient_id: "PT-CARD-883",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "72-year-old female with dilated non-ischemic cardiomyopathy. Transthoracic echocardiogram reveals LVEF 32%. Patient reports NYHA Class III heart failure symptoms with fatigue at low workloads. Treated with GDMT including Sacubitril/Valsartan 49/51mg and Metoprolol succinate 100mg for 5 months. No acute ischemic events. Life expectancy exceeds 1 year."
+            clinical_narrative: "72-year-old female with dilated non-ischemic cardiomyopathy. Transthoracic echocardiogram reveals LVEF 32%. Patient reports NYHA Class III heart failure symptoms with fatigue at low workloads. Treated with GDMT including Sacubitril/Valsartan 49/51mg and Metoprolol succinate 100mg for 5 months. No acute ischemic events. Life expectancy exceeds 1 year.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
         },
         {
             patient_id: "PT-CARD-884",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "61-year-old male presenting with shortness of breath and lower extremity edema. Chart mentions heart failure with reduced ejection fraction, but recent quantitative echocardiogram or radionuclide LVEF measurement report is completely missing from current hospitalization records."
+            clinical_narrative: "61-year-old male presenting with shortness of breath and lower extremity edema. Chart mentions heart failure with reduced ejection fraction, but recent quantitative echocardiogram or radionuclide LVEF measurement report is completely missing from current hospitalization records.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
         }
     ],
     mixed: [
@@ -4536,19 +4536,19 @@ const SAMPLE_BATCH_ROSTERS = {
             patient_id: "PT-PULM-701",
             policy_id: "LCD-L33829",
             requested_procedure_code: "E0601",
-            clinical_narrative: "52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial."
+            clinical_narrative: "52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial.\n\nAttending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)\nElectronically signed by: /s/ Dr. Robert Stevens, MD"
         },
         {
             patient_id: "PT-WOUND-702",
             policy_id: "NCD-20.29",
             requested_procedure_code: "G0277",
-            clinical_narrative: "64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse."
+            clinical_narrative: "64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse.\n\nAttending Physician: Dr. Evelyn Reed, MD (NPI: 1872635490)\nElectronically signed by: /s/ Dr. Evelyn Reed, MD"
         },
         {
             patient_id: "PT-PULM-703",
             policy_id: "NCD-240.2",
             requested_procedure_code: "E1390",
-            clinical_narrative: "70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min."
+            clinical_narrative: "70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min.\n\nAttending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)\nElectronically signed by: /s/ Dr. Robert Stevens, MD"
         }
     ]
 };
@@ -4705,7 +4705,7 @@ function renderBatchTablePending() {
             <td><span style="color:var(--text-muted);font-size:0.75rem;">--</span></td>
             <td><span style="color:var(--text-muted);font-size:0.75rem;">--</span></td>
             <td style="text-align: right;">
-                <button type="button" class="btn-batch-action" onclick="loadRosterItemIntoWizard(${idx})">
+                <button type="button" class="btn-batch-action" onclick="inspectBatchItemNote(${idx})">
                     <span>Inspect Note</span>
                     <span style="font-size:0.8rem;">&rarr;</span>
                 </button>
@@ -4901,15 +4901,68 @@ function viewBatchItemInWizard(idx) {
     goToWizardScreen(3);
 }
 
+let currentInspectedBatchIdx = null;
+
+function inspectBatchItemNote(idx) {
+    if (!currentBatchRoster || !currentBatchRoster[idx]) return;
+    const item = currentBatchRoster[idx];
+    currentInspectedBatchIdx = idx;
+
+    const patIdEl = document.getElementById("batch-modal-patient-id");
+    if (patIdEl) patIdEl.textContent = item.patient_id;
+
+    const polEl = document.getElementById("batch-modal-policy-id");
+    if (polEl) {
+        const spec = getPolicySpecialty(item.policy_id);
+        polEl.textContent = `${item.policy_id} (${spec})`;
+    }
+
+    const cptEl = document.getElementById("batch-modal-cpt-code");
+    if (cptEl) cptEl.textContent = item.requested_procedure_code || "N/A";
+
+    const narrEl = document.getElementById("batch-modal-narrative-text");
+    if (narrEl) narrEl.textContent = item.clinical_narrative;
+
+    const modal = document.getElementById("batch-note-modal");
+    if (modal) modal.classList.remove("hidden");
+}
+
+function closeBatchNoteModal() {
+    const modal = document.getElementById("batch-note-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function loadInspectedNoteIntoWizard() {
+    if (currentInspectedBatchIdx === null || !currentBatchRoster || !currentBatchRoster[currentInspectedBatchIdx]) {
+        closeBatchNoteModal();
+        return;
+    }
+    const idx = currentInspectedBatchIdx;
+    closeBatchNoteModal();
+    loadRosterItemIntoWizard(idx);
+}
+
 function loadRosterItemIntoWizard(idx) {
     if (!currentBatchRoster || !currentBatchRoster[idx]) return;
     const item = currentBatchRoster[idx];
     
+    currentNoteMode = "actual";
     switchMainTab('adjudicate');
-    document.getElementById("actual-paste-textarea").value = item.clinical_narrative;
-    syncPastedNoteToInput();
+    
+    const pasteArea = document.getElementById("actual-paste-textarea");
+    const ehrInput = document.getElementById("ehr-input");
+    const patInput = document.getElementById("patient-id-input");
+    const polInput = document.getElementById("policy-select");
+
+    if (pasteArea) pasteArea.value = item.clinical_narrative;
+    if (ehrInput) ehrInput.value = item.clinical_narrative;
+    if (patInput) patInput.value = item.patient_id;
+    if (polInput && item.policy_id) polInput.value = item.policy_id;
+
+    updateWorkflowRibbon(1);
+    verifyCurrentNoteAuthenticity();
     goToWizardScreen(1);
-    showToast(`Loaded note for ${item.patient_id} into Prior Auth wizard.`, "info");
+    showToast(`Loaded authenticated chart note for ${item.patient_id} into Prior Auth wizard.`, "info");
 }
 
 // =============================================================================
@@ -5477,7 +5530,8 @@ window.addEventListener('keydown', (e) => {
 
 document.addEventListener('click', (e) => {
     if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'audit-detail-modal' && typeof closeAuditDetailModal === 'function') closeAuditDetailModal();
+        if (e.target.id === 'batch-note-modal' && typeof closeBatchNoteModal === 'function') closeBatchNoteModal();
+        else if (e.target.id === 'audit-detail-modal' && typeof closeAuditDetailModal === 'function') closeAuditDetailModal();
         else if (e.target.id === 'policy-document-modal' && typeof closePolicyDocumentModal === 'function') closePolicyDocumentModal();
         else if (e.target.id === 'addendum-modal' && typeof closeAddendumModal === 'function') closeAddendumModal();
         else if (e.target.id === 'criterion-detail-modal' && typeof closeCriterionModal === 'function') closeCriterionModal();

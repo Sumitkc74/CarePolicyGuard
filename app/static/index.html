@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_08">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_09">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -2192,10 +2192,70 @@
         </div>
     </div>
 
+    <!-- BATCH ROSTER CLINICAL NOTE INSPECTION MODAL -->
+    <div class="modal-overlay hidden" id="batch-note-modal">
+        <div class="modal-card audit-clean-modal-card" style="max-width: 620px;">
+            <div class="modal-header audit-clean-header">
+                <div class="audit-header-title-box">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="med-icon modal-icon-badge icon-cyan" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        </span>
+                        <div>
+                            <h3 style="margin:0;font-size:1.05rem;font-weight:600;color:#F8FAFC;">Clinical Chart Note Inspection</h3>
+                            <span class="mono" id="batch-modal-patient-id" style="font-size:0.75rem;color:#38BDF8;">PT-ID</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeBatchNoteModal()">&times;</button>
+            </div>
+
+            <div class="modal-body audit-clean-body">
+                <!-- METADATA STRIP -->
+                <div class="audit-hero-card" style="padding: 12px 16px; gap: 8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span class="audit-meta-lbl">Target Policy:</span>
+                            <strong id="batch-modal-policy-id" style="color:#F8FAFC;font-size:0.85rem;">--</strong>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span class="audit-meta-lbl">CPT / HCPCS:</span>
+                            <span class="procedure-cpt-pill" id="batch-modal-cpt-code">--</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <span class="audit-meta-lbl">Credentials:</span>
+                            <span class="badge-status met" style="padding:2px 8px;font-size:0.72rem;"><span class="chip-dot"></span> Doctor Authenticated</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLINICAL NOTE BODY -->
+                <div class="audit-clean-section">
+                    <div class="audit-clean-section-hdr">
+                        <span class="med-icon icon-xs text-cyan"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>
+                        <span>Treating Physician Clinical Chart Narrative</span>
+                    </div>
+                    <div class="audit-clean-narrative" id="batch-modal-narrative-text" style="max-height: 250px; white-space: pre-wrap; font-size: 0.82rem; line-height: 1.55; color: #E2E8F0;">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions audit-clean-actions">
+                <button type="button" class="btn-secondary" id="btn-load-batch-item-wizard" onclick="loadInspectedNoteIntoWizard()">
+                    <span>Load into Prior Auth Wizard &rarr;</span>
+                </button>
+                <button type="button" class="btn-primary" onclick="closeBatchNoteModal()">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_08"></script>
+    <script src="/static/js/app.js?v=20261026_09"></script>
 </body>
 </html>
 
