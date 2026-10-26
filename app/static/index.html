@@ -1909,12 +1909,32 @@
                     <strong id="addendum-criterion-label">CRIT-ICD-04: Guideline-Directed Medical Therapy (&gt; 90 Days)</strong>
                     <p id="addendum-criterion-desc" class="addendum-criterion-desc">Documentation of optimal medical therapy for at least 90 days before elective ICD placement.</p>
                 </div>
-                <div class="form-group" style="margin-top: 14px;">
+
+                <!-- CLINICAL POLICY GUIDANCE (MINIMUM REQUIRED INFORMATION) -->
+                <div class="addendum-guidance-box" id="addendum-guidance-box">
+                    <div class="guidance-header">
+                        <span class="med-icon icon-xs" style="color: #FBBF24;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </span>
+                        <span>Policy Guidance &bull; Minimum Required Information</span>
+                    </div>
+                    <div id="addendum-guidance-text" class="guidance-content">
+                        <!-- Populated dynamically with specific policy requirements -->
+                    </div>
+                    <div class="guidance-action-row">
+                        <span class="guidance-hint">Physician enters authentic patient facts below. (Optional template starter available)</span>
+                        <button type="button" class="btn-subtle-pill" onclick="applySuggestedAddendumTemplate()">
+                            Insert Template Starter
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 6px;">
                     <label for="addendum-narrative-input" class="form-label">
                         Attested Clinical Note Addendum
-                        <span class="label-hint">(State dates, medication doses, and specific clinical observations)</span>
+                        <span class="label-hint">(Doctor enters authentic observations, specific dates, and medication doses)</span>
                     </label>
-                    <textarea id="addendum-narrative-input" class="form-textarea addendum-textarea" rows="4" placeholder="e.g., Patient has been compliant on Entresto 49/51mg BID and Carvedilol 25mg BID since November 2025 (>120 days) with documented tolerance."></textarea>
+                    <textarea id="addendum-narrative-input" class="form-textarea addendum-textarea" rows="4" placeholder="Enter clinician attestation with exact patient observations, dates, and dosages..."></textarea>
                 </div>
                 <div class="addendum-signatures-row">
                     <div class="form-group half-width">

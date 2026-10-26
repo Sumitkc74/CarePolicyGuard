@@ -4133,6 +4133,7 @@ function renderTimelineAnalysisPanel(data) {
 }
 
 let currentTargetCriterionCode = null;
+let currentSuggestedTemplate = "";
 
 function openAddendumModalForCriterion(code, name, desc) {
     currentTargetCriterionCode = code;
@@ -4141,25 +4142,92 @@ function openAddendumModalForCriterion(code, name, desc) {
 
     const labelElem = document.getElementById("addendum-criterion-label");
     const descElem = document.getElementById("addendum-criterion-desc");
+    const guidanceElem = document.getElementById("addendum-guidance-text");
     const inputElem = document.getElementById("addendum-narrative-input");
 
     if (labelElem) labelElem.textContent = `${code}: ${name}`;
     if (descElem) descElem.textContent = desc || "Clinical criterion requirement.";
 
-    // Pre-populate intelligent prompt template based on criterion
+    // Configure Minimum Required Documentation per Medicare LCD/NCD guidelines
+    let guidanceHtml = "";
+    if (code.includes("GDMT") || code.includes("04")) {
+        guidanceHtml = `
+            <strong>Required Clinical Information per Policy:</strong>
+            <ul>
+                <li>Specific drug names &amp; dosages (e.g. ARNI / ACEi / Beta-blocker).</li>
+                <li>Start date or documented duration of therapy (must document <strong>&ge; 90 days</strong>).</li>
+                <li>Documentation that patient tolerated the regimen without disqualifying adverse effects.</li>
+            </ul>
+        `;
+        currentSuggestedTemplate = "Patient has been compliant on optimal guideline-directed medical therapy ([Medication name & dose, e.g. Entresto 49/51mg BID and Carvedilol 25mg BID]) since [Date / > 90 days] with documented tolerance and no adverse effects.";
+    } else if (code.includes("LVEF") || code.includes("01")) {
+        guidanceHtml = `
+            <strong>Required Clinical Information per Policy:</strong>
+            <ul>
+                <li>Diagnostic imaging modality (e.g., Transthoracic Echocardiogram, Cardiac MRI, or MUGA).</li>
+                <li>Date of diagnostic study (must be within the required policy timeframe, typically 12 months).</li>
+                <li>Quantitative Left Ventricular Ejection Fraction (must verify <strong>&le; 35%</strong>).</li>
+            </ul>
+        `;
+        currentSuggestedTemplate = "Follow-up echocardiogram completed on [Date, e.g. 2026-02-10] demonstrates severe left ventricular systolic dysfunction with LVEF calculated at [Measured %, e.g. 28%] by biplane Simpson's method.";
+    } else if (code.includes("AHI") || code.includes("OSA")) {
+        guidanceHtml = `
+            <strong>Required Clinical Information per Policy:</strong>
+            <ul>
+                <li>Polysomnography or Home Sleep Apnea Test report date.</li>
+                <li>Apnea-Hypopnea Index (AHI) or Respiratory Disturbance Index (RDI) count (&ge; 15, or &ge; 5 with comorbidities).</li>
+                <li>Documented clinical symptoms (e.g. daytime hypersomnolence, refractory hypertension).</li>
+            </ul>
+        `;
+        currentSuggestedTemplate = "Polysomnography report dated [Date] confirms obstructive sleep apnea with an Apnea-Hypopnea Index (AHI) of [Value, e.g. 22.4] events per hour accompanied by documented daytime somnolence.";
+    } else if (code.includes("HBOT") || code.includes("WOUND")) {
+        guidanceHtml = `
+            <strong>Required Clinical Information per Policy:</strong>
+            <ul>
+                <li>Exact anatomic wound location and physical ulcer depth.</li>
+                <li>Wagner Grading classification (Grade 3 or 4 involving tendon, capsule, or bone).</li>
+                <li>Documented failure of standard wound therapy for &ge; 30 days prior to hyperbaric oxygen evaluation.</li>
+            </ul>
+        `;
+        currentSuggestedTemplate = "Physical examination dated [Date] confirms diabetic foot ulcer of [Anatomic location] with involvement of [tendon/bone], consistent with Wagner Grade [3 or 4]. Standard wound care was administered for > 30 days without healing response.";
+    } else {
+        guidanceHtml = `
+            <strong>Required Clinical Information per Policy:</strong>
+            <ul>
+                <li>Encounter date of physical observation or diagnostic testing.</li>
+                <li>Specific clinical finding, lab result, or diagnostic confirmation.</li>
+                <li>Clinician attestation addressing Medicare condition: <em>${escapeHtml(desc || name)}</em>.</li>
+            </ul>
+        `;
+        currentSuggestedTemplate = `Clinician attestation for ${name}: Documented clinical observation on [Date] confirms [Specific clinical findings satisfying Medicare condition].`;
+    }
+
+    if (guidanceElem) {
+        guidanceElem.innerHTML = guidanceHtml;
+    }
+
+    // Leave the textarea empty so the physician directly types their authentic note!
     if (inputElem) {
-        if (code.includes("GDMT") || code.includes("04")) {
-            inputElem.value = "Patient has been compliant on optimal guideline-directed medical therapy (Entresto 49/51mg BID and Carvedilol 25mg BID) for > 120 days since November 2025 with documented tolerance and no adverse effects.";
-        } else if (code.includes("LVEF") || code.includes("01")) {
-            inputElem.value = "Follow-up echocardiogram completed on 2026-02-10 demonstrates severe left ventricular systolic dysfunction with LVEF calculated at 28% by biplane Simpson's method.";
-        } else if (code.includes("AHI") || code.includes("OSA")) {
-            inputElem.value = "Polysomnography report dated 2026-01-15 confirms severe obstructive sleep apnea with an Apnea-Hypopnea Index (AHI) of 24.2 events per hour.";
-        } else {
-            inputElem.value = `Clinician attestation for ${name}: Documented clinical observation confirms compliance with Medicare guidelines.`;
-        }
+        inputElem.value = "";
+        inputElem.placeholder = "Enter authentic clinician attestation with exact patient observations, dates, and dosages...";
     }
 
     modal.classList.remove("hidden");
+    if (inputElem) {
+        setTimeout(() => inputElem.focus(), 100);
+    }
+}
+
+function applySuggestedAddendumTemplate() {
+    const inputElem = document.getElementById("addendum-narrative-input");
+    if (!inputElem) return;
+    if (inputElem.value.trim().length > 0) {
+        if (!confirm("Replace current addendum draft with template starter?")) {
+            return;
+        }
+    }
+    inputElem.value = currentSuggestedTemplate;
+    inputElem.focus();
 }
 
 function closeAddendumModal() {
@@ -4178,8 +4246,14 @@ async function submitClinicalAddendum() {
     const npiElem = document.getElementById("addendum-physician-npi");
 
     const addendumText = inputElem ? inputElem.value.trim() : "";
-    if (addendumText.length < 10) {
-        showToast("Please enter a detailed clinical addendum note (minimum 10 characters).", true);
+    if (!addendumText || addendumText.length < 10) {
+        showToast("Please enter authentic clinical observations for the patient (minimum 10 characters).", true);
+        if (inputElem) inputElem.focus();
+        return;
+    }
+    if (addendumText.includes("[") && addendumText.includes("]")) {
+        showToast("Please replace bracketed placeholders (e.g. [Date], [Medication]) with actual patient clinical data.", true);
+        if (inputElem) inputElem.focus();
         return;
     }
 

@@ -5376,6 +5376,78 @@ body {
     padding-right: 4px;
 }
 
+/* Addendum Clinical Policy Guidance Box */
+.addendum-guidance-box {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.guidance-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #FBBF24;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.guidance-content {
+    font-size: 0.8125rem;
+    color: var(--text-secondary, #CBD5E1);
+    line-height: 1.5;
+}
+
+.guidance-content ul {
+    margin: 4px 0 0 18px;
+    padding: 0;
+}
+
+.guidance-content li {
+    margin-bottom: 3px;
+}
+
+.guidance-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(245, 158, 11, 0.2);
+    flex-wrap: wrap;
+}
+
+.guidance-hint {
+    font-size: 0.74rem;
+    color: var(--text-muted, #94A3B8);
+}
+
+.btn-subtle-pill {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #FDE68A;
+    font-size: 0.74rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-subtle-pill:hover {
+    background: rgba(245, 158, 11, 0.25);
+    color: #FFFFFF;
+    border-color: #FBBF24;
+}
+
 .addendum-target-box {
     background: rgba(168, 85, 247, 0.08);
     border: 1px solid rgba(168, 85, 247, 0.25);
