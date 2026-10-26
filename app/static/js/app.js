@@ -2948,18 +2948,20 @@ async function viewAuditRecordDetails(caseId) {
         const data = await res.json();
         window._activeAuditRecord = data;
 
-        // Modal Header Info
+        // Modal Header Case ID
         const caseIdEl = document.getElementById("audit-modal-case-id");
         if (caseIdEl) caseIdEl.textContent = data.case_id;
 
-        const tsEl = document.getElementById("audit-modal-timestamp");
-        if (tsEl) {
-            const dt = new Date(data.created_at);
-            tsEl.textContent = `Timestamp: ${dt.toLocaleString()} • Verified SHA-256 Chain of Custody Entry`;
+        // Hero Card & Decision Badge
+        const heroCard = document.getElementById("audit-hero-card");
+        const decBadgeEl = document.getElementById("audit-hero-decision-badge");
+        if (heroCard) {
+            heroCard.className = "audit-hero-card";
+            if (data.decision === "APPROVED") heroCard.classList.add("hero-approved");
+            else if (data.decision === "DENIED") heroCard.classList.add("hero-denied");
+            else heroCard.classList.add("hero-deferred");
         }
 
-        // Summary Stats Grid
-        const decBadgeEl = document.getElementById("audit-modal-decision-badge");
         if (decBadgeEl) {
             if (data.decision === "APPROVED") {
                 decBadgeEl.innerHTML = `<span class="decision-pill approved"><span class="decision-dot"></span> Approved</span>`;
@@ -2970,50 +2972,42 @@ async function viewAuditRecordDetails(caseId) {
             }
         }
 
-        const polBadgeEl = document.getElementById("audit-modal-policy-badge");
-        if (polBadgeEl) {
+        // Confidence
+        const confNumEl = document.getElementById("audit-modal-conf-num");
+        if (confNumEl) {
+            confNumEl.textContent = `${Math.round(data.calibrated_confidence * 100)}%`;
+        }
+
+        // Policy & Patient Metadata
+        const polEl = document.getElementById("audit-modal-policy-title");
+        if (polEl) {
             const spec = getPolicySpecialty(data.policy_id);
-            polBadgeEl.innerHTML = `<span>${escapeHtml(data.policy_id)}</span> <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(${escapeHtml(spec)})</span>`;
+            polEl.textContent = `${data.policy_id} (${spec})`;
         }
 
-        const patBadgeEl = document.getElementById("audit-modal-patient-badge");
-        if (patBadgeEl) patBadgeEl.textContent = data.patient_id_masked || "PT-***";
+        const patEl = document.getElementById("audit-modal-patient-id");
+        if (patEl) patEl.textContent = data.patient_id_masked || "PT-***";
 
-        const confBadgeEl = document.getElementById("audit-modal-conf-badge");
-        if (confBadgeEl) {
-            const calPct = (data.calibrated_confidence * 100).toFixed(1);
-            const rawPct = (data.raw_confidence * 100).toFixed(1);
-            confBadgeEl.innerHTML = `${calPct}% <span style="font-size:0.72rem;font-weight:normal;color:var(--text-muted);">(Raw: ${rawPct}%)</span>`;
+        const gateEl = document.getElementById("audit-modal-gate-text");
+        if (gateEl) {
+            gateEl.textContent = data.abstention_status ? "Abstention Triggered" : "Safety Gate Passed";
+            gateEl.style.color = data.abstention_status ? "#FBBF24" : "#34D399";
         }
 
-        const gateBadgeEl = document.getElementById("audit-modal-gate-badge");
-        if (gateBadgeEl) {
-            if (data.abstention_status) {
-                gateBadgeEl.innerHTML = `<span class="safety-gate-pill gate-triggered"><span class="decision-dot"></span> Triggered (&tau; &lt; 0.85)</span>`;
+        // Clinical Narrative / Rationale
+        const narrEl = document.getElementById("audit-modal-narrative");
+        if (narrEl) {
+            if (currentRole === "Admin" && data.sanitized_ehr_preview && data.sanitized_ehr_preview.includes("REDACTED")) {
+                narrEl.textContent = "Clinical narrative is redacted under HIPAA Minimum Necessary (45 CFR 164.502(b)). Only operational audit metadata is accessible to IT Administrators.";
             } else {
-                gateBadgeEl.innerHTML = `<span class="safety-gate-pill gate-pass"><span class="decision-dot"></span> Passed (&ge; 0.85)</span>`;
+                narrEl.textContent = data.sanitized_ehr_preview || "Clinical evaluation completed against statutory Medicare policy criteria.";
             }
         }
 
-        const latBadgeEl = document.getElementById("audit-modal-latency-badge");
-        if (latBadgeEl) {
-            latBadgeEl.textContent = `${data.execution_time_ms ? data.execution_time_ms.toFixed(1) : "0.0"} ms`;
-        }
-
-        // SHA-256 Seal
-        const hashEl = document.getElementById("audit-modal-hash");
-        if (hashEl) hashEl.textContent = data.audit_hash;
-
-        // Clinical Narrative
-        const narrEl = document.getElementById("audit-modal-narrative");
-        if (narrEl) {
-            narrEl.textContent = data.sanitized_ehr_preview || "No clinical narrative recorded for this case.";
-        }
-
-        // Statutory Criteria Table
-        const critTbody = document.getElementById("audit-modal-criteria-body");
-        if (critTbody) {
-            critTbody.innerHTML = "";
+        // Criteria Checklist (Simple & uncluttered)
+        const critListEl = document.getElementById("audit-modal-criteria-list");
+        if (critListEl) {
+            critListEl.innerHTML = "";
             let criteriaList = [];
             try {
                 if (data.criterion_evaluations_json) {
@@ -3025,127 +3019,73 @@ async function viewAuditRecordDetails(caseId) {
 
             if (criteriaList && criteriaList.length > 0) {
                 criteriaList.forEach(crit => {
-                    const tr = document.createElement("tr");
-                    const isExcl = crit.is_exclusion;
+                    const row = document.createElement("div");
+                    row.className = "audit-criterion-row";
+                    
                     const statusStr = (crit.status || (crit.satisfied ? "MET" : "NOT_MET")).toUpperCase();
-
-                    let stChip = `<span class="badge-status not-met">NOT MET</span>`;
+                    let stChip = `<span class="badge-status not-met" style="padding:2px 8px;font-size:0.72rem;">Not Met</span>`;
                     if (statusStr === "MET") {
-                        stChip = `<span class="badge-status met">MET</span>`;
+                        stChip = `<span class="badge-status met" style="padding:2px 8px;font-size:0.72rem;">Met</span>`;
                     } else if (statusStr === "EXCLUDED") {
-                        stChip = `<span class="badge-status excluded">EXCLUDED</span>`;
+                        stChip = `<span class="badge-status excluded" style="padding:2px 8px;font-size:0.72rem;">Excluded</span>`;
                     } else if (statusStr === "INSUFFICIENT" || statusStr.includes("DEFER")) {
-                        stChip = `<span class="badge-status insufficient">INSUFFICIENT</span>`;
+                        stChip = `<span class="badge-status insufficient" style="padding:2px 8px;font-size:0.72rem;">Review</span>`;
                     }
 
-                    const critConf = typeof crit.confidence === "number" ? `${Math.round(crit.confidence * 100)}%` : "--";
-
-                    tr.innerHTML = `
-                        <td><strong class="mono" style="color:#38BDF8;font-size:0.75rem;">${escapeHtml(crit.criterion_code)}</strong></td>
-                        <td>
-                            <strong style="color:#F8FAFC;font-size:0.8rem;">${escapeHtml(crit.name || crit.criterion_code)}</strong>
-                            <p style="margin:2px 0 0 0;font-size:0.72rem;color:var(--text-muted);line-height:1.4;">${escapeHtml(crit.description || "")}</p>
-                        </td>
-                        <td><span style="font-size:0.72rem;color:${isExcl ? '#FB7185' : 'var(--text-muted)'};font-weight:600;">${isExcl ? 'Statutory Exclusion' : 'Coverage Requirement'}</span></td>
-                        <td>${stChip}</td>
-                        <td class="mono" style="font-size:0.75rem;font-weight:600;">${critConf}</td>
+                    row.innerHTML = `
+                        <div class="audit-crit-info">
+                            <span class="audit-crit-code">${escapeHtml(crit.criterion_code)}</span>
+                            <span class="audit-crit-title" title="${escapeHtml(crit.name || crit.criterion_code)}">${escapeHtml(crit.name || crit.criterion_code)}</span>
+                        </div>
+                        <div>${stChip}</div>
                     `;
-                    critTbody.appendChild(tr);
+                    critListEl.appendChild(row);
                 });
             } else {
-                critTbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:12px;">No criteria evaluated or details redacted under role permissions.</td></tr>`;
+                critListEl.innerHTML = `<div style="font-size:0.78rem;color:var(--text-muted);padding:6px;">No specific statutory criteria flags logged.</div>`;
             }
         }
 
-        // Evidence Spans
-        const spansContainer = document.getElementById("audit-modal-spans-container");
-        if (spansContainer) {
-            spansContainer.innerHTML = "";
-            let spansList = [];
-            try {
-                if (data.evidence_spans_json) {
-                    spansList = JSON.parse(data.evidence_spans_json);
-                }
-            } catch (err) {
-                console.warn("Could not parse evidence_spans_json:", err);
+        // Direct Chart Evidence (Only show if available)
+        const evidSection = document.getElementById("audit-evidence-section");
+        const evidBox = document.getElementById("audit-modal-evidence-box");
+        let spansList = [];
+        try {
+            if (data.evidence_spans_json) {
+                spansList = JSON.parse(data.evidence_spans_json);
             }
-
-            if (spansList && spansList.length > 0) {
-                spansList.forEach(sp => {
-                    const spanDiv = document.createElement("div");
-                    spanDiv.className = "audit-span-item";
-                    const quoteText = sp.text || sp.quote || sp.exact_quote || "";
-                    const codeText = sp.criterion_code || sp.code || "CRITERION";
-                    const startChar = typeof sp.start_char === "number" ? sp.start_char : (sp.start || 0);
-                    const endChar = typeof sp.end_char === "number" ? sp.end_char : (sp.end || 0);
-
-                    spanDiv.innerHTML = `
-                        <div class="audit-span-meta">
-                            <span class="mono" style="color:#38BDF8;font-weight:600;">${escapeHtml(codeText)}</span>
-                            <span class="mono" style="color:var(--text-muted);">Offset: [${startChar} - ${endChar}]</span>
-                        </div>
-                        <div class="audit-span-quote">"${escapeHtml(quoteText)}"</div>
-                        <div style="font-size:0.7rem;color:#10B981;font-weight:600;display:flex;align-items:center;gap:4px;">
-                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
-                            <span>100% Exact Character-Grounded EHR Substring</span>
-                        </div>
-                    `;
-                    spansContainer.appendChild(spanDiv);
-                });
-            } else {
-                spansContainer.innerHTML = `<div style="font-size:0.78rem;color:var(--text-muted);background:rgba(0,0,0,0.2);padding:10px 12px;border-radius:6px;">No positive text citation spans recorded for this determination.</div>`;
-            }
+        } catch (err) {
+            console.warn("Could not parse evidence_spans_json:", err);
         }
 
-        // Adversarial Verification Checks
-        const advSection = document.getElementById("audit-modal-adversarial-section");
-        const advContainer = document.getElementById("audit-modal-adversarial-container");
-        if (advContainer) {
-            advContainer.innerHTML = "";
-            let advList = [];
-            try {
-                if (data.adversarial_audits_json) {
-                    advList = JSON.parse(data.adversarial_audits_json);
-                }
-            } catch (err) {
-                console.warn("Could not parse adversarial_audits_json:", err);
-            }
+        if (spansList && spansList.length > 0 && evidSection && evidBox) {
+            evidSection.style.display = "";
+            evidBox.innerHTML = "";
+            spansList.slice(0, 2).forEach(sp => {
+                const quoteText = sp.text || sp.quote || sp.exact_quote || "";
+                const codeText = sp.criterion_code || sp.code || "Requirement";
+                const startChar = typeof sp.start_char === "number" ? sp.start_char : 0;
+                const endChar = typeof sp.end_char === "number" ? sp.end_char : 0;
 
-            if (advList && advList.length > 0) {
-                if (advSection) advSection.style.display = "";
-                const grid = document.createElement("div");
-                grid.className = "audit-adversarial-grid";
-
-                let totalChecked = advList.length;
-                let hallucinationCount = advList.filter(a => a.hallucination_flag).length;
-                let driftCount = advList.filter(a => a.offset_drift_detected).length;
-                let discordanceCount = advList.filter(a => a.discordance_flag).length;
-
-                grid.innerHTML = `
-                    <div class="audit-adversarial-card">
-                        <span style="color:var(--text-muted);">Hallucination Check:</span>
-                        <strong style="color:${hallucinationCount === 0 ? '#34D399' : '#FB7185'};">${hallucinationCount === 0 ? 'Passed (0 Hallucinations)' : 'Flagged (' + hallucinationCount + ')'}</strong>
-                    </div>
-                    <div class="audit-adversarial-card">
-                        <span style="color:var(--text-muted);">Character Offset Drift:</span>
-                        <strong style="color:${driftCount === 0 ? '#34D399' : '#FB7185'};">${driftCount === 0 ? 'Verified Zero-Drift' : 'Drift Detected (' + driftCount + ')'}</strong>
-                    </div>
-                    <div class="audit-adversarial-card">
-                        <span style="color:var(--text-muted);">Adversarial Concordance:</span>
-                        <strong style="color:${discordanceCount === 0 ? '#34D399' : '#FBBF24'};">${discordanceCount === 0 ? '4-Agent Unanimous' : 'Discordant (' + discordanceCount + ')'}</strong>
-                    </div>
-                    <div class="audit-adversarial-card">
-                        <span style="color:var(--text-muted);">Criteria Audited:</span>
-                        <strong style="color:#38BDF8;">${totalChecked} Requirement Checks</strong>
-                    </div>
+                const qDiv = document.createElement("div");
+                qDiv.style.marginBottom = "6px";
+                qDiv.innerHTML = `
+                    <div class="audit-quote-text">"${escapeHtml(quoteText)}"</div>
+                    <div class="audit-quote-sub">Referenced for <strong>${escapeHtml(codeText)}</strong> (Offset: [${startChar}-${endChar}])</div>
                 `;
-                advContainer.appendChild(grid);
-            } else {
-                if (advSection) advSection.style.display = "none";
-            }
+                evidBox.appendChild(qDiv);
+            });
+        } else if (evidSection) {
+            evidSection.style.display = "none";
         }
 
-        // Show the modal
+        // SHA-256 Short Hash
+        const hashShortEl = document.getElementById("audit-modal-hash-short");
+        if (hashShortEl) {
+            hashShortEl.textContent = data.audit_hash ? `${data.audit_hash.slice(0, 24)}...` : "--";
+        }
+
+        // Show Modal
         const modal = document.getElementById("audit-detail-modal");
         if (modal) modal.classList.remove("hidden");
 
@@ -3154,6 +3094,7 @@ async function viewAuditRecordDetails(caseId) {
         showToast("Error retrieving audit record: " + e.message, "error");
     }
 }
+
 
 async function deleteSingleAuditRecord(caseId) {
     if (!confirm(`Permanently purge audit log for case ${caseId}? This action fulfills HIPAA Right-to-Erasure.`)) {

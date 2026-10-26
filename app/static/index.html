@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_07">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_08">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -2095,129 +2095,99 @@
 
     <!-- AUDIT RECORD FORENSIC INSPECTION MODAL -->
     <div class="modal-overlay hidden" id="audit-detail-modal">
-        <div class="modal-card wide-modal audit-detail-modal-card">
-            <div class="modal-header">
-                <div class="modal-title-group" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
-                    <span class="med-icon modal-icon-badge icon-cyan" style="width:38px;height:38px;min-width:38px;min-height:38px;max-width:38px;max-height:38px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:#22D3EE;overflow:hidden;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;display:block;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                    </span>
-                    <div>
-                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                            <h3 style="margin:0;font-size:1.15rem;font-weight:600;color:#F8FAFC;">Audit Record Forensics &amp; Chain-of-Custody</h3>
-                            <span class="code-pill mono" id="audit-modal-case-id" style="font-size:0.75rem;color:#38BDF8;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.25);">CASE-ID</span>
+        <div class="modal-card audit-clean-modal-card">
+            <!-- HEADER -->
+            <div class="modal-header audit-clean-header">
+                <div class="audit-header-title-box">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="med-icon modal-icon-badge icon-cyan" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </span>
+                        <div>
+                            <h3 style="margin:0;font-size:1.05rem;font-weight:600;color:#F8FAFC;">Audit Record Summary</h3>
+                            <span class="mono" id="audit-modal-case-id" style="font-size:0.75rem;color:#38BDF8;">CASE-ID</span>
                         </div>
-                        <p class="modal-sub" id="audit-modal-timestamp" style="font-size:0.8rem;color:#94A3B8;margin:2px 0 0 0;">Immutable ledger log entry verified with SHA-256 seal</p>
                     </div>
                 </div>
                 <button class="modal-close-btn" onclick="closeAuditDetailModal()">&times;</button>
             </div>
 
-            <div class="modal-body audit-modal-body" style="display:flex;flex-direction:column;gap:16px;max-height:calc(85vh - 140px);overflow-y:auto;padding-right:6px;">
-                <!-- SUMMARY STATS GRID -->
-                <div class="audit-stat-grid">
-                    <div class="audit-stat-card">
-                        <span class="audit-stat-label">Adjudication Decision</span>
-                        <div id="audit-modal-decision-badge">--</div>
-                    </div>
-                    <div class="audit-stat-card">
-                        <span class="audit-stat-label">Medicare Policy</span>
-                        <div id="audit-modal-policy-badge" style="font-weight:600;color:#F8FAFC;font-size:0.9rem;">--</div>
-                    </div>
-                    <div class="audit-stat-card">
-                        <span class="audit-stat-label">Patient (Masked)</span>
-                        <div id="audit-modal-patient-badge" class="mono" style="font-weight:600;color:#94A3B8;font-size:0.85rem;">--</div>
-                    </div>
-                    <div class="audit-stat-card">
-                        <span class="audit-stat-label">Calibrated Confidence</span>
-                        <div id="audit-modal-conf-badge" style="font-weight:700;font-size:1rem;color:#F8FAFC;">--</div>
-                    </div>
-                    <div class="audit-stat-card">
-                        <span class="audit-stat-label">Safety Abstention Gate</span>
-                        <div id="audit-modal-gate-badge">--</div>
-                    </div>
-                    <div class="audit-stat-card">
-                        <span class="audit-stat-label">Pipeline Execution Latency</span>
-                        <div id="audit-modal-latency-badge" class="mono" style="font-size:0.85rem;color:#C084FC;">-- ms</div>
-                    </div>
-                </div>
-
-                <!-- CRYPTOGRAPHIC SHA-256 SEAL -->
-                <div class="audit-sha-card">
-                    <div class="audit-sha-header">
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <span class="med-icon icon-xs text-cyan"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
-                            <strong style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:#38BDF8;">Cryptographic SHA-256 Chain-of-Custody Seal</strong>
+            <div class="modal-body audit-clean-body">
+                <!-- HERO DECISION CARD -->
+                <div class="audit-hero-card" id="audit-hero-card">
+                    <div class="audit-hero-top">
+                        <div id="audit-hero-decision-badge">--</div>
+                        <div class="audit-hero-score">
+                            <span class="audit-score-num" id="audit-modal-conf-num">--%</span>
+                            <span class="audit-score-lbl">Confidence</span>
                         </div>
-                        <button type="button" class="btn-subtle-pill" onclick="copyModalAuditHash()" id="btn-copy-modal-hash">
-                            Copy Hash
-                        </button>
                     </div>
-                    <div class="audit-sha-value mono" id="audit-modal-hash">--</div>
-                    <span style="font-size:0.7rem;color:#94A3B8;margin-top:4px;display:block;">Pursuant to HIPAA Security Rule 45 CFR &sect; 164.312(c)(1) (Data Integrity Verification). Prevents undetected log tampering.</span>
-                </div>
-
-                <!-- CLINICAL NARRATIVE PREVIEW / REDACTION -->
-                <div class="audit-narrative-card">
-                    <div class="audit-narrative-header">
-                        <span class="med-icon icon-xs text-cyan"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>
-                        <strong style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:#E2E8F0;">Sanitized Clinical Note Analyzed</strong>
-                    </div>
-                    <div id="audit-modal-narrative" class="audit-narrative-body">--</div>
-                </div>
-
-                <!-- STATUTORY CRITERIA EVALUATION MATRIX -->
-                <div class="audit-section-block">
-                    <h4 class="audit-section-title">
-                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></span>
-                        Statutory Medicare Criteria Breakdown
-                    </h4>
-                    <div class="table-container" style="overflow-x:auto;">
-                        <table class="audit-modal-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 140px;">Criterion Code</th>
-                                    <th>Requirement Name &amp; Description</th>
-                                    <th style="width: 110px;">Classification</th>
-                                    <th style="width: 110px;">Determination</th>
-                                    <th style="width: 90px;">Confidence</th>
-                                </tr>
-                            </thead>
-                            <tbody id="audit-modal-criteria-body">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
+                    <div class="audit-hero-meta">
+                        <div class="audit-meta-item">
+                            <span class="audit-meta-lbl">Policy:</span>
+                            <strong id="audit-modal-policy-title" style="color:#F8FAFC;">--</strong>
+                        </div>
+                        <div class="audit-meta-item">
+                            <span class="audit-meta-lbl">Patient:</span>
+                            <span class="mono" id="audit-modal-patient-id" style="color:#94A3B8;">--</span>
+                        </div>
+                        <div class="audit-meta-item">
+                            <span class="audit-meta-lbl">Gate:</span>
+                            <span id="audit-modal-gate-text" style="color:#94A3B8;">--</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- CHARACTER-GROUNDED EVIDENCE SPANS -->
-                <div class="audit-section-block">
-                    <h4 class="audit-section-title">
-                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                        Character-Grounded Evidence Spans &amp; Faithfulness Audit
-                    </h4>
-                    <div id="audit-modal-spans-container">
+                <!-- CLINICAL RATIONALE / SUMMARY -->
+                <div class="audit-clean-section">
+                    <div class="audit-clean-section-hdr">
+                        <span class="med-icon icon-xs text-cyan"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                        <span>Clinical Findings &amp; Rationale</span>
+                    </div>
+                    <div class="audit-clean-narrative" id="audit-modal-narrative">--</div>
+                </div>
+
+                <!-- CRITERIA CHECKLIST (SIMPLE, AT-A-GLANCE) -->
+                <div class="audit-clean-section">
+                    <div class="audit-clean-section-hdr">
+                        <span class="med-icon icon-xs text-cyan"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></span>
+                        <span>Policy Criteria Checklist</span>
+                    </div>
+                    <div class="audit-criteria-checklist" id="audit-modal-criteria-list">
                         <!-- Populated dynamically -->
                     </div>
                 </div>
 
-                <!-- RED-TEAM ADVERSARIAL INTEGRITY CHECKS -->
-                <div class="audit-section-block" id="audit-modal-adversarial-section">
-                    <h4 class="audit-section-title">
-                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></span>
-                        Adversarial Agent Verification (Red-Team Attacks &amp; Drift)
-                    </h4>
-                    <div id="audit-modal-adversarial-container">
-                        <!-- Populated dynamically -->
+                <!-- EVIDENCE CITATION (IF AVAILABLE) -->
+                <div class="audit-clean-section" id="audit-evidence-section">
+                    <div class="audit-clean-section-hdr">
+                        <span class="med-icon icon-xs text-green"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        <span>Direct Chart Evidence</span>
                     </div>
+                    <div class="audit-clean-evidence" id="audit-modal-evidence-box">--</div>
+                </div>
+
+                <!-- DISCREET CRYPTOGRAPHIC SEAL FOOTER -->
+                <div class="audit-seal-bar">
+                    <div class="audit-seal-left">
+                        <span class="med-icon icon-xs" style="color:#10B981;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                        <span class="audit-seal-label">SHA-256 Seal:</span>
+                        <span class="audit-seal-hash mono" id="audit-modal-hash-short">--</span>
+                    </div>
+                    <button type="button" class="btn-subtle-pill" onclick="copyModalAuditHash()" title="Copy Full SHA-256 Hash">
+                        Copy Hash
+                    </button>
                 </div>
             </div>
 
-            <div class="modal-actions space-between" style="padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);margin-top:10px;">
-                <button type="button" class="btn-secondary" onclick="copyCaseIdToClipboard()" id="btn-copy-case-id">
-                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+            <!-- ACTIONS -->
+            <div class="modal-actions audit-clean-actions">
+                <button type="button" class="btn-secondary" onclick="copyCaseIdToClipboard()">
                     Copy Case ID
                 </button>
-                <button type="button" class="btn-primary" onclick="closeAuditDetailModal()">Close Inspection</button>
+                <button type="button" class="btn-primary" onclick="closeAuditDetailModal()">
+                    Done
+                </button>
             </div>
         </div>
     </div>
@@ -2225,7 +2195,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_07"></script>
+    <script src="/static/js/app.js?v=20261026_08"></script>
 </body>
 </html>
 
