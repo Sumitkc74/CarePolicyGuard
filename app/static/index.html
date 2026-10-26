@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_04">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_05">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -527,51 +527,12 @@
                         <div id="clinician-action-text" class="action-box-content"></div>
                     </div>
 
-                    <!-- CMS BILLING & MEDICAL CODING COMPLIANCE PANEL -->
-                    <div id="billing-compliance-panel" class="billing-compliance-panel hidden">
-                        <div class="billing-panel-header">
-                            <div class="billing-title-group">
-                                <span class="med-icon icon-sm icon-emerald">
-                                    <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                </span>
-                                <span class="billing-panel-title">CMS Billing &amp; Medical Coding Cross-Check</span>
-                                <span class="billing-status-badge" id="billing-status-badge">Compliant</span>
-                            </div>
-                            <div class="billing-carc-pills" id="billing-carc-pills"></div>
-                        </div>
-                        <div class="billing-codes-grid">
-                            <div class="billing-code-card">
-                                <span class="code-card-type">CPT / HCPCS Procedure</span>
-                                <div class="code-card-val" id="billing-cpt-display">33249 &ndash; Insertion of ICD Leads &amp; Generator</div>
-                            </div>
-                            <div class="billing-code-card">
-                                <span class="code-card-type">ICD-10-CM Primary Diagnosis</span>
-                                <div class="code-card-val" id="billing-icd-display">I42.0 &ndash; Dilated Cardiomyopathy</div>
-                            </div>
-                        </div>
-                        <div class="billing-advisory-text" id="billing-advisory-text"></div>
-                    </div>
-
-                    <!-- LONGITUDINAL CLINICAL TIMELINE & WAITING PERIOD PANEL -->
-                    <div id="timeline-analysis-panel" class="timeline-analysis-panel hidden">
-                        <div class="timeline-panel-header">
-                            <div class="timeline-title-group">
-                                <span class="med-icon icon-sm icon-cyan">
-                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                </span>
-                                <span class="timeline-panel-title">Longitudinal Waiting Periods &amp; Clinical Milestone Reasoning</span>
-                                <span class="timeline-status-badge" id="timeline-status-badge">Satisfied</span>
-                            </div>
-                        </div>
-                        <div id="timeline-milestones-container" class="timeline-milestones-container"></div>
-                    </div>
-
                     <!-- REQUIREMENTS LIST FOR THE EVALUATED POLICY -->
                     <div class="criteria-audit-section">
                         <div class="criteria-audit-header">
                             <div class="checklist-header-titles">
-                                <span class="section-label">Policy Criteria Breakdown</span>
-                                <span class="section-sublabel">Click any criterion to open details &amp; compare policy requirements with the patient's record</span>
+                                <span class="section-label">Policy Criteria Checklist</span>
+                                <span class="section-sublabel">Clinical requirements evaluated against patient record</span>
                             </div>
                             <span class="checklist-legend-chips">
                                 <span class="legend-chip met"><span class="chip-dot"></span> Met</span>
@@ -582,9 +543,28 @@
                         <div class="criteria-cards-list" id="criteria-cards-list">
                             <!-- Populated dynamically -->
                         </div>
+                    </div>
 
+                    <!-- ON-DEMAND DETAILS & DOCUMENT TOOLBAR -->
+                    <div class="step3-details-toolbar">
+                        <button type="button" class="btn-secondary btn-sm" onclick="openPolicyDocumentModal()">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                            Read Full Policy Guidelines
+                        </button>
+                        <button type="button" class="btn-secondary btn-sm" id="btn-toggle-ehr" onclick="toggleGroundedEHRViewer()">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                            <span id="toggle-ehr-label">View Chart Evidence Quotes</span>
+                        </button>
+                        <button type="button" class="btn-secondary btn-sm" id="btn-toggle-billing" onclick="toggleBillingDetails()">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
+                            <span id="toggle-billing-label">View Billing &amp; Milestones</span>
+                        </button>
+                    </div>
+
+                    <!-- COLLAPSIBLE ON-DEMAND DETAILS (HIDDEN BY DEFAULT TO ELIMINATE SCREEN CLUTTER) -->
+                    <div id="collapsible-details-container" style="display: flex; flex-direction: column; gap: 14px;">
                         <!-- CHARACTER-GROUNDED CLINICAL CITATIONS VIEWER -->
-                        <div class="grounded-ehr-section" id="grounded-ehr-section">
+                        <div class="grounded-ehr-section hidden" id="grounded-ehr-section">
                             <div class="grounded-ehr-header">
                                 <div class="grounded-ehr-title-group">
                                     <span class="med-icon icon-sm icon-emerald">
@@ -597,6 +577,45 @@
                             <div class="grounded-ehr-body">
                                 <pre id="ehr-highlight-display" class="ehr-highlight-text"></pre>
                             </div>
+                        </div>
+
+                        <!-- CMS BILLING & MEDICAL CODING COMPLIANCE PANEL -->
+                        <div id="billing-compliance-panel" class="billing-compliance-panel hidden">
+                            <div class="billing-panel-header">
+                                <div class="billing-title-group">
+                                    <span class="med-icon icon-sm icon-emerald">
+                                        <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    </span>
+                                    <span class="billing-panel-title">CMS Billing &amp; Medical Coding Cross-Check</span>
+                                    <span class="billing-status-badge" id="billing-status-badge">Compliant</span>
+                                </div>
+                                <div class="billing-carc-pills" id="billing-carc-pills"></div>
+                            </div>
+                            <div class="billing-codes-grid">
+                                <div class="billing-code-card">
+                                    <span class="code-card-type">CPT / HCPCS Procedure</span>
+                                    <div class="code-card-val" id="billing-cpt-display">33249 &ndash; Insertion of ICD Leads &amp; Generator</div>
+                                </div>
+                                <div class="billing-code-card">
+                                    <span class="code-card-type">ICD-10-CM Primary Diagnosis</span>
+                                    <div class="code-card-val" id="billing-icd-display">I42.0 &ndash; Dilated Cardiomyopathy</div>
+                                </div>
+                            </div>
+                            <div class="billing-advisory-text" id="billing-advisory-text"></div>
+                        </div>
+
+                        <!-- LONGITUDINAL CLINICAL TIMELINE & WAITING PERIOD PANEL -->
+                        <div id="timeline-analysis-panel" class="timeline-analysis-panel hidden">
+                            <div class="timeline-panel-header">
+                                <div class="timeline-title-group">
+                                    <span class="med-icon icon-sm icon-cyan">
+                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    </span>
+                                    <span class="timeline-panel-title">Longitudinal Waiting Periods &amp; Clinical Milestone Reasoning</span>
+                                    <span class="timeline-status-badge" id="timeline-status-badge">Satisfied</span>
+                                </div>
+                            </div>
+                            <div id="timeline-milestones-container" class="timeline-milestones-container"></div>
                         </div>
                     </div>
 
@@ -1728,6 +1747,33 @@
         </div>
     </div>
 
+    <!-- OFFICIAL MEDICARE POLICY SPECIFICATION DOCUMENT MODAL -->
+    <div class="modal-overlay hidden" id="policy-document-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(3,7,18,0.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px 16px;overflow-y:auto;box-sizing:border-box;">
+        <div class="modal-card wide-modal policy-doc-modal-card" style="background:#1E293B;border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:100%;max-width:820px;max-height:min(90vh,800px);display:flex;flex-direction:column;padding:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.6);position:relative;box-sizing:border-box;margin:auto;overflow:hidden;">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
+                <div class="modal-title-group" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+                    <span class="med-icon modal-icon-badge icon-cyan" style="width:38px;height:38px;min-width:38px;min-height:38px;max-width:38px;max-height:38px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:#22D3EE;overflow:hidden;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;max-width:20px;max-height:20px;display:block;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </span>
+                    <div>
+                        <h3 id="policy-doc-title" style="margin:0;font-size:1.15rem;font-weight:600;color:#F8FAFC;line-height:1.3;">Medicare Policy Guidelines Document</h3>
+                        <p class="modal-sub" id="policy-doc-subtitle" style="font-size:0.8125rem;color:#94A3B8;margin:3px 0 0 0;line-height:1.4;">Official CMS Coverage Directive &bull; Statutory Criteria &amp; Exclusions</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closePolicyDocumentModal()" style="background:transparent;border:none;color:#94A3B8;font-size:1.5rem;line-height:1;cursor:pointer;padding:4px 8px;border-radius:6px;flex-shrink:0;">&times;</button>
+            </div>
+
+            <div class="modal-body policy-doc-modal-body" id="policy-doc-modal-body" style="flex:1 1 auto;min-height:0;overflow-y:auto;padding-right:6px;display:flex;flex-direction:column;gap:16px;">
+                <!-- Populated dynamically via openPolicyDocumentModal -->
+            </div>
+
+            <div class="modal-actions space-between" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
+                <span style="font-size:0.75rem;color:#94A3B8;">CMS Manual System &bull; Title XVIII Social Security Act &sect; 1862(a)(1)(A)</span>
+                <button class="btn-primary" onclick="closePolicyDocumentModal()">Done Reading</button>
+            </div>
+        </div>
+    </div>
+
     <!-- CRITERION DETAIL POPUP MODAL -->
     <div class="modal-overlay hidden" id="criterion-detail-modal">
         <div class="modal-card wide-modal criterion-modal-card">
@@ -1964,7 +2010,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_04"></script>
+    <script src="/static/js/app.js?v=20261026_05"></script>
 </body>
 </html>
 

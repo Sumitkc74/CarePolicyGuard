@@ -4,6 +4,7 @@ let currentUser = "auditor@medicare.cms.gov";
 let selectedDemoRole = "auditor";
 let clinicalPresets = [];
 let lastAdjudicationResult = null;
+let cachedPoliciesList = [];
 let currentCoveragePacket = null;
 
 // Demo credentials
@@ -1134,6 +1135,7 @@ async function loadPolicies() {
         const res = await fetch("/api/v1/policies");
         if (res.ok) {
             const policies = await res.json();
+            cachedPoliciesList = policies;
             const select = document.getElementById("policy-select");
             const previousVal = select.value;
             select.innerHTML = "";
@@ -1832,10 +1834,16 @@ function renderMultiPolicyScanResults(data) {
                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <span>${featuredMatch.met_criteria}/${featuredMatch.total_criteria} Criteria Satisfied</span>
                     </div>
-                    <span class="featured-active-pill">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        Selected Directive
-                    </span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button type="button" class="btn-subtle-doc" onclick="openPolicyDocumentModal('${featuredMatch.policy_id}')" title="Read complete Medicare statutory guidelines and criteria document">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                            Read Policy Document
+                        </button>
+                        <span class="featured-active-pill">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Selected Directive
+                        </span>
+                    </div>
                 </div>
             </div>
         `;
@@ -2174,8 +2182,8 @@ function renderAdjudicationResults(data) {
     if (data.adjudication_decision === "APPROVED") {
         if (verdictCard) verdictCard.className = "big-verdict-card verdict-approved";
         if (verdictBubble) verdictBubble.innerHTML = `<span class="med-icon icon-lg icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>`;
-        if (verdictTitle) verdictTitle.textContent = "Medicare Coverage Criteria Met";
-        if (verdictSubtitle) verdictSubtitle.textContent = "All required Medicare guidelines were verified directly in the doctor's note. You can proceed to review and sign the prior authorization form.";
+        if (verdictTitle) verdictTitle.textContent = "Medicare Coverage Approved";
+        if (verdictSubtitle) verdictSubtitle.textContent = "All criteria satisfied in clinical record. Ready to review and sign packet.";
         if (abstentionBadge) abstentionBadge.textContent = "Coverage Approved";
 
         if (heroContainer) heroContainer.classList.remove("hidden");
@@ -2193,8 +2201,8 @@ function renderAdjudicationResults(data) {
     } else if (data.adjudication_decision === "DENIED") {
         if (verdictCard) verdictCard.className = "big-verdict-card verdict-denied";
         if (verdictBubble) verdictBubble.innerHTML = `<span class="med-icon icon-lg icon-red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span>`;
-        if (verdictTitle) verdictTitle.textContent = "Does Not Meet Medicare Guidelines";
-        if (verdictSubtitle) verdictSubtitle.textContent = "The clinical note documents an active exclusion condition (such as a recent heart attack within 40 days) that prevents approval at this time.";
+        if (verdictTitle) verdictTitle.textContent = "Medicare Coverage Excluded";
+        if (verdictSubtitle) verdictSubtitle.textContent = "Disqualifying policy exclusion rule prevents approval. Available for internal review.";
         if (abstentionBadge) abstentionBadge.textContent = "Coverage Excluded";
 
         if (heroContainer) heroContainer.classList.remove("hidden");
@@ -2214,7 +2222,7 @@ function renderAdjudicationResults(data) {
         if (verdictCard) verdictCard.className = "big-verdict-card verdict-deferred";
         if (verdictBubble) verdictBubble.innerHTML = `<span class="med-icon icon-lg icon-amber"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>`;
         if (verdictTitle) verdictTitle.textContent = "Physician Review Needed";
-        if (verdictSubtitle) verdictSubtitle.textContent = data.abstention_reason || "Most requirements are met, but 1 item requires your clarification or confirmation before submission.";
+        if (verdictSubtitle) verdictSubtitle.textContent = "One or more criteria require clinician confirmation before submission.";
         if (abstentionBadge) abstentionBadge.textContent = "Review Needed";
 
         if (heroContainer) heroContainer.classList.remove("hidden");
@@ -4970,9 +4978,149 @@ function handleHipaaInactivityTimeout() {
 }
 
 
+
+// =============================================================================
+// ON-DEMAND POLICY SPECIFICATION DOCUMENT & TOGGLES
+// =============================================================================
+
+function openPolicyDocumentModal(policyId) {
+    if (!policyId) {
+        const policySelect = document.getElementById("policy-select");
+        policyId = (policySelect && policySelect.value) ? policySelect.value : (lastAdjudicationResult ? lastAdjudicationResult.policy_id : "NCD-20.4");
+    }
+
+    const modal = document.getElementById("policy-document-modal");
+    if (!modal) return;
+
+    let policy = (cachedPoliciesList || []).find(p => p.policy_id === policyId);
+    if (!policy && lastMultiPolicyScanResult && lastMultiPolicyScanResult.all_matches) {
+        policy = lastMultiPolicyScanResult.all_matches.find(m => m.policy_id === policyId);
+    }
+
+    const titleElem = document.getElementById("policy-doc-title");
+    const subElem = document.getElementById("policy-doc-subtitle");
+    const bodyElem = document.getElementById("policy-doc-modal-body");
+
+    const pTitle = policy ? (policy.title || policy.policy_title) : "Implantable Automatic Defibrillators";
+    const pJurisdiction = policy ? (policy.jurisdiction || "National Coverage Determination (CMS)") : "National Coverage Determination (CMS)";
+    const pCategory = policy ? policy.category : "Cardiology";
+    const pEffDate = policy ? (policy.effective_date || "2018-02-15") : "2018-02-15";
+    const pDesc = policy ? (policy.description || "CMS National Coverage Determination establishing statutory clinical indications, objective diagnostic thresholds, and disqualifying exclusions.") : "";
+
+    if (titleElem) titleElem.textContent = `${policyId} - ${pTitle}`;
+    if (subElem) subElem.textContent = `${pJurisdiction} | Category: ${pCategory} | Effective: ${pEffDate}`;
+
+    let criteriaHtml = "";
+    if (policy && policy.criteria && policy.criteria.length > 0) {
+        criteriaHtml = `
+            <table class="policy-doc-crit-table">
+                <thead>
+                    <tr>
+                        <th style="width: 16%;">Code</th>
+                        <th style="width: 26%;">Requirement</th>
+                        <th style="width: 44%;">Statutory Coverage Condition</th>
+                        <th style="width: 14%;">Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${policy.criteria.map(c => `
+                        <tr>
+                            <td><span class="code-pill">${escapeHtml(c.criterion_code)}</span></td>
+                            <td><strong>${escapeHtml(c.name || c.criterion_code)}</strong></td>
+                            <td>
+                                <div>${escapeHtml(c.description || 'Statutory Medicare criteria condition.')}</div>
+                                ${c.required_temporal_window ? `<div style="font-size: 0.74rem; color: #38BDF8; margin-top: 3px;">Timing Window: ${escapeHtml(c.required_temporal_window)}</div>` : ''}
+                            </td>
+                            <td><span class="badge-role-tag">${c.is_exclusion ? 'Exclusion' : 'Mandatory'}</span></td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        `;
+    } else {
+        criteriaHtml = `
+            <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                Evaluates mandatory left ventricular ejection fraction threshold (&le; 35%), optimal guideline-directed medical therapy (&ge; 90 days), NYHA functional heart failure classification (Class II/III), acute myocardial infarction waiting periods (&ge; 40 days), and absence of cardiogenic shock.
+            </p>
+        `;
+    }
+
+    if (bodyElem) {
+        bodyElem.innerHTML = `
+            <div class="policy-doc-section">
+                <div class="policy-doc-section-title">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+                    Coverage Indications &amp; Statutory Scope
+                </div>
+                <p class="policy-doc-text">${escapeHtml(pDesc || 'CMS policy governing coverage requirements under Title XVIII of the Social Security Act § 1862(a)(1)(A).')}</p>
+            </div>
+
+            <div class="policy-doc-section">
+                <div class="policy-doc-section-title">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></span>
+                    Evaluated Statutory Criteria Specifications
+                </div>
+                ${criteriaHtml}
+            </div>
+
+            <div class="policy-doc-section">
+                <div class="policy-doc-section-title">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                    Governing Regulatory Authority &amp; Integrity Rules
+                </div>
+                <p class="policy-doc-text" style="font-size: 0.78rem;">
+                    Pursuant to CMS Program Integrity Manual (PIM Ch. 3) and 42 CFR § 410.38, all objective diagnostic measures must be grounded in contemporaneous patient records signed by the treating clinician.
+                </p>
+            </div>
+        `;
+    }
+
+    modal.classList.remove("hidden");
+}
+
+function closePolicyDocumentModal() {
+    const modal = document.getElementById("policy-document-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function toggleGroundedEHRViewer() {
+    const section = document.getElementById("grounded-ehr-section");
+    const label = document.getElementById("toggle-ehr-label");
+    if (!section) return;
+
+    if (section.classList.contains("hidden")) {
+        section.classList.remove("hidden");
+        if (label) label.textContent = "Hide Chart Evidence Quotes";
+        section.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+        section.classList.add("hidden");
+        if (label) label.textContent = "View Chart Evidence Quotes";
+    }
+}
+
+function toggleBillingDetails() {
+    const billingPanel = document.getElementById("billing-compliance-panel");
+    const timelinePanel = document.getElementById("timeline-analysis-panel");
+    const label = document.getElementById("toggle-billing-label");
+
+    const isHidden = billingPanel ? billingPanel.classList.contains("hidden") : true;
+    if (isHidden) {
+        if (billingPanel) billingPanel.classList.remove("hidden");
+        if (timelinePanel) timelinePanel.classList.remove("hidden");
+        if (label) label.textContent = "Hide Billing & Milestones";
+        if (billingPanel) billingPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+        if (billingPanel) billingPanel.classList.add("hidden");
+        if (timelinePanel) timelinePanel.classList.add("hidden");
+        if (label) label.textContent = "View Billing & Milestones";
+    }
+}
+
+
 // Global modal backdrop click & Escape key handler
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+        if (typeof closePolicyDocumentModal === 'function') closePolicyDocumentModal();
         if (typeof closeAddendumModal === 'function') closeAddendumModal();
         if (typeof closeCriterionModal === 'function') closeCriterionModal();
         if (typeof closeSampleTutorialModal === 'function') closeSampleTutorialModal();
@@ -4984,7 +5132,8 @@ window.addEventListener('keydown', (e) => {
 
 document.addEventListener('click', (e) => {
     if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'addendum-modal' && typeof closeAddendumModal === 'function') closeAddendumModal();
+        if (e.target.id === 'policy-document-modal' && typeof closePolicyDocumentModal === 'function') closePolicyDocumentModal();
+        else if (e.target.id === 'addendum-modal' && typeof closeAddendumModal === 'function') closeAddendumModal();
         else if (e.target.id === 'criterion-detail-modal' && typeof closeCriterionModal === 'function') closeCriterionModal();
         else if (e.target.id === 'sample-tutorial-modal' && typeof closeSampleTutorialModal === 'function') closeSampleTutorialModal();
         else if (e.target.id === 'terms-modal' && typeof closeTermsModal === 'function') closeTermsModal();
