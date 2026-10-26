@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupUploadDropzone();
     updateWorkflowRibbon(1);
     initHipaaInactivityWatcher();
+    setupPinInputListeners();
 });
 
 // =============================================================================
@@ -3576,27 +3577,199 @@ function populatePacketDocument() {
     }
 }
 
-async function submitPacketToInsurance() {
-    if (!currentCoveragePacket) return;
+async // =============================================================================
+// CLINICIAN SIGNING PIN & NON-REPUDIATION ATTESTATION
+// =============================================================================
+
+function getClinicianSigningPin() {
+    return localStorage.getItem('clinician_signing_pin') || '1234';
+}
+
+function submitPacketToInsurance() {
+    if (!currentCoveragePacket) {
+        showToast("No active coverage packet prepared for submission.", "error");
+        return;
+    }
 
     if (lastAdjudicationResult && lastAdjudicationResult.adjudication_decision === "DENIED") {
-        showToast("Submission Blocked: This patient's condition is excluded under Medicare policy. Excluded treatments cannot be submitted for prior authorization.", true);
+        showToast("Submission Blocked: This patient's condition is excluded under Medicare policy. Excluded treatments cannot be submitted for prior authorization.", "error");
         return;
     }
 
     if (currentRole === "Auditor") {
-        showToast("Auditor access is read-only: Transmitting and signing prior-authorization packets to insurance requires an authenticated Verified Clinician.", true);
+        showToast("Auditor access is read-only: Transmitting and signing prior-authorization packets to insurance requires an authenticated Verified Clinician.", "error");
         return;
     }
 
     const certifyCheck = document.getElementById("doc-certify-check");
     if (certifyCheck && !certifyCheck.checked) {
-        showToast("Please certify the clinical necessity check before transmitting.", true);
+        showToast("Please certify the clinical necessity check before transmitting.", "warning");
         return;
     }
 
+    openClinicianPinModal();
+}
+
+function openClinicianPinModal() {
+    const modal = document.getElementById("clinician-pin-modal");
+    if (!modal) {
+        executePacketSubmission();
+        return;
+    }
+
+    const caseIdEl = document.getElementById("pin-modal-case-id");
+    if (caseIdEl) caseIdEl.textContent = (currentCoveragePacket && currentCoveragePacket.case_id) || "CASE-CURRENT";
+
     const sigInput = document.getElementById("doc-physician-signature");
-    const signerName = (sigInput && sigInput.value.trim()) || "Dr. Sarah Jenkins, MD, FACC";
+    const signerName = (sigInput && sigInput.value.trim()) || "Dr. Eleanor Vance, MD";
+    const signerEl = document.getElementById("pin-modal-signer");
+    if (signerEl) signerEl.textContent = signerName;
+
+    // Reset PIN inputs
+    const d1 = document.getElementById("pin-d1");
+    const d2 = document.getElementById("pin-d2");
+    const d3 = document.getElementById("pin-d3");
+    const d4 = document.getElementById("pin-d4");
+    [d1, d2, d3, d4].forEach(b => {
+        if (b) {
+            b.value = "";
+            b.classList.remove("pin-error");
+        }
+    });
+
+    const fb = document.getElementById("pin-feedback-msg");
+    if (fb) {
+        fb.textContent = "";
+        fb.className = "pin-feedback-msg";
+    }
+
+    const drawer = document.getElementById("pin-change-drawer");
+    if (drawer) drawer.classList.add("hidden");
+
+    modal.classList.remove("hidden");
+    setTimeout(() => { if (d1) d1.focus(); }, 80);
+}
+
+function closeClinicianPinModal() {
+    const modal = document.getElementById("clinician-pin-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function toggleChangePinDrawer() {
+    const drawer = document.getElementById("pin-change-drawer");
+    if (drawer) {
+        drawer.classList.toggle("hidden");
+        if (!drawer.classList.contains("hidden")) {
+            const curInput = document.getElementById("input-current-pin");
+            if (curInput) curInput.focus();
+        }
+    }
+}
+
+function saveNewSigningPin() {
+    const curInput = document.getElementById("input-current-pin");
+    const newInput = document.getElementById("input-new-pin");
+    const currentPin = getClinicianSigningPin();
+
+    if (!curInput || !newInput) return;
+
+    if (curInput.value.trim() !== currentPin) {
+        showToast("Current PIN does not match. Default demo PIN is 1234.", "error");
+        curInput.focus();
+        return;
+    }
+
+    const newPin = newInput.value.trim();
+    if (!/^\d{4}$/.test(newPin)) {
+        showToast("New PIN must be exactly 4 numeric digits.", "error");
+        newInput.focus();
+        return;
+    }
+
+    localStorage.setItem("clinician_signing_pin", newPin);
+    showToast("Clinician Signing PIN updated successfully.", "success");
+    curInput.value = "";
+    newInput.value = "";
+    toggleChangePinDrawer();
+}
+
+function setupPinInputListeners() {
+    const boxes = ["pin-d1", "pin-d2", "pin-d3", "pin-d4"].map(id => document.getElementById(id));
+    if (!boxes[0]) return;
+
+    boxes.forEach((box, idx) => {
+        if (!box) return;
+
+        box.addEventListener("input", (e) => {
+            box.classList.remove("pin-error");
+            const val = box.value.replace(/[^0-9]/g, "");
+            box.value = val ? val[0] : "";
+
+            if (box.value && idx < 3) {
+                boxes[idx + 1].focus();
+            } else if (idx === 3 && box.value) {
+                verifyAndExecuteSubmission();
+            }
+        });
+
+        box.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !box.value && idx > 0) {
+                boxes[idx - 1].focus();
+            } else if (e.key === "Enter") {
+                verifyAndExecuteSubmission();
+            }
+        });
+
+        box.addEventListener("paste", (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData("text").replace(/[^0-9]/g, "");
+            if (text.length >= 4) {
+                boxes[0].value = text[0];
+                boxes[1].value = text[1];
+                boxes[2].value = text[2];
+                boxes[3].value = text[3];
+                boxes[3].focus();
+                verifyAndExecuteSubmission();
+            }
+        });
+    });
+}
+
+function verifyAndExecuteSubmission() {
+    const d1 = document.getElementById("pin-d1");
+    const d2 = document.getElementById("pin-d2");
+    const d3 = document.getElementById("pin-d3");
+    const d4 = document.getElementById("pin-d4");
+    const enteredPin = `${d1?.value || ""}${d2?.value || ""}${d3?.value || ""}${d4?.value || ""}`;
+
+    const expectedPin = getClinicianSigningPin();
+    const fb = document.getElementById("pin-feedback-msg");
+
+    if (enteredPin !== expectedPin) {
+        [d1, d2, d3, d4].forEach(b => {
+            if (b) {
+                b.classList.add("pin-error");
+                b.value = "";
+            }
+        });
+        if (fb) {
+            fb.textContent = "Invalid Signing PIN. Please try again (Demo default: 1234).";
+            fb.className = "pin-feedback-msg error";
+        }
+        if (d1) d1.focus();
+        return;
+    }
+
+    closeClinicianPinModal();
+    executePacketSubmission();
+}
+
+async function executePacketSubmission() {
+    if (!currentCoveragePacket) return;
+
+    const sigInput = document.getElementById("doc-physician-signature");
+    const signerBase = (sigInput && sigInput.value.trim()) || "Dr. Eleanor Vance, MD";
+    const signerName = `${signerBase} (PIN-Verified Attestation)`;
     const notesInput = document.getElementById("doc-clinical-summary");
     const clinicianNotes = notesInput ? notesInput.value.trim() : (currentCoveragePacket.clinical_summary || "");
 
@@ -3627,21 +3800,18 @@ async function submitPacketToInsurance() {
 
         const receipt = await res.json();
 
-        // Update current packet status
         currentCoveragePacket.submission_status = "SUBMITTED_TO_PAYER";
         currentCoveragePacket.payer_transaction_id = receipt.payer_transaction_id;
         currentCoveragePacket.signed_by = signerName;
 
-        // Render receipt details on Screen 5 and advance
         showSubmissionReceipt(receipt);
         goToWizardScreen(5);
 
-        // Refresh audit ledger
         loadAuditLogs();
-        showToast("Packet successfully signed and submitted to Medicare!");
+        showToast("Clinician PIN authenticated. Packet successfully signed and submitted to Medicare!", "success");
     } catch (e) {
         console.error("Submission failed:", e);
-        showToast("Submission failed: " + e.message, true);
+        showToast("Submission failed: " + e.message, "error");
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -5530,7 +5700,8 @@ window.addEventListener('keydown', (e) => {
 
 document.addEventListener('click', (e) => {
     if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'batch-note-modal' && typeof closeBatchNoteModal === 'function') closeBatchNoteModal();
+        if (e.target.id === 'clinician-pin-modal' && typeof closeClinicianPinModal === 'function') closeClinicianPinModal();
+        else if (e.target.id === 'batch-note-modal' && typeof closeBatchNoteModal === 'function') closeBatchNoteModal();
         else if (e.target.id === 'audit-detail-modal' && typeof closeAuditDetailModal === 'function') closeAuditDetailModal();
         else if (e.target.id === 'policy-document-modal' && typeof closePolicyDocumentModal === 'function') closePolicyDocumentModal();
         else if (e.target.id === 'addendum-modal' && typeof closeAddendumModal === 'function') closeAddendumModal();

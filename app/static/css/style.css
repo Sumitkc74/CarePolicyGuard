@@ -6522,4 +6522,194 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+}
+
+/* ========================================================================== */
+/* CLINICIAN SIGNING PIN MODAL STYLES                                         */
+/* ========================================================================== */
+
+.pin-modal-card {
+    max-width: 460px;
+    width: 92%;
+    background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.pin-modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(17, 24, 39, 0.95);
+}
+
+.pin-modal-body {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pin-summary-strip {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+}
+
+.pin-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pin-summary-row span {
+    color: var(--text-muted, #94A3B8);
+    font-size: 0.75rem;
+}
+
+.pin-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+}
+
+.pin-digits-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.pin-digit-box {
+    width: 54px;
+    height: 60px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    font-family: var(--font-mono, monospace);
+    color: #38BDF8;
+    outline: none;
+    transition: all 0.2s ease;
+    caret-color: transparent;
+}
+
+.pin-digit-box:focus {
+    border-color: #38BDF8;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+    background: rgba(30, 41, 59, 0.9);
+}
+
+.pin-digit-box.pin-error {
+    border-color: #F43F5E;
+    box-shadow: 0 0 14px rgba(244, 63, 94, 0.4);
+    animation: pinShake 0.35s ease;
+}
+
+@keyframes pinShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.pin-feedback-msg {
+    font-size: 0.75rem;
+    min-height: 18px;
+    text-align: center;
+}
+
+.pin-feedback-msg.error {
+    color: #FB7185;
+}
+
+.pin-help-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-size: 0.72rem;
+    color: var(--text-muted, #94A3B8);
+}
+
+.pin-toggle-btn {
+    background: transparent;
+    border: none;
+    color: #38BDF8;
+    cursor: pointer;
+    font-size: 0.72rem;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.pin-toggle-btn:hover {
+    color: #7DD3FC;
+}
+
+/* Change PIN Drawer */
+.pin-change-drawer {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pin-change-drawer.hidden {
+    display: none;
+}
+
+.pin-change-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pin-change-row label {
+    font-size: 0.72rem;
+    color: var(--text-muted, #94A3B8);
+}
+
+.pin-change-input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.85rem;
+    color: #F8FAFC;
+    letter-spacing: 0.1em;
+}
+
+.pin-legal-note {
+    font-size: 0.7rem;
+    color: var(--text-muted, #94A3B8);
+    line-height: 1.4;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 10px;
+}
+
+.pin-modal-actions {
+    padding: 14px 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(17, 24, 39, 0.95);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

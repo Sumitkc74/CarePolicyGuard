@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_09">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_10">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -2252,10 +2252,92 @@
         </div>
     </div>
 
+    <!-- CLINICIAN SIGNING PIN VERIFICATION MODAL -->
+    <div class="modal-overlay hidden" id="clinician-pin-modal">
+        <div class="modal-card pin-modal-card">
+            <div class="modal-header pin-modal-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span class="med-icon modal-icon-badge icon-cyan" style="width:34px;height:34px;border-radius:8px;flex-shrink:0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </span>
+                    <div>
+                        <h3 style="margin:0;font-size:1.05rem;font-weight:600;color:#F8FAFC;">Clinician Signing PIN</h3>
+                        <p class="modal-sub" style="font-size:0.75rem;color:#94A3B8;margin:2px 0 0 0;">Authorize Medicare transmission with personal PIN</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeClinicianPinModal()">&times;</button>
+            </div>
+
+            <div class="modal-body pin-modal-body">
+                <!-- SUMMARY STRIP -->
+                <div class="pin-summary-strip">
+                    <div class="pin-summary-row">
+                        <span>Case Number:</span>
+                        <strong class="mono" id="pin-modal-case-id" style="color:#38BDF8;">--</strong>
+                    </div>
+                    <div class="pin-summary-row">
+                        <span>Attesting Physician:</span>
+                        <strong id="pin-modal-signer" style="color:#F8FAFC;">Dr. Eleanor Vance, MD</strong>
+                    </div>
+                    <div class="pin-summary-row">
+                        <span>Destination Clearinghouse:</span>
+                        <strong id="pin-modal-payer" style="color:#94A3B8;">CMS Medicare Part B / MAC</strong>
+                    </div>
+                </div>
+
+                <!-- 4-DIGIT PIN INPUTS -->
+                <div class="pin-input-wrapper">
+                    <span style="font-size:0.8rem;color:#CBD5E1;font-weight:500;">Enter 4-Digit Signing PIN:</span>
+                    <div class="pin-digits-row">
+                        <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="pin-digit-box" id="pin-d1" autocomplete="off" />
+                        <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="pin-digit-box" id="pin-d2" autocomplete="off" />
+                        <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="pin-digit-box" id="pin-d3" autocomplete="off" />
+                        <input type="password" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="pin-digit-box" id="pin-d4" autocomplete="off" />
+                    </div>
+                    <div class="pin-feedback-msg" id="pin-feedback-msg"></div>
+
+                    <div class="pin-help-row">
+                        <span>Default Demo PIN: <strong style="color:#38BDF8;">1234</strong></span>
+                        <button type="button" class="pin-toggle-btn" onclick="toggleChangePinDrawer()">Change PIN</button>
+                    </div>
+                </div>
+
+                <!-- CHANGE PIN DRAWER (OPTIONAL EXPANDABLE) -->
+                <div class="pin-change-drawer hidden" id="pin-change-drawer">
+                    <div style="font-size:0.75rem;font-weight:600;color:#38BDF8;margin-bottom:4px;">Set Custom 4-Digit PIN</div>
+                    <div class="pin-change-row">
+                        <label for="input-current-pin">Current PIN:</label>
+                        <input type="password" id="input-current-pin" class="pin-change-input" maxlength="4" placeholder="e.g. 1234" />
+                    </div>
+                    <div class="pin-change-row">
+                        <label for="input-new-pin">New 4-Digit PIN:</label>
+                        <input type="password" id="input-new-pin" class="pin-change-input" maxlength="4" placeholder="4 digits" />
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+                        <button type="button" class="btn-secondary" style="padding:4px 10px;font-size:0.75rem;" onclick="toggleChangePinDrawer()">Cancel</button>
+                        <button type="button" class="btn-primary" style="padding:4px 12px;font-size:0.75rem;" onclick="saveNewSigningPin()">Save PIN</button>
+                    </div>
+                </div>
+
+                <div class="pin-legal-note">
+                    Cryptographic digital signature with non-repudiation pursuant to 42 CFR &sect; 495 &amp; False Claims Act (31 U.S.C. &sect; 3729).
+                </div>
+            </div>
+
+            <div class="modal-actions pin-modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeClinicianPinModal()">Cancel</button>
+                <button type="button" class="btn-primary" id="btn-confirm-pin-submit" onclick="verifyAndExecuteSubmission()">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
+                    Authorize &amp; Transmit
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_09"></script>
+    <script src="/static/js/app.js?v=20261026_10"></script>
 </body>
 </html>
 
