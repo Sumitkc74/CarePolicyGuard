@@ -1833,18 +1833,22 @@ function renderMultiPolicyScanResults(data) {
 
             card.innerHTML = `
                 <div class="match-item-top">
-                    <span class="match-code">${m.policy_id}</span>
+                    <div class="match-code-group">
+                        <span class="match-code">${m.policy_id}</span>
+                        <span class="match-category">${m.category}</span>
+                    </div>
                     <div class="match-badges">
                         ${bestBadge}
                         ${statusBadge}
                     </div>
                 </div>
                 <div class="match-title">${m.policy_title}</div>
-                <div class="match-category">${m.category}</div>
-                <div class="match-rationale">${m.clinical_rationale}</div>
                 <div class="match-footer">
-                    <span class="match-criteria-count">${m.met_criteria}/${m.total_criteria} Criteria Met</span>
-                    <span class="match-select-action">${isSelected ? "Active Selected" : "Select this Policy &rarr;"}</span>
+                    <span class="match-criteria-count">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        ${m.met_criteria}/${m.total_criteria} Criteria Satisfied
+                    </span>
+                    <span class="match-select-action ${isSelected ? "active" : ""}">${isSelected ? "Selected" : "Select &rarr;"}</span>
                 </div>
             `;
             gridElem.appendChild(card);
@@ -1864,11 +1868,17 @@ function selectPolicyFromScan(policyId, triggerToast = true) {
         if (codeElem && codeElem.textContent.trim() === policyId) {
             item.classList.add("selected");
             const actElem = item.querySelector(".match-select-action");
-            if (actElem) actElem.textContent = "Active Selected";
+            if (actElem) {
+                actElem.textContent = "Selected";
+                actElem.classList.add("active");
+            }
         } else {
             item.classList.remove("selected");
             const actElem = item.querySelector(".match-select-action");
-            if (actElem) actElem.innerHTML = "Select this Policy &rarr;";
+            if (actElem) {
+                actElem.innerHTML = "Select &rarr;";
+                actElem.classList.remove("active");
+            }
         }
     });
 

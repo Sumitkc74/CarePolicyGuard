@@ -432,83 +432,26 @@
             <!-- ==================================================== -->
             <!-- SCREEN 2: MEDICARE POLICY MATCH & MULTI-POLICY SCAN -->
             <!-- ==================================================== -->
-            <div id="screen-step-2" class="wizard-screen">
-                <div class="wizard-card-centered wide">
+                        <div id="screen-step-2" class="wizard-screen">
+                <div class="wizard-card-centered wide step2-clean-container">
                     <div class="wizard-card-header">
                         <div class="header-left-group">
                             <span class="wizard-step-pill">STEP 2</span>
-                            <h2>Medicare Policy Matching & Coverage Discovery</h2>
-                        </div>
-                        <button type="button" class="btn-subtle-scan" onclick="triggerMultiPolicyAutoScan()" title="Re-scan all policies against note">
-                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                            Re-Scan All Policies
-                        </button>
-                    </div>
-
-                    <!-- MULTI-POLICY DISCOVERY & CO-OCCURRENCE INSIGHTS BANNER -->
-                    <div id="multi-policy-insights-banner" class="multi-policy-insights-banner hidden">
-                        <div class="insights-icon">
-                            <span class="med-icon icon-md icon-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
-                        </div>
-                        <div class="insights-body">
-                            <div class="insights-title" id="multi-policy-insights-title">Multi-Policy Coverage Detected</div>
-                            <div class="insights-desc" id="multi-policy-insights-desc">Patient documentation satisfies criteria for multiple distinct Medicare coverage policies.</div>
+                            <div>
+                                <h2>Select Medicare Policy Directive</h2>
+                                <p class="step2-subtitle">Review candidate policies matched to your clinical documentation. The best evidentiary match is pre-selected.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- POLICY MATCH MATRIX (All policies scanned) -->
+                    <!-- CLEAN POLICY MATCH GRID -->
                     <div class="policy-scan-section">
-                        <div class="scan-section-header">
-                            <span class="scan-title">Automated Multi-Policy Evaluation:</span>
-                            <span class="scan-subtitle" id="scan-summary-counter">Scanning clinical documentation across all CMS policies...</span>
-                        </div>
                         <div class="policy-match-grid" id="policy-match-grid">
                             <!-- Populated dynamically via app.js -->
                         </div>
                     </div>
 
-                    <!-- CURRENT ACTIVE POLICY DETAILS CARD -->
-                    <div class="policy-summary-card active-selection-card">
-                        <div class="active-policy-label">
-                            <span>Selected Policy for Evaluation & Coverage Packet:</span>
-                            <span class="best-match-badge hidden" id="active-best-match-pill"> BEST EVIDENTIARY MATCH</span>
-                        </div>
-                        <div class="policy-header-row">
-                            <div class="policy-badge-icon" id="policy-badge-icon">
-                                <span class="med-icon icon-lg icon-blue">
-                                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                </span>
-                            </div>
-                            <div>
-                                <span class="policy-code" id="step2-policy-id">NCD 20.4</span>
-                                <h3 id="step2-policy-title">Implantable Automatic Defibrillators</h3>
-                                <p id="step2-patient-id" class="policy-patient-sub">Patient: Eleanor Vance (PT-CARD-8821)</p>
-                            </div>
-                        </div>
-
-                        <div class="policy-rules-box">
-                            <div class="rules-box-title">Key Coverage Requirements:</div>
-                            <div class="policy-rule-chips" id="step2-requirements-list">
-                                <span class="rule-chip">LVEF &le; 35%</span>
-                                <span class="rule-chip">NYHA Class II or III</span>
-                                <span class="rule-chip">GDMT &ge; 90 days</span>
-                                <span class="rule-chip">No MI within 40 days</span>
-                            </div>
-                        </div>
-
-                        <!-- CMS POLICY SYNC STATUS BAR -->
-                        <div class="cms-sync-indicator-bar">
-                            <div class="sync-left">
-                                <span class="pulse-dot"></span>
-                                <span id="cms-sync-status-text">CMS Coverage Database: Automated Sync Active</span>
-                            </div>
-                            <button type="button" class="btn-sync-cms-subtle" onclick="triggerUiCmsSync()" title="Check for live CMS transmittals">
-                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></span>
-                                Sync CMS Policies
-                            </button>
-                        </div>
-                    </div>
-
+                    <!-- NAVIGATION FOOTER -->
                     <div class="wizard-nav-footer">
                         <button class="btn-secondary" onclick="goToWizardScreen(1)">
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></span>
@@ -522,9 +465,6 @@
                 </div>
             </div>
 
-            <!-- ==================================================== -->
-            <!-- SCREEN 3: COVERAGE VERDICT & PLAIN-ENGLISH CHECKLIST -->
-            <!-- ==================================================== -->
             <div id="screen-step-3" class="wizard-screen">
                 <div class="wizard-card-centered wide">
                     <div class="wizard-card-header">
