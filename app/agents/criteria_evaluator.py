@@ -288,6 +288,19 @@ class CriteriaEvaluationAgent:
                             temporal_window_met = False
                             rationale = f"GDMT documented for only {months} months (< 3 months requirement){contra_note}."
                             raw_confidence = 0.90
+                    elif "week" in raw_dur_str:
+                        nums = re.findall(r'\d+', raw_dur_str)
+                        weeks = int(nums[0]) if nums else 12
+                        if weeks >= 12:
+                            status = DeterminationStatus.MET
+                            temporal_window_met = True
+                            rationale = f"Documented guideline-directed medical therapy sustained for {weeks} weeks (meets >=90 day / 12 weeks CMS threshold){contra_note}."
+                            raw_confidence = 0.95
+                        else:
+                            status = DeterminationStatus.NOT_MET
+                            temporal_window_met = False
+                            rationale = f"GDMT documented for only {weeks} weeks (< 12 weeks / 90 days requirement){contra_note}."
+                            raw_confidence = 0.90
                     elif "day" in raw_dur_str:
                         nums = re.findall(r'\d+', raw_dur_str)
                         days = int(nums[0]) if nums else 90
