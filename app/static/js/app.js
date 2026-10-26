@@ -568,10 +568,10 @@ function renderClinicianProfile() {
     if (dispSpec) dispSpec.textContent = profile.specialty;
     if (dispFac) dispFac.textContent = profile.facility;
 
-    // Sync top navigation display name if role is Clinician
+    // Top navigation button displays "Profile"
     const nameLabel = document.getElementById("user-name-label");
-    if (nameLabel && currentRole === "Clinician") {
-        nameLabel.textContent = profile.full_name;
+    if (nameLabel) {
+        nameLabel.textContent = "Profile";
     }
 
     // Sync Step 4 physician signature input
@@ -672,7 +672,7 @@ function updateUserBadge() {
 
     if (roleLabel) roleLabel.textContent = currentRole;
     if (nameLabel) {
-        nameLabel.textContent = (currentRole === "Clinician") ? profile.full_name : currentUser;
+        nameLabel.textContent = "Profile";
     }
 
     const modalUser = document.getElementById("modal-profile-user");

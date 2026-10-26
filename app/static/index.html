@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_12">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_13">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -280,15 +280,11 @@
                 <button class="nav-btn" id="tab-crd-btn" onclick="switchMainTab('crd')">EHR CDS &amp; DTR</button>
                 <button class="nav-btn" id="tab-telemetry-btn" onclick="switchMainTab('telemetry')">Telemetry &amp; Metrics</button>
             </nav>
-            <div class="user-profile-badge" id="user-badge" onclick="toggleAuthModal()" title="Click to view profile or sign out">
+            <div class="user-profile-badge" id="user-badge" onclick="toggleAuthModal()" title="Provider Profile &amp; Settings">
                 <span class="user-role-tag" id="user-role-label">Reviewer</span>
-                <span class="user-name" id="user-name-label">doctor@hospital.org</span>
+                <span class="user-name" id="user-name-label">Profile</span>
                 <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
             </div>
-            <button class="btn-logout-subtle" onclick="signOutToLoginGate()" title="Sign Out">
-                <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
-                <span>Sign Out</span>
-            </button>
         </div>
     </header>
 
@@ -2432,7 +2428,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_12"></script>
+    <script src="/static/js/app.js?v=20261026_13"></script>
 </body>
 </html>
 
