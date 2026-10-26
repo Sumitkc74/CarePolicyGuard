@@ -4397,8 +4397,78 @@ const SAMPLE_BATCH_ROSTERS = {
 
 let currentBatchRoster = [];
 
+// =============================================================================
+// TAB 4: MULTI-PATIENT BATCH ROSTER ADJUDICATION
+// =============================================================================
+
+const POLICY_SPECIALTY_MAP = {
+    "NCD-20.4": "Cardiology",
+    "LCD-L33829": "Pulmonology",
+    "NCD-20.29": "Wound Care",
+    "NCD-240.2": "Pulmonology"
+};
+
+function getPolicySpecialty(policyId) {
+    return POLICY_SPECIALTY_MAP[policyId] || "Medicare Part B";
+}
+
+let currentBatchCohortType = 'cardiology';
+let currentBatchFilter = 'ALL';
+
+function switchBatchCohort(cohortType) {
+    currentBatchCohortType = cohortType;
+    currentBatchFilter = 'ALL';
+    
+    const btnCardio = document.getElementById("btn-cohort-cardiology");
+    const btnMixed = document.getElementById("btn-cohort-mixed");
+    if (btnCardio && btnMixed) {
+        if (cohortType === 'cardiology') {
+            btnCardio.classList.add("active");
+            btnMixed.classList.remove("active");
+        } else {
+            btnMixed.classList.add("active");
+            btnCardio.classList.remove("active");
+        }
+    }
+    loadSampleBatchRoster(cohortType);
+}
+
+function filterBatchTable(filterType) {
+    currentBatchFilter = filterType;
+    
+    const pills = document.querySelectorAll(".batch-filter-pill");
+    pills.forEach(pill => pill.classList.remove("active"));
+    
+    const targetPillId = {
+        'ALL': 'filter-all',
+        'APPROVED': 'filter-approved',
+        'DENIED': 'filter-denied',
+        'DEFERRED': 'filter-deferred'
+    }[filterType] || 'filter-all';
+    
+    const activeEl = document.getElementById(targetPillId);
+    if (activeEl) activeEl.classList.add("active");
+    
+    const rows = document.querySelectorAll("#batch-table-body tr");
+    rows.forEach(tr => {
+        const rowDecision = tr.getAttribute("data-decision") || "PENDING";
+        if (filterType === 'ALL') {
+            tr.style.display = "";
+        } else if (filterType === 'APPROVED' && rowDecision === 'APPROVED') {
+            tr.style.display = "";
+        } else if (filterType === 'DENIED' && rowDecision === 'DENIED') {
+            tr.style.display = "";
+        } else if (filterType === 'DEFERRED' && (rowDecision === 'DEFERRED' || rowDecision === 'HOLD' || rowDecision.includes('DEFER'))) {
+            tr.style.display = "";
+        } else {
+            tr.style.display = "none";
+        }
+    });
+}
+
 function loadSampleBatchRoster(rosterType) {
     window._activeBatchLoaded = true;
+    currentBatchCohortType = rosterType;
     currentBatchRoster = JSON.parse(JSON.stringify(SAMPLE_BATCH_ROSTERS[rosterType] || SAMPLE_BATCH_ROSTERS.cardiology));
     
     const titleEl = document.getElementById("batch-roster-title");
@@ -4406,6 +4476,12 @@ function loadSampleBatchRoster(rosterType) {
         titleEl.textContent = rosterType === 'cardiology' 
             ? "Current Roster: Cardiology Clinic Morning Cohort (4 Patients)" 
             : "Current Roster: Mixed Specialty Outpatient Cohort (3 Patients)";
+    }
+    const subEl = document.getElementById("batch-cohort-name-sub");
+    if (subEl) {
+        subEl.textContent = rosterType === 'cardiology'
+            ? "Cardiology Clinic Morning Cohort"
+            : "Mixed Specialty Outpatient Cohort";
     }
     
     document.getElementById("batch-total-count").textContent = currentBatchRoster.length;
@@ -4422,22 +4498,60 @@ function renderBatchTablePending() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
+    currentBatchFilter = 'ALL';
+    const pills = document.querySelectorAll(".batch-filter-pill");
+    pills.forEach(pill => pill.classList.remove("active"));
+    const allPill = document.getElementById("filter-all");
+    if (allPill) allPill.classList.add("active");
+
+    const totalEl = document.getElementById("filter-count-all");
+    if (totalEl) totalEl.textContent = currentBatchRoster.length;
+    const appEl = document.getElementById("filter-count-approved");
+    if (appEl) appEl.textContent = "0";
+    const denEl = document.getElementById("filter-count-denied");
+    if (denEl) denEl.textContent = "0";
+    const defEl = document.getElementById("filter-count-deferred");
+    if (defEl) defEl.textContent = "0";
+
     currentBatchRoster.forEach((item, idx) => {
         const tr = document.createElement("tr");
-        const snippet = item.clinical_narrative.length > 90 
-            ? item.clinical_narrative.substring(0, 90) + "..." 
+        tr.setAttribute("data-decision", "PENDING");
+        
+        const snippet = item.clinical_narrative.length > 95 
+            ? item.clinical_narrative.substring(0, 95) + "..." 
             : item.clinical_narrative;
+        const specialty = getPolicySpecialty(item.policy_id);
 
         tr.innerHTML = `
-            <td><strong>#${idx + 1}</strong></td>
-            <td><span class="user-role-tag">${item.patient_id}</span></td>
-            <td><code>${item.policy_id}</code></td>
-            <td><span class="code-pill">${item.requested_procedure_code || 'N/A'}</span></td>
-            <td><small class="text-secondary">${snippet}</small></td>
-            <td><span class="badge-status" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8;">Pending Run</span></td>
-            <td>--</td>
-            <td>--</td>
-            <td><button class="btn-side-tutorial" style="padding: 2px 8px;" onclick="loadRosterItemIntoWizard(${idx})">Inspect Note</button></td>
+            <td><strong style="color:var(--text-muted);">#${idx + 1}</strong></td>
+            <td>
+                <div class="patient-chip">
+                    <span class="patient-avatar-mini">PT</span>
+                    <span>${escapeHtml(item.patient_id)}</span>
+                </div>
+            </td>
+            <td>
+                <div class="policy-tag-badge">
+                    <span class="policy-code-pill">${escapeHtml(item.policy_id)}</span>
+                    <span class="policy-specialty-sub">${escapeHtml(specialty)}</span>
+                </div>
+            </td>
+            <td><span class="procedure-cpt-pill">${escapeHtml(item.requested_procedure_code || 'N/A')}</span></td>
+            <td><div class="clinical-snippet-box">${escapeHtml(snippet)}</div></td>
+            <td>
+                <span class="decision-pill pending">
+                    <span class="decision-dot"></span>
+                    Pending Run
+                </span>
+            </td>
+            <td><span style="color:var(--text-muted);font-size:0.75rem;">--</span></td>
+            <td><span style="color:var(--text-muted);font-size:0.75rem;">--</span></td>
+            <td style="text-align: right;">
+                <button type="button" class="btn-batch-action" onclick="loadRosterItemIntoWizard(${idx})">
+                    <span>Inspect Note</span>
+                    <span style="font-size:0.8rem;">&rarr;</span>
+                </button>
+            </td>
         `;
         tbody.appendChild(tr);
     });
@@ -4498,49 +4612,124 @@ function renderBatchResults(results) {
     if (!tbody) return;
     tbody.innerHTML = "";
 
+    let approvedCount = 0;
+    let deniedCount = 0;
+    let deferredCount = 0;
+
     results.forEach((item) => {
         const tr = document.createElement("tr");
-        const snippet = item.adjudication.sanitized_ehr_text.length > 90 
-            ? item.adjudication.sanitized_ehr_text.substring(0, 90) + "..." 
+        const decisionNorm = (item.decision || "PENDING").toUpperCase();
+        tr.setAttribute("data-decision", decisionNorm);
+
+        if (decisionNorm === "APPROVED") approvedCount++;
+        else if (decisionNorm === "DENIED") deniedCount++;
+        else deferredCount++;
+
+        const snippet = item.adjudication.sanitized_ehr_text.length > 95 
+            ? item.adjudication.sanitized_ehr_text.substring(0, 95) + "..." 
             : item.adjudication.sanitized_ehr_text;
 
+        const specialty = getPolicySpecialty(item.policy_id);
+        const cptCode = item.adjudication.cpt_codes && item.adjudication.cpt_codes.length > 0 
+            ? item.adjudication.cpt_codes[0] 
+            : (item.requested_procedure_code || 'N/A');
+
         let decisionBadge = "";
-        if (item.decision === "APPROVED") {
-            decisionBadge = `<span class="badge-status met"><span class="chip-dot"></span> Approved</span>`;
-        } else if (item.decision === "DENIED") {
-            decisionBadge = `<span class="badge-status excluded"><span class="chip-dot"></span> Denied</span>`;
+        if (decisionNorm === "APPROVED") {
+            decisionBadge = `
+                <span class="decision-pill approved">
+                    <span class="decision-dot"></span>
+                    Approved
+                </span>
+            `;
+        } else if (decisionNorm === "DENIED") {
+            decisionBadge = `
+                <span class="decision-pill denied">
+                    <span class="decision-dot"></span>
+                    Denied
+                </span>
+            `;
         } else {
-            decisionBadge = `<span class="badge-status" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><span class="chip-dot"></span> Deferred to MD</span>`;
+            decisionBadge = `
+                <span class="decision-pill deferred">
+                    <span class="decision-dot"></span>
+                    Deferred to MD
+                </span>
+            `;
         }
 
         let gateBadge = "";
         if (item.abstention_status) {
-            gateBadge = `<span class="tile-tag tag-amber" style="padding: 2px 6px;">Triggered (&tau; &lt; 0.85)</span>`;
+            gateBadge = `
+                <span class="safety-gate-pill gate-triggered">
+                    <span class="decision-dot"></span>
+                    Triggered (&tau; &lt; 0.85)
+                </span>
+            `;
         } else {
-            gateBadge = `<span class="tile-tag tag-green" style="padding: 2px 6px;">Passed (&ge; 0.85)</span>`;
+            gateBadge = `
+                <span class="safety-gate-pill gate-pass">
+                    <span class="decision-dot"></span>
+                    Passed (&ge; 0.85)
+                </span>
+            `;
         }
 
         const confPct = Math.round(item.calibrated_confidence * 100);
+        const confClass = confPct >= 85 ? "high" : (confPct >= 65 ? "medium" : "low");
 
         tr.innerHTML = `
-            <td><strong>#${item.index}</strong></td>
-            <td><span class="user-role-tag">${item.patient_id_masked}</span></td>
-            <td><code>${item.policy_id}</code></td>
-            <td><span class="code-pill">${item.adjudication.cpt_codes && item.adjudication.cpt_codes.length > 0 ? item.adjudication.cpt_codes[0] : 'N/A'}</span></td>
-            <td><small class="text-secondary">${snippet}</small></td>
-            <td>${decisionBadge}</td>
-            <td><strong>${confPct}%</strong></td>
-            <td>${gateBadge}</td>
+            <td><strong style="color:var(--text-muted);">#${item.index}</strong></td>
             <td>
-                <button class="btn-side-tutorial" style="padding: 3px 8px;" onclick="viewBatchItemInWizard(${item.index - 1})">
-                    Open Case &rarr;
+                <div class="patient-chip">
+                    <span class="patient-avatar-mini">PT</span>
+                    <span>${escapeHtml(item.patient_id_masked)}</span>
+                </div>
+            </td>
+            <td>
+                <div class="policy-tag-badge">
+                    <span class="policy-code-pill">${escapeHtml(item.policy_id)}</span>
+                    <span class="policy-specialty-sub">${escapeHtml(specialty)}</span>
+                </div>
+            </td>
+            <td><span class="procedure-cpt-pill">${escapeHtml(cptCode)}</span></td>
+            <td><div class="clinical-snippet-box">${escapeHtml(snippet)}</div></td>
+            <td>${decisionBadge}</td>
+            <td>
+                <div class="conf-meter-wrapper">
+                    <div class="conf-meter-label">
+                        <span>Confidence</span>
+                        <span>${confPct}%</span>
+                    </div>
+                    <div class="conf-bar-bg">
+                        <div class="conf-bar-fill ${confClass}" style="width: ${confPct}%;"></div>
+                    </div>
+                </div>
+            </td>
+            <td>${gateBadge}</td>
+            <td style="text-align: right;">
+                <button type="button" class="btn-batch-action" onclick="viewBatchItemInWizard(${item.index - 1})">
+                    <span>Open Case</span>
+                    <span style="font-size:0.8rem;">&rarr;</span>
                 </button>
             </td>
         `;
         tbody.appendChild(tr);
     });
 
+    const totalEl = document.getElementById("filter-count-all");
+    if (totalEl) totalEl.textContent = results.length;
+    const appEl = document.getElementById("filter-count-approved");
+    if (appEl) appEl.textContent = approvedCount;
+    const denEl = document.getElementById("filter-count-denied");
+    if (denEl) denEl.textContent = deniedCount;
+    const defEl = document.getElementById("filter-count-deferred");
+    if (defEl) defEl.textContent = deferredCount;
+
     window._lastBatchResults = results;
+    if (currentBatchFilter !== 'ALL') {
+        filterBatchTable(currentBatchFilter);
+    }
 }
 
 function viewBatchItemInWizard(idx) {
@@ -4549,7 +4738,6 @@ function viewBatchItemInWizard(idx) {
     lastAdjudicationResult = item.adjudication;
     currentCoveragePacket = null;
     
-    // Switch to prior authorization tab and show Screen 3 (Coverage Result)
     switchMainTab('adjudicate');
     renderCoverageScreen(item.adjudication);
     goToWizardScreen(3);
@@ -4565,7 +4753,6 @@ function loadRosterItemIntoWizard(idx) {
     goToWizardScreen(1);
     showToast(`Loaded note for ${item.patient_id} into Prior Auth wizard.`, "info");
 }
-
 
 // =============================================================================
 // HL7 DA VINCI CRD & DTR SIMULATOR

@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_05">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_06">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -1172,76 +1172,162 @@
         <!-- TAB 4: BATCH CLINICAL ROSTER ADJUDICATION VIEW -->
         <!-- ========================================== -->
         <section id="batch-view" class="view-panel">
-            <div class="view-header">
-                <div>
-                    <h2>Multi-Patient Batch Roster Adjudication</h2>
-                    <p class="section-desc">High-throughput automated prior-authorization verification across clinical cohorts with individual character grounding and safety deferrals.</p>
-                </div>
-                <div class="header-action-group">
-                    <button class="btn-secondary" onclick="loadSampleBatchRoster('cardiology')">Load Cardiology Roster</button>
-                    <button class="btn-secondary" onclick="loadSampleBatchRoster('mixed')">Load Mixed Specialty Roster</button>
-                    <button class="btn-primary" id="btn-run-batch-adjudication" onclick="executeBatchAdjudication()">
-                        <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
-                        Run Batch Verification
-                    </button>
-                </div>
-            </div>
-
-            <!-- BATCH ROSTER SUMMARY BANNER -->
-            <div class="metrics-row" id="batch-metrics-row" style="margin-bottom: 20px;">
-                <div class="metric-card">
-                    <div class="metric-val" id="batch-total-count">3</div>
-                    <div class="metric-lbl">Total Roster Patients</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-val text-emerald" id="batch-approved-count">--</div>
-                    <div class="metric-lbl">Auto-Approved</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-val text-rose" id="batch-denied-count">--</div>
-                    <div class="metric-lbl">Auto-Denied (Appeal Ready)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-val text-amber" id="batch-deferred-count">--</div>
-                    <div class="metric-lbl">Deferred to Clinician (&tau; &lt; 0.85)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-val text-cyan" id="batch-latency-count">-- ms</div>
-                    <div class="metric-lbl">Total Execution Latency</div>
-                </div>
-            </div>
-
-            <!-- BATCH PATIENT TABLE -->
-            <div class="audit-card">
-                <div class="card-header space-between">
-                    <div>
-                        <h3 id="batch-roster-title">Current Roster: Cardiology Clinic Morning Cohort</h3>
-                        <p class="card-subtitle">Every patient note is independently checked against statutory Medicare criteria and verified letter-by-letter.</p>
+            <div class="batch-page-container">
+                <!-- SLEEK BATCH HEADER BAR -->
+                <div class="batch-header-bar">
+                    <div class="batch-header-info">
+                        <div class="batch-title-row">
+                            <h2>Multi-Patient Batch Roster Adjudication</h2>
+                            <span class="batch-live-tag">
+                                <span class="chip-dot" style="background:#38BDF8;"></span>
+                                High-Throughput Engine
+                            </span>
+                        </div>
+                        <p class="batch-header-desc">Automated, policy-grounded verification across clinical cohorts with deterministic rule evaluation, character-level citations, and clinician safety abstentions.</p>
                     </div>
-                    <span class="badge-status met"><span class="chip-dot"></span> 4-Agent Verification Gate Enabled</span>
+                    <div class="batch-header-actions">
+                        <!-- COHORT SELECTOR -->
+                        <div class="cohort-segmented-control" role="group" aria-label="Select Cohort Roster">
+                            <button type="button" class="cohort-pill-btn active" id="btn-cohort-cardiology" onclick="switchBatchCohort('cardiology')">
+                                <span>Cardiology Clinic</span>
+                                <span class="cohort-pill-count">4</span>
+                            </button>
+                            <button type="button" class="cohort-pill-btn" id="btn-cohort-mixed" onclick="switchBatchCohort('mixed')">
+                                <span>Mixed Specialty</span>
+                                <span class="cohort-pill-count">3</span>
+                            </button>
+                        </div>
+                        <button class="btn-batch-run" id="btn-run-batch-adjudication" onclick="executeBatchAdjudication()">
+                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+                            <span>Run Batch Verification</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="table-container">
-                    <table class="audit-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Patient ID (HIPAA Masked)</th>
-                                <th>Target Policy</th>
-                                <th>CPT Code</th>
-                                <th>Clinical Presentation Snippet</th>
-                                <th>Status / Decision</th>
-                                <th>Calibrated Conf</th>
-                                <th>Safety Gate</th>
-                                <th>Action / Detail</th>
-                            </tr>
-                        </thead>
-                        <tbody id="batch-table-body">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
+
+                <!-- 5 HIGH-IMPACT KPI SUMMARY STAT CARDS -->
+                <div class="batch-kpi-grid" id="batch-metrics-row">
+                    <!-- Card 1: Total Patients -->
+                    <div class="batch-kpi-card kpi-total">
+                        <div class="kpi-top-row">
+                            <span class="kpi-label">Roster Cohort</span>
+                            <span class="kpi-icon-badge">
+                                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </span>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-number" id="batch-total-count">4</span>
+                        </div>
+                        <span class="kpi-subtext" id="batch-cohort-name-sub">Cardiology Clinic Morning Cohort</span>
+                    </div>
+
+                    <!-- Card 2: Auto-Approved -->
+                    <div class="batch-kpi-card kpi-approved">
+                        <div class="kpi-top-row">
+                            <span class="kpi-label">Auto-Approved</span>
+                            <span class="kpi-icon-badge">
+                                <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </span>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-number text-emerald" id="batch-approved-count">--</span>
+                        </div>
+                        <span class="kpi-subtext">Satisfies all statutory coverage criteria</span>
+                    </div>
+
+                    <!-- Card 3: Auto-Denied -->
+                    <div class="batch-kpi-card kpi-denied">
+                        <div class="kpi-top-row">
+                            <span class="kpi-label">Auto-Denied</span>
+                            <span class="kpi-icon-badge">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                            </span>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-number text-rose" id="batch-denied-count">--</span>
+                        </div>
+                        <span class="kpi-subtext">Statutory exclusion or severe defect</span>
+                    </div>
+
+                    <!-- Card 4: Clinician Deferrals -->
+                    <div class="batch-kpi-card kpi-deferred">
+                        <div class="kpi-top-row">
+                            <span class="kpi-label">Clinician Deferral</span>
+                            <span class="kpi-icon-badge">
+                                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            </span>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-number text-amber" id="batch-deferred-count">--</span>
+                        </div>
+                        <span class="kpi-subtext">Safety abstention gate (&tau; &lt; 0.85)</span>
+                    </div>
+
+                    <!-- Card 5: Execution Latency -->
+                    <div class="batch-kpi-card kpi-latency">
+                        <div class="kpi-top-row">
+                            <span class="kpi-label">Pipeline Latency</span>
+                            <span class="kpi-icon-badge">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            </span>
+                        </div>
+                        <div class="kpi-value-row">
+                            <span class="kpi-number text-cyan" id="batch-latency-count">-- ms</span>
+                        </div>
+                        <span class="kpi-subtext">Multi-agent ensemble execution</span>
+                    </div>
+                </div>
+
+                <!-- BATCH PATIENT ROSTER TABLE CARD -->
+                <div class="batch-card">
+                    <div class="batch-card-header">
+                        <div class="batch-card-title-group">
+                            <h3 id="batch-roster-title">Current Roster: Cardiology Clinic Morning Cohort (4 Patients)</h3>
+                            <p>Every chart is adjudicated independently with 4-agent verification, calibrated confidence, and character grounding.</p>
+                        </div>
+                        <!-- FILTER TOOLBAR -->
+                        <div class="batch-filter-toolbar">
+                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-right: 4px;">Filter:</span>
+                            <button type="button" class="batch-filter-pill active" id="filter-all" onclick="filterBatchTable('ALL')">
+                                <span>All Cases</span>
+                                <span class="filter-count" id="filter-count-all">4</span>
+                            </button>
+                            <button type="button" class="batch-filter-pill filter-approved" id="filter-approved" onclick="filterBatchTable('APPROVED')">
+                                <span>Approved</span>
+                                <span class="filter-count" id="filter-count-approved">0</span>
+                            </button>
+                            <button type="button" class="batch-filter-pill filter-denied" id="filter-denied" onclick="filterBatchTable('DENIED')">
+                                <span>Denied</span>
+                                <span class="filter-count" id="filter-count-denied">0</span>
+                            </button>
+                            <button type="button" class="batch-filter-pill filter-deferred" id="filter-deferred" onclick="filterBatchTable('DEFERRED')">
+                                <span>Deferred</span>
+                                <span class="filter-count" id="filter-count-deferred">0</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container" style="overflow-x: auto;">
+                        <table class="batch-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>Patient ID</th>
+                                    <th>Medicare Policy</th>
+                                    <th>CPT / HCPCS</th>
+                                    <th>Clinical Summary</th>
+                                    <th>Adjudication Decision</th>
+                                    <th style="min-width: 110px;">Calibrated Conf</th>
+                                    <th>Safety Gate</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batch-table-body">
+                                <!-- Dynamically populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </section>
+</section>
 
         <!-- ========================================== -->
         <!-- TAB 5: HL7 DA VINCI CRD & DTR SIMULATOR -->
@@ -2010,7 +2096,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_05"></script>
+    <script src="/static/js/app.js?v=20261026_06"></script>
 </body>
 </html>
 
