@@ -6721,6 +6721,7 @@ body {
 /* ========================================================================== */
 
 .profile-tab-strip {
+    flex-shrink: 0;
     display: flex;
     gap: 6px;
     background: rgba(15, 23, 42, 0.7);
@@ -6776,4 +6777,37 @@ body {
 .profile-field-hint {
     font-size: 0.7rem;
     color: var(--text-muted, #94A3B8);
+}
+.profile-modal-card {
+    width: 520px;
+    max-width: 95vw;
+    max-height: min(88vh, 760px);
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+    overscroll-behavior: contain;
+}
+
+.profile-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.profile-modal-body::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 4px;
+}
+
+.profile-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.25);
+    border-radius: 4px;
+}
+
+.profile-modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.45);
 }

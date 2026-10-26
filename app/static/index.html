@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_11">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261026_12">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -1554,7 +1554,7 @@
 
     <!-- AUTH / SESSION PROFILE MODAL -->
     <div class="modal-overlay hidden" id="auth-modal">
-        <div class="modal-card">
+        <div class="modal-card profile-modal-card">
             <div class="modal-header">
                 <div>
                     <h3>Authenticated Provider Profile</h3>
@@ -1562,7 +1562,6 @@
                 </div>
                 <button class="modal-close-btn" onclick="toggleAuthModal()">&times;</button>
             </div>
-            
             
             <!-- MODAL TAB STRIP -->
             <div class="profile-tab-strip">
@@ -1574,194 +1573,196 @@
                 </button>
             </div>
 
-            <!-- TAB 1: CLINICIAN CREDENTIALS & PERSONAL DETAILS -->
-            <div id="profile-tab-content-credentials">
-                <!-- VIEW MODE -->
-                <div class="session-profile-card" id="profile-creds-view-box">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span class="med-icon icon-sm icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
-                            <span style="font-size:0.85rem;font-weight:600;color:#F8FAFC;">Practitioner Identity (Legal Sign-Off)</span>
+            <div class="modal-body profile-modal-body">
+                <!-- TAB 1: CLINICIAN CREDENTIALS & PERSONAL DETAILS -->
+                <div id="profile-tab-content-credentials">
+                    <!-- VIEW MODE -->
+                    <div class="session-profile-card" id="profile-creds-view-box">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span class="med-icon icon-sm icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
+                                <span style="font-size:0.85rem;font-weight:600;color:#F8FAFC;">Practitioner Identity (Legal Sign-Off)</span>
+                            </div>
+                            <button type="button" class="btn-subtle-pill" onclick="enableClinicianProfileEditMode()">
+                                Edit Details
+                            </button>
                         </div>
-                        <button type="button" class="btn-subtle-pill" onclick="enableClinicianProfileEditMode()">
-                            Edit Details
-                        </button>
+
+                        <div class="profile-row">
+                            <span class="profile-k">Legal Treating Physician:</span>
+                            <strong class="profile-v" id="disp-profile-name" style="color:#F8FAFC;">Dr. Eleanor Vance, MD</strong>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-k">10-Digit CMS NPI:</span>
+                            <strong class="profile-v mono" id="disp-profile-npi" style="color:#38BDF8;">1043256787</strong>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-k">Primary Specialty:</span>
+                            <span class="profile-v" id="disp-profile-specialty">Cardiology / Electrophysiology</span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-k">Healthcare Facility:</span>
+                            <span class="profile-v" id="disp-profile-facility">MetroHealth Heart &amp; Vascular Institute</span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-k">Signing PIN:</span>
+                            <span class="profile-v"><span class="mono">&bull;&bull;&bull;&bull;</span> <span style="font-size:0.75rem;color:#10B981;font-weight:600;">(4-Digit Attestation Active)</span></span>
+                        </div>
                     </div>
 
-                    <div class="profile-row">
-                        <span class="profile-k">Legal Treating Physician:</span>
-                        <strong class="profile-v" id="disp-profile-name" style="color:#F8FAFC;">Dr. Eleanor Vance, MD</strong>
-                    </div>
-                    <div class="profile-row">
-                        <span class="profile-k">10-Digit CMS NPI:</span>
-                        <strong class="profile-v mono" id="disp-profile-npi" style="color:#38BDF8;">1043256787</strong>
-                    </div>
-                    <div class="profile-row">
-                        <span class="profile-k">Primary Specialty:</span>
-                        <span class="profile-v" id="disp-profile-specialty">Cardiology / Electrophysiology</span>
-                    </div>
-                    <div class="profile-row">
-                        <span class="profile-k">Healthcare Facility:</span>
-                        <span class="profile-v" id="disp-profile-facility">MetroHealth Heart &amp; Vascular Institute</span>
-                    </div>
-                    <div class="profile-row">
-                        <span class="profile-k">Signing PIN:</span>
-                        <span class="profile-v"><span class="mono">••••</span> <span style="font-size:0.75rem;color:#10B981;font-weight:600;">(4-Digit Attestation Active)</span></span>
+                    <!-- EDIT MODE -->
+                    <div class="session-profile-card hidden" id="profile-creds-edit-box">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
+                            <strong style="color:#38BDF8;font-size:0.85rem;">Edit Clinician Personal Details</strong>
+                            <span style="font-size:0.72rem;color:var(--text-muted);">Syncs across claims, addenda &amp; EHR signatures</span>
+                        </div>
+
+                        <div class="profile-edit-grid">
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="inp-profile-name">Legal Physician Name &amp; Title</label>
+                                <input type="text" id="inp-profile-name" class="form-input" placeholder="e.g. Dr. Eleanor Vance, MD" />
+                                <span class="profile-field-hint">Used on all electronic prior authorization signatures and CMS attestations.</span>
+                            </div>
+
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="inp-profile-npi">10-Digit CMS National Provider Identifier (NPI)</label>
+                                <input type="text" id="inp-profile-npi" class="form-input mono" maxlength="10" placeholder="10 numeric digits (e.g. 1043256787)" />
+                                <span class="profile-field-hint">Required for Medicare MAC claims and Da Vinci PAS FHIR Practitioner bundles.</span>
+                            </div>
+
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="inp-profile-specialty">Clinical Specialty</label>
+                                <input type="text" id="inp-profile-specialty" class="form-input" placeholder="e.g. Cardiology / Electrophysiology" />
+                            </div>
+
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="inp-profile-facility">Practice / Healthcare Facility</label>
+                                <input type="text" id="inp-profile-facility" class="form-input" placeholder="e.g. MetroHealth Heart &amp; Vascular Institute" />
+                            </div>
+
+                            <div class="profile-field-group">
+                                <label class="profile-field-label" for="inp-profile-pin">Clinician Signing PIN (4 Digits)</label>
+                                <input type="password" id="inp-profile-pin" class="form-input mono" maxlength="4" placeholder="4 digits" />
+                                <span class="profile-field-hint">Entered before final Medicare transmission to satisfy non-repudiation.</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
+                            <button type="button" class="btn-secondary" onclick="cancelClinicianProfileEdit()">Cancel</button>
+                            <button type="button" class="btn-primary" onclick="saveClinicianProfileChanges()">Save Changes</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- EDIT MODE -->
-                <div class="session-profile-card hidden" id="profile-creds-edit-box">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
-                        <strong style="color:#38BDF8;font-size:0.85rem;">Edit Clinician Personal Details</strong>
-                        <span style="font-size:0.72rem;color:var(--text-muted);">Syncs across claims, addenda &amp; EHR signatures</span>
-                    </div>
-
-                    <div class="profile-edit-grid">
-                        <div class="profile-field-group">
-                            <label class="profile-field-label" for="inp-profile-name">Legal Physician Name &amp; Title</label>
-                            <input type="text" id="inp-profile-name" class="form-input" placeholder="e.g. Dr. Eleanor Vance, MD" />
-                            <span class="profile-field-hint">Used on all electronic prior authorization signatures and CMS attestations.</span>
+                <!-- TAB 2: SECURITY, SESSION & MFA -->
+                <div id="profile-tab-content-security" class="hidden">
+                    <div class="session-profile-card">
+                        <div class="profile-row">
+                            <span class="profile-k">Account Identity:</span>
+                            <strong class="profile-v" id="modal-profile-user">clinician@hospital.org</strong>
                         </div>
-
-                        <div class="profile-field-group">
-                            <label class="profile-field-label" for="inp-profile-npi">10-Digit CMS National Provider Identifier (NPI)</label>
-                            <input type="text" id="inp-profile-npi" class="form-input mono" maxlength="10" placeholder="10 numeric digits (e.g. 1043256787)" />
-                            <span class="profile-field-hint">Required for Medicare MAC claims and Da Vinci PAS FHIR Practitioner bundles.</span>
+                        <div class="profile-row">
+                            <span class="profile-k">Authorized Role:</span>
+                            <span class="badge-role-tag" id="modal-profile-role">Clinician</span>
                         </div>
-
-                        <div class="profile-field-group">
-                            <label class="profile-field-label" for="inp-profile-specialty">Clinical Specialty</label>
-                            <input type="text" id="inp-profile-specialty" class="form-input" placeholder="e.g. Cardiology / Electrophysiology" />
+                        <div class="profile-row">
+                            <span class="profile-k">Clinical Authority:</span>
+                            <span class="profile-v text-emerald" id="modal-profile-authority">Full Prior-Auth Creation &amp; Signing</span>
                         </div>
-
-                        <div class="profile-field-group">
-                            <label class="profile-field-label" for="inp-profile-facility">Practice / Healthcare Facility</label>
-                            <input type="text" id="inp-profile-facility" class="form-input" placeholder="e.g. MetroHealth Heart &amp; Vascular Institute" />
+                        <div class="profile-row">
+                            <span class="profile-k">Security Protocol:</span>
+                            <span class="profile-v">PBKDF2-HMAC-SHA256 &bull; JWT Bearer Token</span>
                         </div>
-
-                        <div class="profile-field-group">
-                            <label class="profile-field-label" for="inp-profile-pin">Clinician Signing PIN (4 Digits)</label>
-                            <input type="password" id="inp-profile-pin" class="form-input mono" maxlength="4" placeholder="4 digits" />
-                            <span class="profile-field-hint">Entered before final Medicare transmission to satisfy non-repudiation.</span>
+                        <div class="profile-row">
+                            <span class="profile-k">Two-Factor Authentication:</span>
+                            <span class="profile-v" id="modal-profile-mfa-badge" style="font-weight: 600;">Checking status...</span>
                         </div>
                     </div>
 
-                    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
-                        <button type="button" class="btn-secondary" onclick="cancelClinicianProfileEdit()">Cancel</button>
-                        <button type="button" class="btn-primary" onclick="saveClinicianProfileChanges()">Save Changes</button>
+                    <!-- MFA CONFIGURATION & SWITCHING PANEL -->
+                    <div class="session-profile-card" style="margin-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <strong style="color: #f1f5f9; font-size: 13px;">Multi-Factor Authentication (MFA) Settings</strong>
+                            <span id="mfa-current-status-tag" style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #334155; color: #94a3b8;">Loading...</span>
+                        </div>
+                        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 10px 0;">Protect patient charts and clinical signatures with RFC 6238 TOTP Authenticator apps or Email verification.</p>
+
+                        <div style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; padding: 6px 10px; margin-bottom: 10px; font-size: 11px; color: #cbd5e1; border-radius: 0 4px 4px 0;">
+                            <strong>Multi-Factor Security Policy:</strong> You may have multiple MFA factors active simultaneously and pick which to use at login. At least one factor must remain active.
+                        </div>
+
+                        <div id="mfa-factors-list-container" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
+                            <!-- Dynamically populated: Authenticator App, Email OTP, SMS OTP with Active status & Remove buttons -->
+                        </div>
+
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="openTotpSetup()">
+                                + Add Authenticator App
+                            </button>
+                            <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="enableEmailOtpMfa()">
+                                + Add Email OTP
+                            </button>
+                            <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="openSmsSetup()">
+                                + Add SMS OTP
+                            </button>
+                        </div>
+
+                        <!-- TOTP APP SETUP ACCORDION -->
+                        <div id="totp-setup-box" class="hidden" style="margin-top: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">Setup Google / Microsoft / Duo Authenticator:</div>
+                            <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">1. Scan this QR code in your Authenticator app, or enter the manual key below:</p>
+                            <div style="text-align: center; margin-bottom: 10px;">
+                                <img id="totp-qr-img" src="" alt="MFA QR Code" style="width: 140px; height: 140px; background: #ffffff; padding: 6px; border-radius: 6px; display: inline-block;">
+                            </div>
+                            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Manual Key: <code id="totp-manual-secret" style="background: #1e293b; padding: 2px 6px; border-radius: 4px; color: #f8fafc; font-weight: 700;"></code></div>
+                            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                                <input type="text" id="totp-verify-code-input" class="login-input" maxlength="6" placeholder="6-digit code" style="font-size: 14px; text-align: center; letter-spacing: 3px; max-width: 130px;">
+                                <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="confirmTotpActivation()">Verify &amp; Activate App</button>
+                                <button type="button" class="btn-side-tutorial" style="padding: 6px 10px; font-size: 11px;" onclick="document.getElementById('totp-setup-box').classList.add('hidden')">Cancel</button>
+                            </div>
+                        </div>
+
+                        <!-- EMAIL OTP CONFIRM ACCORDION -->
+                        <div id="email-setup-box" class="hidden" style="margin-top: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">Email Verification Code Sent:</div>
+                            <p id="email-otp-target-hint" style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">Check your email inbox for the 6-digit one-time passcode.</p>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="email-verify-code-input" class="login-input" maxlength="6" placeholder="6-digit code" style="font-size: 14px; text-align: center; letter-spacing: 3px; max-width: 130px;">
+                                <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="confirmEmailMfaActivation()">Verify &amp; Activate Email MFA</button>
+                                <button type="button" class="btn-side-tutorial" style="padding: 6px 10px; font-size: 11px;" onclick="document.getElementById('email-setup-box').classList.add('hidden')">Cancel</button>
+                            </div>
+                        </div>
+
+                        <!-- SMS OTP CONFIRM ACCORDION -->
+                        <div id="sms-setup-box" class="hidden" style="margin-top: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">SMS Mobile Verification:</div>
+                            <p id="sms-otp-target-hint" style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">Enter your mobile number to receive a verification code.</p>
+                            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                <input type="tel" id="sms-phone-input" class="login-input" placeholder="+1-555-0199" style="font-size: 13px; max-width: 170px;">
+                                <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="requestSmsOtpCode()">Send SMS Code</button>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="sms-verify-code-input" class="login-input" maxlength="6" placeholder="6-digit code" style="font-size: 14px; text-align: center; letter-spacing: 3px; max-width: 130px;">
+                                <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="confirmSmsMfaActivation()">Verify &amp; Activate SMS MFA</button>
+                                <button type="button" class="btn-side-tutorial" style="padding: 6px 10px; font-size: 11px;" onclick="document.getElementById('sms-setup-box').classList.add('hidden')">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVE DEVICE SESSIONS & REMOTE REVOCATION -->
+                    <div class="session-profile-card" style="margin-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <strong style="color: #f1f5f9; font-size: 13px;">Active Device Sessions</strong>
+                            <button type="button" class="btn-side-tutorial" style="padding: 2px 8px; font-size: 10px;" onclick="loadUserSessionsList()">Refresh</button>
+                        </div>
+                        <div id="active-sessions-list-container" style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
+                            <div style="font-size: 11px; color: #94a3b8;">Loading connected devices...</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: SECURITY, SESSION & MFA -->
-            <div id="profile-tab-content-security" class="hidden">
-
-<div class="session-profile-card">
-                <div class="profile-row">
-                    <span class="profile-k">Account Identity:</span>
-                    <strong class="profile-v" id="modal-profile-user">clinician@hospital.org</strong>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-k">Authorized Role:</span>
-                    <span class="badge-role-tag" id="modal-profile-role">Clinician</span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-k">Clinical Authority:</span>
-                    <span class="profile-v text-emerald" id="modal-profile-authority">Full Prior-Auth Creation &amp; Signing</span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-k">Security Protocol:</span>
-                    <span class="profile-v">PBKDF2-HMAC-SHA256 &bull; JWT Bearer Token</span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-k">Two-Factor Authentication:</span>
-                    <span class="profile-v" id="modal-profile-mfa-badge" style="font-weight: 600;">Checking status...</span>
-                </div>
-            </div>
-
-            <!-- MFA CONFIGURATION & SWITCHING PANEL -->
-            <div class="session-profile-card" style="margin-top: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <strong style="color: #f1f5f9; font-size: 13px;">Multi-Factor Authentication (MFA) Settings</strong>
-                    <span id="mfa-current-status-tag" style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #334155; color: #94a3b8;">Loading...</span>
-                </div>
-                <p style="font-size: 12px; color: #94a3b8; margin: 0 0 10px 0;">Protect patient charts and clinical signatures with RFC 6238 TOTP Authenticator apps or Email verification.</p>
-
-                <div style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; padding: 6px 10px; margin-bottom: 10px; font-size: 11px; color: #cbd5e1; border-radius: 0 4px 4px 0;">
-                    <strong>Multi-Factor Security Policy:</strong> You may have multiple MFA factors active simultaneously and pick which to use at login. At least one factor must remain active.
-                </div>
-
-                <div id="mfa-factors-list-container" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
-                    <!-- Dynamically populated: Authenticator App, Email OTP, SMS OTP with Active status & Remove buttons -->
-                </div>
-
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="openTotpSetup()">
-                        + Add Authenticator App
-                    </button>
-                    <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="enableEmailOtpMfa()">
-                        + Add Email OTP
-                    </button>
-                    <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="openSmsSetup()">
-                        + Add SMS OTP
-                    </button>
-                </div>
-
-                <!-- TOTP APP SETUP ACCORDION -->
-                <div id="totp-setup-box" class="hidden" style="margin-top: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px;">
-                    <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">Setup Google / Microsoft / Duo Authenticator:</div>
-                    <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">1. Scan this QR code in your Authenticator app, or enter the manual key below:</p>
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <img id="totp-qr-img" src="" alt="MFA QR Code" style="width: 140px; height: 140px; background: #ffffff; padding: 6px; border-radius: 6px; display: inline-block;">
-                    </div>
-                    <div style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Manual Key: <code id="totp-manual-secret" style="background: #1e293b; padding: 2px 6px; border-radius: 4px; color: #f8fafc; font-weight: 700;"></code></div>
-                    <div style="display: flex; gap: 8px; margin-top: 10px;">
-                        <input type="text" id="totp-verify-code-input" class="login-input" maxlength="6" placeholder="6-digit code" style="font-size: 14px; text-align: center; letter-spacing: 3px; max-width: 130px;">
-                        <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="confirmTotpActivation()">Verify &amp; Activate App</button>
-                        <button type="button" class="btn-side-tutorial" style="padding: 6px 10px; font-size: 11px;" onclick="document.getElementById('totp-setup-box').classList.add('hidden')">Cancel</button>
-                    </div>
-                </div>
-
-                <!-- EMAIL OTP CONFIRM ACCORDION -->
-                <div id="email-setup-box" class="hidden" style="margin-top: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px;">
-                    <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">Email Verification Code Sent:</div>
-                    <p id="email-otp-target-hint" style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">Check your email inbox for the 6-digit one-time passcode.</p>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="email-verify-code-input" class="login-input" maxlength="6" placeholder="6-digit code" style="font-size: 14px; text-align: center; letter-spacing: 3px; max-width: 130px;">
-                        <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="confirmEmailMfaActivation()">Verify &amp; Activate Email MFA</button>
-                        <button type="button" class="btn-side-tutorial" style="padding: 6px 10px; font-size: 11px;" onclick="document.getElementById('email-setup-box').classList.add('hidden')">Cancel</button>
-                    </div>
-                </div>
-
-                <!-- SMS OTP CONFIRM ACCORDION -->
-                <div id="sms-setup-box" class="hidden" style="margin-top: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px;">
-                    <div style="font-size: 12px; font-weight: 600; color: #38bdf8; margin-bottom: 6px;">SMS Mobile Verification:</div>
-                    <p id="sms-otp-target-hint" style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">Enter your mobile number to receive a verification code.</p>
-                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                        <input type="tel" id="sms-phone-input" class="login-input" placeholder="+1-555-0199" style="font-size: 13px; max-width: 170px;">
-                        <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="requestSmsOtpCode()">Send SMS Code</button>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="sms-verify-code-input" class="login-input" maxlength="6" placeholder="6-digit code" style="font-size: 14px; text-align: center; letter-spacing: 3px; max-width: 130px;">
-                        <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="confirmSmsMfaActivation()">Verify &amp; Activate SMS MFA</button>
-                        <button type="button" class="btn-side-tutorial" style="padding: 6px 10px; font-size: 11px;" onclick="document.getElementById('sms-setup-box').classList.add('hidden')">Cancel</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACTIVE DEVICE SESSIONS & REMOTE REVOCATION -->
-            <div class="session-profile-card" style="margin-top: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <strong style="color: #f1f5f9; font-size: 13px;">Active Device Sessions</strong>
-                    <button type="button" class="btn-side-tutorial" style="padding: 2px 8px; font-size: 10px;" onclick="loadUserSessionsList()">Refresh</button>
-                </div>
-                <div id="active-sessions-list-container" style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
-                    <div style="font-size: 11px; color: #94a3b8;">Loading connected devices...</div>
-                </div>
-            </div>
-
-            <div class="modal-actions" style="margin-top: 16px; display: flex; gap: 10px;">
+            <div class="modal-actions" style="margin-top: 16px; display: flex; gap: 10px; flex-shrink: 0;">
                 <button class="btn-primary full-width" onclick="signOutToLoginGate()">
                     <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span>
                     Sign Out of Session
@@ -2431,7 +2432,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_11"></script>
+    <script src="/static/js/app.js?v=20261026_12"></script>
 </body>
 </html>
 

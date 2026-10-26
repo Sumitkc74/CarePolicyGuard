@@ -536,6 +536,11 @@ function switchProfileModalTab(tabName) {
     const btnSec = document.getElementById("btn-tab-profile-security");
     const contentCreds = document.getElementById("profile-tab-content-credentials");
     const contentSec = document.getElementById("profile-tab-content-security");
+    const modalBody = document.querySelector(".profile-modal-body");
+
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
 
     if (tabName === "credentials") {
         if (btnCreds) btnCreds.classList.add("active");
@@ -799,6 +804,8 @@ function toggleAuthModal() {
     if (modal) {
         modal.classList.toggle("hidden");
         if (!modal.classList.contains("hidden")) {
+            const modalBody = document.querySelector(".profile-modal-body");
+            if (modalBody) modalBody.scrollTop = 0;
             renderClinicianProfile();
             cancelClinicianProfileEdit();
             loadAuthModalSecurityDetails();
