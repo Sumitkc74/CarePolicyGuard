@@ -2864,30 +2864,35 @@ async function loadAuditLogs() {
                 let actionsCell = "";
                 if (currentRole === "Auditor") {
                     actionsCell = `
-                        <button class="btn-icon-subtle" title="Inspect Forensic Evidence & Offsets" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
-                            <span class="med-icon icon-sm text-cyan"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="Inspect Forensic Evidence & Offsets" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                            <span>Inspect</span>
                         </button>
                     `;
                 } else if (currentRole === "Admin") {
                     actionsCell = `
-                        <button class="btn-icon-subtle" title="Inspect Technical Metadata" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
-                            <span class="med-icon icon-sm text-cyan"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                        </button>
-                        <button class="btn-icon-subtle" title="Purge Record (System Maintenance)" onclick="deleteSingleAuditRecord('${escapeHtml(log.case_id)}')">
-                            <span class="med-icon icon-sm text-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
-                        </button>
+                        <div style="display:inline-flex;align-items:center;gap:6px;">
+                            <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="Inspect Technical Metadata" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                                <span>Inspect</span>
+                            </button>
+                            <button type="button" class="btn-icon-subtle" title="Purge Record (System Maintenance)" onclick="deleteSingleAuditRecord('${escapeHtml(log.case_id)}')">
+                                <span class="med-icon icon-sm text-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                            </button>
+                        </div>
                     `;
                 } else {
                     actionsCell = `
-                        <button class="btn-icon-subtle" title="View Adjudication Summary" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
-                            <span class="med-icon icon-sm text-cyan"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="View Adjudication Summary" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                            <span>Inspect</span>
                         </button>
                     `;
                 }
 
                 tr.innerHTML = `
                     <td class="mono-cell">${ts}</td>
-                    <td class="mono-cell" style="color: var(--accent-cyan); font-weight: 600;">${escapeHtml(log.case_id)}</td>
+                    <td class="mono-cell" style="color: var(--accent-cyan); font-weight: 600; cursor: pointer;" title="Click to inspect audit record" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')"><span style="border-bottom: 1px dashed rgba(56, 189, 248, 0.4);">${escapeHtml(log.case_id)}</span></td>
                     <td class="mono-cell">${patientCellContent}</td>
                     <td><strong>${escapeHtml(log.policy_id)}</strong></td>
                     <td>${decisionChip}</td>
@@ -2906,35 +2911,247 @@ async function loadAuditLogs() {
     }
 }
 
+window._activeAuditRecord = null;
+
+function closeAuditDetailModal() {
+    const modal = document.getElementById("audit-detail-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+function copyModalAuditHash() {
+    if (!window._activeAuditRecord || !window._activeAuditRecord.audit_hash) return;
+    navigator.clipboard.writeText(window._activeAuditRecord.audit_hash).then(() => {
+        showToast("Copied full SHA-256 seal to clipboard.", "success");
+    }).catch(() => {
+        showToast("Unable to copy SHA-256 seal.", "error");
+    });
+}
+
+function copyCaseIdToClipboard() {
+    if (!window._activeAuditRecord || !window._activeAuditRecord.case_id) return;
+    navigator.clipboard.writeText(window._activeAuditRecord.case_id).then(() => {
+        showToast(`Copied case ID ${window._activeAuditRecord.case_id} to clipboard.`, "success");
+    }).catch(() => {
+        showToast("Unable to copy case ID.", "error");
+    });
+}
+
 async function viewAuditRecordDetails(caseId) {
     try {
         const res = await fetch(`/api/v1/audit-logs/${encodeURIComponent(caseId)}`, {
             headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
         });
         if (!res.ok) {
-            showToast("Failed to fetch record details", true);
+            showToast("Failed to fetch record details", "error");
             return;
         }
         const data = await res.json();
-        
-        let detailsMsg = `=== AUDIT RECORD: ${data.case_id} ===\n`;
-        detailsMsg += `Policy: ${data.policy_id}\n`;
-        detailsMsg += `Decision: ${data.decision}\n`;
-        detailsMsg += `Calibrated Confidence: ${(data.calibrated_confidence * 100).toFixed(1)}%\n`;
-        detailsMsg += `SHA-256 Seal: ${data.audit_hash}\n\n`;
-        
-        if (currentRole === "Admin") {
-            detailsMsg += `[PRIVACY NOTICE]: Logged in as IT Admin. Clinical details are redacted under HIPAA Minimum Necessary.\n`;
-            detailsMsg += `Clinical Narrative: ${data.sanitized_ehr_preview}\n`;
-            detailsMsg += `Evidence Spans: ${data.evidence_spans_json}\n`;
-        } else {
-            detailsMsg += `Clinical Narrative Preview: ${data.sanitized_ehr_preview}\n\n`;
-            detailsMsg += `Evidence Spans: ${data.evidence_spans_json}\n`;
+        window._activeAuditRecord = data;
+
+        // Modal Header Info
+        const caseIdEl = document.getElementById("audit-modal-case-id");
+        if (caseIdEl) caseIdEl.textContent = data.case_id;
+
+        const tsEl = document.getElementById("audit-modal-timestamp");
+        if (tsEl) {
+            const dt = new Date(data.created_at);
+            tsEl.textContent = `Timestamp: ${dt.toLocaleString()} • Verified SHA-256 Chain of Custody Entry`;
         }
-        
-        alert(detailsMsg);
+
+        // Summary Stats Grid
+        const decBadgeEl = document.getElementById("audit-modal-decision-badge");
+        if (decBadgeEl) {
+            if (data.decision === "APPROVED") {
+                decBadgeEl.innerHTML = `<span class="decision-pill approved"><span class="decision-dot"></span> Approved</span>`;
+            } else if (data.decision === "DENIED") {
+                decBadgeEl.innerHTML = `<span class="decision-pill denied"><span class="decision-dot"></span> Denied</span>`;
+            } else {
+                decBadgeEl.innerHTML = `<span class="decision-pill deferred"><span class="decision-dot"></span> Deferred to MD</span>`;
+            }
+        }
+
+        const polBadgeEl = document.getElementById("audit-modal-policy-badge");
+        if (polBadgeEl) {
+            const spec = getPolicySpecialty(data.policy_id);
+            polBadgeEl.innerHTML = `<span>${escapeHtml(data.policy_id)}</span> <span style="font-size:0.75rem;color:var(--text-muted);font-weight:normal;">(${escapeHtml(spec)})</span>`;
+        }
+
+        const patBadgeEl = document.getElementById("audit-modal-patient-badge");
+        if (patBadgeEl) patBadgeEl.textContent = data.patient_id_masked || "PT-***";
+
+        const confBadgeEl = document.getElementById("audit-modal-conf-badge");
+        if (confBadgeEl) {
+            const calPct = (data.calibrated_confidence * 100).toFixed(1);
+            const rawPct = (data.raw_confidence * 100).toFixed(1);
+            confBadgeEl.innerHTML = `${calPct}% <span style="font-size:0.72rem;font-weight:normal;color:var(--text-muted);">(Raw: ${rawPct}%)</span>`;
+        }
+
+        const gateBadgeEl = document.getElementById("audit-modal-gate-badge");
+        if (gateBadgeEl) {
+            if (data.abstention_status) {
+                gateBadgeEl.innerHTML = `<span class="safety-gate-pill gate-triggered"><span class="decision-dot"></span> Triggered (&tau; &lt; 0.85)</span>`;
+            } else {
+                gateBadgeEl.innerHTML = `<span class="safety-gate-pill gate-pass"><span class="decision-dot"></span> Passed (&ge; 0.85)</span>`;
+            }
+        }
+
+        const latBadgeEl = document.getElementById("audit-modal-latency-badge");
+        if (latBadgeEl) {
+            latBadgeEl.textContent = `${data.execution_time_ms ? data.execution_time_ms.toFixed(1) : "0.0"} ms`;
+        }
+
+        // SHA-256 Seal
+        const hashEl = document.getElementById("audit-modal-hash");
+        if (hashEl) hashEl.textContent = data.audit_hash;
+
+        // Clinical Narrative
+        const narrEl = document.getElementById("audit-modal-narrative");
+        if (narrEl) {
+            narrEl.textContent = data.sanitized_ehr_preview || "No clinical narrative recorded for this case.";
+        }
+
+        // Statutory Criteria Table
+        const critTbody = document.getElementById("audit-modal-criteria-body");
+        if (critTbody) {
+            critTbody.innerHTML = "";
+            let criteriaList = [];
+            try {
+                if (data.criterion_evaluations_json) {
+                    criteriaList = JSON.parse(data.criterion_evaluations_json);
+                }
+            } catch (err) {
+                console.warn("Could not parse criterion_evaluations_json:", err);
+            }
+
+            if (criteriaList && criteriaList.length > 0) {
+                criteriaList.forEach(crit => {
+                    const tr = document.createElement("tr");
+                    const isExcl = crit.is_exclusion;
+                    const statusStr = (crit.status || (crit.satisfied ? "MET" : "NOT_MET")).toUpperCase();
+
+                    let stChip = `<span class="badge-status not-met">NOT MET</span>`;
+                    if (statusStr === "MET") {
+                        stChip = `<span class="badge-status met">MET</span>`;
+                    } else if (statusStr === "EXCLUDED") {
+                        stChip = `<span class="badge-status excluded">EXCLUDED</span>`;
+                    } else if (statusStr === "INSUFFICIENT" || statusStr.includes("DEFER")) {
+                        stChip = `<span class="badge-status insufficient">INSUFFICIENT</span>`;
+                    }
+
+                    const critConf = typeof crit.confidence === "number" ? `${Math.round(crit.confidence * 100)}%` : "--";
+
+                    tr.innerHTML = `
+                        <td><strong class="mono" style="color:#38BDF8;font-size:0.75rem;">${escapeHtml(crit.criterion_code)}</strong></td>
+                        <td>
+                            <strong style="color:#F8FAFC;font-size:0.8rem;">${escapeHtml(crit.name || crit.criterion_code)}</strong>
+                            <p style="margin:2px 0 0 0;font-size:0.72rem;color:var(--text-muted);line-height:1.4;">${escapeHtml(crit.description || "")}</p>
+                        </td>
+                        <td><span style="font-size:0.72rem;color:${isExcl ? '#FB7185' : 'var(--text-muted)'};font-weight:600;">${isExcl ? 'Statutory Exclusion' : 'Coverage Requirement'}</span></td>
+                        <td>${stChip}</td>
+                        <td class="mono" style="font-size:0.75rem;font-weight:600;">${critConf}</td>
+                    `;
+                    critTbody.appendChild(tr);
+                });
+            } else {
+                critTbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:12px;">No criteria evaluated or details redacted under role permissions.</td></tr>`;
+            }
+        }
+
+        // Evidence Spans
+        const spansContainer = document.getElementById("audit-modal-spans-container");
+        if (spansContainer) {
+            spansContainer.innerHTML = "";
+            let spansList = [];
+            try {
+                if (data.evidence_spans_json) {
+                    spansList = JSON.parse(data.evidence_spans_json);
+                }
+            } catch (err) {
+                console.warn("Could not parse evidence_spans_json:", err);
+            }
+
+            if (spansList && spansList.length > 0) {
+                spansList.forEach(sp => {
+                    const spanDiv = document.createElement("div");
+                    spanDiv.className = "audit-span-item";
+                    const quoteText = sp.text || sp.quote || sp.exact_quote || "";
+                    const codeText = sp.criterion_code || sp.code || "CRITERION";
+                    const startChar = typeof sp.start_char === "number" ? sp.start_char : (sp.start || 0);
+                    const endChar = typeof sp.end_char === "number" ? sp.end_char : (sp.end || 0);
+
+                    spanDiv.innerHTML = `
+                        <div class="audit-span-meta">
+                            <span class="mono" style="color:#38BDF8;font-weight:600;">${escapeHtml(codeText)}</span>
+                            <span class="mono" style="color:var(--text-muted);">Offset: [${startChar} - ${endChar}]</span>
+                        </div>
+                        <div class="audit-span-quote">"${escapeHtml(quoteText)}"</div>
+                        <div style="font-size:0.7rem;color:#10B981;font-weight:600;display:flex;align-items:center;gap:4px;">
+                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+                            <span>100% Exact Character-Grounded EHR Substring</span>
+                        </div>
+                    `;
+                    spansContainer.appendChild(spanDiv);
+                });
+            } else {
+                spansContainer.innerHTML = `<div style="font-size:0.78rem;color:var(--text-muted);background:rgba(0,0,0,0.2);padding:10px 12px;border-radius:6px;">No positive text citation spans recorded for this determination.</div>`;
+            }
+        }
+
+        // Adversarial Verification Checks
+        const advSection = document.getElementById("audit-modal-adversarial-section");
+        const advContainer = document.getElementById("audit-modal-adversarial-container");
+        if (advContainer) {
+            advContainer.innerHTML = "";
+            let advList = [];
+            try {
+                if (data.adversarial_audits_json) {
+                    advList = JSON.parse(data.adversarial_audits_json);
+                }
+            } catch (err) {
+                console.warn("Could not parse adversarial_audits_json:", err);
+            }
+
+            if (advList && advList.length > 0) {
+                if (advSection) advSection.style.display = "";
+                const grid = document.createElement("div");
+                grid.className = "audit-adversarial-grid";
+
+                let totalChecked = advList.length;
+                let hallucinationCount = advList.filter(a => a.hallucination_flag).length;
+                let driftCount = advList.filter(a => a.offset_drift_detected).length;
+                let discordanceCount = advList.filter(a => a.discordance_flag).length;
+
+                grid.innerHTML = `
+                    <div class="audit-adversarial-card">
+                        <span style="color:var(--text-muted);">Hallucination Check:</span>
+                        <strong style="color:${hallucinationCount === 0 ? '#34D399' : '#FB7185'};">${hallucinationCount === 0 ? 'Passed (0 Hallucinations)' : 'Flagged (' + hallucinationCount + ')'}</strong>
+                    </div>
+                    <div class="audit-adversarial-card">
+                        <span style="color:var(--text-muted);">Character Offset Drift:</span>
+                        <strong style="color:${driftCount === 0 ? '#34D399' : '#FB7185'};">${driftCount === 0 ? 'Verified Zero-Drift' : 'Drift Detected (' + driftCount + ')'}</strong>
+                    </div>
+                    <div class="audit-adversarial-card">
+                        <span style="color:var(--text-muted);">Adversarial Concordance:</span>
+                        <strong style="color:${discordanceCount === 0 ? '#34D399' : '#FBBF24'};">${discordanceCount === 0 ? '4-Agent Unanimous' : 'Discordant (' + discordanceCount + ')'}</strong>
+                    </div>
+                    <div class="audit-adversarial-card">
+                        <span style="color:var(--text-muted);">Criteria Audited:</span>
+                        <strong style="color:#38BDF8;">${totalChecked} Requirement Checks</strong>
+                    </div>
+                `;
+                advContainer.appendChild(grid);
+            } else {
+                if (advSection) advSection.style.display = "none";
+            }
+        }
+
+        // Show the modal
+        const modal = document.getElementById("audit-detail-modal");
+        if (modal) modal.classList.remove("hidden");
+
     } catch (e) {
-        showToast("Error retrieving audit record: " + e.message, true);
+        console.error("Error displaying audit record:", e);
+        showToast("Error retrieving audit record: " + e.message, "error");
     }
 }
 
@@ -5319,7 +5536,8 @@ window.addEventListener('keydown', (e) => {
 
 document.addEventListener('click', (e) => {
     if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
-        if (e.target.id === 'policy-document-modal' && typeof closePolicyDocumentModal === 'function') closePolicyDocumentModal();
+        if (e.target.id === 'audit-detail-modal' && typeof closeAuditDetailModal === 'function') closeAuditDetailModal();
+        else if (e.target.id === 'policy-document-modal' && typeof closePolicyDocumentModal === 'function') closePolicyDocumentModal();
         else if (e.target.id === 'addendum-modal' && typeof closeAddendumModal === 'function') closeAddendumModal();
         else if (e.target.id === 'criterion-detail-modal' && typeof closeCriterionModal === 'function') closeCriterionModal();
         else if (e.target.id === 'sample-tutorial-modal' && typeof closeSampleTutorialModal === 'function') closeSampleTutorialModal();

@@ -5658,7 +5658,8 @@ body {
 
 .policy-doc-crit-table tr:hover td {
     background: rgba(255, 255, 255, 0.02);
-}
+}
+
 
 
 /* ========================================================================== */
@@ -6264,4 +6265,185 @@ body {
     border-color: #38BDF8;
     color: #FFFFFF;
     transform: translateX(2px);
+}
+
+
+/* ========================================================================== */
+/* AUDIT RECORD FORENSIC INSPECTION MODAL STYLES                              */
+/* ========================================================================== */
+
+.audit-detail-modal-card {
+    max-width: 860px;
+    width: 95%;
+    max-height: min(92vh, 880px);
+    display: flex;
+    flex-direction: column;
+}
+
+.audit-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.audit-stat-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.audit-stat-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #94A3B8);
+}
+
+.audit-sha-card {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.audit-sha-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.audit-sha-value {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.76rem;
+    color: #38BDF8;
+    word-break: break-all;
+    user-select: all;
+}
+
+.audit-narrative-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.audit-narrative-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.audit-narrative-body {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-secondary, #CBD5E1);
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 6px;
+    padding: 10px 12px;
+    max-height: 120px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: inherit;
+}
+
+.audit-section-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.audit-section-title {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #38BDF8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.audit-modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.audit-modal-table th {
+    background: rgba(15, 23, 42, 0.8);
+    color: var(--text-muted, #94A3B8);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+}
+
+.audit-modal-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary, #CBD5E1);
+    vertical-align: top;
+}
+
+.audit-span-item {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 3px solid #10B981;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.audit-span-quote {
+    font-size: 0.8rem;
+    color: #F8FAFC;
+    font-style: italic;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.audit-span-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-muted, #94A3B8);
+}
+
+.audit-adversarial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px;
+}
+
+.audit-adversarial-card {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
 }
