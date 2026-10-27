@@ -557,6 +557,7 @@ function switchProfileModalTab(tabName) {
 
 function renderClinicianProfile() {
     const profile = getClinicianProfile();
+    resetAllIndividualEdits();
 
     const dispName = document.getElementById("disp-profile-name");
     const dispNpi = document.getElementById("disp-profile-npi");
@@ -587,82 +588,149 @@ function renderClinicianProfile() {
     if (addendumNpi) addendumNpi.value = profile.npi;
 }
 
-function enableClinicianProfileEditMode() {
+const INDIVIDUAL_PROFILE_FIELDS = ['name', 'npi', 'specialty', 'facility', 'pin'];
+
+function resetAllIndividualEdits() {
+    INDIVIDUAL_PROFILE_FIELDS.forEach(f => {
+        const viewRow = document.getElementById(`view-row-${f}`);
+        const editRow = document.getElementById(`edit-row-${f}`);
+        if (viewRow) viewRow.classList.remove("hidden");
+        if (editRow) editRow.classList.add("hidden");
+    });
+}
+
+function openIndividualEdit(fieldName) {
     const profile = getClinicianProfile();
+    resetAllIndividualEdits();
 
-    const inpName = document.getElementById("inp-profile-name");
-    const inpNpi = document.getElementById("inp-profile-npi");
-    const inpSpec = document.getElementById("inp-profile-specialty");
-    const inpFac = document.getElementById("inp-profile-facility");
-    const inpPin = document.getElementById("inp-profile-pin");
+    const viewRow = document.getElementById(`view-row-${fieldName}`);
+    const editRow = document.getElementById(`edit-row-${fieldName}`);
+    if (viewRow) viewRow.classList.add("hidden");
+    if (editRow) editRow.classList.remove("hidden");
 
-    if (inpName) inpName.value = profile.full_name;
-    if (inpNpi) inpNpi.value = profile.npi;
-    if (inpSpec) inpSpec.value = profile.specialty;
-    if (inpFac) inpFac.value = profile.facility;
-    if (inpPin) inpPin.value = getClinicianSigningPin();
+    if (fieldName === "name") {
+        const inp = document.getElementById("inp-profile-name");
+        if (inp) {
+            inp.value = profile.full_name || "";
+            inp.focus();
+        }
+    } else if (fieldName === "npi") {
+        const inp = document.getElementById("inp-profile-npi");
+        if (inp) {
+            inp.value = profile.npi || "";
+            inp.focus();
+        }
+    } else if (fieldName === "specialty") {
+        const inp = document.getElementById("inp-profile-specialty");
+        if (inp) {
+            inp.value = profile.specialty || "";
+            inp.focus();
+        }
+    } else if (fieldName === "facility") {
+        const inp = document.getElementById("inp-profile-facility");
+        if (inp) {
+            inp.value = profile.facility || "";
+            inp.focus();
+        }
+    } else if (fieldName === "pin") {
+        const inp = document.getElementById("inp-profile-pin");
+        if (inp) {
+            inp.value = "";
+            inp.type = "password";
+            inp.focus();
+        }
+    }
+}
 
-    const viewBox = document.getElementById("profile-creds-view-box");
-    const editBox = document.getElementById("profile-creds-edit-box");
-    if (viewBox) viewBox.classList.add("hidden");
-    if (editBox) editBox.classList.remove("hidden");
-
-    if (inpName) inpName.focus();
+function cancelIndividualEdit(fieldName) {
+    const viewRow = document.getElementById(`view-row-${fieldName}`);
+    const editRow = document.getElementById(`edit-row-${fieldName}`);
+    if (viewRow) viewRow.classList.remove("hidden");
+    if (editRow) editRow.classList.add("hidden");
 }
 
 function cancelClinicianProfileEdit() {
-    const viewBox = document.getElementById("profile-creds-view-box");
-    const editBox = document.getElementById("profile-creds-edit-box");
-    if (viewBox) viewBox.classList.remove("hidden");
-    if (editBox) editBox.classList.add("hidden");
+    resetAllIndividualEdits();
 }
 
-function saveClinicianProfileChanges() {
-    const inpName = document.getElementById("inp-profile-name");
-    const inpNpi = document.getElementById("inp-profile-npi");
-    const inpSpec = document.getElementById("inp-profile-specialty");
-    const inpFac = document.getElementById("inp-profile-facility");
-    const inpPin = document.getElementById("inp-profile-pin");
+function saveIndividualEdit(fieldName) {
+    const profile = getClinicianProfile();
 
-    const name = inpName ? inpName.value.trim() : "";
-    const npi = inpNpi ? inpNpi.value.trim() : "";
-    const specialty = inpSpec ? inpSpec.value.trim() : "";
-    const facility = inpFac ? inpFac.value.trim() : "";
-    const pin = inpPin ? inpPin.value.trim() : "";
-
-    if (!name || name.length < 3) {
-        showToast("Please enter a valid physician legal name.", "error");
-        if (inpName) inpName.focus();
-        return;
+    if (fieldName === "name") {
+        const inp = document.getElementById("inp-profile-name");
+        const val = inp ? inp.value.trim() : "";
+        if (!val || val.length < 3) {
+            showToast("Please enter a valid legal physician name.", true);
+            if (inp) inp.focus();
+            return;
+        }
+        profile.full_name = val;
+        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
+        renderClinicianProfile();
+        cancelIndividualEdit("name");
+        showToast("Treating physician legal name updated.");
+    } else if (fieldName === "npi") {
+        const inp = document.getElementById("inp-profile-npi");
+        const val = inp ? inp.value.trim() : "";
+        if (!/^\d{10}$/.test(val)) {
+            showToast("CMS National Provider Identifier (NPI) must be exactly 10 digits.", true);
+            if (inp) inp.focus();
+            return;
+        }
+        profile.npi = val;
+        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
+        renderClinicianProfile();
+        cancelIndividualEdit("npi");
+        showToast("10-Digit CMS NPI updated.");
+    } else if (fieldName === "specialty") {
+        const inp = document.getElementById("inp-profile-specialty");
+        const val = inp ? inp.value.trim() : "";
+        if (!val) {
+            showToast("Please enter a clinical specialty.", true);
+            if (inp) inp.focus();
+            return;
+        }
+        profile.specialty = val;
+        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
+        renderClinicianProfile();
+        cancelIndividualEdit("specialty");
+        showToast("Clinical specialty updated.");
+    } else if (fieldName === "facility") {
+        const inp = document.getElementById("inp-profile-facility");
+        const val = inp ? inp.value.trim() : "";
+        if (!val) {
+            showToast("Please enter a practice / healthcare facility.", true);
+            if (inp) inp.focus();
+            return;
+        }
+        profile.facility = val;
+        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
+        renderClinicianProfile();
+        cancelIndividualEdit("facility");
+        showToast("Healthcare facility affiliation updated.");
+    } else if (fieldName === "pin") {
+        const inp = document.getElementById("inp-profile-pin");
+        const val = inp ? inp.value.trim() : "";
+        if (!/^\d{4}$/.test(val)) {
+            showToast("Clinician Signing PIN must be exactly 4 numeric digits.", true);
+            if (inp) inp.focus();
+            return;
+        }
+        localStorage.setItem("clinician_signing_pin", val);
+        renderClinicianProfile();
+        cancelIndividualEdit("pin");
+        showToast("Clinician signing PIN updated successfully.");
     }
+}
 
-    if (!/^\d{10}$/.test(npi)) {
-        showToast("CMS National Provider Identifier (NPI) must be exactly 10 numeric digits.", "error");
-        if (inpNpi) inpNpi.focus();
-        return;
+function togglePinInputVisibility(inputId) {
+    const inp = document.getElementById(inputId);
+    if (!inp) return;
+    if (inp.type === "password") {
+        inp.type = "text";
+    } else {
+        inp.type = "password";
     }
-
-    if (pin && !/^\d{4}$/.test(pin)) {
-        showToast("Clinician Signing PIN must be exactly 4 numeric digits.", "error");
-        if (inpPin) inpPin.focus();
-        return;
-    }
-
-    const updatedProfile = {
-        full_name: name,
-        npi: npi,
-        specialty: specialty || "General Medicine",
-        facility: facility || "Outpatient Clinical Center"
-    };
-
-    localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(updatedProfile));
-    if (pin) {
-        localStorage.setItem("clinician_signing_pin", pin);
-    }
-
-    renderClinicianProfile();
-    cancelClinicianProfileEdit();
-    showToast("Clinician personal credentials updated and synchronized across claim workflows.", "success");
 }
 
 function updateUserBadge() {

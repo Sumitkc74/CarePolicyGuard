@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261026_14">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261027_01">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -1570,79 +1570,125 @@
             </div>
 
             <div class="modal-body profile-modal-body">
-                <!-- TAB 1: CLINICIAN CREDENTIALS & PERSONAL DETAILS -->
+                <!-- TAB 1: CLINICIAN CREDENTIALS & PERSONAL DETAILS (INDIVIDUALLY EDITABLE) -->
                 <div id="profile-tab-content-credentials">
-                    <!-- VIEW MODE -->
-                    <div class="session-profile-card" id="profile-creds-view-box">
+                    <div class="session-profile-card" id="profile-creds-container">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <span class="med-icon icon-sm icon-green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>
                                 <span style="font-size:0.85rem;font-weight:600;color:#F8FAFC;">Practitioner Identity (Legal Sign-Off)</span>
                             </div>
-                            <button type="button" class="btn-subtle-pill" onclick="enableClinicianProfileEditMode()">
-                                Edit Details
-                            </button>
+                            <span style="font-size:0.75rem;color:var(--text-muted);">Click Edit to update any detail</span>
                         </div>
 
-                        <div class="profile-row">
-                            <span class="profile-k">Legal Treating Physician:</span>
-                            <strong class="profile-v" id="disp-profile-name" style="color:#F8FAFC;">Dr. Eleanor Vance, MD</strong>
-                        </div>
-                        <div class="profile-row">
-                            <span class="profile-k">10-Digit CMS NPI:</span>
-                            <strong class="profile-v mono" id="disp-profile-npi" style="color:#38BDF8;">1043256787</strong>
-                        </div>
-                        <div class="profile-row">
-                            <span class="profile-k">Primary Specialty:</span>
-                            <span class="profile-v" id="disp-profile-specialty">Cardiology / Electrophysiology</span>
-                        </div>
-                        <div class="profile-row">
-                            <span class="profile-k">Healthcare Facility:</span>
-                            <span class="profile-v" id="disp-profile-facility">MetroHealth Heart &amp; Vascular Institute</span>
-                        </div>
-                        <div class="profile-row">
-                            <span class="profile-k">Signing PIN:</span>
-                            <span class="profile-v"><span class="mono">&bull;&bull;&bull;&bull;</span> <span style="font-size:0.75rem;color:#10B981;font-weight:600;">(4-Digit Attestation Active)</span></span>
-                        </div>
-                    </div>
-
-                    <!-- EDIT MODE -->
-                    <div class="session-profile-card hidden" id="profile-creds-edit-box">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);">
-                            <strong style="color:#38BDF8;font-size:0.85rem;">Edit Clinician Personal Details</strong>
-                            <span style="font-size:0.72rem;color:var(--text-muted);">Syncs across claims, addenda &amp; EHR signatures</span>
-                        </div>
-
-                        <div class="profile-edit-grid">
-                            <div class="profile-field-group">
-                                <label class="profile-field-label" for="inp-profile-name">Legal Physician Name &amp; Title</label>
-                                <input type="text" id="inp-profile-name" class="form-input" placeholder="e.g. Dr. Eleanor Vance, MD" />
+                        <!-- 1. LEGAL PHYSICIAN NAME -->
+                        <div class="profile-item-row" id="item-row-name">
+                            <div class="profile-row-view" id="view-row-name">
+                                <div class="profile-row-content">
+                                    <span class="profile-k">Legal Treating Physician:</span>
+                                    <strong class="profile-v" id="disp-profile-name" style="color:#F8FAFC;">Dr. Eleanor Vance, MD</strong>
+                                </div>
+                                <button type="button" class="btn-item-edit" onclick="openIndividualEdit('name')">Edit</button>
                             </div>
+                            <div class="profile-row-edit hidden" id="edit-row-name">
+                                <label class="profile-field-label" for="inp-profile-name">Legal Treating Physician Name &amp; Title</label>
+                                <div class="inline-edit-group">
+                                    <input type="text" id="inp-profile-name" class="form-input" placeholder="e.g. Dr. Eleanor Vance, MD" />
+                                    <div class="inline-edit-actions">
+                                        <button type="button" class="btn-secondary btn-xs" onclick="cancelIndividualEdit('name')">Cancel</button>
+                                        <button type="button" class="btn-primary btn-xs" onclick="saveIndividualEdit('name')">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                            <div class="profile-field-group">
+                        <!-- 2. 10-DIGIT CMS NPI -->
+                        <div class="profile-item-row" id="item-row-npi">
+                            <div class="profile-row-view" id="view-row-npi">
+                                <div class="profile-row-content">
+                                    <span class="profile-k">10-Digit CMS NPI:</span>
+                                    <strong class="profile-v mono" id="disp-profile-npi" style="color:#38BDF8;">1043256787</strong>
+                                </div>
+                                <button type="button" class="btn-item-edit" onclick="openIndividualEdit('npi')">Edit</button>
+                            </div>
+                            <div class="profile-row-edit hidden" id="edit-row-npi">
                                 <label class="profile-field-label" for="inp-profile-npi">10-Digit CMS National Provider Identifier (NPI)</label>
-                                <input type="text" id="inp-profile-npi" class="form-input mono" maxlength="10" placeholder="10 numeric digits (e.g. 1043256787)" />
-                            </div>
-
-                            <div class="profile-field-group">
-                                <label class="profile-field-label" for="inp-profile-specialty">Clinical Specialty</label>
-                                <input type="text" id="inp-profile-specialty" class="form-input" placeholder="e.g. Cardiology / Electrophysiology" />
-                            </div>
-
-                            <div class="profile-field-group">
-                                <label class="profile-field-label" for="inp-profile-facility">Practice / Healthcare Facility</label>
-                                <input type="text" id="inp-profile-facility" class="form-input" placeholder="e.g. MetroHealth Heart &amp; Vascular Institute" />
-                            </div>
-
-                            <div class="profile-field-group">
-                                <label class="profile-field-label" for="inp-profile-pin">Clinician Signing PIN (4 Digits)</label>
-                                <input type="password" id="inp-profile-pin" class="form-input mono" maxlength="4" placeholder="4 digits" />
+                                <div class="inline-edit-group">
+                                    <input type="text" id="inp-profile-npi" class="form-input mono" maxlength="10" placeholder="10 numeric digits (e.g. 1043256787)" />
+                                    <div class="inline-edit-actions">
+                                        <button type="button" class="btn-secondary btn-xs" onclick="cancelIndividualEdit('npi')">Cancel</button>
+                                        <button type="button" class="btn-primary btn-xs" onclick="saveIndividualEdit('npi')">Save</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08);">
-                            <button type="button" class="btn-secondary" onclick="cancelClinicianProfileEdit()">Cancel</button>
-                            <button type="button" class="btn-primary" onclick="saveClinicianProfileChanges()">Save Changes</button>
+                        <!-- 3. PRIMARY SPECIALTY -->
+                        <div class="profile-item-row" id="item-row-specialty">
+                            <div class="profile-row-view" id="view-row-specialty">
+                                <div class="profile-row-content">
+                                    <span class="profile-k">Primary Specialty:</span>
+                                    <span class="profile-v" id="disp-profile-specialty">Cardiology / Electrophysiology</span>
+                                </div>
+                                <button type="button" class="btn-item-edit" onclick="openIndividualEdit('specialty')">Edit</button>
+                            </div>
+                            <div class="profile-row-edit hidden" id="edit-row-specialty">
+                                <label class="profile-field-label" for="inp-profile-specialty">Primary Specialty</label>
+                                <div class="inline-edit-group">
+                                    <input type="text" id="inp-profile-specialty" class="form-input" placeholder="e.g. Cardiology / Electrophysiology" />
+                                    <div class="inline-edit-actions">
+                                        <button type="button" class="btn-secondary btn-xs" onclick="cancelIndividualEdit('specialty')">Cancel</button>
+                                        <button type="button" class="btn-primary btn-xs" onclick="saveIndividualEdit('specialty')">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. HEALTHCARE FACILITY -->
+                        <div class="profile-item-row" id="item-row-facility">
+                            <div class="profile-row-view" id="view-row-facility">
+                                <div class="profile-row-content">
+                                    <span class="profile-k">Healthcare Facility:</span>
+                                    <span class="profile-v" id="disp-profile-facility">MetroHealth Heart &amp; Vascular Institute</span>
+                                </div>
+                                <button type="button" class="btn-item-edit" onclick="openIndividualEdit('facility')">Edit</button>
+                            </div>
+                            <div class="profile-row-edit hidden" id="edit-row-facility">
+                                <label class="profile-field-label" for="inp-profile-facility">Healthcare Facility / Practice</label>
+                                <div class="inline-edit-group">
+                                    <input type="text" id="inp-profile-facility" class="form-input" placeholder="e.g. MetroHealth Heart &amp; Vascular Institute" />
+                                    <div class="inline-edit-actions">
+                                        <button type="button" class="btn-secondary btn-xs" onclick="cancelIndividualEdit('facility')">Cancel</button>
+                                        <button type="button" class="btn-primary btn-xs" onclick="saveIndividualEdit('facility')">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. SIGNING PIN -->
+                        <div class="profile-item-row" id="item-row-pin">
+                            <div class="profile-row-view" id="view-row-pin">
+                                <div class="profile-row-content">
+                                    <span class="profile-k">Signing PIN:</span>
+                                    <span class="profile-v"><span class="mono">&bull;&bull;&bull;&bull;</span> <span style="font-size:0.75rem;color:#10B981;font-weight:600;">(4-Digit Attestation Active)</span></span>
+                                </div>
+                                <button type="button" class="btn-item-edit" onclick="openIndividualEdit('pin')">Change PIN</button>
+                            </div>
+                            <div class="profile-row-edit hidden" id="edit-row-pin">
+                                <label class="profile-field-label" for="inp-profile-pin">New Clinician Signing PIN (4 Digits)</label>
+                                <div class="inline-edit-group">
+                                    <div style="position:relative;flex:1;">
+                                        <input type="password" id="inp-profile-pin" class="form-input mono" maxlength="4" placeholder="4 digits" style="padding-right:36px;" />
+                                        <button type="button" class="pin-toggle-visibility-btn" onclick="togglePinInputVisibility('inp-profile-pin')" title="Toggle visibility" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#94a3b8;cursor:pointer;padding:4px;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                        </button>
+                                    </div>
+                                    <div class="inline-edit-actions">
+                                        <button type="button" class="btn-secondary btn-xs" onclick="cancelIndividualEdit('pin')">Cancel</button>
+                                        <button type="button" class="btn-primary btn-xs" onclick="saveIndividualEdit('pin')">Save</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2412,7 +2458,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261026_14"></script>
+    <script src="/static/js/app.js?v=20261027_01"></script>
 </body>
 </html>
 
