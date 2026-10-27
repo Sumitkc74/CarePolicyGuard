@@ -15,6 +15,25 @@ const DEMO_CREDENTIALS = {
     admin: { username: "admin@carepolicyguard.med", password: "AdminGuard!2026", role: "Admin" }
 };
 
+const POLICY_SPECIALTY_MAP = {
+    "NCD-20.4": "Cardiology",
+    "LCD-L33829": "Pulmonology",
+    "NCD-20.29": "Wound Care",
+    "NCD-240.2": "Pulmonology"
+};
+
+function getPolicySpecialty(policyId) {
+    if (!policyId) return "Medicare Part B";
+    try {
+        if (typeof POLICY_SPECIALTY_MAP !== "undefined" && POLICY_SPECIALTY_MAP[policyId]) {
+            return POLICY_SPECIALTY_MAP[policyId];
+        }
+    } catch (e) {
+        // Fallback
+    }
+    return "Medicare Part B";
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     await checkSessionOrShowGate();
     setupUploadDropzone();
@@ -4950,16 +4969,7 @@ let currentBatchRoster = [];
 // TAB 4: MULTI-PATIENT BATCH ROSTER ADJUDICATION
 // =============================================================================
 
-const POLICY_SPECIALTY_MAP = {
-    "NCD-20.4": "Cardiology",
-    "LCD-L33829": "Pulmonology",
-    "NCD-20.29": "Wound Care",
-    "NCD-240.2": "Pulmonology"
-};
-
-function getPolicySpecialty(policyId) {
-    return POLICY_SPECIALTY_MAP[policyId] || "Medicare Part B";
-}
+// (POLICY_SPECIALTY_MAP moved to top of app.js)
 
 let currentBatchCohortType = 'cardiology';
 let currentBatchFilter = 'ALL';
