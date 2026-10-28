@@ -19,53 +19,56 @@ flowchart LR
     %% -------------------------------------------------------------
     %% STYLES & THEMING FOR MAXIMUM READABILITY
     %% -------------------------------------------------------------
-    classDef clientStyle fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
-    classDef gatewayStyle fill:#0F172A,stroke:#818CF8,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
-    classDef agentStyle fill:#1E1B4B,stroke:#A855F7,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
-    classDef gateStyle fill:#312E81,stroke:#C084FC,stroke-width:3px,color:#FFFFFF,font-size:15px,font-weight:bold;
-    classDef approveStyle fill:#064E3B,stroke:#10B981,stroke-width:2px,color:#ECFDF5,font-size:15px,font-weight:bold;
-    classDef denyStyle fill:#7F1D1D,stroke:#F43F5E,stroke-width:2px,color:#FFF1F2,font-size:15px,font-weight:bold;
-    classDef deferStyle fill:#78350F,stroke:#F59E0B,stroke-width:2px,color:#FEF3C7,font-size:15px,font-weight:bold;
-    classDef dataStyle fill:#0F172A,stroke:#06B6D4,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
+    classDef clientStyle fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC,font-size:14px,font-weight:bold;
+    classDef gatewayStyle fill:#0F172A,stroke:#818CF8,stroke-width:2px,color:#F8FAFC,font-size:14px,font-weight:bold;
+    classDef ragStyle fill:#2E1065,stroke:#E879F9,stroke-width:2px,color:#FDF4FF,font-size:14px,font-weight:bold;
+    classDef agentStyle fill:#1E1B4B,stroke:#A855F7,stroke-width:2px,color:#F8FAFC,font-size:14px,font-weight:bold;
+    classDef gateStyle fill:#312E81,stroke:#C084FC,stroke-width:3px,color:#FFFFFF,font-size:14px,font-weight:bold;
+    classDef approveStyle fill:#064E3B,stroke:#10B981,stroke-width:2px,color:#ECFDF5,font-size:14px,font-weight:bold;
+    classDef denyStyle fill:#7F1D1D,stroke:#F43F5E,stroke-width:2px,color:#FFF1F2,font-size:14px,font-weight:bold;
+    classDef deferStyle fill:#78350F,stroke:#F59E0B,stroke-width:2px,color:#FEF3C7,font-size:14px,font-weight:bold;
+    classDef dataStyle fill:#0F172A,stroke:#06B6D4,stroke-width:2px,color:#F8FAFC,font-size:14px,font-weight:bold;
 
-    subgraph C1 ["1. USER INTERFACES"]
+    subgraph C1 ["1. CLINICAL CLIENTS"]
         Clinician["Clinician Workspace"]:::clientStyle
         Batch["Batch Roster Engine"]:::clientStyle
         Auditor["Auditor Portal"]:::clientStyle
     end
 
-    subgraph C2 ["2. SECURE GATEWAY"]
+    subgraph C2 ["2. SECURE API GATEWAY"]
         API["FastAPI Gateway"]:::gatewayStyle
         Auth["Auth & MFA Guard"]:::gatewayStyle
         HIPAA["HIPAA PHI Masker"]:::gatewayStyle
     end
 
-    subgraph C3 ["3. MULTI-AGENT PIPELINE"]
-        Agent1["1. Policy Retrieval"]:::agentStyle
+    subgraph C3 ["3. HYBRID RAG & MULTI-AGENT PIPELINE"]
+        CMS_DB[("CMS Policy Rules<br/>(NCDs & LCDs)")]:::ragStyle
+        RAG["1. Hybrid RAG Engine<br/>(Lexical-Semantic Search)"]:::ragStyle
         Agent2["2. Criteria Evaluator"]:::agentStyle
         Agent3["3. Adversarial Verifier"]:::agentStyle
         Gate{"4. Abstention Gate<br/>(tau >= 0.85)"}:::gateStyle
         Agent5["5. Defense Packet Generator"]:::agentStyle
     end
 
-    subgraph C4 ["4. DECISIONS"]
+    subgraph C4 ["4. ADJUDICATION OUTCOMES"]
         Approved["APPROVED"]:::approveStyle
         Denied["DENIED"]:::denyStyle
         Deferred["DEFERRED TO MD"]:::deferStyle
     end
 
     subgraph C5 ["5. AUDIT & CLEARINGHOUSE"]
-        DB[("Relational DB")]:::dataStyle
-        Ledger["SHA-256 Ledger"]:::dataStyle
+        DB[("Relational Database")]:::dataStyle
+        Ledger["SHA-256 Audit Ledger"]:::dataStyle
         CMS["CMS MAC Clearinghouse"]:::dataStyle
     end
 
     C1 --> API
     API --> Auth
     Auth --> HIPAA
-    HIPAA --> Agent1
+    HIPAA --> RAG
 
-    Agent1 --> Agent2
+    CMS_DB --> RAG
+    RAG --> Agent2
     Agent2 --> Agent3
     Agent3 --> Gate
 
