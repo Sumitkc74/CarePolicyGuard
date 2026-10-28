@@ -807,13 +807,32 @@ def run_benchmark():
 # =============================================================================
 
 def extract_text_from_upload(filename: str, content: bytes) -> str:
-    """Extracts raw clinical text from uploaded .txt, .pdf, .docx, or image files (.png, .jpg, .jpeg, .tiff, .bmp, .webp)."""
+    """Extracts raw clinical text from uploaded .txt, .pdf, .docx, or image files (.png, .jpg, .jpeg, .tiff, .bmp, .webp), with multi-page and OCR support for scanned documents."""
     fn = filename.lower()
     if fn.endswith(".pdf"):
         import pypdf
         reader = pypdf.PdfReader(io.BytesIO(content))
-        pages_text = [page.extract_text() or "" for page in reader.pages]
-        return "\n".join(pages_text).strip()
+        pages_text = []
+        for i, page in enumerate(reader.pages):
+            page_str = (page.extract_text() or "").strip()
+            # If page text is missing or minimal (scanned image in PDF), run RapidOCR on page images
+            if len(page_str) < 20 and getattr(page, "images", None):
+                ocr_lines = []
+                try:
+                    from rapidocr_onnxruntime import RapidOCR
+                    ocr_engine = RapidOCR()
+                    for img in page.images:
+                        res, _ = ocr_engine(img.data)
+                        if res:
+                            ocr_lines.extend([item[1] for item in res if item and len(item) > 1])
+                except Exception as ocr_e:
+                    logger.warning(f"RapidOCR failed for scanned PDF page {i+1}: {ocr_e}")
+                if ocr_lines:
+                    page_str = "\n".join(ocr_lines).strip()
+            
+            if page_str:
+                pages_text.append(f"--- [Page {i + 1}] ---\n{page_str}" if len(reader.pages) > 1 else page_str)
+        return "\n\n".join(pages_text).strip()
     elif fn.endswith(".docx"):
         import docx
         doc = docx.Document(io.BytesIO(content))
@@ -851,23 +870,41 @@ def extract_text_from_upload(filename: str, content: bytes) -> str:
 
 @api_router.post("/extract-text", summary="Extract Clinical Text from Document or Image for Confirmation")
 async def extract_clinical_text(
-    file: UploadFile = File(...),
+    file: Optional[UploadFile] = File(None),
+    files: Optional[List[UploadFile]] = File(None),
     db: Session = Depends(get_db)
 ):
     """
-    Extracts text from uploaded PDF, DOCX, TXT, or Image (OCR) and suggests governing policy
-    so the clinician can review, edit, and confirm before moving to Step 2.
-    Enforces maximum upload limits and filename sanitization.
+    Extracts text from uploaded PDF, DOCX, TXT, or Image (OCR) and suggests governing policy.
+    Supports single files, multi-page PDFs, and multiple scanned pages uploaded together.
     """
-    content = await file.read()
-    safe_filename = validate_and_sanitize_upload(file.filename, content)
+    upload_list: List[UploadFile] = []
+    if files:
+        upload_list.extend(files)
+    if file and file not in upload_list:
+        upload_list.append(file)
+    if not upload_list:
+        raise HTTPException(status_code=400, detail="No clinical files uploaded.")
 
-    try:
-        extracted_text = extract_text_from_upload(safe_filename, content)
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to extract document text: {str(e)}")
+    extracted_parts = []
+    safe_filenames = []
+    for idx, f in enumerate(upload_list, 1):
+        content = await f.read()
+        safe_filename = validate_and_sanitize_upload(f.filename, content)
+        safe_filenames.append(safe_filename)
+        try:
+            txt = extract_text_from_upload(safe_filename, content)
+            if len(upload_list) > 1:
+                extracted_parts.append(f"--- [Document {idx}: {safe_filename}] ---\n{txt}")
+            else:
+                extracted_parts.append(txt)
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to extract text from {safe_filename}: {str(e)}")
+
+    extracted_text = "\n\n".join(extracted_parts).strip()
+    primary_filename = ", ".join(safe_filenames) if len(safe_filenames) > 1 else safe_filenames[0]
 
     # Verify physician name, signature, and clinical authenticity
     auth_check = verify_clinical_document_authenticity(extracted_text)
@@ -882,7 +919,8 @@ async def extract_clinical_text(
         policy_title = candidates[0].get("title", suggested_policy)
 
     return {
-        "filename": safe_filename,
+        "filename": primary_filename,
+        "files_count": len(upload_list),
         "character_count": len(extracted_text),
         "extracted_text": extracted_text,
         "suggested_policy_id": suggested_policy,

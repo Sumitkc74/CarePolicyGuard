@@ -1733,8 +1733,8 @@ function syncPastedNoteToInput() {
 }
 
 async function handleActualFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     currentNoteMode = "actual";
     const banner = document.getElementById("active-note-badge-banner");
@@ -1742,11 +1742,19 @@ async function handleActualFileUpload(event) {
     const titleElem = document.getElementById("actual-upload-title");
     const subElem = document.getElementById("actual-upload-subtitle");
 
-    if (titleElem) titleElem.textContent = `Reading: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`;
-    if (subElem) subElem.textContent = "Extracting text and running OCR on document...";
+    if (files.length === 1) {
+        const file = files[0];
+        if (titleElem) titleElem.textContent = `Reading: ${file.name} (${(file.size / 1024).toFixed(1)} KB)...`;
+        if (subElem) subElem.textContent = "Extracting multi-page text and running OCR on document...";
+    } else {
+        if (titleElem) titleElem.textContent = `Reading ${files.length} scanned pages/documents...`;
+        if (subElem) subElem.textContent = "Extracting and merging multi-page clinical notes with RapidOCR...";
+    }
 
     const formData = new FormData();
-    formData.append("file", file);
+    for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+    }
 
     try {
         const res = await fetch("/api/v1/extract-text", {
@@ -4998,6 +5006,74 @@ let currentBatchRoster = [];
 
 let currentBatchCohortType = 'cardiology';
 let currentBatchFilter = 'ALL';
+
+
+async function handleBatchRosterFileUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    showToast(`Uploading ${files.length} roster file(s) for clinical extraction...`, "info");
+    const uploadBtn = document.getElementById("btn-cohort-upload");
+    const origHtml = uploadBtn ? uploadBtn.innerHTML : "";
+    if (uploadBtn) {
+        uploadBtn.classList.add("active");
+        uploadBtn.innerHTML = `<span class="med-icon icon-xs spinning"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-linecap="round"></circle></svg></span> <span>Extracting...</span>`;
+    }
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+    }
+
+    try {
+        const res = await fetch("/api/v1/adjudicate/batch/upload-parse", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.detail || `Upload failed with status ${res.status}`);
+        }
+
+        const data = await res.json();
+        currentBatchRoster = data.items || [];
+
+        // Deactivate other cohort pills
+        document.querySelectorAll(".cohort-pill-btn").forEach(b => b.classList.remove("active"));
+        if (uploadBtn) {
+            uploadBtn.classList.add("active");
+            uploadBtn.innerHTML = `<span>Uploaded (${currentBatchRoster.length})</span>`;
+        }
+
+        // Update roster title & counter
+        const titleEl = document.getElementById("batch-roster-title");
+        if (titleEl) titleEl.textContent = data.batch_name || `Custom Uploaded Cohort (${currentBatchRoster.length} Patients)`;
+        const totalEl = document.getElementById("batch-total-count");
+        if (totalEl) totalEl.textContent = currentBatchRoster.length;
+        const subEl = document.getElementById("batch-cohort-name-sub");
+        if (subEl) subEl.textContent = "Custom Ingested Cohort";
+
+        // Reset metrics
+        const appEl = document.getElementById("batch-approved-count");
+        const denEl = document.getElementById("batch-denied-count");
+        const defEl = document.getElementById("batch-deferred-count");
+        const latEl = document.getElementById("batch-latency-count");
+        if (appEl) appEl.textContent = "--";
+        if (denEl) denEl.textContent = "--";
+        if (defEl) defEl.textContent = "--";
+        if (latEl) latEl.textContent = "-- ms";
+
+        renderBatchRosterTable(currentBatchRoster);
+        showToast(`Successfully extracted ${currentBatchRoster.length} patient cases into roster!`, "success");
+    } catch (err) {
+        console.error("Batch roster upload error:", err);
+        showToast(`Failed to parse batch files: ${err.message}`, "error");
+        if (uploadBtn) uploadBtn.innerHTML = origHtml;
+    } finally {
+        event.target.value = "";
+    }
+}
 
 function switchBatchCohort(cohortType) {
     currentBatchCohortType = cohortType;

@@ -362,12 +362,12 @@
                     <div class="clinical-note-input-container">
                         <!-- UPLOAD DROPZONE -->
                         <div class="actual-upload-card" onclick="document.getElementById('actual-file-input').click()">
-                            <input type="file" id="actual-file-input" style="display: none;" accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.tiff,.bmp,.webp" onchange="handleActualFileUpload(event)">
+                            <input type="file" id="actual-file-input" style="display: none;" multiple accept=".pdf,.docx,.txt,.md,.png,.jpg,.jpeg,.tiff,.bmp,.webp" onchange="handleActualFileUpload(event)">
                             <span class="med-icon icon-lg icon-cyan">
                                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                             </span>
-                            <h3 id="actual-upload-title">Drop clinical note or image (or browse)</h3>
-                            <p id="actual-upload-subtitle">PDF, Word, Text, or Scanned Image</p>
+                            <h3 id="actual-upload-title">Drop clinical notes, multi-page PDF, or scanned pages</h3>
+                            <p id="actual-upload-subtitle">Multi-Page PDF, Scanned Images (RapidOCR), Word, or select multiple pages</p>
                         </div>
 
                         <!-- OR PASTE NOTE DIRECTLY -->
@@ -1192,6 +1192,11 @@
                                 <span>Mixed Specialty</span>
                                 <span class="cohort-pill-count">3</span>
                             </button>
+                            <button type="button" class="cohort-pill-btn" id="btn-cohort-upload" onclick="document.getElementById('batch-upload-file-input').click()" title="Upload CSV spreadsheet, JSON roster, or multiple scanned charts">
+                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
+                                <span>Upload Roster (CSV / PDFs)</span>
+                            </button>
+                            <input type="file" id="batch-upload-file-input" style="display:none;" multiple accept=".csv,.json,.pdf,.docx,.txt,.png,.jpg,.jpeg,.tiff,.bmp" onchange="handleBatchRosterFileUpload(event)" />
                         </div>
                         <button class="btn-batch-run" id="btn-run-batch-adjudication" onclick="executeBatchAdjudication()">
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
@@ -2458,6 +2463,6 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261027_04" defer></script>
+    <script src="/static/js/app.js?v=20261027_05" defer></script>
 </body>
 </html>
