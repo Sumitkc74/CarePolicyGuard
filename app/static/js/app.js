@@ -3039,40 +3039,54 @@ async function loadAuditLogs() {
             purgeAllBtn.style.display = (currentRole === "Admin") ? "inline-flex" : "none";
         }
 
+        const isDismissed = localStorage.getItem("carepolicyguard_audit_banner_dismissed_" + currentRole) === "true";
+
         if (bannerElem) {
-            if (currentRole === "Admin") {
-                bannerElem.style.background = "rgba(245, 158, 11, 0.12)";
-                bannerElem.style.border = "1px solid rgba(245, 158, 11, 0.35)";
-                bannerElem.style.color = "#fbbf24";
-                bannerElem.innerHTML = `
-                    <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
-                    <div>
-                        <strong> HIPAA Minimum Necessary Standard (45 CFR § 164.502(b)):</strong>
-                        You are authenticated as an <em>IT Administrator</em>. In accordance with clinical data minimization, clinical narratives, diagnostic quotes, and medical rationales are <strong>REDACTED</strong>. Only operational metadata (Case ID, Policy, Decision, Latency, and SHA-256 seal) is displayed.
-                    </div>
-                `;
-            } else if (currentRole === "Auditor") {
-                bannerElem.style.background = "rgba(6, 182, 212, 0.12)";
-                bannerElem.style.border = "1px solid rgba(6, 182, 212, 0.35)";
-                bannerElem.style.color = "#67e8f9";
-                bannerElem.innerHTML = `
-                    <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                    <div>
-                        <strong> CMS RAC/MAC Regulatory Auditor Oversight:</strong>
-                        Authorized for forensic inspection. Full character-grounded clinical quotes, offsets, calibration scores, and SHA-256 cryptographic verification seals are displayed. Direct patient PHI is masked (<code>PT-***</code>) under HIPAA Safe Harbor. Audit logs are immutable; deletion and purging controls are disabled.
-                    </div>
-                `;
+            if (isDismissed) {
+                bannerElem.style.display = "none";
             } else {
-                bannerElem.style.background = "rgba(16, 185, 129, 0.12)";
-                bannerElem.style.border = "1px solid rgba(16, 185, 129, 0.35)";
-                bannerElem.style.color = "#6ee7b7";
-                bannerElem.innerHTML = `
-                    <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>
-                    <div>
-                        <strong> Licensed Clinician Mode (HIPAA Minimum Necessary):</strong>
-                        Displaying only cases handled by your clinician account. Cross-provider cases across other facilities are restricted to regulatory auditors.
-                    </div>
+                bannerElem.style.display = "flex";
+                const closeBtnHtml = `
+                    <button type="button" onclick="dismissAuditBanner()" style="background:none;border:none;color:inherit;cursor:pointer;padding:2px 8px;margin-left:auto;font-size:1.25rem;line-height:1;border-radius:4px;opacity:0.75;transition:opacity 0.15s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.75'" title="Dismiss notice" aria-label="Dismiss">&times;</button>
                 `;
+
+                if (currentRole === "Admin") {
+                    bannerElem.style.background = "rgba(245, 158, 11, 0.12)";
+                    bannerElem.style.border = "1px solid rgba(245, 158, 11, 0.35)";
+                    bannerElem.style.color = "#fbbf24";
+                    bannerElem.innerHTML = `
+                        <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                        <div style="flex:1;">
+                            <strong> HIPAA Minimum Necessary Standard (45 CFR § 164.502(b)):</strong>
+                            You are authenticated as an <em>IT Administrator</em>. In accordance with clinical data minimization, clinical narratives, diagnostic quotes, and medical rationales are <strong>REDACTED</strong>. Only operational metadata (Case ID, Policy, Decision, Latency, and SHA-256 seal) is displayed.
+                        </div>
+                        ${closeBtnHtml}
+                    `;
+                } else if (currentRole === "Auditor") {
+                    bannerElem.style.background = "rgba(6, 182, 212, 0.12)";
+                    bannerElem.style.border = "1px solid rgba(6, 182, 212, 0.35)";
+                    bannerElem.style.color = "#67e8f9";
+                    bannerElem.innerHTML = `
+                        <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        <div style="flex:1;">
+                            <strong> CMS RAC/MAC Regulatory Auditor Oversight:</strong>
+                            Authorized for forensic inspection. Full character-grounded clinical quotes, offsets, calibration scores, and SHA-256 cryptographic verification seals are displayed. Direct patient PHI is masked (<code>PT-***</code>) under HIPAA Safe Harbor. Audit logs are immutable; deletion and purging controls are disabled.
+                        </div>
+                        ${closeBtnHtml}
+                    `;
+                } else {
+                    bannerElem.style.background = "rgba(16, 185, 129, 0.12)";
+                    bannerElem.style.border = "1px solid rgba(16, 185, 129, 0.35)";
+                    bannerElem.style.color = "#6ee7b7";
+                    bannerElem.innerHTML = `
+                        <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>
+                        <div style="flex:1;">
+                            <strong> Licensed Clinician Mode (HIPAA Minimum Necessary):</strong>
+                            Displaying only cases handled by your clinician account. Cross-provider cases across other facilities are restricted to regulatory auditors.
+                        </div>
+                        ${closeBtnHtml}
+                    `;
+                }
             }
         }
 
@@ -3153,6 +3167,14 @@ async function loadAuditLogs() {
     } catch (e) {
         console.error("Failed to load audit logs:", e);
     }
+}
+
+function dismissAuditBanner() {
+    const bannerElem = document.getElementById("audit-role-privacy-banner");
+    if (bannerElem) {
+        bannerElem.style.display = "none";
+    }
+    localStorage.setItem("carepolicyguard_audit_banner_dismissed_" + currentRole, "true");
 }
 
 window._activeAuditRecord = null;
