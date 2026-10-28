@@ -1184,13 +1184,21 @@
                     <div class="batch-header-actions">
                         <!-- COHORT SELECTOR -->
                         <div class="cohort-segmented-control" role="group" aria-label="Select Cohort Roster">
-                            <button type="button" class="cohort-pill-btn active" id="btn-cohort-cardiology" onclick="switchBatchCohort('cardiology')">
+                            <button type="button" class="cohort-pill-btn active" id="btn-cohort-cardiology" onclick="switchBatchCohort(\'cardiology\')">
                                 <span>Cardiology Clinic</span>
                                 <span class="cohort-pill-count">4</span>
                             </button>
-                            <button type="button" class="cohort-pill-btn" id="btn-cohort-mixed" onclick="switchBatchCohort('mixed')">
-                                <span>Mixed Specialty</span>
+                            <button type="button" class="cohort-pill-btn" id="btn-cohort-pulmonology" onclick="switchBatchCohort(\'pulmonology\')">
+                                <span>Pulmonology &amp; Sleep</span>
                                 <span class="cohort-pill-count">3</span>
+                            </button>
+                            <button type="button" class="cohort-pill-btn" id="btn-cohort-wound_care" onclick="switchBatchCohort(\'wound_care\')">
+                                <span>Wound Care &amp; HBOT</span>
+                                <span class="cohort-pill-count">3</span>
+                            </button>
+                            <button type="button" class="cohort-pill-btn" id="btn-cohort-mixed" onclick="switchBatchCohort(\'mixed\')">
+                                <span>Mixed Specialty</span>
+                                <span class="cohort-pill-count">4</span>
                             </button>
                             <button type="button" class="cohort-pill-btn" id="btn-cohort-upload" onclick="document.getElementById('batch-upload-file-input').click()" title="Upload Excel (.xlsx/.xls), CSV spreadsheet, JSON roster, or multiple scanned PDF/image charts">
                                 <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
@@ -2467,6 +2475,6 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261027_06" defer></script>
+    <script src="/static/js/app.js?v=20261027_07" defer></script>
 </body>
 </html>

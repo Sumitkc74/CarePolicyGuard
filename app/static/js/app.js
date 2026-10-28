@@ -63,7 +63,7 @@ function switchMainTab(tabName) {
         const batchView = document.getElementById("batch-view");
         if (batchView) batchView.classList.add("active");
         if (!window._activeBatchLoaded) {
-            loadSampleBatchRoster('cardiology');
+            switchBatchCohort('cardiology', true);
         }
     } else if (tabName === "benchmark") {
         document.getElementById("tab-benchmark-btn").classList.add("active");
@@ -4953,45 +4953,133 @@ const SAMPLE_BATCH_ROSTERS = {
             patient_id: "PT-CARD-881",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
+            clinical_narrative: `68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
         },
         {
             patient_id: "PT-CARD-882",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "55-year-old female post acute STEMI 12 days ago. Underwent emergency stenting. Echo demonstrates LVEF 30%. NYHA Class II. Currently in hospital recovering from acute event.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
+            clinical_narrative: `55-year-old female post acute STEMI 12 days ago. Underwent emergency stenting. Echo demonstrates LVEF 30%. NYHA Class II. Currently in hospital recovering from acute event.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
         },
         {
             patient_id: "PT-CARD-883",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "72-year-old female with dilated non-ischemic cardiomyopathy. Transthoracic echocardiogram reveals LVEF 32%. Patient reports NYHA Class III heart failure symptoms with fatigue at low workloads. Treated with GDMT including Sacubitril/Valsartan 49/51mg and Metoprolol succinate 100mg for 5 months. No acute ischemic events. Life expectancy exceeds 1 year.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
+            clinical_narrative: `72-year-old female with dilated non-ischemic cardiomyopathy. Transthoracic echocardiogram reveals LVEF 32%. Patient reports NYHA Class III heart failure symptoms with fatigue at low workloads. Treated with GDMT including Sacubitril/Valsartan 49/51mg and Metoprolol succinate 100mg for 5 months. No acute ischemic events. Life expectancy exceeds 1 year.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
         },
         {
             patient_id: "PT-CARD-884",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
-            clinical_narrative: "61-year-old male presenting with shortness of breath and lower extremity edema. Chart mentions heart failure with reduced ejection fraction, but recent quantitative echocardiogram or radionuclide LVEF measurement report is completely missing from current hospitalization records.\n\nAttending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)\nElectronically signed by: /s/ Dr. Marcus Vance, MD"
+            clinical_narrative: `61-year-old male presenting with shortness of breath and lower extremity edema. Chart mentions heart failure with reduced ejection fraction, but recent quantitative echocardiogram or radionuclide LVEF measurement report is completely missing from current hospitalization records.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
         }
     ],
-    mixed: [
+    pulmonology: [
         {
             patient_id: "PT-PULM-701",
             policy_id: "LCD-L33829",
             requested_procedure_code: "E0601",
-            clinical_narrative: "52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial.\n\nAttending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)\nElectronically signed by: /s/ Dr. Robert Stevens, MD"
-        },
-        {
-            patient_id: "PT-WOUND-702",
-            policy_id: "NCD-20.29",
-            requested_procedure_code: "G0277",
-            clinical_narrative: "64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse.\n\nAttending Physician: Dr. Evelyn Reed, MD (NPI: 1872635490)\nElectronically signed by: /s/ Dr. Evelyn Reed, MD"
+            clinical_narrative: `52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial.
+
+Attending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)
+Electronically signed by: /s/ Dr. Robert Stevens, MD`
         },
         {
             patient_id: "PT-PULM-703",
             policy_id: "NCD-240.2",
             requested_procedure_code: "E1390",
-            clinical_narrative: "70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min.\n\nAttending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)\nElectronically signed by: /s/ Dr. Robert Stevens, MD"
+            clinical_narrative: `70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min.
+
+Attending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)
+Electronically signed by: /s/ Dr. Robert Stevens, MD`
+        },
+        {
+            patient_id: "PT-PULM-704",
+            policy_id: "LCD-L33829",
+            requested_procedure_code: "E0601",
+            clinical_narrative: `48-year-old male presenting with habitual snoring and morning sluggishness. Epworth Sleepiness Scale score is 11/24. No diagnostic overnight polysomnography or home sleep apnea test has been conducted to quantify apnea-hypopnea index (AHI).
+
+Attending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)
+Electronically signed by: /s/ Dr. Robert Stevens, MD`
+        }
+    ],
+    wound_care: [
+        {
+            patient_id: "PT-WOUND-702",
+            policy_id: "NCD-20.29",
+            requested_procedure_code: "G0277",
+            clinical_narrative: `64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse.
+
+Attending Physician: Dr. Evelyn Reed, MD (NPI: 1872635490)
+Electronically signed by: /s/ Dr. Evelyn Reed, MD`
+        },
+        {
+            patient_id: "PT-WOUND-705",
+            policy_id: "NCD-20.29",
+            requested_procedure_code: "G0277",
+            clinical_narrative: `58-year-old female with type 2 diabetes with superficial Wagner Grade 1 neuropathic ulcer on lateral malleolus for 8 days. Conventional standard wound dressings applied for 1 week only. No osteomyelitis, deep abscess, or tendon involvement.
+
+Attending Physician: Dr. Evelyn Reed, MD (NPI: 1872635490)
+Electronically signed by: /s/ Dr. Evelyn Reed, MD`
+        },
+        {
+            patient_id: "PT-WOUND-706",
+            policy_id: "NCD-20.29",
+            requested_procedure_code: "G0277",
+            clinical_narrative: `71-year-old male with end-stage peripheral arterial disease and rapidly ascending wet gangrene with hemodynamic instability. Distal pulses absent. Non-compressible heavily calcified arteries with unrecordable ABI. Requires immediate surgical debridement and vascular intervention prior to any hyperbaric evaluation.
+
+Attending Physician: Dr. Evelyn Reed, MD (NPI: 1872635490)
+Electronically signed by: /s/ Dr. Evelyn Reed, MD`
+        }
+    ],
+    mixed: [
+        {
+            patient_id: "PT-CARD-881",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: `68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
+        },
+        {
+            patient_id: "PT-PULM-701",
+            policy_id: "LCD-L33829",
+            requested_procedure_code: "E0601",
+            clinical_narrative: `52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial.
+
+Attending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)
+Electronically signed by: /s/ Dr. Robert Stevens, MD`
+        },
+        {
+            patient_id: "PT-WOUND-702",
+            policy_id: "NCD-20.29",
+            requested_procedure_code: "G0277",
+            clinical_narrative: `64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse.
+
+Attending Physician: Dr. Evelyn Reed, MD (NPI: 1872635490)
+Electronically signed by: /s/ Dr. Evelyn Reed, MD`
+        },
+        {
+            patient_id: "PT-PULM-703",
+            policy_id: "NCD-240.2",
+            requested_procedure_code: "E1390",
+            clinical_narrative: `70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min.
+
+Attending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)
+Electronically signed by: /s/ Dr. Robert Stevens, MD`
         }
     ]
 };
@@ -5077,7 +5165,8 @@ async function handleBatchRosterFileUpload(event) {
         if (latEl) latEl.textContent = "-- ms";
 
         renderBatchRosterTable(currentBatchRoster);
-        showToast(`Successfully extracted ${currentBatchRoster.length} patient cases into roster!`, "success");
+        showToast(`Successfully extracted ${currentBatchRoster.length} patient cases into roster! Running verification...`, "info");
+        await executeBatchAdjudication();
     } catch (err) {
         console.error("Batch roster upload error:", err);
         showToast(`Failed to parse batch files: ${err.message}`, "error");
@@ -5114,26 +5203,39 @@ function clearCustomCohort() {
     showToast("Cleared custom roster cohort.", "info");
 }
 
-function switchBatchCohort(cohortType) {
+async function switchBatchCohort(cohortType, autoRun = true) {
     currentBatchCohortType = cohortType;
     const clearBtn = document.getElementById("btn-clear-custom-cohort");
     if (clearBtn && cohortType !== 'upload') clearBtn.style.display = "none";
     const uploadBtn = document.getElementById("btn-cohort-upload");
-    if (uploadBtn && cohortType !== 'upload') uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster (Excel / CSV / PDFs)</span>`;
+    if (uploadBtn && cohortType !== 'upload') {
+        uploadBtn.classList.remove("active");
+        uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster (Excel / CSV / PDFs)</span>`;
+    }
     currentBatchFilter = 'ALL';
     
-    const btnCardio = document.getElementById("btn-cohort-cardiology");
-    const btnMixed = document.getElementById("btn-cohort-mixed");
-    if (btnCardio && btnMixed) {
-        if (cohortType === 'cardiology') {
-            btnCardio.classList.add("active");
-            btnMixed.classList.remove("active");
-        } else {
-            btnMixed.classList.add("active");
-            btnCardio.classList.remove("active");
-        }
+    // Update active class on all cohort buttons
+    document.querySelectorAll(".cohort-pill-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+    const targetBtn = document.getElementById(`btn-cohort-${cohortType}`);
+    if (targetBtn) {
+        targetBtn.classList.add("active");
     }
+
     loadSampleBatchRoster(cohortType);
+
+    if (autoRun) {
+        const cohortPrettyNames = {
+            cardiology: "Cardiology Clinic",
+            pulmonology: "Pulmonology & Sleep",
+            wound_care: "Wound Care & HBOT",
+            mixed: "Mixed Specialty"
+        };
+        const pretty = cohortPrettyNames[cohortType] || cohortType;
+        showToast(`Loaded ${pretty} cohort (${currentBatchRoster.length} patients). Running automated verification...`, "info");
+        await executeBatchAdjudication();
+    }
 }
 
 function filterBatchTable(filterType) {
@@ -5174,18 +5276,31 @@ function loadSampleBatchRoster(rosterType) {
     currentBatchCohortType = rosterType;
     currentBatchRoster = JSON.parse(JSON.stringify(SAMPLE_BATCH_ROSTERS[rosterType] || SAMPLE_BATCH_ROSTERS.cardiology));
     
+    const cohortLabels = {
+        cardiology: {
+            title: `Current Roster: Cardiology Clinic Morning Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Cardiology Clinic Morning Cohort"
+        },
+        pulmonology: {
+            title: `Current Roster: Pulmonology & Sleep Medicine Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Pulmonology & Sleep Medicine Cohort"
+        },
+        wound_care: {
+            title: `Current Roster: Wound Care & Hyperbaric Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Wound Care & Hyperbaric Cohort"
+        },
+        mixed: {
+            title: `Current Roster: Mixed Specialty Outpatient Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Mixed Specialty Outpatient Cohort"
+        }
+    };
+
+    const label = cohortLabels[rosterType] || cohortLabels.cardiology;
+    
     const titleEl = document.getElementById("batch-roster-title");
-    if (titleEl) {
-        titleEl.textContent = rosterType === 'cardiology' 
-            ? "Current Roster: Cardiology Clinic Morning Cohort (4 Patients)" 
-            : "Current Roster: Mixed Specialty Outpatient Cohort (3 Patients)";
-    }
+    if (titleEl) titleEl.textContent = label.title;
     const subEl = document.getElementById("batch-cohort-name-sub");
-    if (subEl) {
-        subEl.textContent = rosterType === 'cardiology'
-            ? "Cardiology Clinic Morning Cohort"
-            : "Mixed Specialty Outpatient Cohort";
-    }
+    if (subEl) subEl.textContent = label.sub;
     
     document.getElementById("batch-total-count").textContent = currentBatchRoster.length;
     document.getElementById("batch-approved-count").textContent = "--";
