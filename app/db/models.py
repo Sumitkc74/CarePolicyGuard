@@ -97,9 +97,9 @@ class MedicarePolicy(Base):
     effective_date = Column(String(50), nullable=False)
     description = Column(Text, nullable=False)
     category = Column(String(100), nullable=False, default="Cardiology")
-    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
 
-    criteria = relationship("PolicyCriterion", back_populates="policy", cascade="all, delete-orphan", order_by="PolicyCriterion.id")
+    criteria = relationship("PolicyCriterion", back_populates="policy", cascade="all, delete-orphan", order_by="PolicyCriterion.id", lazy="selectin")
 
 
 class PolicyCriterion(Base):
@@ -115,7 +115,7 @@ class PolicyCriterion(Base):
     required_temporal_window = Column(String(150), nullable=False, default="Not specified")
     keywords = Column(Text, nullable=False, default="")  # comma-separated clinical tokens
     min_score = Column(Float, default=0.75, nullable=False)
-    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
 
     policy = relationship("MedicarePolicy", back_populates="criteria")
 
@@ -145,7 +145,7 @@ class AdjudicationLog(Base):
     signed_at = Column(DateTime(timezone=True), nullable=True)
     payer_transaction_id = Column(String(100), nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
 
     user = relationship("User", back_populates="adjudication_logs")
 
@@ -162,7 +162,7 @@ class UserSession(Base):
     ip_address = Column(String(50), nullable=True)
     is_revoked = Column(Boolean, default=False, nullable=False)
     revoked_at = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), default=utcnow, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
     last_active_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     user = relationship("User", back_populates="sessions")

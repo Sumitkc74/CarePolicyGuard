@@ -3466,7 +3466,7 @@ function updateBenchmarkMetrics(data) {
         tableBody.innerHTML = data.vignette_results.map(v => {
             const formatDec = (dec, isGold = false, isBaseline = false) => {
                 if (isBaseline && dec === "APPROVED" && v.gold_decision !== "APPROVED") {
-                    return `<span class="badge-status not-met" style="font-size: 0.72rem;" title="False Approval! High-liability citation error.">️ False Approval</span>`;
+                    return `<span class="badge-status not-met" style="font-size: 0.72rem;" title="False Approval! High-liability citation error."><span class="chip-dot"></span> False Approval</span>`;
                 }
                 if (dec === "APPROVED") {
                     return `<span class="badge-status met" style="font-size: 0.72rem;"><span class="chip-dot"></span> Approved</span>`;

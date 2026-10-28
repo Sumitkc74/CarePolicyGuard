@@ -4,6 +4,7 @@ from fastapi import FastAPI, Depends, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from app.core.config import settings
 from app.db.session import engine, SessionLocal, Base, get_db
@@ -73,6 +74,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# GZip Compression Middleware (Compresses responses >= 1KB by 70-85%)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # OWASP & HIPAA Security Headers Middleware
 @app.middleware("http")
