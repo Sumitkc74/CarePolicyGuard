@@ -1182,31 +1182,33 @@
                         <p class="batch-header-desc">Automated, policy-grounded verification across clinical cohorts with deterministic rule evaluation, character-level citations, and clinician safety abstentions.</p>
                     </div>
                     <div class="batch-header-actions">
-                        <!-- COHORT SELECTOR -->
-                        <div class="cohort-segmented-control" role="group" aria-label="Select Cohort Roster">
-                            <button type="button" class="cohort-pill-btn active" id="btn-cohort-cardiology" onclick="switchBatchCohort(\'cardiology\')">
-                                <span>Cardiology Clinic</span>
-                                <span class="cohort-pill-count">4</span>
-                            </button>
-                            <button type="button" class="cohort-pill-btn" id="btn-cohort-pulmonology" onclick="switchBatchCohort(\'pulmonology\')">
-                                <span>Pulmonology &amp; Sleep</span>
-                                <span class="cohort-pill-count">3</span>
-                            </button>
-                            <button type="button" class="cohort-pill-btn" id="btn-cohort-wound_care" onclick="switchBatchCohort(\'wound_care\')">
-                                <span>Wound Care &amp; HBOT</span>
-                                <span class="cohort-pill-count">3</span>
-                            </button>
-                            <button type="button" class="cohort-pill-btn" id="btn-cohort-mixed" onclick="switchBatchCohort(\'mixed\')">
-                                <span>Mixed Specialty</span>
-                                <span class="cohort-pill-count">4</span>
-                            </button>
-                            <button type="button" class="cohort-pill-btn" id="btn-cohort-upload" onclick="document.getElementById('batch-upload-file-input').click()" title="Upload Excel (.xlsx/.xls), CSV spreadsheet, JSON roster, or multiple scanned PDF/image charts">
+                        <!-- COHORT SELECTOR DROPDOWN & ACTIONS -->
+                        <div class="cohort-selector-wrap" role="group" aria-label="Select Clinical Cohort">
+                            <div class="cohort-dropdown-box">
+                                <label for="batch-cohort-select" class="cohort-dropdown-label">
+                                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg></span>
+                                    <span>Cohort:</span>
+                                </label>
+                                <div class="cohort-select-wrapper">
+                                    <select id="batch-cohort-select" class="batch-cohort-select" onchange="switchBatchCohort(this.value)">
+                                        <option value="cardiology">Cardiology Clinic (4 Patients - NCD-20.4)</option>
+                                        <option value="pulmonology">Pulmonology &amp; Sleep (3 Patients - LCD-L33829)</option>
+                                        <option value="wound_care">Wound Care &amp; HBOT (3 Patients - NCD-20.29)</option>
+                                        <option value="mixed">Mixed Specialty Outpatient (4 Patients)</option>
+                                        <option value="upload" id="opt-cohort-upload" style="display:none;">Custom Uploaded Cohort</option>
+                                    </select>
+                                    <span class="cohort-select-arrow">
+                                        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-cohort-upload-action" id="btn-cohort-upload" onclick="document.getElementById('batch-upload-file-input').click()" title="Upload Excel (.xlsx/.xls), CSV spreadsheet, JSON roster, or multiple scanned PDF/image charts">
                                 <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
-                                <span>+ Add Roster (Excel / CSV / PDFs)</span>
+                                <span>+ Add Roster</span>
                             </button>
-                            <button type="button" class="cohort-pill-btn" id="btn-clear-custom-cohort" onclick="clearCustomCohort()" style="display:none;color:#F43F5E;border-color:rgba(244,63,94,0.3);" title="Clear custom uploaded cohort">
+                            <button type="button" class="btn-cohort-clear-action" id="btn-clear-custom-cohort" onclick="clearCustomCohort()" style="display:none;" title="Clear custom uploaded cohort">
                                 <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
-                                <span>Clear Cohort</span>
+                                <span>Clear</span>
                             </button>
                             <input type="file" id="batch-upload-file-input" style="display:none;" multiple accept=".xlsx,.xls,.csv,.json,.pdf,.docx,.txt,.png,.jpg,.jpeg,.tiff,.bmp" onchange="handleBatchRosterFileUpload(event)" />
                         </div>
@@ -2475,6 +2477,6 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261027_07" defer></script>
+    <script src="/static/js/app.js?v=20261027_08" defer></script>
 </body>
 </html>

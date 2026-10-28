@@ -5733,7 +5733,143 @@ body {
     flex-shrink: 0;
 }
 
-/* Cohort Segmented Control */
+/* Cohort Selector Dropdown Controls */
+.cohort-selector-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cohort-dropdown-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 9px;
+    padding: 6px 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.cohort-dropdown-box:focus-within {
+    border-color: #38BDF8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+
+.cohort-dropdown-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    margin: 0;
+    cursor: default;
+}
+
+.cohort-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.batch-cohort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    color: #38BDF8;
+    font-size: 0.84rem;
+    font-weight: 700;
+    font-family: inherit;
+    padding-right: 22px;
+    cursor: pointer;
+    outline: none;
+}
+
+.batch-cohort-select option {
+    background: #0F172A;
+    color: #F8FAFC;
+    padding: 8px;
+}
+
+.cohort-select-arrow {
+    position: absolute;
+    right: 0;
+    pointer-events: none;
+    width: 14px;
+    height: 14px;
+    stroke: #38BDF8;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: flex;
+    align-items: center;
+}
+
+.cohort-select-arrow svg {
+    width: 100%;
+    height: 100%;
+}
+
+.btn-cohort-upload-action {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38BDF8;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-cohort-upload-action:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38BDF8;
+    color: #FFFFFF;
+}
+
+.btn-cohort-upload-action.active {
+    background: #3B82F6;
+    border-color: #3B82F6;
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+.btn-cohort-clear-action {
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.35);
+    color: #F43F5E;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-cohort-clear-action:hover {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: #F43F5E;
+    color: #FFFFFF;
+}
+
+/* Legacy Cohort Segmented Control */
 .cohort-segmented-control {
     display: inline-flex;
     flex-wrap: wrap;

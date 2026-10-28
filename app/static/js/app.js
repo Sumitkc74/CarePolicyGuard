@@ -5146,6 +5146,15 @@ async function handleBatchRosterFileUpload(event) {
         const clearBtn = document.getElementById("btn-clear-custom-cohort");
         if (clearBtn) clearBtn.style.display = "inline-flex";
 
+        // Update dropdown option for uploaded cohort
+        const optUpload = document.getElementById("opt-cohort-upload");
+        if (optUpload) {
+            optUpload.style.display = "";
+            optUpload.textContent = `Custom Uploaded (${currentBatchRoster.length} Patients)`;
+        }
+        const selectEl = document.getElementById("batch-cohort-select");
+        if (selectEl) selectEl.value = "upload";
+
         // Update roster title & counter
         const titleEl = document.getElementById("batch-roster-title");
         if (titleEl) titleEl.textContent = data.batch_name || `Custom Uploaded Cohort (${currentBatchRoster.length} Patients)`;
@@ -5179,58 +5188,51 @@ async function handleBatchRosterFileUpload(event) {
 
 function clearCustomCohort() {
     currentBatchRoster = [];
-    currentBatchCohortType = 'upload';
-    const uploadBtn = document.getElementById("btn-cohort-upload");
-    if (uploadBtn) uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster (Excel / CSV / PDFs)</span>`;
+    currentBatchCohortType = 'cardiology';
+    
+    const optUpload = document.getElementById("opt-cohort-upload");
+    if (optUpload) optUpload.style.display = "none";
     const clearBtn = document.getElementById("btn-clear-custom-cohort");
     if (clearBtn) clearBtn.style.display = "none";
+    const uploadBtn = document.getElementById("btn-cohort-upload");
+    if (uploadBtn) {
+        uploadBtn.classList.remove("active");
+        uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster</span>`;
+    }
 
-    const titleEl = document.getElementById("batch-roster-title");
-    if (titleEl) titleEl.textContent = "Custom Cohort (0 Patients - Click '+ Add Roster' to Upload)";
-    const totalEl = document.getElementById("batch-total-count");
-    if (totalEl) totalEl.textContent = "0";
-
-    const appEl = document.getElementById("batch-approved-count");
-    const denEl = document.getElementById("batch-denied-count");
-    const defEl = document.getElementById("batch-deferred-count");
-    const latEl = document.getElementById("batch-latency-count");
-    if (appEl) appEl.textContent = "--";
-    if (denEl) denEl.textContent = "--";
-    if (defEl) defEl.textContent = "--";
-    if (latEl) latEl.textContent = "-- ms";
-
-    renderBatchRosterTable([]);
-    showToast("Cleared custom roster cohort.", "info");
+    switchBatchCohort('cardiology', true);
+    showToast("Cleared custom roster cohort. Reset to Cardiology Clinic.", "info");
 }
 
 async function switchBatchCohort(cohortType, autoRun = true) {
     currentBatchCohortType = cohortType;
+    const selectEl = document.getElementById("batch-cohort-select");
+    if (selectEl && selectEl.value !== cohortType) {
+        selectEl.value = cohortType;
+    }
+
     const clearBtn = document.getElementById("btn-clear-custom-cohort");
     if (clearBtn && cohortType !== 'upload') clearBtn.style.display = "none";
     const uploadBtn = document.getElementById("btn-cohort-upload");
     if (uploadBtn && cohortType !== 'upload') {
         uploadBtn.classList.remove("active");
-        uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster (Excel / CSV / PDFs)</span>`;
+        uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster</span>`;
     }
     currentBatchFilter = 'ALL';
-    
-    // Update active class on all cohort buttons
-    document.querySelectorAll(".cohort-pill-btn").forEach(btn => {
-        btn.classList.remove("active");
-    });
-    const targetBtn = document.getElementById(`btn-cohort-${cohortType}`);
-    if (targetBtn) {
-        targetBtn.classList.add("active");
-    }
 
-    loadSampleBatchRoster(cohortType);
+    if (cohortType === 'upload') {
+        if (clearBtn) clearBtn.style.display = "";
+    } else {
+        loadSampleBatchRoster(cohortType);
+    }
 
     if (autoRun) {
         const cohortPrettyNames = {
             cardiology: "Cardiology Clinic",
             pulmonology: "Pulmonology & Sleep",
             wound_care: "Wound Care & HBOT",
-            mixed: "Mixed Specialty"
+            mixed: "Mixed Specialty",
+            upload: "Custom Uploaded"
         };
         const pretty = cohortPrettyNames[cohortType] || cohortType;
         showToast(`Loaded ${pretty} cohort (${currentBatchRoster.length} patients). Running automated verification...`, "info");
