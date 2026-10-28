@@ -3135,7 +3135,6 @@ async function loadAuditLogs() {
                 }
 
                 tr.innerHTML = `
-                    <td class="mono-cell">${ts}</td>
                     <td class="mono-cell" style="color: var(--accent-cyan); font-weight: 600; cursor: pointer;" title="Click to inspect audit record" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')"><span style="border-bottom: 1px dashed rgba(56, 189, 248, 0.4);">${escapeHtml(log.case_id)}</span></td>
                     <td class="mono-cell">${patientCellContent}</td>
                     <td><strong>${escapeHtml(log.policy_id)}</strong></td>
@@ -3145,6 +3144,7 @@ async function loadAuditLogs() {
                     <td class="mono-cell" title="${escapeHtml(log.audit_hash)}" style="cursor: pointer;" onclick="copySpecificHash('${escapeHtml(log.audit_hash)}')">
                         <span style="border-bottom: 1px dotted var(--accent-cyan);">${shortHash}</span>
                     </td>
+                    <td class="mono-cell">${ts}</td>
                     <td>${actionsCell}</td>
                 `;
                 tbody.appendChild(tr);
