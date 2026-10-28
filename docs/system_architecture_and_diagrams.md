@@ -15,55 +15,63 @@ CarePolicyGuard is structured as a tiered, HIPAA-compliant prior authorization a
 *Direct image files: [PNG](images/01_system_architecture.png) | [SVG](images/01_system_architecture.svg)*
 
 ```mermaid
-flowchart TB
-    subgraph UI ["User Interfaces"]
-        Clinician["Clinician Workspace"]
-        Batch["Batch Roster Engine"]
-        Auditor["Auditor Portal"]
-        EHR["EHR CDS Hooks"]
+flowchart LR
+    %% -------------------------------------------------------------
+    %% STYLES & THEMING FOR MAXIMUM READABILITY
+    %% -------------------------------------------------------------
+    classDef clientStyle fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
+    classDef gatewayStyle fill:#0F172A,stroke:#818CF8,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
+    classDef agentStyle fill:#1E1B4B,stroke:#A855F7,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
+    classDef gateStyle fill:#312E81,stroke:#C084FC,stroke-width:3px,color:#FFFFFF,font-size:15px,font-weight:bold;
+    classDef approveStyle fill:#064E3B,stroke:#10B981,stroke-width:2px,color:#ECFDF5,font-size:15px,font-weight:bold;
+    classDef denyStyle fill:#7F1D1D,stroke:#F43F5E,stroke-width:2px,color:#FFF1F2,font-size:15px,font-weight:bold;
+    classDef deferStyle fill:#78350F,stroke:#F59E0B,stroke-width:2px,color:#FEF3C7,font-size:15px,font-weight:bold;
+    classDef dataStyle fill:#0F172A,stroke:#06B6D4,stroke-width:2px,color:#F8FAFC,font-size:15px,font-weight:bold;
+
+    subgraph C1 ["1. USER INTERFACES"]
+        Clinician["Clinician Workspace"]:::clientStyle
+        Batch["Batch Roster Engine"]:::clientStyle
+        Auditor["Auditor Portal"]:::clientStyle
     end
 
-    subgraph Gateway ["API Gateway & Security"]
-        API["FastAPI Gateway"]
-        Auth["Auth & MFA Service"]
-        HIPAA["HIPAA PHI Masker"]
+    subgraph C2 ["2. SECURE GATEWAY"]
+        API["FastAPI Gateway"]:::gatewayStyle
+        Auth["Auth & MFA Guard"]:::gatewayStyle
+        HIPAA["HIPAA PHI Masker"]:::gatewayStyle
     end
 
-    subgraph Pipeline ["Multi-Agent Clinical Pipeline"]
-        Agent1["Agent 1: Policy Retrieval"]
-        Agent2["Agent 2: Criteria Evaluation"]
-        Agent3["Agent 3: Adversarial Verifier"]
-        Gate{"Agent 4: Abstention Gate<br/>(tau >= 0.85)"}
-        
-        Approved["Approved"]
-        Denied["Denied"]
-        Deferred["Deferred to MD"]
-        
-        Agent5["Agent 5: Defense Packet Generator"]
+    subgraph C3 ["3. MULTI-AGENT PIPELINE"]
+        Agent1["1. Policy Retrieval"]:::agentStyle
+        Agent2["2. Criteria Evaluator"]:::agentStyle
+        Agent3["3. Adversarial Verifier"]:::agentStyle
+        Gate{"4. Abstention Gate<br/>(tau >= 0.85)"}:::gateStyle
+        Agent5["5. Defense Packet Generator"]:::agentStyle
     end
 
-    subgraph Storage ["Data & Audit Layer"]
-        DB[("Relational Database")]
-        Ledger["SHA-256 Audit Ledger"]
+    subgraph C4 ["4. DECISIONS"]
+        Approved["APPROVED"]:::approveStyle
+        Denied["DENIED"]:::denyStyle
+        Deferred["DEFERRED TO MD"]:::deferStyle
     end
 
-    subgraph External ["External Systems"]
-        CMS["CMS MAC Clearinghouse"]
-        SMTP["Google SMTP Server"]
+    subgraph C5 ["5. AUDIT & CLEARINGHOUSE"]
+        DB[("Relational DB")]:::dataStyle
+        Ledger["SHA-256 Ledger"]:::dataStyle
+        CMS["CMS MAC Clearinghouse"]:::dataStyle
     end
 
-    UI --> API
+    C1 --> API
     API --> Auth
-    API --> HIPAA
-    API --> Agent1
+    Auth --> HIPAA
+    HIPAA --> Agent1
 
     Agent1 --> Agent2
     Agent2 --> Agent3
     Agent3 --> Gate
 
-    Gate -- "Pass" --> Approved
-    Gate -- "Exclusion" --> Denied
-    Gate -- "Low Conf" --> Deferred
+    Gate -->|"Pass (>= 0.85)"| Approved
+    Gate -->|"Exclusion Flag"| Denied
+    Gate -->|"Low Conf (< 0.85)"| Deferred
 
     Approved --> Agent5
     Denied --> Agent5
@@ -72,7 +80,6 @@ flowchart TB
     Agent5 --> DB
     Agent5 --> Ledger
     Agent5 --> CMS
-    Auth -. "Email OTP" .-> SMTP
 ```
 
 ---
