@@ -66,6 +66,11 @@ function switchMainTab(tabName) {
             switchBatchCohort('cardiology', true);
         }
     } else if (tabName === "benchmark") {
+        if (currentRole === "Clinician") {
+            showToast("Benchmark Lab is restricted to System Administrators and Quality Auditors.", "warning");
+            switchMainTab("adjudicate");
+            return;
+        }
         document.getElementById("tab-benchmark-btn").classList.add("active");
         document.getElementById("benchmark-view").classList.add("active");
         runLiveBenchmark();
@@ -523,6 +528,7 @@ function signOutToLoginGate() {
     const authModal = document.getElementById("auth-modal");
     if (authModal) authModal.classList.add("hidden");
 
+    updateUserBadge();
     showLoginGate();
     showToast("Signed out successfully. Authentication required to continue.");
 }
@@ -773,6 +779,25 @@ function updateUserBadge() {
             auditorNotice.classList.remove("hidden");
         } else {
             auditorNotice.classList.add("hidden");
+        }
+    }
+
+    updateRoleBasedNavigation();
+}
+
+function updateRoleBasedNavigation() {
+    const benchmarkBtn = document.getElementById("tab-benchmark-btn");
+    const isClinician = (currentRole === "Clinician");
+
+    if (benchmarkBtn) {
+        if (isClinician) {
+            benchmarkBtn.style.display = "none";
+            const benchmarkView = document.getElementById("benchmark-view");
+            if (benchmarkView && benchmarkView.classList.contains("active")) {
+                switchMainTab("adjudicate");
+            }
+        } else {
+            benchmarkBtn.style.display = "";
         }
     }
 }
