@@ -110,6 +110,14 @@ def serve_dashboard():
         return FileResponse(index_file)
     return {"message": f"Welcome to {settings.PROJECT_NAME}. UI index.html not found."}
 
+@app.get("/diagrams", include_in_schema=False)
+def serve_diagrams():
+    """Serves the interactive architecture diagrams viewer."""
+    diagrams_file = os.path.join(os.path.dirname(__file__), "docs", "diagrams_viewer.html")
+    if os.path.exists(diagrams_file):
+        return FileResponse(diagrams_file)
+    return {"message": "Diagrams viewer not found."}
+
 @app.get("/health", tags=["System"])
 def health_check():
     """Microservice liveness and readiness probe."""

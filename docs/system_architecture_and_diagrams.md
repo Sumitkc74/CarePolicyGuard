@@ -1,0 +1,291 @@
+# CarePolicyGuard Architecture and Design Specification
+
+This document provides complete architectural, relational, sequence, state, and interoperability diagrams for the **CarePolicyGuard** clinical adjudication and prior authorization attestation platform.
+
+---
+
+## 1. High-Level System Architecture
+
+CarePolicyGuard is structured as a tiered, HIPAA-compliant prior authorization adjudication platform. It decouples interface concerns, API orchestration, deterministic clinical inference, cryptographic integrity auditing, and external healthcare integrations.
+
+```mermaid
+flowchart TB
+    subgraph ClientLayer ["Client and Interface Layer"]
+        ClinicianUI["Clinician Workspace (Prior Auth, Adjudication, 4-Digit PIN Signing)"]
+        AuditorUI["Regulatory Auditor Portal (Cryptographic Chain Verification, Tamper Detection)"]
+        AdminUI["IT Administrator Portal (HIPAA Minimum Necessary Redaction, Session Audit)"]
+        EHRClient["EHR / SMART on FHIR Client (Epic, Cerner, CDS Hooks Consumer)"]
+    end
+
+    subgraph GatewayLayer ["API Gateway and Middleware Layer (FastAPI)"]
+        ReverseProxy["FastAPI Reverse Proxy and Router"]
+        SecurityHeaders["OWASP and HIPAA Security Headers Middleware"]
+        GZip["GZip Compression Middleware (Payloads >= 1KB)"]
+        AuthMiddleware["JWT and Session Auth / RBAC Guard"]
+        RateLimiter["Adaptive Rate Limiter and Anti-Abuse Guard"]
+    end
+
+    subgraph ServiceLayer ["Core Clinical and Adjudication Services"]
+        NLPService["Clinical NLP Engine (Biomarker, Procedure, and Temporal Extraction)"]
+        AdjudicationEngine["Deterministic Adjudication Engine (CMS LCD/NCD Rule Matcher)"]
+        AuditService["Cryptographic Audit Ledger (SHA-256 Merkle Chain and Hash Verification)"]
+        FHIRService["HL7 FHIR DaVinci Adapter (CDS Hooks, DTR Questionnaire, PAS Claim Engine)"]
+        AuthService["Identity and MFA Engine (Argon2, TOTP, Live Google SMTP Email OTP)"]
+    end
+
+    subgraph DataLayer ["Persistence and External Integration Layer"]
+        DB[("Relational Database (SQLite / PostgreSQL with Indexed Timestamps)")]
+        CMSClearinghouse["CMS Medicare Part B / MAC Clearinghouse Gateway"]
+        GoogleSMTP["Google SMTP Server (Live Email OTP Delivery)"]
+        FHIRServer["External FHIR R4 Repository (EHR Interop)"]
+    end
+
+    ClientLayer --> GatewayLayer
+    GatewayLayer --> ServiceLayer
+    ServiceLayer --> DataLayer
+```
+
+---
+
+## 2. Entity-Relationship Data Model (ERD)
+
+The data model enforces relational integrity across users, sessions, national/local Medicare coverage determinations, individual criteria, and immutable adjudication ledgers.
+
+```mermaid
+erDiagram
+    User ||--o{ UserSession : "establishes"
+    User ||--o{ AdjudicationLog : "signs and attests"
+    MedicarePolicy ||--|{ PolicyCriterion : "defines"
+    MedicarePolicy ||--o{ AdjudicationLog : "governs"
+
+    User {
+        int id PK
+        string username UK
+        string email UK
+        string hashed_password
+        string role "Clinician | Auditor | Admin"
+        boolean is_active
+        string npi_number "Indexed"
+        string medical_license
+        string credential_title "MD | DO | NP | PA-C"
+        string specialty
+        string organization
+        boolean is_verified_medical_pro
+        string mfa_method "email_otp | totp_app | sms_otp"
+        string totp_secret
+        string active_otp_code
+        datetime otp_expires_at
+        datetime created_at "Indexed"
+        datetime updated_at
+    }
+
+    UserSession {
+        int id PK
+        string session_id UK "Indexed"
+        int user_id FK
+        string device_name
+        string ip_address
+        boolean is_revoked
+        datetime revoked_at
+        datetime created_at "Indexed"
+        datetime last_active_at
+    }
+
+    MedicarePolicy {
+        int id PK
+        string policy_id UK "Indexed"
+        string title
+        string jurisdiction
+        string effective_date
+        string category
+        text description
+        datetime created_at "Indexed"
+    }
+
+    PolicyCriterion {
+        int id PK
+        int policy_id FK "Indexed"
+        string criterion_code "Indexed"
+        string name
+        text description
+        text clinical_intent
+        boolean is_exclusion
+        string required_temporal_window
+        text keywords
+        float min_score
+        datetime created_at "Indexed"
+    }
+
+    AdjudicationLog {
+        int id PK
+        string case_id UK "Indexed"
+        string patient_id_masked "Indexed"
+        string policy_id "Indexed"
+        string decision "APPROVED | DENIED | DEFERRED_TO_HUMAN"
+        string idempotency_key UK
+        boolean abstention_status
+        text abstention_reason
+        float calibrated_confidence
+        float raw_confidence
+        text criterion_evaluations_json
+        text evidence_spans_json
+        text adversarial_audits_json
+        string audit_hash "SHA-256 Indexed"
+        string submission_status "PENDING_REVIEW | SUBMITTED"
+        string signed_by
+        datetime signed_at
+        string payer_transaction_id
+        int user_id FK
+        datetime created_at "Indexed"
+    }
+```
+
+---
+
+## 3. Sequence Diagram: Prior Authorization Adjudication and Signing Flow
+
+This sequence traces the clinical adjudication pipeline from initial note ingestion through deterministic rule evaluation, clinician review, 4-digit PIN verification, cryptographic hashing, and clearinghouse transmission.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Clinician as Attesting Clinician
+    participant UI as CarePolicyGuard Frontend
+    participant API as FastAPI Gateway
+    participant NLP as Clinical NLP Engine
+    participant Rules as CMS Policy Matcher
+    participant DB as Relational Database
+    participant Audit as Cryptographic Ledger Engine
+    participant MAC as CMS Medicare MAC Gateway
+
+    Clinician->>UI: Selects patient case or triggers CDS Hooks order-sign
+    UI->>API: POST /api/v1/adjudicate (EHR notes, policy_id, patient_id)
+    API->>DB: Query MedicarePolicy and criteria (eager selectin batch)
+    DB-->>API: Policy criteria definitions
+    API->>NLP: Extract clinical entities, biomarkers, and temporal spans
+    NLP-->>API: Extracted structured clinical facts
+    API->>Rules: Evaluate criteria (inclusions, exclusions, thresholds)
+    Rules-->>API: Decision (APPROVED / DENIED / DEFERRED), confidence, and citations
+    API-->>UI: Return adjudication recommendation with evidence highlights
+    Clinician->>UI: Reviews clinical justification and clicks "Sign and Authorize"
+    UI->>Clinician: Prompts 4-Digit Clinician Signing PIN modal
+    Clinician->>UI: Enters 4-Digit Signing PIN
+    UI->>API: POST /api/v1/adjudicate/sign (case_id, PIN, attestation)
+    API->>Audit: Compute SHA-256 cryptographic hash and link previous block
+    Audit->>DB: Store immutable AdjudicationLog entry
+    API->>MAC: Transmit 278 Prior Authorization claim via PAS
+    MAC-->>API: Return Payer Transaction ID (CMS-MAC-ACK)
+    API->>DB: Update submission_status = SUBMITTED, payer_transaction_id
+    API-->>UI: Return signed confirmation with verification seal
+    UI-->>Clinician: Display transmission receipt and cryptographic hash
+```
+
+---
+
+## 4. Sequence Diagram: Multi-Factor Authentication and Live Email OTP Delivery
+
+This sequence illustrates the authentication flow, including live Google SMTP email dispatch for two-factor verification.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Healthcare User
+    participant Browser as Browser Client
+    participant AuthAPI as Auth Controller
+    participant DB as User Database
+    participant SMTP as Google SMTP Server
+    participant Inbox as Clinician Email Inbox
+
+    User->>Browser: Enters email and password
+    Browser->>AuthAPI: POST /api/v1/auth/login
+    AuthAPI->>DB: Fetch user record and verify Argon2 / PBKDF2 hash
+    DB-->>AuthAPI: User record validated (MFA enabled: email_otp)
+    AuthAPI->>AuthAPI: Generate cryptographically secure 6-digit OTP and 5-min expiry
+    AuthAPI->>DB: Persist active_otp_code and otp_expires_at
+    AuthAPI->>SMTP: Dispatch TLS MIME email with one-time verification passcode
+    SMTP->>Inbox: Deliver CarePolicyGuard Security Passcode
+    AuthAPI-->>Browser: HTTP 200 (require_otp: true, mfa_method: email_otp)
+    Browser->>User: Display 6-digit OTP verification prompt
+    User->>Inbox: Retrieves OTP code
+    User->>Browser: Enters 6-digit code
+    Browser->>AuthAPI: POST /api/v1/auth/verify-otp (email, otp_code)
+    AuthAPI->>DB: Verify active_otp_code matches and now < otp_expires_at
+    AuthAPI->>DB: Clear active_otp_code, generate UserSession
+    AuthAPI-->>Browser: Issue secure session cookie / bearer token
+    Browser->>User: Route to role-specific dashboard (Clinician / Auditor / Admin)
+```
+
+---
+
+## 5. State Diagram: Adjudication Case Lifecycle and Audit Immutability
+
+This state chart outlines the progression of an adjudication case from raw EHR clinical input to an immutable, cryptographically sealed record.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Ingested: EHR Case Ingested via CDS Hooks or Manual Entry
+    Ingested --> ExtractingEvidence: Trigger Clinical NLP
+    ExtractingEvidence --> EvaluatingCriteria: Entities and Temporal Spans Extracted
+    
+    state EvaluatingCriteria {
+        [*] --> CheckInclusions
+        CheckInclusions --> CheckExclusions: Inclusions Satisfied
+        CheckExclusions --> CalcConfidence: No Disqualifying Exclusions
+    }
+
+    EvaluatingCriteria --> Approved: All Criteria Met (Confidence >= Threshold)
+    EvaluatingCriteria --> Denied: Unmet Criteria or Active Exclusion
+    EvaluatingCriteria --> DeferredToHuman: Low Confidence or Ambiguous Evidence
+
+    Approved --> PendingAttestation: Clinician Review Required
+    Denied --> PendingAttestation: Clinician Review or Peer-to-Peer
+    DeferredToHuman --> ManualCorrection: Clinician Overrides or Amends Notes
+    ManualCorrection --> EvaluatingCriteria: Re-evaluate
+
+    PendingAttestation --> AuthenticatingSigner: Clinician Clicks Authorize
+    AuthenticatingSigner --> SignedAndSealed: Correct 4-Digit Signing PIN Entered
+    AuthenticatingSigner --> PendingAttestation: Invalid PIN (Retry Allowed)
+
+    SignedAndSealed --> TransmittedToClearinghouse: PAS 278 Claim Generated
+    TransmittedToClearinghouse --> ArchivedInLedger: Payer Acknowledgment Received
+    ArchivedInLedger --> [*]: Cryptographically Locked (SHA-256)
+```
+
+---
+
+## 6. DaVinci FHIR Standards Interoperability Flow
+
+CarePolicyGuard complies with HL7 DaVinci prior authorization implementation guides:
+
+1. **CRD (Coverage Requirements Discovery)**: Informs clinicians of prior authorization requirements at the point of order sign.
+2. **DTR (Documentation Templates and Rules)**: Pre-populates clinical documentation forms with EHR data.
+3. **PAS (Prior Authorization Support)**: Submits 278 prior authorization requests and receives immediate clearinghouse adjudication responses.
+
+```mermaid
+flowchart LR
+    subgraph EHR ["EHR Environment"]
+        EHRApp["EHR Ordering System"]
+    end
+
+    subgraph CarePolicyGuardEngine ["CarePolicyGuard Platform"]
+        CRD["CDS Hooks Service (Coverage Requirements Discovery)"]
+        DTR["DTR Service (Documentation Templates and Rules)"]
+        PAS["PAS Service (Prior Authorization Support)"]
+        AuditEngine["Cryptographic Ledger Engine"]
+    end
+
+    subgraph PayerClearinghouse ["Payer / CMS Clearinghouse"]
+        CMSGateway["CMS Medicare Part B MAC Gateway"]
+    end
+
+    EHRApp -- "1. order-sign CDS Hook trigger" --> CRD
+    CRD -- "2. Return CDS Card with policy requirements" --> EHRApp
+    EHRApp -- "3. Fetch SMART on FHIR questionnaire" --> DTR
+    DTR -- "4. Return prepopulated clinical questionnaire" --> EHRApp
+    EHRApp -- "5. Submit completed FHIR Bundle" --> PAS
+    PAS -- "6. Cryptographic attestation and verification" --> AuditEngine
+    PAS -- "7. Forward X12 278 / FHIR Claim" --> CMSGateway
+    CMSGateway -- "8. Return 278 ClaimResponse" --> PAS
+    PAS -- "9. Update prior auth status" --> EHRApp
+```
+

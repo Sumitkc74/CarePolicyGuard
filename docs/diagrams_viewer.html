@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarePolicyGuard - System Architecture &amp; Diagrams Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-card: #182234;
+            --border: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --accent-blue: #38BDF8;
+            --accent-cyan: #06B6D4;
+            --accent-emerald: #10B981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+        }
+
+        .header {
+            max-width: 1280px;
+            margin: 0 auto 32px auto;
+            padding: 24px 32px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            color: #FFFFFF;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .badge-live {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: var(--accent-blue);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-chips {
+            max-width: 1280px;
+            margin: 0 auto 24px auto;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .nav-chip:hover {
+            color: #FFFFFF;
+            border-color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .diagram-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .diagram-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .diagram-header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .diagram-header span {
+            font-size: 0.825rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .diagram-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .diagram-canvas {
+            background: #0B1120;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div>
+            <h1>CarePolicyGuard Architecture Specifications</h1>
+            <p>Interactive System Architecture, Relational Models, Sequence Flows, and Interoperability Specifications</p>
+        </div>
+        <div class="badge-live">HL7 DaVinci &amp; CMS Part B</div>
+    </header>
+
+    <div class="nav-chips">
+        <a href="#section-arch" class="nav-chip">1. System Architecture</a>
+        <a href="#section-erd" class="nav-chip">2. Relational ERD</a>
+        <a href="#section-seq-adj" class="nav-chip">3. Adjudication Sequence</a>
+        <a href="#section-seq-mfa" class="nav-chip">4. MFA &amp; Email OTP Flow</a>
+        <a href="#section-state" class="nav-chip">5. Case Lifecycle State</a>
+        <a href="#section-davinci" class="nav-chip">6. DaVinci Interop Flow</a>
+    </div>
+
+    <main class="container">
+        <!-- 1. System Architecture -->
+        <section class="diagram-card" id="section-arch">
+            <div class="diagram-header">
+                <h2>1. Tiered System Architecture</h2>
+                <span>Component Interaction</span>
+            </div>
+            <p class="diagram-desc">Decoupled 4-tier model separating the Clinician/Auditor interfaces, FastAPI gateway, deterministic rule evaluation, and cryptographic persistence.</p>
+            <div class="diagram-canvas">
+                <div class="mermaid">
+flowchart TB
+    subgraph ClientLayer ["Client and Interface Layer"]
+        ClinicianUI["Clinician Workspace (Prior Auth, Adjudication, 4-Digit PIN Signing)"]
+        AuditorUI["Regulatory Auditor Portal (Cryptographic Chain Verification, Tamper Detection)"]
+        AdminUI["IT Administrator Portal (HIPAA Minimum Necessary Redaction, Session Audit)"]
+        EHRClient["EHR / SMART on FHIR Client (Epic, Cerner, CDS Hooks Consumer)"]
+    end
+
+    subgraph GatewayLayer ["API Gateway and Middleware Layer (FastAPI)"]
+        ReverseProxy["FastAPI Reverse Proxy and Router"]
+        SecurityHeaders["OWASP and HIPAA Security Headers Middleware"]
+        GZip["GZip Compression Middleware (Payloads >= 1KB)"]
+        AuthMiddleware["JWT and Session Auth / RBAC Guard"]
+        RateLimiter["Adaptive Rate Limiter and Anti-Abuse Guard"]
+    end
+
+    subgraph ServiceLayer ["Core Clinical and Adjudication Services"]
+        NLPService["Clinical NLP Engine (Biomarker, Procedure, and Temporal Extraction)"]
+        AdjudicationEngine["Deterministic Adjudication Engine (CMS LCD/NCD Rule Matcher)"]
+        AuditService["Cryptographic Audit Ledger (SHA-256 Merkle Chain and Hash Verification)"]
+        FHIRService["HL7 FHIR DaVinci Adapter (CDS Hooks, DTR Questionnaire, PAS Claim Engine)"]
+        AuthService["Identity and MFA Engine (Argon2, TOTP, Live Google SMTP Email OTP)"]
+    end
+
+    subgraph DataLayer ["Persistence and External Integration Layer"]
+        DB[("Relational Database (SQLite / PostgreSQL with Indexed Timestamps)")]
+        CMSClearinghouse["CMS Medicare Part B / MAC Clearinghouse Gateway"]
+        GoogleSMTP["Google SMTP Server (Live Email OTP Delivery)"]
+        FHIRServer["External FHIR R4 Repository (EHR Interop)"]
+    end
+
+    ClientLayer --> GatewayLayer
+    GatewayLayer --> ServiceLayer
+    ServiceLayer --> DataLayer
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Relational ERD -->
+        <section class="diagram-card" id="section-erd">
+            <div class="diagram-header">
+                <h2>2. Entity-Relationship Data Model (ERD)</h2>
+                <span>Relational Schema</span>
+            </div>
+            <p class="diagram-desc">Complete database entity relational schema with indexes, foreign keys, clinical criteria mapping, and cryptographic hashes.</p>
+            <div class="diagram-canvas">
+                <div class="mermaid">
+erDiagram
+    User ||--o{ UserSession : "establishes"
+    User ||--o{ AdjudicationLog : "signs and attests"
+    MedicarePolicy ||--|{ PolicyCriterion : "defines"
+    MedicarePolicy ||--o{ AdjudicationLog : "governs"
+
+    User {
+        int id PK
+        string username UK
+        string email UK
+        string hashed_password
+        string role "Clinician | Auditor | Admin"
+        boolean is_active
+        string npi_number "Indexed"
+        string medical_license
+        string credential_title "MD | DO | NP | PA-C"
+        string specialty
+        string organization
+        boolean is_verified_medical_pro
+        string mfa_method "email_otp | totp_app | sms_otp"
+        string totp_secret
+        string active_otp_code
+        datetime otp_expires_at
+        datetime created_at "Indexed"
+        datetime updated_at
+    }
+
+    UserSession {
+        int id PK
+        string session_id UK "Indexed"
+        int user_id FK
+        string device_name
+        string ip_address
+        boolean is_revoked
+        datetime revoked_at
+        datetime created_at "Indexed"
+        datetime last_active_at
+    }
+
+    MedicarePolicy {
+        int id PK
+        string policy_id UK "Indexed"
+        string title
+        string jurisdiction
+        string effective_date
+        string category
+        text description
+        datetime created_at "Indexed"
+    }
+
+    PolicyCriterion {
+        int id PK
+        int policy_id FK "Indexed"
+        string criterion_code "Indexed"
+        string name
+        text description
+        text clinical_intent
+        boolean is_exclusion
+        string required_temporal_window
+        text keywords
+        float min_score
+        datetime created_at "Indexed"
+    }
+
+    AdjudicationLog {
+        int id PK
+        string case_id UK "Indexed"
+        string patient_id_masked "Indexed"
+        string policy_id "Indexed"
+        string decision "APPROVED | DENIED | DEFERRED_TO_HUMAN"
+        string idempotency_key UK
+        boolean abstention_status
+        text abstention_reason
+        float calibrated_confidence
+        float raw_confidence
+        text criterion_evaluations_json
+        text evidence_spans_json
+        text adversarial_audits_json
+        string audit_hash "SHA-256 Indexed"
+        string submission_status "PENDING_REVIEW | SUBMITTED"
+        string signed_by
+        datetime signed_at
+        string payer_transaction_id
+        int user_id FK
+        datetime created_at "Indexed"
+    }
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Adjudication Sequence -->
+        <section class="diagram-card" id="section-seq-adj">
+            <div class="diagram-header">
+                <h2>3. Prior Authorization Adjudication &amp; Signing Sequence</h2>
+                <span>Clinical Execution Trace</span>
+            </div>
+            <p class="diagram-desc">Sequence trace from note extraction, deterministic evaluation, 4-digit PIN authorization, cryptographic block creation, and clearinghouse submission.</p>
+            <div class="diagram-canvas">
+                <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Clinician as Attesting Clinician
+    participant UI as CarePolicyGuard Frontend
+    participant API as FastAPI Gateway
+    participant NLP as Clinical NLP Engine
+    participant Rules as CMS Policy Matcher
+    participant DB as Relational Database
+    participant Audit as Cryptographic Ledger Engine
+    participant MAC as CMS Medicare MAC Gateway
+
+    Clinician->>UI: Selects patient case or triggers CDS Hooks order-sign
+    UI->>API: POST /api/v1/adjudicate (EHR notes, policy_id, patient_id)
+    API->>DB: Query MedicarePolicy and criteria (eager selectin batch)
+    DB-->>API: Policy criteria definitions
+    API->>NLP: Extract clinical entities, biomarkers, and temporal spans
+    NLP-->>API: Extracted structured clinical facts
+    API->>Rules: Evaluate criteria (inclusions, exclusions, thresholds)
+    Rules-->>API: Decision (APPROVED / DENIED / DEFERRED), confidence, and citations
+    API-->>UI: Return adjudication recommendation with evidence highlights
+    Clinician->>UI: Reviews clinical justification and clicks "Sign and Authorize"
+    UI->>Clinician: Prompts 4-Digit Clinician Signing PIN modal
+    Clinician->>UI: Enters 4-Digit Signing PIN
+    UI->>API: POST /api/v1/adjudicate/sign (case_id, PIN, attestation)
+    API->>Audit: Compute SHA-256 cryptographic hash and link previous block
+    Audit->>DB: Store immutable AdjudicationLog entry
+    API->>MAC: Transmit 278 Prior Authorization claim via PAS
+    MAC-->>API: Return Payer Transaction ID (CMS-MAC-ACK)
+    API->>DB: Update submission_status = SUBMITTED, payer_transaction_id
+    API-->>UI: Return signed confirmation with verification seal
+    UI-->>Clinician: Display transmission receipt and cryptographic hash
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. MFA & Email OTP Sequence -->
+        <section class="diagram-card" id="section-seq-mfa">
+            <div class="diagram-header">
+                <h2>4. MFA &amp; Live Email OTP Delivery Sequence</h2>
+                <span>Security &amp; Identity Verification</span>
+            </div>
+            <p class="diagram-desc">Step-up two-factor verification with live Google SMTP TLS delivery and ephemeral passcode validation.</p>
+            <div class="diagram-canvas">
+                <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User as Healthcare User
+    participant Browser as Browser Client
+    participant AuthAPI as Auth Controller
+    participant DB as User Database
+    participant SMTP as Google SMTP Server
+    participant Inbox as Clinician Email Inbox
+
+    User->>Browser: Enters email and password
+    Browser->>AuthAPI: POST /api/v1/auth/login
+    AuthAPI->>DB: Fetch user record and verify Argon2 / PBKDF2 hash
+    DB-->>AuthAPI: User record validated (MFA enabled: email_otp)
+    AuthAPI->>AuthAPI: Generate cryptographically secure 6-digit OTP and 5-min expiry
+    AuthAPI->>DB: Persist active_otp_code and otp_expires_at
+    AuthAPI->>SMTP: Dispatch TLS MIME email with one-time verification passcode
+    SMTP->>Inbox: Deliver CarePolicyGuard Security Passcode
+    AuthAPI-->>Browser: HTTP 200 (require_otp: true, mfa_method: email_otp)
+    Browser->>User: Display 6-digit OTP verification prompt
+    User->>Inbox: Retrieves OTP code
+    User->>Browser: Enters 6-digit code
+    Browser->>AuthAPI: POST /api/v1/auth/verify-otp (email, otp_code)
+    AuthAPI->>DB: Verify active_otp_code matches and now < otp_expires_at
+    AuthAPI->>DB: Clear active_otp_code, generate UserSession
+    AuthAPI-->>Browser: Issue secure session cookie / bearer token
+    Browser->>User: Route to role-specific dashboard (Clinician / Auditor / Admin)
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Case Lifecycle State Diagram -->
+        <section class="diagram-card" id="section-state">
+            <div class="diagram-header">
+                <h2>5. Adjudication Case Lifecycle State Machine</h2>
+                <span>State Progression</span>
+            </div>
+            <p class="diagram-desc">State transitions from initial ingestion, inclusion/exclusion evaluation, safety gate abstentions, to immutable cryptographic sealing.</p>
+            <div class="diagram-canvas">
+                <div class="mermaid">
+stateDiagram-v2
+    [*] --> Ingested: EHR Case Ingested via CDS Hooks or Manual Entry
+    Ingested --> ExtractingEvidence: Trigger Clinical NLP
+    ExtractingEvidence --> EvaluatingCriteria: Entities and Temporal Spans Extracted
+    
+    state EvaluatingCriteria {
+        [*] --> CheckInclusions
+        CheckInclusions --> CheckExclusions: Inclusions Satisfied
+        CheckExclusions --> CalcConfidence: No Disqualifying Exclusions
+    }
+
+    EvaluatingCriteria --> Approved: All Criteria Met (Confidence >= Threshold)
+    EvaluatingCriteria --> Denied: Unmet Criteria or Active Exclusion
+    EvaluatingCriteria --> DeferredToHuman: Low Confidence or Ambiguous Evidence
+
+    Approved --> PendingAttestation: Clinician Review Required
+    Denied --> PendingAttestation: Clinician Review or Peer-to-Peer
+    DeferredToHuman --> ManualCorrection: Clinician Overrides or Amends Notes
+    ManualCorrection --> EvaluatingCriteria: Re-evaluate
+
+    PendingAttestation --> AuthenticatingSigner: Clinician Clicks Authorize
+    AuthenticatingSigner --> SignedAndSealed: Correct 4-Digit Signing PIN Entered
+    AuthenticatingSigner --> PendingAttestation: Invalid PIN (Retry Allowed)
+
+    SignedAndSealed --> TransmittedToClearinghouse: PAS 278 Claim Generated
+    TransmittedToClearinghouse --> ArchivedInLedger: Payer Acknowledgment Received
+    ArchivedInLedger --> [*]: Cryptographically Locked (SHA-256)
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. DaVinci Interoperability Flow -->
+        <section class="diagram-card" id="section-davinci">
+            <div class="diagram-header">
+                <h2>6. HL7 DaVinci FHIR Standards Interoperability Flow</h2>
+                <span>Healthcare Standard Compliance</span>
+            </div>
+            <p class="diagram-desc">End-to-end integration across CRD (CDS Hooks), DTR (Questionnaire pre-population), and PAS (Claim submission) standards.</p>
+            <div class="diagram-canvas">
+                <div class="mermaid">
+flowchart LR
+    subgraph EHR ["EHR Environment"]
+        EHRApp["EHR Ordering System"]
+    end
+
+    subgraph CarePolicyGuardEngine ["CarePolicyGuard Platform"]
+        CRD["CDS Hooks Service (Coverage Requirements Discovery)"]
+        DTR["DTR Service (Documentation Templates and Rules)"]
+        PAS["PAS Service (Prior Authorization Support)"]
+        AuditEngine["Cryptographic Ledger Engine"]
+    end
+
+    subgraph PayerClearinghouse ["Payer / CMS Clearinghouse"]
+        CMSGateway["CMS Medicare Part B MAC Gateway"]
+    end
+
+    EHRApp -- "1. order-sign CDS Hook trigger" --> CRD
+    CRD -- "2. Return CDS Card with policy requirements" --> EHRApp
+    EHRApp -- "3. Fetch SMART on FHIR questionnaire" --> DTR
+    DTR -- "4. Return prepopulated clinical questionnaire" --> EHRApp
+    EHRApp -- "5. Submit completed FHIR Bundle" --> PAS
+    PAS -- "6. Cryptographic attestation and verification" --> AuditEngine
+    PAS -- "7. Forward X12 278 / FHIR Claim" --> CMSGateway
+    CMSGateway -- "8. Return 278 ClaimResponse" --> PAS
+    PAS -- "9. Update prior auth status" --> EHRApp
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                darkMode: true,
+                background: '#0B1120',
+                primaryColor: '#1E293B',
+                primaryTextColor: '#F8FAFC',
+                primaryBorderColor: '#38BDF8',
+                lineColor: '#38BDF8',
+                secondaryColor: '#0F172A',
+                tertiaryColor: '#1E293B'
+            }
+        });
+    </script>
+</body>
+</html>
+
