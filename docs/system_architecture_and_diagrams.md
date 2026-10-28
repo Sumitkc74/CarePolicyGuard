@@ -1,12 +1,18 @@
 # CarePolicyGuard Architecture and Design Specification
 
-This document provides complete architectural, relational, sequence, state, and interoperability diagrams for the **CarePolicyGuard** clinical adjudication and prior authorization attestation platform.
+This document provides visual architectural, relational, sequence, state, and interoperability diagrams for the **CarePolicyGuard** clinical adjudication and prior authorization attestation platform.
+
+Standalone image files are saved directly in `docs/images/` as both **PNG** and **SVG** formats for use in presentations, reports, and documentation.
 
 ---
 
 ## 1. High-Level System Architecture
 
 CarePolicyGuard is structured as a tiered, HIPAA-compliant prior authorization adjudication platform. It decouples interface concerns, API orchestration, deterministic clinical inference, cryptographic integrity auditing, and external healthcare integrations.
+
+![1. High-Level System Architecture](images/01_system_architecture.png)
+
+*Direct image files: [PNG](images/01_system_architecture.png) | [SVG](images/01_system_architecture.svg)*
 
 ```mermaid
 flowchart TB
@@ -50,6 +56,10 @@ flowchart TB
 ## 2. Entity-Relationship Data Model (ERD)
 
 The data model enforces relational integrity across users, sessions, national/local Medicare coverage determinations, individual criteria, and immutable adjudication ledgers.
+
+![2. Entity-Relationship Data Model](images/02_entity_relationship_erd.png)
+
+*Direct image files: [PNG](images/02_entity_relationship_erd.png) | [SVG](images/02_entity_relationship_erd.svg)*
 
 ```mermaid
 erDiagram
@@ -146,6 +156,10 @@ erDiagram
 
 This sequence traces the clinical adjudication pipeline from initial note ingestion through deterministic rule evaluation, clinician review, 4-digit PIN verification, cryptographic hashing, and clearinghouse transmission.
 
+![3. Prior Authorization Adjudication Sequence](images/03_adjudication_sequence.png)
+
+*Direct image files: [PNG](images/03_adjudication_sequence.png) | [SVG](images/03_adjudication_sequence.svg)*
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -186,6 +200,10 @@ sequenceDiagram
 
 This sequence illustrates the authentication flow, including live Google SMTP email dispatch for two-factor verification.
 
+![4. MFA and Email OTP Delivery Sequence](images/04_mfa_email_otp_sequence.png)
+
+*Direct image files: [PNG](images/04_mfa_email_otp_sequence.png) | [SVG](images/04_mfa_email_otp_sequence.svg)*
+
 ```mermaid
 sequenceDiagram
     autonumber
@@ -220,6 +238,10 @@ sequenceDiagram
 ## 5. State Diagram: Adjudication Case Lifecycle and Audit Immutability
 
 This state chart outlines the progression of an adjudication case from raw EHR clinical input to an immutable, cryptographically sealed record.
+
+![5. Case Lifecycle State Machine](images/05_case_lifecycle_state_machine.png)
+
+*Direct image files: [PNG](images/05_case_lifecycle_state_machine.png) | [SVG](images/05_case_lifecycle_state_machine.svg)*
 
 ```mermaid
 stateDiagram-v2
@@ -261,6 +283,10 @@ CarePolicyGuard complies with HL7 DaVinci prior authorization implementation gui
 2. **DTR (Documentation Templates and Rules)**: Pre-populates clinical documentation forms with EHR data.
 3. **PAS (Prior Authorization Support)**: Submits 278 prior authorization requests and receives immediate clearinghouse adjudication responses.
 
+![6. DaVinci FHIR Standards Interoperability Flow](images/06_davinci_fhir_interoperability.png)
+
+*Direct image files: [PNG](images/06_davinci_fhir_interoperability.png) | [SVG](images/06_davinci_fhir_interoperability.svg)*
+
 ```mermaid
 flowchart LR
     subgraph EHR ["EHR Environment"]
@@ -288,4 +314,3 @@ flowchart LR
     CMSGateway -- "8. Return 278 ClaimResponse" --> PAS
     PAS -- "9. Update prior auth status" --> EHRApp
 ```
-
