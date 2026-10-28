@@ -108,14 +108,15 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
             webhook_delivered=webhook_delivered,
             results=results
         )
-    @api_router.post("/adjudicate/batch/upload-parse", summary="Parse Uploaded Batch Roster Files (CSV, JSON, Multi-Page PDFs, or Scanned Images)")
+
+    @api_router.post("/adjudicate/batch/upload-parse", summary="Parse Uploaded Batch Roster Files (CSV, Excel, JSON, Multi-Page PDFs, or Scanned Images)")
     async def parse_batch_upload(
         files: List[UploadFile] = File(...),
         db: Session = Depends(get_db)
     ):
         """
         Ingests multi-patient files for batch verification:
-        - .csv: Ingests spreadsheets with patient_id, policy_id, procedure_code, clinical_narrative columns.
+        - .csv / .xlsx / .xls: Ingests spreadsheets with patient_id, policy_id, procedure_code, clinical_narrative columns.
         - .json: Ingests cohort JSON arrays.
         - .pdf, images (.png/.jpg/.tiff), .docx: Extracts multi-page text and applies OCR on scanned pages, auto-generating cohort cases.
         """
@@ -136,7 +137,7 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                 text_content = content.decode("utf-8", errors="replace")
                 reader = csv.DictReader(io.StringIO(text_content))
                 for row_idx, row in enumerate(reader, 1):
-                    row_lower = {k.strip().lower(): (v or "").strip() for k, v in row.items() if k}
+                    row_lower = {re.sub(r'[\s_-]+', '_', k).strip().lower(): (v or "").strip() for k, v in row.items() if k}
                     patient_id = (
                         row_lower.get("patient_id") or
                         row_lower.get("patient") or
@@ -162,7 +163,7 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                         row_lower.get("narrative") or
                         row_lower.get("notes") or
                         row_lower.get("chart") or
-                        row_lower.get("text") or
+                        row_lower.get("text") or row_lower.get("clinical_notes") or row_lower.get("clinical_note") or
                         ""
                     )
                     if narrative:
@@ -172,6 +173,57 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                             "requested_procedure_code": cpt,
                             "clinical_narrative": narrative
                         })
+
+            elif fn.endswith(".xlsx") or fn.endswith(".xls"):
+                import openpyxl
+                try:
+                    wb = openpyxl.load_workbook(io.BytesIO(content), data_only=True)
+                    sheet = wb.active
+                    rows_iter = sheet.iter_rows(values_only=True)
+                    header_row = next(rows_iter, None)
+                    if header_row:
+                        headers = [re.sub(r'[\s_-]+', '_', str(c or '')).strip().lower() for c in header_row]
+                        for row_idx, row in enumerate(rows_iter, 2):
+                            if not any(row):
+                                continue
+                            row_lower = {headers[i]: str(val).strip() for i, val in enumerate(row) if i < len(headers) and val is not None}
+                            patient_id = (
+                                row_lower.get("patient_id") or
+                                row_lower.get("patient") or
+                                row_lower.get("mrn") or
+                                f"PT-XLS-{row_idx:03d}"
+                            )
+                            policy_id = (
+                                row_lower.get("policy_id") or
+                                row_lower.get("policy") or
+                                row_lower.get("ncd") or
+                                row_lower.get("lcd") or
+                                "NCD-20.4"
+                            )
+                            cpt = (
+                                row_lower.get("requested_procedure_code") or
+                                row_lower.get("procedure_code") or
+                                row_lower.get("cpt") or
+                                row_lower.get("cpt_code") or
+                                "33249"
+                            )
+                            narrative = (
+                                row_lower.get("clinical_narrative") or
+                                row_lower.get("narrative") or
+                                row_lower.get("notes") or
+                                row_lower.get("chart") or
+                                row_lower.get("text") or row_lower.get("clinical_notes") or row_lower.get("clinical_note") or
+                                ""
+                            )
+                            if narrative:
+                                items.append({
+                                    "patient_id": patient_id,
+                                    "policy_id": policy_id,
+                                    "requested_procedure_code": cpt,
+                                    "clinical_narrative": narrative
+                                })
+                except Exception as e:
+                    raise HTTPException(status_code=400, detail=f"Failed to read Excel file {f.filename}: {str(e)}")
 
             elif fn.endswith(".json"):
                 try:
@@ -223,4 +275,3 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
             "total_patients": len(items),
             "items": items
         }
-

@@ -1192,11 +1192,15 @@
                                 <span>Mixed Specialty</span>
                                 <span class="cohort-pill-count">3</span>
                             </button>
-                            <button type="button" class="cohort-pill-btn" id="btn-cohort-upload" onclick="document.getElementById('batch-upload-file-input').click()" title="Upload CSV spreadsheet, JSON roster, or multiple scanned charts">
+                            <button type="button" class="cohort-pill-btn" id="btn-cohort-upload" onclick="document.getElementById('batch-upload-file-input').click()" title="Upload Excel (.xlsx/.xls), CSV spreadsheet, JSON roster, or multiple scanned PDF/image charts">
                                 <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
-                                <span>Upload Roster (CSV / PDFs)</span>
+                                <span>+ Add Roster (Excel / CSV / PDFs)</span>
                             </button>
-                            <input type="file" id="batch-upload-file-input" style="display:none;" multiple accept=".csv,.json,.pdf,.docx,.txt,.png,.jpg,.jpeg,.tiff,.bmp" onchange="handleBatchRosterFileUpload(event)" />
+                            <button type="button" class="cohort-pill-btn" id="btn-clear-custom-cohort" onclick="clearCustomCohort()" style="display:none;color:#F43F5E;border-color:rgba(244,63,94,0.3);" title="Clear custom uploaded cohort">
+                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                                <span>Clear Cohort</span>
+                            </button>
+                            <input type="file" id="batch-upload-file-input" style="display:none;" multiple accept=".xlsx,.xls,.csv,.json,.pdf,.docx,.txt,.png,.jpg,.jpeg,.tiff,.bmp" onchange="handleBatchRosterFileUpload(event)" />
                         </div>
                         <button class="btn-batch-run" id="btn-run-batch-adjudication" onclick="executeBatchAdjudication()">
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
@@ -2463,6 +2467,6 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261027_05" defer></script>
+    <script src="/static/js/app.js?v=20261027_06" defer></script>
 </body>
 </html>

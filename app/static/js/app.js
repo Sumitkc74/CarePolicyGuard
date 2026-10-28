@@ -5037,14 +5037,26 @@ async function handleBatchRosterFileUpload(event) {
         }
 
         const data = await res.json();
-        currentBatchRoster = data.items || [];
+        const newItems = data.items || [];
 
-        // Deactivate other cohort pills
+        // If currently on an uploaded cohort, APPEND newly uploaded patients so users can click one-by-one!
+        if (currentBatchCohortType === 'upload' && Array.isArray(currentBatchRoster) && currentBatchRoster.length > 0) {
+            currentBatchRoster = currentBatchRoster.concat(newItems);
+            showToast(`Added ${newItems.length} patient(s) to cohort (Total: ${currentBatchRoster.length})!`, "success");
+        } else {
+            currentBatchRoster = newItems;
+            showToast(`Loaded ${currentBatchRoster.length} patient cases into roster!`, "success");
+        }
+        currentBatchCohortType = 'upload';
+
+        // Deactivate preset pills and activate upload + clear pills
         document.querySelectorAll(".cohort-pill-btn").forEach(b => b.classList.remove("active"));
         if (uploadBtn) {
             uploadBtn.classList.add("active");
-            uploadBtn.innerHTML = `<span>Uploaded (${currentBatchRoster.length})</span>`;
+            uploadBtn.innerHTML = `<span>Custom Roster (${currentBatchRoster.length})</span>`;
         }
+        const clearBtn = document.getElementById("btn-clear-custom-cohort");
+        if (clearBtn) clearBtn.style.display = "inline-flex";
 
         // Update roster title & counter
         const titleEl = document.getElementById("batch-roster-title");
@@ -5075,8 +5087,39 @@ async function handleBatchRosterFileUpload(event) {
     }
 }
 
+
+function clearCustomCohort() {
+    currentBatchRoster = [];
+    currentBatchCohortType = 'upload';
+    const uploadBtn = document.getElementById("btn-cohort-upload");
+    if (uploadBtn) uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster (Excel / CSV / PDFs)</span>`;
+    const clearBtn = document.getElementById("btn-clear-custom-cohort");
+    if (clearBtn) clearBtn.style.display = "none";
+
+    const titleEl = document.getElementById("batch-roster-title");
+    if (titleEl) titleEl.textContent = "Custom Cohort (0 Patients - Click '+ Add Roster' to Upload)";
+    const totalEl = document.getElementById("batch-total-count");
+    if (totalEl) totalEl.textContent = "0";
+
+    const appEl = document.getElementById("batch-approved-count");
+    const denEl = document.getElementById("batch-denied-count");
+    const defEl = document.getElementById("batch-deferred-count");
+    const latEl = document.getElementById("batch-latency-count");
+    if (appEl) appEl.textContent = "--";
+    if (denEl) denEl.textContent = "--";
+    if (defEl) defEl.textContent = "--";
+    if (latEl) latEl.textContent = "-- ms";
+
+    renderBatchRosterTable([]);
+    showToast("Cleared custom roster cohort.", "info");
+}
+
 function switchBatchCohort(cohortType) {
     currentBatchCohortType = cohortType;
+    const clearBtn = document.getElementById("btn-clear-custom-cohort");
+    if (clearBtn && cohortType !== 'upload') clearBtn.style.display = "none";
+    const uploadBtn = document.getElementById("btn-cohort-upload");
+    if (uploadBtn && cohortType !== 'upload') uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster (Excel / CSV / PDFs)</span>`;
     currentBatchFilter = 'ALL';
     
     const btnCardio = document.getElementById("btn-cohort-cardiology");

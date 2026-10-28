@@ -83,7 +83,7 @@ api_router = APIRouter()
 # SECURITY & PRIVACY GUARDRAILS
 # =============================================================================
 MAX_FILE_SIZE = 15 * 1024 * 1024  # 15 MB maximum upload limit
-ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md", ".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp"}
+ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md", ".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp", ".csv", ".xlsx", ".xls", ".json"}
 
 # In-memory ephemeral store for Zero-Retention mode (not persisted to disk)
 _EPHEMERAL_PACKETS: Dict[str, CMSCoveragePacket] = {}

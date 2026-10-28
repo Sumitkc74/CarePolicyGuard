@@ -49,3 +49,30 @@ def test_multipage_extract_text():
     assert "Page 2:" in data["extracted_text"]
     assert "NCD-20.4" in data["suggested_policy_id"]
 
+
+def test_batch_upload_excel_and_mixed_files():
+    import openpyxl
+    # 1. Create an in-memory Excel workbook
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(["Patient ID", "Policy ID", "Procedure Code", "Clinical Narrative"])
+    ws.append(["PT-XLS-001", "NCD-20.4", "33249", "62yo male with severe ischemic cardiomyopathy, LVEF 24%, NYHA III on GDMT."])
+    ws.append(["PT-XLS-002", "NCD-20.4", "33249", "54yo female status-post anterior STEMI 8 days ago, LVEF 30%."])
+    excel_buf = io.BytesIO()
+    wb.save(excel_buf)
+    excel_buf.seek(0)
+
+    # 2. Upload a mix of Excel spreadsheet AND an individual clinical chart document together!
+    files = [
+        ("files", ("clinic_roster.xlsx", excel_buf, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")),
+        ("files", ("chart_pt3.txt", io.BytesIO(b"Patient: PT-TXT-003. History of dilated non-ischemic cardiomyopathy. Echo LVEF 31%. NYHA II."), "text/plain"))
+    ]
+
+    res = client.post("/api/v1/adjudicate/batch/upload-parse", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total_patients"] == 3
+    ids = [item["patient_id"] for item in data["items"]]
+    assert "PT-XLS-001" in ids
+    assert "PT-XLS-002" in ids
+    assert "PT-TXT-003" in ids
