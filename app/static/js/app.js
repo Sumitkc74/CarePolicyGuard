@@ -3069,8 +3069,8 @@ async function loadAuditLogs() {
                 bannerElem.innerHTML = `
                     <span class="med-icon icon-sm" style="flex-shrink: 0;"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>
                     <div>
-                        <strong> Licensed Clinician Mode:</strong>
-                        Viewing prior authorization determinations for clinical care delivery and peer-to-peer appeal documentation.
+                        <strong> Licensed Clinician Mode (HIPAA Minimum Necessary):</strong>
+                        Displaying only cases handled by your clinician account. Cross-provider cases across other facilities are restricted to regulatory auditors.
                     </div>
                 `;
             }
@@ -3085,7 +3085,10 @@ async function loadAuditLogs() {
             tbody.innerHTML = "";
 
             if (logs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">No adjudication audit logs recorded yet. Ephemeral zero-retention mode is active.</td></tr>`;
+                const emptyMsg = (currentRole === "Clinician")
+                    ? "No cases handled by your clinician account found. Adjudicate or sign a case to record it in your personal ledger."
+                    : "No adjudication audit logs recorded yet. Ephemeral zero-retention mode is active.";
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">${emptyMsg}</td></tr>`;
                 return;
             }
 

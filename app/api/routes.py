@@ -17,6 +17,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Response, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -436,6 +437,7 @@ async def adjudicate_record(
     request: AdjudicationRequest,
     http_request: Request,
     http_response: Response,
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -472,6 +474,7 @@ async def adjudicate_record(
         patient_id=request.patient_id,
         policy_id=request.policy_id,
         ehr_narrative=request.ehr_narrative,
+        user_id=current_user.id if current_user else None,
         custom_tau=custom_tau,
         save_record=save_record,
         cpt_codes=request.cpt_codes,
@@ -572,13 +575,27 @@ def get_audit_logs(
 ):
     """
     Retrieves immutable adjudication audit histories with cryptographic verification hashes.
-    Applies role-based clinical redaction (Admin: Metadata Only | Auditor: Full Regulatory Audit | Clinician: Full Care Delivery).
+    Applies role-based scoping and clinical redaction:
+    - Clinician: Scoped strictly to cases handled by this clinician (HIPAA Minimum Necessary, 45 CFR § 164.502(b)).
+    - Auditor: Complete cross-facility audit across all system records for regulatory oversight.
+    - Admin: Operational technical metadata across system records (clinical narratives redacted).
     """
     query = db.query(AdjudicationLog)
     if policy_id:
         query = query.filter(AdjudicationLog.policy_id == policy_id)
     if decision:
         query = query.filter(AdjudicationLog.decision == decision)
+
+    # HIPAA Minimum Necessary: Clinicians only see cases they personally handled/signed
+    if current_user and current_user.role == UserRole.CLINICIAN.value:
+        clinician_filters = [AdjudicationLog.user_id == current_user.id]
+        if current_user.username:
+            clinician_filters.append(AdjudicationLog.signed_by == current_user.username)
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.username}%"))
+        if current_user.email:
+            clinician_filters.append(AdjudicationLog.signed_by == current_user.email)
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.email}%"))
+        query = query.filter(or_(*clinician_filters))
 
     logs = query.order_by(AdjudicationLog.created_at.desc()).limit(limit).all()
     return [sanitize_audit_log_for_user(l, current_user) for l in logs]
@@ -591,7 +608,8 @@ def get_audit_log_by_case(
 ):
     """
     Retrieves full details for a specific case adjudication audit record.
-    Redacts clinical details for IT Admin in compliance with HIPAA Minimum Necessary.
+    Enforces HIPAA Minimum Necessary scoping: Clinicians can only inspect cases they handled.
+    Auditors and Admins retain full cross-system inspection rights.
     """
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
     if not log:
@@ -599,6 +617,20 @@ def get_audit_log_by_case(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Audit log record for case '{case_id}' not found."
         )
+
+    # HIPAA Minimum Necessary: Clinicians cannot inspect other clinicians' cases
+    if current_user and current_user.role == UserRole.CLINICIAN.value:
+        handled_by_user = (
+            log.user_id == current_user.id or
+            (log.signed_by and current_user.username in log.signed_by) or
+            (log.signed_by and current_user.email in log.signed_by)
+        )
+        if not handled_by_user and log.user_id is not None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access Denied: HIPAA Minimum Necessary restricts clinical inspection to cases handled by your account."
+            )
+
     return sanitize_audit_log_for_user(log, current_user)
 
 @api_router.delete("/audit-logs/purge/all", summary="Purge All Ephemeral & Unsubmitted Records")
@@ -981,6 +1013,7 @@ def get_coverage_packet(case_id: str, db: Session = Depends(get_db)):
 @api_router.post("/packet/submit", response_model=SubmissionReceipt, summary="Sign & Submit Reviewed Policy Packet to Insurance")
 def submit_coverage_to_insurance(
     request: SubmitPacketRequest,
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -994,9 +1027,11 @@ def submit_coverage_to_insurance(
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == request.case_id).first()
     if log:
         log.submission_status = "SUBMITTED_TO_PAYER"
-        log.signed_by = request.signed_by
+        log.signed_by = request.signed_by or (current_user.username if current_user else None)
         log.signed_at = now
         log.payer_transaction_id = transaction_id
+        if current_user and not log.user_id:
+            log.user_id = current_user.id
         if request.clinician_notes:
             log.required_clinician_action_notes = (log.required_clinician_action_notes or "") + f"\n[Clinician Attestation Note]: {request.clinician_notes}"
         db.commit()
