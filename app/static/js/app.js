@@ -5798,9 +5798,7 @@ function exportBatchRosterCSV() {
             gate = res.abstention_status ? "Triggered (tau < 0.85)" : "Passed (tau >= 0.85)";
         }
         
-        const cleanSummary = (item.clinical_narrative || "").replace(/[
-
-]+/g, " ").replace(/"/g, '""');
+        const cleanSummary = (item.clinical_narrative || "").replace(/\s+/g, " ").replace(/"/g, '""');
         const pName = (item.patient_name || "").replace(/"/g, '""');
         const demo = (item.demographics || "").replace(/"/g, '""');
         const procName = (item.procedure_name || getProcedureDescription(item.requested_procedure_code)).replace(/"/g, '""');
