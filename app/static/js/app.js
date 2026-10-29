@@ -871,6 +871,17 @@ function updateRoleBasedNavigation() {
     if (purgeAllBtn) {
         purgeAllBtn.style.display = isAdmin ? "inline-flex" : "none";
     }
+
+    // 5. Profile Modal Tabs: Clinician Credentials visible ONLY to Clinicians
+    const credsTabBtn = document.getElementById("btn-tab-profile-creds");
+    if (credsTabBtn) {
+        if (!isClinician) {
+            credsTabBtn.style.display = "none";
+            switchProfileModalTab("security");
+        } else {
+            credsTabBtn.style.display = "";
+        }
+    }
 }
 
 function routeToRoleDefaultTab() {
@@ -1038,6 +1049,7 @@ async function handleMfaChallengeSubmit(event) {
             sessionStorage.setItem("carepolicyguard_user", currentUser);
 
             updateUserBadge();
+            routeToRoleDefaultTab();
             hideLoginGate();
             showToast(`Two-factor verification successful. Authenticated as ${currentRole} (${currentUser})`);
 
@@ -3438,7 +3450,9 @@ async function viewAuditRecordDetails(caseId) {
             console.warn("Could not parse evidence_spans_json:", err);
         }
 
-        if (spansList && spansList.length > 0 && evidSection && evidBox) {
+        if (currentRole === "Admin") {
+            if (evidSection) evidSection.style.display = "none";
+        } else if (spansList && spansList.length > 0 && evidSection && evidBox) {
             evidSection.style.display = "";
             evidBox.innerHTML = "";
             spansList.slice(0, 2).forEach(sp => {
