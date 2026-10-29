@@ -573,7 +573,7 @@ function signOutToLoginGate() {
 // =============================================================================
 
 const DEFAULT_CLINICIAN_PROFILE = {
-    full_name: "Dr. Eleanor Vance, MD",
+    full_name: "Dr. Sarah Jenkins, MD, FACC",
     npi: "1043256787",
     specialty: "Cardiology / Electrophysiology",
     facility: "MetroHealth Heart & Vascular Institute"
@@ -583,7 +583,12 @@ function getClinicianProfile() {
     try {
         const stored = localStorage.getItem("carepolicyguard_clinician_profile");
         if (stored) {
-            return { ...DEFAULT_CLINICIAN_PROFILE, ...JSON.parse(stored) };
+            const parsed = JSON.parse(stored);
+            if (parsed.full_name && parsed.full_name.includes("Eleanor Vance")) {
+                parsed.full_name = "Dr. Sarah Jenkins, MD, FACC";
+                localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(parsed));
+            }
+            return { ...DEFAULT_CLINICIAN_PROFILE, ...parsed };
         }
     } catch (e) {
         console.warn("Could not parse stored clinician profile:", e);
@@ -4083,7 +4088,7 @@ function openClinicianPinModal() {
     if (caseIdEl) caseIdEl.textContent = (currentCoveragePacket && currentCoveragePacket.case_id) || "CASE-CURRENT";
 
     const sigInput = document.getElementById("doc-physician-signature");
-    const signerName = (sigInput && sigInput.value.trim()) || "Dr. Eleanor Vance, MD";
+    const signerName = (sigInput && sigInput.value.trim()) || "Dr. Sarah Jenkins, MD, FACC";
     const signerEl = document.getElementById("pin-modal-signer");
     if (signerEl) signerEl.textContent = signerName;
 
@@ -4240,7 +4245,7 @@ async function executePacketSubmission() {
     if (!currentCoveragePacket) return;
 
     const sigInput = document.getElementById("doc-physician-signature");
-    const signerBase = (sigInput && sigInput.value.trim()) || "Dr. Eleanor Vance, MD";
+    const signerBase = (sigInput && sigInput.value.trim()) || "Dr. Sarah Jenkins, MD, FACC";
     const signerName = `${signerBase} (PIN-Verified Attestation)`;
     const notesInput = document.getElementById("doc-clinical-summary");
     const clinicianNotes = notesInput ? notesInput.value.trim() : (currentCoveragePacket.clinical_summary || "");
