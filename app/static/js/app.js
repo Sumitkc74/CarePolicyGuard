@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initHipaaInactivityWatcher();
     setupPinInputListeners();
     renderClinicianProfile();
+    initGoogleGIS();
 });
 
 // =============================================================================
@@ -390,28 +391,74 @@ async function handleCustomGoogleSubmit(e) {
     await handleGoogleOAuthCredential(credential);
 }
 
+
+async function initGoogleGIS() {
+    try {
+        const cfgRes = await fetch("/api/v1/auth/oauth/config");
+        const cfg = cfgRes.ok ? await cfgRes.json() : {};
+
+        if (cfg.google_enabled && cfg.google_client_id) {
+            window._googleClientId = cfg.google_client_id;
+            
+            const checkGisReady = () => {
+                if (window.google && window.google.accounts && window.google.accounts.id) {
+                    google.accounts.id.initialize({
+                        client_id: cfg.google_client_id,
+                        callback: async (response) => {
+                            if (response && response.credential) {
+                                await handleGoogleOAuthCredential(response.credential);
+                            }
+                        },
+                        auto_select: false,
+                        cancel_on_tap_outside: true
+                    });
+
+                    // Render official Google Sign-In button
+                    const gContainer = document.getElementById("google-official-btn-container");
+                    if (gContainer) {
+                        gContainer.innerHTML = "";
+                        google.accounts.id.renderButton(gContainer, {
+                            type: "standard",
+                            shape: "rectangular",
+                            theme: "outline",
+                            text: "signin_with",
+                            size: "large",
+                            logo_alignment: "left",
+                            width: 320
+                        });
+                    }
+                } else {
+                    setTimeout(checkGisReady, 250);
+                }
+            };
+            checkGisReady();
+        }
+    } catch (e) {
+        console.warn("Google GIS initialization error:", e);
+    }
+}
+
 async function triggerGoogleSignIn() {
     try {
         const cfgRes = await fetch("/api/v1/auth/oauth/config");
         const cfg = cfgRes.ok ? await cfgRes.json() : {};
 
-        // If Google Client ID is configured and Google SDK is loaded, launch official Google GIS
+        // If Google Client ID is configured and Google SDK is loaded
         if (cfg.google_enabled && cfg.google_client_id && window.google && window.google.accounts) {
-            google.accounts.id.initialize({
-                client_id: cfg.google_client_id,
-                callback: async (response) => {
-                    if (response && response.credential) {
-                        await handleGoogleOAuthCredential(response.credential);
-                    }
-                }
-            });
+            // If official button is rendered, clicking it triggers the native Google account popup
+            const renderedBtn = document.querySelector("#google-official-btn-container div[role=button]");
+            if (renderedBtn) {
+                renderedBtn.click();
+                return;
+            }
+
             google.accounts.id.prompt((notification) => {
                 if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
                     openGoogleOAuthModal();
                 }
             });
         } else {
-            // Local Evaluation / Sandbox Mode: Open sleek in-app Google account picker
+            // Local Evaluation / Sandbox Mode: Open in-app Google account picker
             openGoogleOAuthModal();
         }
     } catch (e) {

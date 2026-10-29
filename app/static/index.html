@@ -58,6 +58,9 @@
                         <div style="flex: 1; height: 1px; background: #334155;"></div>
                     </div>
 
+                    <!-- OFFICIAL GOOGLE SIGN-IN BUTTON CONTAINER (RENDERED VIA GOOGLE IDENTITY SERVICES) -->
+                    <div id="google-official-btn-container" style="display: flex; justify-content: center; margin-bottom: 8px; width: 100%;"></div>
+
                     <!-- FEDERATED OAUTH SSO BUTTONS (GOOGLE & APPLE) -->
                     <div style="display: flex; gap: 8px; margin-bottom: 4px;">
                         <button type="button" class="btn-side-tutorial" id="btn-oauth-google" onclick="triggerGoogleSignIn()" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #f8fafc; font-size: 12px; font-weight: 600; cursor: pointer;">
@@ -2528,7 +2531,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261029_10" defer></script>
+    <script src="/static/js/app.js?v=20261029_11" defer></script>
 
     <!-- GOOGLE WORKSPACE OAUTH MODAL -->
     <div class="modal-overlay hidden" id="oauth-google-modal" style="position: fixed; inset: 0; z-index: 100000; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target===this)closeGoogleOAuthModal()">
