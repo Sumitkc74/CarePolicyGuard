@@ -3226,7 +3226,7 @@ async function loadAuditLogs() {
 
             if (logs.length === 0) {
                 const emptyMsg = (currentRole === "Clinician")
-                    ? "No cases handled by your clinician account found. Adjudicate or sign a case to record it in your personal ledger."
+                    ? "No cases found. Adjudicate or sign a case to record it in your personal ledger."
                     : "No adjudication audit logs recorded yet. Ephemeral zero-retention mode is active.";
                 tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">${emptyMsg}</td></tr>`;
                 return;
