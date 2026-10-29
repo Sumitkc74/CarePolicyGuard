@@ -247,7 +247,12 @@ async function handleMedicalRegistration(event) {
     const attestation = document.getElementById("reg-attestation-check")?.checked;
 
     if (!attestation) {
-        showToast("You must solemnly attest to your medical licensure status.", true);
+        showToast("Attestation required: please check the medical licensure certification box.", true);
+        return;
+    }
+
+    if (!npi) {
+        showToast("NPI cannot be empty. Please enter your 10-digit National Provider Identifier.", true);
         return;
     }
 
@@ -322,8 +327,16 @@ async function handleCustomLogin(event) {
     const username = uInput ? uInput.value.trim() : "";
     const password = pInput ? pInput.value : "";
 
-    if (!username || !password) {
-        showToast("Please provide both username and password.", true);
+    if (!username && !password) {
+        showToast("Please enter your username and password.", true);
+        return;
+    }
+    if (!username) {
+        showToast("Please enter your username or clinical email.", true);
+        return;
+    }
+    if (!password) {
+        showToast("Please enter your password.", true);
         return;
     }
 
@@ -532,7 +545,7 @@ async function executeLogin(username, password) {
             await loadAuditLogs();
         } else {
             const err = await res.json().catch(() => ({}));
-            showToast(err.detail || "Invalid credentials. Please verify username and password.", true);
+            showToast(err.detail || "Invalid credentials: the username or password entered is incorrect.", true);
         }
     } catch (e) {
         showToast("Authentication connection error: " + e.message, true);
@@ -706,8 +719,13 @@ function saveIndividualEdit(fieldName) {
     if (fieldName === "name") {
         const inp = document.getElementById("inp-profile-name");
         const val = inp ? inp.value.trim() : "";
-        if (!val || val.length < 3) {
-            showToast("Please enter a valid legal physician name.", true);
+        if (!val) {
+            showToast("Physician name cannot be empty. Please enter a legal name.", true);
+            if (inp) inp.focus();
+            return;
+        }
+        if (val.length < 3) {
+            showToast("Physician name is too short (at least 3 characters required).", true);
             if (inp) inp.focus();
             return;
         }
@@ -719,8 +737,13 @@ function saveIndividualEdit(fieldName) {
     } else if (fieldName === "npi") {
         const inp = document.getElementById("inp-profile-npi");
         const val = inp ? inp.value.trim() : "";
+        if (!val) {
+            showToast("NPI cannot be empty. Please enter a 10-digit CMS NPI.", true);
+            if (inp) inp.focus();
+            return;
+        }
         if (!/^\d{10}$/.test(val)) {
-            showToast("CMS National Provider Identifier (NPI) must be exactly 10 digits.", true);
+            showToast("Invalid NPI format: CMS NPI must be exactly 10 numeric digits.", true);
             if (inp) inp.focus();
             return;
         }
@@ -733,7 +756,7 @@ function saveIndividualEdit(fieldName) {
         const inp = document.getElementById("inp-profile-specialty");
         const val = inp ? inp.value.trim() : "";
         if (!val) {
-            showToast("Please enter a clinical specialty.", true);
+            showToast("Clinical specialty cannot be empty. Please enter a specialty.", true);
             if (inp) inp.focus();
             return;
         }
@@ -746,7 +769,7 @@ function saveIndividualEdit(fieldName) {
         const inp = document.getElementById("inp-profile-facility");
         const val = inp ? inp.value.trim() : "";
         if (!val) {
-            showToast("Please enter a practice / healthcare facility.", true);
+            showToast("Healthcare facility cannot be empty. Please enter a facility or practice name.", true);
             if (inp) inp.focus();
             return;
         }
@@ -758,8 +781,13 @@ function saveIndividualEdit(fieldName) {
     } else if (fieldName === "pin") {
         const inp = document.getElementById("inp-profile-pin");
         const val = inp ? inp.value.trim() : "";
+        if (!val) {
+            showToast("Signing PIN cannot be empty. Please enter a 4-digit numeric PIN.", true);
+            if (inp) inp.focus();
+            return;
+        }
         if (!/^\d{4}$/.test(val)) {
-            showToast("Clinician Signing PIN must be exactly 4 numeric digits.", true);
+            showToast("Invalid PIN format: Clinician Signing PIN must be exactly 4 numeric digits.", true);
             if (inp) inp.focus();
             return;
         }
@@ -1010,8 +1038,12 @@ async function handleMfaChallengeSubmit(event) {
     const submitBtn = document.getElementById("btn-mfa-submit");
     const code = codeInput ? codeInput.value.trim() : "";
 
-    if (!code || code.length !== 6) {
-        showToast("Please enter a valid 6-digit security code.", true);
+    if (!code) {
+        showToast("Security code cannot be empty. Please enter your 6-digit code.", true);
+        return;
+    }
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        showToast("Invalid security code: code must be exactly 6 numeric digits.", true);
         return;
     }
 
@@ -1250,8 +1282,12 @@ async function openTotpSetup() {
 async function confirmTotpActivation() {
     const input = document.getElementById("totp-verify-code-input");
     const code = input ? input.value.trim() : "";
-    if (!code || code.length !== 6) {
-        showToast("Please enter the 6-digit code from your Authenticator app.", true);
+    if (!code) {
+        showToast("Authenticator code cannot be empty. Please enter your 6-digit code.", true);
+        return;
+    }
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        showToast("Invalid code: Authenticator code must be exactly 6 numeric digits.", true);
         return;
     }
 
@@ -1320,8 +1356,12 @@ async function enableEmailOtpMfa() {
 async function confirmEmailMfaActivation() {
     const input = document.getElementById("email-verify-code-input");
     const code = input ? input.value.trim() : "";
-    if (!code || code.length !== 6) {
-        showToast("Please enter the 6-digit verification code from your email.", true);
+    if (!code) {
+        showToast("Email verification code cannot be empty. Please enter your 6-digit code.", true);
+        return;
+    }
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        showToast("Invalid code: email verification code must be exactly 6 numeric digits.", true);
         return;
     }
 
@@ -1369,7 +1409,7 @@ async function requestSmsOtpCode() {
     const phoneInput = document.getElementById("sms-phone-input");
     const phone = phoneInput ? phoneInput.value.trim() : "";
     if (!phone) {
-        showToast("Please enter a valid mobile phone number.", true);
+        showToast("Mobile phone number cannot be empty. Please enter your phone number.", true);
         return;
     }
 
@@ -1407,8 +1447,12 @@ async function confirmSmsMfaActivation() {
     const code = input ? input.value.trim() : "";
     const phone = phoneInput ? phoneInput.value.trim() : null;
 
-    if (!code || code.length !== 6) {
-        showToast("Please enter the 6-digit verification code from your SMS.", true);
+    if (!code) {
+        showToast("SMS verification code cannot be empty. Please enter your 6-digit code.", true);
+        return;
+    }
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        showToast("Invalid code: SMS code must be exactly 6 numeric digits.", true);
         return;
     }
 
@@ -3995,7 +4039,7 @@ function getClinicianSigningPin() {
 
 function submitPacketToInsurance() {
     if (!currentCoveragePacket) {
-        showToast("No active coverage packet prepared for submission.", "error");
+        showToast("No coverage packet found: please run Step 2 (Policy Check) to generate a coverage packet before submitting.", "error");
         return;
     }
 
@@ -4011,7 +4055,7 @@ function submitPacketToInsurance() {
 
     const certifyCheck = document.getElementById("doc-certify-check");
     if (certifyCheck && !certifyCheck.checked) {
-        showToast("Please certify the clinical necessity check before transmitting.", "warning");
+        showToast("Attestation required: please check the certification box confirming clinical necessity before transmitting.", "warning");
         return;
     }
 
@@ -4081,6 +4125,11 @@ function saveNewSigningPin() {
 
     if (!curInput || !newInput) return;
 
+    if (!curInput.value.trim()) {
+        showToast("Current PIN cannot be empty. Please enter your current PIN.", "error");
+        curInput.focus();
+        return;
+    }
     if (curInput.value.trim() !== currentPin) {
         showToast("Current PIN does not match. Default demo PIN is 1234.", "error");
         curInput.focus();
@@ -4088,8 +4137,13 @@ function saveNewSigningPin() {
     }
 
     const newPin = newInput.value.trim();
+    if (!newPin) {
+        showToast("New PIN cannot be empty. Please enter a 4-digit PIN.", "error");
+        newInput.focus();
+        return;
+    }
     if (!/^\d{4}$/.test(newPin)) {
-        showToast("New PIN must be exactly 4 numeric digits.", "error");
+        showToast("Invalid PIN format: new PIN must be exactly 4 numeric digits.", "error");
         newInput.focus();
         return;
     }
@@ -4574,7 +4628,7 @@ let currentFhirBundle = null;
 
 async function openPeerToPeerAppealModal() {
     if (!lastAdjudicationResult && !currentCoveragePacket) {
-        showToast("Please evaluate a clinical note first.", true);
+        showToast("No evaluated case found: please evaluate a patient note on Step 2 before generating an appeal letter.", true);
         return;
     }
 
@@ -4662,7 +4716,7 @@ function printAppealLetter() {
 
 async function exportFhirBundle() {
     if (!lastAdjudicationResult && !currentCoveragePacket) {
-        showToast("Please evaluate a clinical note first.", true);
+        showToast("No evaluated case found: please evaluate a patient note on Step 2 before exporting FHIR bundle.", true);
         return;
     }
 
@@ -4720,7 +4774,7 @@ function downloadFhirJsonFile() {
 
 async function pushToHospitalEhr() {
     if (!lastAdjudicationResult && !currentCoveragePacket) {
-        showToast("Please evaluate a clinical note first.", true);
+        showToast("No evaluated case found: please evaluate a patient note on Step 2 before syncing to EHR.", true);
         return;
     }
 
@@ -4981,7 +5035,7 @@ function closeAddendumModal() {
 
 async function submitClinicalAddendum() {
     if (!lastAdjudicationResult) {
-        showToast("No active adjudication case to amend.", true);
+        showToast("No active prior authorization case selected. Please evaluate a case on Step 2 before drafting an addendum.", true);
         return;
     }
 
@@ -4990,8 +5044,13 @@ async function submitClinicalAddendum() {
     const npiElem = document.getElementById("addendum-physician-npi");
 
     const addendumText = inputElem ? inputElem.value.trim() : "";
-    if (!addendumText || addendumText.length < 10) {
-        showToast("Please enter authentic clinical observations for the patient (minimum 10 characters).", true);
+    if (!addendumText) {
+        showToast("Addendum text cannot be empty. Please enter clinical observations for the patient.", true);
+        if (inputElem) inputElem.focus();
+        return;
+    }
+    if (addendumText.length < 10) {
+        showToast("Addendum text is too short (minimum 10 characters required).", true);
         if (inputElem) inputElem.focus();
         return;
     }
@@ -6054,7 +6113,7 @@ function downloadPacketPdf(customCaseId) {
         (lastAdjudicationResult && lastAdjudicationResult.case_id);
 
     if (!caseId) {
-        showToast("No active clinical case identifier found.", true);
+        showToast("No evaluated case found: please evaluate a patient note on Step 2 before downloading PDF.", true);
         return;
     }
 
@@ -6094,7 +6153,7 @@ function downloadAppealLetterPdf(customCaseId) {
         (lastAdjudicationResult && lastAdjudicationResult.case_id);
 
     if (!caseId) {
-        showToast("No active clinical case identifier found.", true);
+        showToast("No evaluated case found: please evaluate a patient note on Step 2 before downloading appeal PDF.", true);
         return;
     }
 
