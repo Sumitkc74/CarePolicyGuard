@@ -5161,10 +5161,103 @@ function exportAuditTrailCsv() {
 // BATCH ROSTER ADJUDICATION ENGINE
 // =============================================================================
 
+function getProcedureDescription(cptCode) {
+    const codeMap = {
+        '33249': 'ICD Implantation (Transvenous)',
+        '33206': 'Pacemaker Insertion (Single Chamber)',
+        '33207': 'Pacemaker Insertion (Transvenous)',
+        '33208': 'Pacemaker Insertion (Dual Chamber)',
+        'E0601': 'Continuous Airway Pressure (CPAP)',
+        'E0470': 'Bi-Level Respiratory Assist (BiPAP)',
+        'E1390': 'Home Oxygen Concentrator',
+        'G0277': 'Hyperbaric Oxygen Therapy (HBOT)',
+        '99214': 'Outpatient Clinic Evaluation (Level 4)',
+        '99215': 'Outpatient Clinic Evaluation (Level 5)'
+    };
+    return codeMap[cptCode] || 'Medical Procedure';
+}
+
 const SAMPLE_BATCH_ROSTERS = {
+    practice: [
+        {
+            patient_id: "PT-CARD-881",
+            patient_name: "Eleanor Vance",
+            demographics: "68yo M",
+            procedure_name: "ICD Implantation (Transvenous)",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: `68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
+        },
+        {
+            patient_id: "PT-PULM-701",
+            patient_name: "Harold Finch",
+            demographics: "52yo M",
+            procedure_name: "Auto-Titrating CPAP Device",
+            policy_id: "LCD-L33829",
+            requested_procedure_code: "E0601",
+            clinical_narrative: `52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial.
+
+Attending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)
+Electronically signed by: /s/ Dr. Robert Stevens, MD`
+        },
+        {
+            patient_id: "PT-WOUND-702",
+            patient_name: "Arthur Pendelton",
+            demographics: "64yo M",
+            procedure_name: "Hyperbaric Oxygen Therapy (HBOT)",
+            policy_id: "NCD-20.29",
+            requested_procedure_code: "G0277",
+            clinical_narrative: `64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse.
+
+Attending Physician: Dr. Evelyn Reed, MD (NPI: 1872635490)
+Electronically signed by: /s/ Dr. Evelyn Reed, MD`
+        },
+        {
+            patient_id: "PT-CARD-882",
+            patient_name: "Beatrice Cox",
+            demographics: "55yo F",
+            procedure_name: "ICD Implantation (Transvenous)",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: `55-year-old female post acute STEMI 12 days ago. Underwent emergency stenting. Echo demonstrates LVEF 30%. NYHA Class II. Currently in hospital recovering from acute event.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
+        },
+        {
+            patient_id: "PT-PULM-703",
+            patient_name: "Maria Santos",
+            demographics: "70yo F",
+            procedure_name: "Stationary Oxygen Concentrator",
+            policy_id: "NCD-240.2",
+            requested_procedure_code: "E1390",
+            clinical_narrative: `70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min.
+
+Attending Physician: Dr. Robert Stevens, MD (NPI: 1982736451)
+Electronically signed by: /s/ Dr. Robert Stevens, MD`
+        },
+        {
+            patient_id: "PT-CARD-884",
+            patient_name: "David Kim",
+            demographics: "61yo M",
+            procedure_name: "ICD Implantation (Transvenous)",
+            policy_id: "NCD-20.4",
+            requested_procedure_code: "33249",
+            clinical_narrative: `61-year-old male presenting with shortness of breath and lower extremity edema. Chart mentions heart failure with reduced ejection fraction, but recent quantitative echocardiogram or radionuclide LVEF measurement report is completely missing from current hospitalization records.
+
+Attending Physician: Dr. Marcus Vance, MD (NPI: 1043256787)
+Electronically signed by: /s/ Dr. Marcus Vance, MD`
+        }
+    ],
     cardiology: [
         {
             patient_id: "PT-CARD-881",
+            patient_name: "Eleanor Vance",
+            demographics: "68yo M",
+            procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
             clinical_narrative: `68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness.
@@ -5174,6 +5267,9 @@ Electronically signed by: /s/ Dr. Marcus Vance, MD`
         },
         {
             patient_id: "PT-CARD-882",
+            patient_name: "Beatrice Cox",
+            demographics: "55yo F",
+            procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
             clinical_narrative: `55-year-old female post acute STEMI 12 days ago. Underwent emergency stenting. Echo demonstrates LVEF 30%. NYHA Class II. Currently in hospital recovering from acute event.
@@ -5183,6 +5279,9 @@ Electronically signed by: /s/ Dr. Marcus Vance, MD`
         },
         {
             patient_id: "PT-CARD-883",
+            patient_name: "Thomas Miller",
+            demographics: "72yo F",
+            procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
             clinical_narrative: `72-year-old female with dilated non-ischemic cardiomyopathy. Transthoracic echocardiogram reveals LVEF 32%. Patient reports NYHA Class III heart failure symptoms with fatigue at low workloads. Treated with GDMT including Sacubitril/Valsartan 49/51mg and Metoprolol succinate 100mg for 5 months. No acute ischemic events. Life expectancy exceeds 1 year.
@@ -5192,6 +5291,9 @@ Electronically signed by: /s/ Dr. Marcus Vance, MD`
         },
         {
             patient_id: "PT-CARD-884",
+            patient_name: "David Kim",
+            demographics: "61yo M",
+            procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
             clinical_narrative: `61-year-old male presenting with shortness of breath and lower extremity edema. Chart mentions heart failure with reduced ejection fraction, but recent quantitative echocardiogram or radionuclide LVEF measurement report is completely missing from current hospitalization records.
@@ -5203,6 +5305,9 @@ Electronically signed by: /s/ Dr. Marcus Vance, MD`
     pulmonology: [
         {
             patient_id: "PT-PULM-701",
+            patient_name: "Harold Finch",
+            demographics: "52yo M",
+            procedure_name: "Auto-Titrating CPAP Device",
             policy_id: "LCD-L33829",
             requested_procedure_code: "E0601",
             clinical_narrative: `52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial.
@@ -5212,6 +5317,9 @@ Electronically signed by: /s/ Dr. Robert Stevens, MD`
         },
         {
             patient_id: "PT-PULM-703",
+            patient_name: "Maria Santos",
+            demographics: "70yo F",
+            procedure_name: "Stationary Oxygen Concentrator",
             policy_id: "NCD-240.2",
             requested_procedure_code: "E1390",
             clinical_narrative: `70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min.
@@ -5221,6 +5329,9 @@ Electronically signed by: /s/ Dr. Robert Stevens, MD`
         },
         {
             patient_id: "PT-PULM-704",
+            patient_name: "Dennis Walker",
+            demographics: "48yo M",
+            procedure_name: "Auto-Titrating CPAP Device",
             policy_id: "LCD-L33829",
             requested_procedure_code: "E0601",
             clinical_narrative: `48-year-old male presenting with habitual snoring and morning sluggishness. Epworth Sleepiness Scale score is 11/24. No diagnostic overnight polysomnography or home sleep apnea test has been conducted to quantify apnea-hypopnea index (AHI).
@@ -5232,6 +5343,9 @@ Electronically signed by: /s/ Dr. Robert Stevens, MD`
     wound_care: [
         {
             patient_id: "PT-WOUND-702",
+            patient_name: "Arthur Pendelton",
+            demographics: "64yo M",
+            procedure_name: "Hyperbaric Oxygen Therapy (HBOT)",
             policy_id: "NCD-20.29",
             requested_procedure_code: "G0277",
             clinical_narrative: `64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse.
@@ -5241,6 +5355,9 @@ Electronically signed by: /s/ Dr. Evelyn Reed, MD`
         },
         {
             patient_id: "PT-WOUND-705",
+            patient_name: "Clara Higgins",
+            demographics: "58yo F",
+            procedure_name: "Hyperbaric Oxygen Therapy (HBOT)",
             policy_id: "NCD-20.29",
             requested_procedure_code: "G0277",
             clinical_narrative: `58-year-old female with type 2 diabetes with superficial Wagner Grade 1 neuropathic ulcer on lateral malleolus for 8 days. Conventional standard wound dressings applied for 1 week only. No osteomyelitis, deep abscess, or tendon involvement.
@@ -5250,6 +5367,9 @@ Electronically signed by: /s/ Dr. Evelyn Reed, MD`
         },
         {
             patient_id: "PT-WOUND-706",
+            patient_name: "Franklin Scott",
+            demographics: "71yo M",
+            procedure_name: "Hyperbaric Oxygen Therapy (HBOT)",
             policy_id: "NCD-20.29",
             requested_procedure_code: "G0277",
             clinical_narrative: `71-year-old male with end-stage peripheral arterial disease and rapidly ascending wet gangrene with hemodynamic instability. Distal pulses absent. Non-compressible heavily calcified arteries with unrecordable ABI. Requires immediate surgical debridement and vascular intervention prior to any hyperbaric evaluation.
@@ -5261,6 +5381,9 @@ Electronically signed by: /s/ Dr. Evelyn Reed, MD`
     mixed: [
         {
             patient_id: "PT-CARD-881",
+            patient_name: "Eleanor Vance",
+            demographics: "68yo M",
+            procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",
             requested_procedure_code: "33249",
             clinical_narrative: `68-year-old male with ischemic cardiomyopathy. Prior MI in 2021 (>3 years ago). Echo on 01/10/2024 shows severe systolic dysfunction with LVEF 28%. NYHA Class II symptoms with mild dyspnea on exertion. On guideline-directed medical therapy for >6 months with Carvedilol 25mg BID, Lisinopril 20mg daily, and Spironolactone 25mg daily. No cardiogenic shock, no terminal illness.
@@ -5270,6 +5393,9 @@ Electronically signed by: /s/ Dr. Marcus Vance, MD`
         },
         {
             patient_id: "PT-PULM-701",
+            patient_name: "Harold Finch",
+            demographics: "52yo M",
+            procedure_name: "Auto-Titrating CPAP Device",
             policy_id: "LCD-L33829",
             requested_procedure_code: "E0601",
             clinical_narrative: `52-year-old male with chronic severe snoring and witnessed apneas. Prior in-person face-to-face evaluation by Dr. Stevens documented severe daytime somnolence (Epworth 16/24). Diagnostic polysomnography performed showing severe OSA with AHI 36.4 events/hr. Recommending auto-CPAP trial.
@@ -5279,6 +5405,9 @@ Electronically signed by: /s/ Dr. Robert Stevens, MD`
         },
         {
             patient_id: "PT-WOUND-702",
+            patient_name: "Arthur Pendelton",
+            demographics: "64yo M",
+            procedure_name: "Hyperbaric Oxygen Therapy (HBOT)",
             policy_id: "NCD-20.29",
             requested_procedure_code: "G0277",
             clinical_narrative: `64-year-old male with type 2 diabetes presenting with non-healing right plantar ulcer. Physical exam demonstrates Wagner Grade 3 diabetic foot ulcer with exposed tendon and deep abscess. Patient has undergone 45 days of standard wound care including sharp debridement and offloading without improvement. Lower extremity arterial Doppler demonstrates ABI 0.82 and palpable posterior tibial pulse.
@@ -5288,6 +5417,9 @@ Electronically signed by: /s/ Dr. Evelyn Reed, MD`
         },
         {
             patient_id: "PT-PULM-703",
+            patient_name: "Maria Santos",
+            demographics: "70yo F",
+            procedure_name: "Stationary Oxygen Concentrator",
             policy_id: "NCD-240.2",
             requested_procedure_code: "E1390",
             clinical_narrative: `70-year-old female with severe end-stage COPD. Resting arterial blood gas on room air demonstrates PaO2 51 mmHg and pulse oximetry SpO2 86% at rest. Prescribing home stationary oxygen concentrator continuous 2 L/min.
@@ -5556,6 +5688,97 @@ function filterBatchTable(filterType) {
     }
 }
 
+
+function searchBatchTable(query) {
+    const q = (query || "").toLowerCase().trim();
+    const rows = document.querySelectorAll("#batch-table-body tr:not(.empty-filter-row):not(#batch-empty-roster-row)");
+    let matchCount = 0;
+    
+    rows.forEach(tr => {
+        const text = tr.textContent.toLowerCase();
+        const rowDecision = tr.getAttribute("data-decision") || "PENDING";
+        
+        let pillMatch = true;
+        if (currentBatchFilter === 'APPROVED' && rowDecision !== 'APPROVED') pillMatch = false;
+        if (currentBatchFilter === 'DENIED' && rowDecision !== 'DENIED') pillMatch = false;
+        if (currentBatchFilter === 'DEFERRED' && (rowDecision !== 'DEFERRED' && rowDecision !== 'HOLD' && !rowDecision.includes('DEFER'))) pillMatch = false;
+        
+        const matchesQuery = !q || text.includes(q);
+        const visible = matchesQuery && pillMatch;
+        tr.style.display = visible ? "" : "none";
+        if (visible) matchCount++;
+    });
+    
+    const tbody = document.getElementById("batch-table-body");
+    const existingEmpty = document.getElementById("batch-empty-search-row");
+    if (matchCount === 0 && rows.length > 0) {
+        if (!existingEmpty && tbody) {
+            const emptyTr = document.createElement("tr");
+            emptyTr.id = "batch-empty-search-row";
+            emptyTr.className = "empty-filter-row";
+            emptyTr.innerHTML = `<td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted);font-size:0.88rem;">No cases match search query "<strong>${escapeHtml(query)}</strong>".</td>`;
+            tbody.appendChild(emptyTr);
+        }
+    } else {
+        if (existingEmpty) existingEmpty.remove();
+    }
+}
+
+function exportBatchRosterCSV() {
+    if (!currentBatchRoster || currentBatchRoster.length === 0) {
+        showToast("No patient records in roster to export.", "warning");
+        return;
+    }
+    
+    const headers = ["Index", "Patient ID", "Patient Name", "Demographics", "Policy ID", "CPT/HCPCS", "Procedure Description", "Adjudication Decision", "Calibrated Confidence", "Safety Gate", "Clinical Summary"];
+    
+    const rows = currentBatchRoster.map((item, idx) => {
+        let decision = "PENDING";
+        let conf = "--";
+        let gate = "--";
+        
+        if (window._lastBatchResults && window._lastBatchResults[idx]) {
+            const res = window._lastBatchResults[idx];
+            decision = (res.decision || "PENDING").toUpperCase();
+            conf = `${Math.round((res.calibrated_confidence || 0) * 100)}%`;
+            gate = res.abstention_status ? "Triggered (tau < 0.85)" : "Passed (tau >= 0.85)";
+        }
+        
+        const cleanSummary = (item.clinical_narrative || "").replace(/[
+
+]+/g, " ").replace(/"/g, '""');
+        const pName = (item.patient_name || "").replace(/"/g, '""');
+        const demo = (item.demographics || "").replace(/"/g, '""');
+        const procName = (item.procedure_name || getProcedureDescription(item.requested_procedure_code)).replace(/"/g, '""');
+        
+        return [
+            idx + 1,
+            `"${item.patient_id}"`,
+            `"${pName}"`,
+            `"${demo}"`,
+            `"${item.policy_id}"`,
+            `"${item.requested_procedure_code || ''}"`,
+            `"${procName}"`,
+            `"${decision}"`,
+            `"${conf}"`,
+            `"${gate}"`,
+            `"${cleanSummary}"`
+        ].join(",");
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    link.setAttribute("download", `CarePolicyGuard_Roster_${timestamp}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast(`Exported ${currentBatchRoster.length} cases to CSV file.`, "success");
+}
+
 function loadSampleBatchRoster(rosterType) {
     if (!rosterType || rosterType === "none" || rosterType === "") {
         renderBatchEmptyState();
@@ -5570,6 +5793,10 @@ function loadSampleBatchRoster(rosterType) {
     }
     
     const cohortLabels = {
+        practice: {
+            title: `Active Roster: Multi-Specialty Benchmark Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Multi-Specialty Benchmark Practice Cohort"
+        },
         cardiology: {
             title: `Active Roster: Cardiology Clinic Cohort (${currentBatchRoster.length} Patients)`,
             sub: "Cardiology Clinic Cohort (NCD-20.4)"
@@ -5635,13 +5862,17 @@ function renderBatchTablePending() {
             ? item.clinical_narrative.substring(0, 95) + "..." 
             : item.clinical_narrative;
         const specialty = getPolicySpecialty(item.policy_id);
+        const procName = item.procedure_name || getProcedureDescription(item.requested_procedure_code);
 
         tr.innerHTML = `
             <td><strong style="color:var(--text-muted);">#${idx + 1}</strong></td>
             <td>
-                <div class="patient-chip">
+                <div class="patient-chip" style="gap:10px;">
                     <span class="patient-avatar-mini">PT</span>
-                    <span>${escapeHtml(item.patient_id)}</span>
+                    <div style="display:flex; flex-direction:column; line-height:1.2;">
+                        <span style="font-weight:600; color:var(--text-primary); font-size:0.85rem;">${escapeHtml(item.patient_id)}</span>
+                        ${item.patient_name ? `<span style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(item.patient_name)}${item.demographics ? ` &bull; ${escapeHtml(item.demographics)}` : ''}</span>` : ''}
+                    </div>
                 </div>
             </td>
             <td>
@@ -5650,7 +5881,12 @@ function renderBatchTablePending() {
                     <span class="policy-specialty-sub">${escapeHtml(specialty)}</span>
                 </div>
             </td>
-            <td><span class="procedure-cpt-pill">${escapeHtml(item.requested_procedure_code || 'N/A')}</span></td>
+            <td>
+                <div style="display:flex; flex-direction:column; line-height:1.2; gap:3px;">
+                    <span class="procedure-cpt-pill">${escapeHtml(item.requested_procedure_code || 'N/A')}</span>
+                    <span style="font-size:0.72rem; color:var(--text-muted); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(procName)}</span>
+                </div>
+            </td>
             <td><div class="clinical-snippet-box">${escapeHtml(snippet)}</div></td>
             <td>
                 <span class="decision-pill pending">
@@ -5792,13 +6028,19 @@ function renderBatchResults(results) {
 
         const confPct = Math.round(item.calibrated_confidence * 100);
         const confClass = confPct >= 85 ? "high" : (confPct >= 65 ? "medium" : "low");
+        const patientName = (currentBatchRoster[item.index - 1] && currentBatchRoster[item.index - 1].patient_name) || "";
+        const demographics = (currentBatchRoster[item.index - 1] && currentBatchRoster[item.index - 1].demographics) || "";
+        const procName = (currentBatchRoster[item.index - 1] && currentBatchRoster[item.index - 1].procedure_name) || getProcedureDescription(cptCode);
 
         tr.innerHTML = `
             <td><strong style="color:var(--text-muted);">#${item.index}</strong></td>
             <td>
-                <div class="patient-chip">
+                <div class="patient-chip" style="gap:10px;">
                     <span class="patient-avatar-mini">PT</span>
-                    <span>${escapeHtml(item.patient_id_masked)}</span>
+                    <div style="display:flex; flex-direction:column; line-height:1.2;">
+                        <span style="font-weight:600; color:var(--text-primary); font-size:0.85rem;">${escapeHtml(item.patient_id_masked)}</span>
+                        ${patientName ? `<span style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(patientName)}${demographics ? ` &bull; ${escapeHtml(demographics)}` : ''}</span>` : ''}
+                    </div>
                 </div>
             </td>
             <td>
@@ -5807,7 +6049,12 @@ function renderBatchResults(results) {
                     <span class="policy-specialty-sub">${escapeHtml(specialty)}</span>
                 </div>
             </td>
-            <td><span class="procedure-cpt-pill">${escapeHtml(cptCode)}</span></td>
+            <td>
+                <div style="display:flex; flex-direction:column; line-height:1.2; gap:3px;">
+                    <span class="procedure-cpt-pill">${escapeHtml(cptCode)}</span>
+                    <span style="font-size:0.72rem; color:var(--text-muted); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(procName)}</span>
+                </div>
+            </td>
             <td><div class="clinical-snippet-box">${escapeHtml(snippet)}</div></td>
             <td>${decisionBadge}</td>
             <td>

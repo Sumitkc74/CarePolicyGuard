@@ -1191,6 +1191,7 @@
                                 <div class="cohort-select-wrapper">
                                     <select id="batch-cohort-select" class="batch-cohort-select" onchange="switchBatchCohort(this.value)">
                                         <option value="" selected>-- Select a Cohort or Upload Roster --</option>
+                                        <option value="practice">Multi-Specialty Benchmark Cohort (6 Practice Cases)</option>
                                         <option value="cardiology">Cardiology Clinic (4 Practice Cases - NCD-20.4)</option>
                                         <option value="pulmonology">Pulmonology &amp; Sleep (3 Practice Cases - LCD-L33829)</option>
                                         <option value="wound_care">Wound Care &amp; HBOT (3 Practice Cases - NCD-20.29)</option>
@@ -1202,11 +1203,19 @@
                                     </span>
                                 </div>
                             </div>
+                            <button type="button" class="btn-cohort-sample-action" id="btn-cohort-sample" onclick="loadSampleBatchRoster('practice')" title="Fill rows with realistic multi-specialty clinical test cases">
+                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+                                <span>Fill Test Data</span>
+                            </button>
                             <button type="button" class="btn-cohort-upload-action" id="btn-cohort-upload" onclick="document.getElementById('batch-upload-file-input').click()" title="Upload Excel (.xlsx/.xls), CSV spreadsheet, JSON roster, or multiple scanned PDF/image charts">
                                 <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span>
                                 <span>+ Add Roster</span>
                             </button>
-                            <button type="button" class="btn-cohort-clear-action" id="btn-clear-custom-cohort" onclick="clearCustomCohort()" style="display:none;" title="Clear custom uploaded cohort">
+                            <button type="button" class="btn-cohort-export-action" id="btn-cohort-export" onclick="exportBatchRosterCSV()" title="Export current patient roster or verification audit report as CSV">
+                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></span>
+                                <span>Export CSV</span>
+                            </button>
+                            <button type="button" class="btn-cohort-clear-action" id="btn-clear-custom-cohort" onclick="clearCustomCohort()" style="display:none;" title="Clear patient roster">
                                 <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
                                 <span>Clear</span>
                             </button>
@@ -1298,25 +1307,34 @@
                         <div class="batch-card-title-group">
                             <h3 id="batch-roster-title">Active Roster: None Loaded (0 Patients)</h3>
                         </div>
-                        <!-- FILTER TOOLBAR -->
-                        <div class="batch-filter-toolbar">
-                            <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-right: 4px;">Filter:</span>
-                            <button type="button" class="batch-filter-pill active" id="filter-all" onclick="filterBatchTable('ALL')">
-                                <span>All Cases</span>
-                                <span class="filter-count" id="filter-count-all">0</span>
-                            </button>
-                            <button type="button" class="batch-filter-pill filter-approved" id="filter-approved" onclick="filterBatchTable('APPROVED')">
-                                <span>Approved</span>
-                                <span class="filter-count" id="filter-count-approved">0</span>
-                            </button>
-                            <button type="button" class="batch-filter-pill filter-denied" id="filter-denied" onclick="filterBatchTable('DENIED')">
-                                <span>Denied</span>
-                                <span class="filter-count" id="filter-count-denied">0</span>
-                            </button>
-                            <button type="button" class="batch-filter-pill filter-deferred" id="filter-deferred" onclick="filterBatchTable('DEFERRED')">
-                                <span>Deferred</span>
-                                <span class="filter-count" id="filter-count-deferred">0</span>
-                            </button>
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <!-- LIVE SEARCH BOX -->
+                            <div style="position: relative; min-width: 220px;">
+                                <input type="text" id="batch-search-input" placeholder="Search patients, CPT, policy..." oninput="searchBatchTable(this.value)" style="width: 100%; padding: 6px 12px 6px 30px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; font-size: 0.78rem; color: #F8FAFC;" />
+                                <span style="position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; display: flex; align-items: center;">
+                                    <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                </span>
+                            </div>
+                            <!-- FILTER TOOLBAR -->
+                            <div class="batch-filter-toolbar">
+                                <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-right: 4px;">Filter:</span>
+                                <button type="button" class="batch-filter-pill active" id="filter-all" onclick="filterBatchTable('ALL')">
+                                    <span>All Cases</span>
+                                    <span class="filter-count" id="filter-count-all">0</span>
+                                </button>
+                                <button type="button" class="batch-filter-pill filter-approved" id="filter-approved" onclick="filterBatchTable('APPROVED')">
+                                    <span>Approved</span>
+                                    <span class="filter-count" id="filter-count-approved">0</span>
+                                </button>
+                                <button type="button" class="batch-filter-pill filter-denied" id="filter-denied" onclick="filterBatchTable('DENIED')">
+                                    <span>Denied</span>
+                                    <span class="filter-count" id="filter-count-denied">0</span>
+                                </button>
+                                <button type="button" class="batch-filter-pill filter-deferred" id="filter-deferred" onclick="filterBatchTable('DEFERRED')">
+                                    <span>Deferred</span>
+                                    <span class="filter-count" id="filter-count-deferred">0</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="table-container" style="overflow-x: auto;">
@@ -1324,10 +1342,10 @@
                             <thead>
                                 <tr>
                                     <th style="width: 40px;">#</th>
-                                    <th>Patient ID</th>
+                                    <th>Patient / Demographics</th>
                                     <th>Medicare Policy</th>
-                                    <th>CPT / HCPCS</th>
-                                    <th>Clinical Summary</th>
+                                    <th>Requested Procedure</th>
+                                    <th>Clinical Indication &amp; Summary</th>
                                     <th>Adjudication Decision</th>
                                     <th style="min-width: 110px;">Calibrated Conf</th>
                                     <th>Safety Gate</th>
@@ -2483,6 +2501,6 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261028_01" defer></script>
+    <script src="/static/js/app.js?v=20261028_02" defer></script>
 </body>
 </html>
