@@ -2083,8 +2083,12 @@ function selectPatientTile(tileElem, presetId) {
 
 function proceedToStep2() {
     const ehrText = document.getElementById("ehr-input").value.trim();
-    if (!ehrText || ehrText.length < 20) {
-        showToast("Please upload a file or paste your patient note text (at least 20 characters), or click 'Try a Sample' above.", true);
+    if (!ehrText) {
+        showToast("Please upload or paste a patient note first.", true);
+        return;
+    }
+    if (ehrText.length < 20) {
+        showToast("Patient note is too short (at least 20 characters required).", true);
         return;
     }
 
@@ -2326,7 +2330,14 @@ function goToWizardScreen(stepNumber) {
 
     // Check prerequisites sequentially
     if (stepNumber >= 2 && !isStepCompleted(1)) {
-        showToast("Please upload or paste a patient note (at least 20 characters) first.", true);
+        const ehrElem = document.getElementById("ehr-input");
+        const pasted = document.getElementById("actual-paste-textarea");
+        const val = (ehrElem && ehrElem.value.trim()) || (pasted && pasted.value.trim()) || "";
+        if (!val) {
+            showToast("Please upload or paste a patient note first.", true);
+        } else {
+            showToast("Patient note is too short (at least 20 characters required).", true);
+        }
         return;
     }
 
@@ -2459,8 +2470,12 @@ async function executeAdjudication() {
     const ehrText = document.getElementById("ehr-input").value.trim();
     const tau = parseFloat(document.getElementById("tau-input").value) || 0.85;
 
-    if (!ehrText || ehrText.length < 20) {
-        showToast("Please input clinical EHR notes (min 20 characters).", true);
+    if (!ehrText) {
+        showToast("Please upload or paste a patient note first.", true);
+        return;
+    }
+    if (ehrText.length < 20) {
+        showToast("Patient note is too short (at least 20 characters required).", true);
         return;
     }
 
