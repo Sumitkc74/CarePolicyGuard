@@ -31,12 +31,9 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     SMTP_FROM_EMAIL: str = os.getenv("SMTP_FROM_EMAIL", "auth@carepolicyguard.med")
 
-    # OAuth Single Sign-On (Google & Apple)
+    # OAuth Single Sign-On (Google)
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
-    APPLE_CLIENT_ID: str = os.getenv("APPLE_CLIENT_ID", "")
-    APPLE_TEAM_ID: str = os.getenv("APPLE_TEAM_ID", "")
-    APPLE_KEY_ID: str = os.getenv("APPLE_KEY_ID", "")
 
     # Default Demo Credentials
     DEFAULT_ADMIN_USER: str = "admin@carepolicyguard.med"

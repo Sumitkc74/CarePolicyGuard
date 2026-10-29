@@ -11,7 +11,6 @@ def test_oauth_config_endpoint():
     assert res.status_code == 200
     data = res.json()
     assert "google" in data["supported_providers"]
-    assert "apple" in data["supported_providers"]
     assert data["dev_mode"] is True
 
 def test_google_sso_auto_provision_and_mfa():
@@ -48,26 +47,26 @@ def test_google_sso_auto_provision_and_mfa():
     finally:
         db.close()
 
-def test_apple_sso_auto_provision_and_direct_bypass():
-    # Test Apple sign-in with bypass header
-    apple_res = client.post(
-        "/api/v1/auth/oauth/apple",
-        json={"id_token": "mock_apple_dr.jones@hospital.org"},
+def test_google_sso_auto_provision_and_direct_bypass():
+    # Test Google sign-in with bypass header
+    google_res = client.post(
+        "/api/v1/auth/oauth/google",
+        json={"credential": "mock_google_dr.bypass@hospital.org"},
         headers={"X-Test-Bypass-MFA": "true"}
     )
-    assert apple_res.status_code == 200
-    token_data = apple_res.json()
+    assert google_res.status_code == 200
+    token_data = google_res.json()
     assert "access_token" in token_data
     assert token_data["role"] == "Clinician"
-    assert token_data["username"] == "dr.jones@hospital.org"
-    assert token_data["oauth_provider"] == "apple"
+    assert token_data["username"] == "dr.bypass@hospital.org"
+    assert token_data["oauth_provider"] == "google"
 
     # Verify user record in database
     db = SessionLocal()
     try:
-        user = db.query(User).filter(User.email == "dr.jones@hospital.org").first()
+        user = db.query(User).filter(User.email == "dr.bypass@hospital.org").first()
         assert user is not None
-        assert user.oauth_provider == "apple"
+        assert user.oauth_provider == "google"
         assert user.is_verified_medical_pro is True
     finally:
         db.close()
