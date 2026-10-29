@@ -51,6 +51,11 @@ function switchMainTab(tabName) {
     document.querySelectorAll(".view-panel").forEach(panel => panel.classList.remove("active"));
 
     if (tabName === "adjudicate") {
+        if (currentRole !== "Clinician") {
+            showToast("Clinical note entry and adjudication is restricted to licensed clinicians.", "warning");
+            switchMainTab(currentRole === "Auditor" ? "audit" : "telemetry");
+            return;
+        }
         document.getElementById("tab-adjudicate-btn").classList.add("active");
         document.getElementById("adjudicate-view").classList.add("active");
     } else if (tabName === "audit") {
@@ -58,6 +63,11 @@ function switchMainTab(tabName) {
         document.getElementById("audit-view").classList.add("active");
         loadAuditLogs();
     } else if (tabName === "batch") {
+        if (currentRole !== "Clinician") {
+            showToast("Batch patient roster entry is restricted to licensed clinicians.", "warning");
+            switchMainTab(currentRole === "Auditor" ? "audit" : "telemetry");
+            return;
+        }
         const batchBtn = document.getElementById("tab-batch-btn");
         if (batchBtn) batchBtn.classList.add("active");
         const batchView = document.getElementById("batch-view");
@@ -75,6 +85,11 @@ function switchMainTab(tabName) {
         document.getElementById("benchmark-view").classList.add("active");
         runLiveBenchmark();
     } else if (tabName === "crd") {
+        if (currentRole !== "Clinician") {
+            showToast("EHR CDS Hooks & DTR simulation is restricted to licensed clinicians.", "warning");
+            switchMainTab(currentRole === "Auditor" ? "audit" : "telemetry");
+            return;
+        }
         const btn = document.getElementById("tab-crd-btn");
         if (btn) btn.classList.add("active");
         const view = document.getElementById("crd-view");
@@ -83,7 +98,7 @@ function switchMainTab(tabName) {
     } else if (tabName === "telemetry") {
         if (currentRole !== "Admin") {
             showToast("Operational Telemetry & System Health is restricted to IT Administrators.", "warning");
-            switchMainTab("adjudicate");
+            switchMainTab(currentRole === "Auditor" ? "audit" : "adjudicate");
             return;
         }
         const btn = document.getElementById("tab-telemetry-btn");
@@ -109,6 +124,7 @@ async function checkSessionOrShowGate() {
         currentUser = savedUser || "clinician@hospital.org";
         hideLoginGate();
         updateUserBadge();
+        routeToRoleDefaultTab();
         await loadPolicies();
         await loadPresets();
         await loadAuditLogs();
@@ -507,6 +523,7 @@ async function executeLogin(username, password) {
             sessionStorage.setItem("carepolicyguard_user", currentUser);
 
             updateUserBadge();
+            routeToRoleDefaultTab();
             hideLoginGate();
             showToast(`Welcome! Authenticated as ${currentRole} (${currentUser})`);
 
@@ -795,7 +812,33 @@ function updateRoleBasedNavigation() {
     const isAuditor = (currentRole === "Auditor");
     const isAdmin = (currentRole === "Admin");
 
-    // 1. Benchmark Tab: Visible to Auditor & Admin only (hidden for Clinicians)
+    // 1. Clinical Note Entry (Single Case & Batch Roster): Clinician ONLY
+    const adjudicateBtn = document.getElementById("tab-adjudicate-btn");
+    if (adjudicateBtn) {
+        adjudicateBtn.style.display = isClinician ? "" : "none";
+    }
+    const batchBtn = document.getElementById("tab-batch-btn");
+    if (batchBtn) {
+        batchBtn.style.display = isClinician ? "" : "none";
+    }
+    const crdBtn = document.getElementById("tab-crd-btn");
+    if (crdBtn) {
+        crdBtn.style.display = isClinician ? "" : "none";
+    }
+
+    // If Auditor or Admin is currently on a note entry view, redirect them
+    if (!isClinician) {
+        const adjView = document.getElementById("adjudicate-view");
+        const batchView = document.getElementById("batch-view");
+        const crdView = document.getElementById("crd-view");
+        if ((adjView && adjView.classList.contains("active")) || 
+            (batchView && batchView.classList.contains("active")) ||
+            (crdView && crdView.classList.contains("active"))) {
+            switchMainTab(isAuditor ? "audit" : "telemetry");
+        }
+    }
+
+    // 2. Benchmark Tab: Visible to Auditor & Admin only (hidden for Clinicians)
     const benchmarkBtn = document.getElementById("tab-benchmark-btn");
     if (benchmarkBtn) {
         if (isClinician) {
@@ -809,24 +852,34 @@ function updateRoleBasedNavigation() {
         }
     }
 
-    // 2. Telemetry Tab: Visible to Admin only (hidden for Clinicians & Auditors)
+    // 3. Telemetry Tab: Visible to Admin only (hidden for Clinicians & Auditors)
     const telemetryBtn = document.getElementById("tab-telemetry-btn");
     if (telemetryBtn) {
         if (!isAdmin) {
             telemetryBtn.style.display = "none";
             const telemetryView = document.getElementById("telemetry-view");
             if (telemetryView && telemetryView.classList.contains("active")) {
-                switchMainTab("adjudicate");
+                switchMainTab(isClinician ? "adjudicate" : "audit");
             }
         } else {
             telemetryBtn.style.display = "";
         }
     }
 
-    // 3. Purge Audit Records Button: Visible to Admin only
+    // 4. Purge Audit Records Button: Visible to Admin only
     const purgeAllBtn = document.getElementById("btn-purge-all-audit");
     if (purgeAllBtn) {
         purgeAllBtn.style.display = isAdmin ? "inline-flex" : "none";
+    }
+}
+
+function routeToRoleDefaultTab() {
+    if (currentRole === "Clinician") {
+        switchMainTab("adjudicate");
+    } else if (currentRole === "Auditor") {
+        switchMainTab("audit");
+    } else if (currentRole === "Admin") {
+        switchMainTab("telemetry");
     }
 }
 
