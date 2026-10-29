@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     initHipaaInactivityWatcher();
     setupPinInputListeners();
     renderClinicianProfile();
-    loadSampleBatchRoster('cardiology');
 });
 
 // =============================================================================
@@ -73,11 +72,6 @@ function switchMainTab(tabName) {
         if (batchBtn) batchBtn.classList.add("active");
         const batchView = document.getElementById("batch-view");
         if (batchView) batchView.classList.add("active");
-        
-        const tbody = document.getElementById("batch-table-body");
-        if (!tbody || tbody.children.length === 0 || !window._activeBatchLoaded) {
-            switchBatchCohort(currentBatchCohortType || 'cardiology', true);
-        }
     } else if (tabName === "benchmark") {
         if (currentRole === "Clinician") {
             showToast("Benchmark Lab is restricted to System Administrators and Quality Auditors.", "warning");
@@ -5393,7 +5387,7 @@ async function handleBatchRosterFileUpload(event) {
         if (defEl) defEl.textContent = "--";
         if (latEl) latEl.textContent = "-- ms";
 
-        renderBatchRosterTable(currentBatchRoster);
+        renderBatchTablePending();
         showToast(`Successfully extracted ${currentBatchRoster.length} patient cases into roster! Running verification...`, "info");
         await executeBatchAdjudication();
     } catch (err) {
@@ -5406,9 +5400,58 @@ async function handleBatchRosterFileUpload(event) {
 }
 
 
+function renderBatchEmptyState() {
+    currentBatchRoster = [];
+    window._activeBatchLoaded = false;
+    currentBatchCohortType = "";
+    
+    const selectEl = document.getElementById("batch-cohort-select");
+    if (selectEl) selectEl.value = "";
+
+    const titleEl = document.getElementById("batch-roster-title");
+    if (titleEl) titleEl.textContent = "Active Roster: None Loaded (0 Patients)";
+    const subEl = document.getElementById("batch-cohort-name-sub");
+    if (subEl) subEl.textContent = "No Active Roster";
+
+    const totalEl = document.getElementById("batch-total-count");
+    if (totalEl) totalEl.textContent = "0";
+    const appEl = document.getElementById("batch-approved-count");
+    if (appEl) appEl.textContent = "--";
+    const denEl = document.getElementById("batch-denied-count");
+    if (denEl) denEl.textContent = "--";
+    const defEl = document.getElementById("batch-deferred-count");
+    if (defEl) defEl.textContent = "--";
+    const latEl = document.getElementById("batch-latency-count");
+    if (latEl) latEl.textContent = "-- ms";
+
+    const fAll = document.getElementById("filter-count-all");
+    if (fAll) fAll.textContent = "0";
+    const fApp = document.getElementById("filter-count-approved");
+    if (fApp) fApp.textContent = "0";
+    const fDen = document.getElementById("filter-count-denied");
+    if (fDen) fDen.textContent = "0";
+    const fDef = document.getElementById("filter-count-deferred");
+    if (fDef) fDef.textContent = "0";
+
+    const tbody = document.getElementById("batch-table-body");
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr id="batch-empty-roster-row">
+                <td colspan="9" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+                    <div style="max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">No Patient Roster Loaded</span>
+                        <span style="font-size: 0.85rem; line-height: 1.5;">Upload a spreadsheet (Excel .xlsx, CSV) or select a practice cohort from the dropdown above to load patient records.</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+}
+
 function clearCustomCohort() {
     currentBatchRoster = [];
-    currentBatchCohortType = 'cardiology';
+    currentBatchCohortType = '';
+    window._activeBatchLoaded = false;
     
     const optUpload = document.getElementById("opt-cohort-upload");
     if (optUpload) optUpload.style.display = "none";
@@ -5420,11 +5463,15 @@ function clearCustomCohort() {
         uploadBtn.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></span> <span>+ Add Roster</span>`;
     }
 
-    switchBatchCohort('cardiology', true);
-    showToast("Cleared custom roster cohort. Reset to Cardiology Clinic.", "info");
+    renderBatchEmptyState();
+    showToast("Cleared patient roster. Roster reset to 0 patients.", "info");
 }
 
-async function switchBatchCohort(cohortType, autoRun = true) {
+async function switchBatchCohort(cohortType, autoRun = false) {
+    if (!cohortType || cohortType === "none" || cohortType === "") {
+        renderBatchEmptyState();
+        return;
+    }
     currentBatchCohortType = cohortType;
     const selectEl = document.getElementById("batch-cohort-select");
     if (selectEl && selectEl.value !== cohortType) {
@@ -5446,7 +5493,7 @@ async function switchBatchCohort(cohortType, autoRun = true) {
         loadSampleBatchRoster(cohortType);
     }
 
-    if (autoRun) {
+    if (autoRun && currentBatchRoster && currentBatchRoster.length > 0) {
         const cohortPrettyNames = {
             cardiology: "Cardiology Clinic",
             pulmonology: "Pulmonology & Sleep",
@@ -5510,30 +5557,41 @@ function filterBatchTable(filterType) {
 }
 
 function loadSampleBatchRoster(rosterType) {
+    if (!rosterType || rosterType === "none" || rosterType === "") {
+        renderBatchEmptyState();
+        return;
+    }
     window._activeBatchLoaded = true;
     currentBatchCohortType = rosterType;
-    currentBatchRoster = JSON.parse(JSON.stringify(SAMPLE_BATCH_ROSTERS[rosterType] || SAMPLE_BATCH_ROSTERS.cardiology));
+    currentBatchRoster = JSON.parse(JSON.stringify(SAMPLE_BATCH_ROSTERS[rosterType] || []));
+    if (currentBatchRoster.length === 0) {
+        renderBatchEmptyState();
+        return;
+    }
     
     const cohortLabels = {
         cardiology: {
-            title: `Current Roster: Cardiology Clinic Morning Cohort (${currentBatchRoster.length} Patients)`,
-            sub: "Cardiology Clinic Morning Cohort"
+            title: `Active Roster: Cardiology Clinic Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Cardiology Clinic Cohort (NCD-20.4)"
         },
         pulmonology: {
-            title: `Current Roster: Pulmonology & Sleep Medicine Cohort (${currentBatchRoster.length} Patients)`,
-            sub: "Pulmonology & Sleep Medicine Cohort"
+            title: `Active Roster: Pulmonology & Sleep Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Pulmonology & Sleep Cohort (LCD-L33829)"
         },
         wound_care: {
-            title: `Current Roster: Wound Care & Hyperbaric Cohort (${currentBatchRoster.length} Patients)`,
-            sub: "Wound Care & Hyperbaric Cohort"
+            title: `Active Roster: Wound Care & Hyperbaric Cohort (${currentBatchRoster.length} Patients)`,
+            sub: "Wound Care & Hyperbaric Cohort (NCD-20.29)"
         },
         mixed: {
-            title: `Current Roster: Mixed Specialty Outpatient Cohort (${currentBatchRoster.length} Patients)`,
+            title: `Active Roster: Mixed Specialty Outpatient Cohort (${currentBatchRoster.length} Patients)`,
             sub: "Mixed Specialty Outpatient Cohort"
         }
     };
 
-    const label = cohortLabels[rosterType] || cohortLabels.cardiology;
+    const label = cohortLabels[rosterType] || {
+        title: `Active Roster: Cohort (${currentBatchRoster.length} Patients)`,
+        sub: "Practice Cohort"
+    };
     
     const titleEl = document.getElementById("batch-roster-title");
     if (titleEl) titleEl.textContent = label.title;
@@ -5615,7 +5673,8 @@ function renderBatchTablePending() {
 
 async function executeBatchAdjudication() {
     if (!currentBatchRoster || currentBatchRoster.length === 0) {
-        loadSampleBatchRoster('cardiology');
+        showToast("No patient roster loaded. Please select a practice cohort or upload a spreadsheet file first.", "warning");
+        return;
     }
 
     const btn = document.getElementById("btn-run-batch-adjudication");

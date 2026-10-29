@@ -1190,10 +1190,11 @@
                                 </label>
                                 <div class="cohort-select-wrapper">
                                     <select id="batch-cohort-select" class="batch-cohort-select" onchange="switchBatchCohort(this.value)">
-                                        <option value="cardiology">Cardiology Clinic (4 Patients - NCD-20.4)</option>
-                                        <option value="pulmonology">Pulmonology &amp; Sleep (3 Patients - LCD-L33829)</option>
-                                        <option value="wound_care">Wound Care &amp; HBOT (3 Patients - NCD-20.29)</option>
-                                        <option value="mixed">Mixed Specialty Outpatient (4 Patients)</option>
+                                        <option value="" selected>-- Select a Cohort or Upload Roster --</option>
+                                        <option value="cardiology">Cardiology Clinic (4 Practice Cases - NCD-20.4)</option>
+                                        <option value="pulmonology">Pulmonology &amp; Sleep (3 Practice Cases - LCD-L33829)</option>
+                                        <option value="wound_care">Wound Care &amp; HBOT (3 Practice Cases - NCD-20.29)</option>
+                                        <option value="mixed">Mixed Specialty Outpatient (4 Practice Cases)</option>
                                         <option value="upload" id="opt-cohort-upload" style="display:none;">Custom Uploaded Cohort</option>
                                     </select>
                                     <span class="cohort-select-arrow">
@@ -1229,9 +1230,9 @@
                             </span>
                         </div>
                         <div class="kpi-value-row">
-                            <span class="kpi-number" id="batch-total-count">4</span>
+                            <span class="kpi-number" id="batch-total-count">0</span>
                         </div>
-                        <span class="kpi-subtext" id="batch-cohort-name-sub">Cardiology Clinic Morning Cohort</span>
+                        <span class="kpi-subtext" id="batch-cohort-name-sub">No Active Roster</span>
                     </div>
 
                     <!-- Card 2: Auto-Approved -->
@@ -1295,14 +1296,14 @@
                 <div class="batch-card">
                     <div class="batch-card-header">
                         <div class="batch-card-title-group">
-                            <h3 id="batch-roster-title">Current Roster: Cardiology Clinic Morning Cohort (4 Patients)</h3>
+                            <h3 id="batch-roster-title">Active Roster: None Loaded (0 Patients)</h3>
                         </div>
                         <!-- FILTER TOOLBAR -->
                         <div class="batch-filter-toolbar">
                             <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; margin-right: 4px;">Filter:</span>
                             <button type="button" class="batch-filter-pill active" id="filter-all" onclick="filterBatchTable('ALL')">
                                 <span>All Cases</span>
-                                <span class="filter-count" id="filter-count-all">4</span>
+                                <span class="filter-count" id="filter-count-all">0</span>
                             </button>
                             <button type="button" class="batch-filter-pill filter-approved" id="filter-approved" onclick="filterBatchTable('APPROVED')">
                                 <span>Approved</span>
@@ -1334,7 +1335,14 @@
                                 </tr>
                             </thead>
                             <tbody id="batch-table-body">
-                                <!-- Dynamically populated via JS -->
+                                <tr id="batch-empty-roster-row">
+                                    <td colspan="9" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+                                        <div style="max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                            <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">No Patient Roster Loaded</span>
+                                            <span style="font-size: 0.85rem; line-height: 1.5;">Upload a spreadsheet (Excel .xlsx, CSV) or select a practice cohort from the dropdown above to load patient records.</span>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -2475,6 +2483,6 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261027_20" defer></script>
+    <script src="/static/js/app.js?v=20261028_01" defer></script>
 </body>
 </html>
