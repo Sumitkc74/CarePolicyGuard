@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     initHipaaInactivityWatcher();
     setupPinInputListeners();
     renderClinicianProfile();
+    loadSampleBatchRoster('cardiology');
 });
 
 // =============================================================================
@@ -72,8 +73,10 @@ function switchMainTab(tabName) {
         if (batchBtn) batchBtn.classList.add("active");
         const batchView = document.getElementById("batch-view");
         if (batchView) batchView.classList.add("active");
-        if (!window._activeBatchLoaded) {
-            switchBatchCohort('cardiology', true);
+        
+        const tbody = document.getElementById("batch-table-body");
+        if (!tbody || tbody.children.length === 0 || !window._activeBatchLoaded) {
+            switchBatchCohort(currentBatchCohortType || 'cardiology', true);
         }
     } else if (tabName === "benchmark") {
         if (currentRole === "Clinician") {
@@ -5473,21 +5476,37 @@ function filterBatchTable(filterType) {
     const activeEl = document.getElementById(targetPillId);
     if (activeEl) activeEl.classList.add("active");
     
-    const rows = document.querySelectorAll("#batch-table-body tr");
+    const rows = document.querySelectorAll("#batch-table-body tr:not(.empty-filter-row)");
+    let visibleCount = 0;
     rows.forEach(tr => {
         const rowDecision = tr.getAttribute("data-decision") || "PENDING";
+        let match = false;
         if (filterType === 'ALL') {
-            tr.style.display = "";
+            match = true;
         } else if (filterType === 'APPROVED' && rowDecision === 'APPROVED') {
-            tr.style.display = "";
+            match = true;
         } else if (filterType === 'DENIED' && rowDecision === 'DENIED') {
-            tr.style.display = "";
+            match = true;
         } else if (filterType === 'DEFERRED' && (rowDecision === 'DEFERRED' || rowDecision === 'HOLD' || rowDecision.includes('DEFER'))) {
-            tr.style.display = "";
-        } else {
-            tr.style.display = "none";
+            match = true;
         }
+        tr.style.display = match ? "" : "none";
+        if (match) visibleCount++;
     });
+
+    const tbody = document.getElementById("batch-table-body");
+    const existingEmpty = document.getElementById("batch-empty-filter-row");
+    if (visibleCount === 0) {
+        if (!existingEmpty && tbody) {
+            const emptyTr = document.createElement("tr");
+            emptyTr.id = "batch-empty-filter-row";
+            emptyTr.className = "empty-filter-row";
+            emptyTr.innerHTML = `<td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted);font-size:0.88rem;">No cases match the <strong>${escapeHtml(filterType)}</strong> filter in this cohort.</td>`;
+            tbody.appendChild(emptyTr);
+        }
+    } else {
+        if (existingEmpty) existingEmpty.remove();
+    }
 }
 
 function loadSampleBatchRoster(rosterType) {
