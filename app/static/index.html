@@ -77,6 +77,29 @@
                             Apple
                         </button>
                     </div>
+                    <!-- INLINE GOOGLE SSO DRAWER -->
+                    <div id="google-sso-drawer" class="hidden" style="margin: 10px 0 6px 0; padding: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid #38bdf8; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 11px; font-weight: 600; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">Sign in with Google Workspace:</span>
+                            <button type="button" onclick="document.getElementById('google-sso-drawer').classList.add('hidden')" style="background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; padding: 0 4px;">&times;</button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <button type="button" class="btn-demo-chip" onclick="selectGoogleAccount('s.jenkins@pacificheart.org')" style="width: 100%; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px; background: rgba(30,41,59,0.8); border: 1px solid #334155; border-radius: 6px; cursor: pointer;">
+                                <span style="width: 22px; height: 22px; border-radius: 50%; background: #0284c7; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0;">SJ</span>
+                                <div>
+                                    <div style="font-weight: 600; color: #f8fafc; font-size: 12px;">Dr. Sarah Jenkins, MD, FACC</div>
+                                    <div style="font-size: 10px; color: #94a3b8;">s.jenkins@pacificheart.org (Cardiology)</div>
+                                </div>
+                            </button>
+                            <button type="button" class="btn-demo-chip" onclick="selectGoogleAccount('m.vance@hospital.org')" style="width: 100%; text-align: left; padding: 8px 10px; display: flex; align-items: center; gap: 8px; background: rgba(30,41,59,0.8); border: 1px solid #334155; border-radius: 6px; cursor: pointer;">
+                                <span style="width: 22px; height: 22px; border-radius: 50%; background: #059669; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0;">MV</span>
+                                <div>
+                                    <div style="font-weight: 600; color: #f8fafc; font-size: 12px;">Dr. Marcus Vance, MD</div>
+                                    <div style="font-size: 10px; color: #94a3b8;">m.vance@hospital.org (Attending)</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </form>
 
                 <!-- EVALUATION TEST ACCOUNTS HELPER -->
@@ -86,6 +109,9 @@
                         <span>Evaluation Accounts (Autofill Credentials):</span>
                     </div>
                     <div class="demo-creds-chips" style="flex-wrap: wrap; gap: 6px;">
+                        <button type="button" class="btn-demo-chip" onclick="selectGoogleAccount('s.jenkins@pacificheart.org')" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.1);">
+                            <strong style="color: #38bdf8;">Google SSO: Dr. Jenkins</strong> (s.jenkins@pacificheart.org)
+                        </button>
                         <button type="button" class="btn-demo-chip" onclick="autofillLogin('clinician@hospital.org', 'ClinicianCare!2026')">
                             <strong>Dr. Clinician</strong> (clinician@hospital.org - 2FA Enforced)
                         </button>
@@ -2502,10 +2528,10 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261028_03" defer></script>
+    <script src="/static/js/app.js?v=20261029_05" defer></script>
 
     <!-- GOOGLE WORKSPACE OAUTH MODAL -->
-    <div class="modal-overlay hidden" id="oauth-google-modal">
+    <div class="modal-overlay hidden" id="oauth-google-modal" style="position: fixed; inset: 0; z-index: 100000; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target===this)closeGoogleOAuthModal()">
         <div class="modal-card" style="max-width: 440px; border-radius: 16px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
             <div class="modal-header" style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 12px;">

@@ -355,12 +355,23 @@ async function handleCustomLogin(event) {
 
 function openGoogleOAuthModal() {
     const modal = document.getElementById("oauth-google-modal");
-    if (modal) modal.classList.remove("hidden");
+    if (modal) {
+        modal.classList.remove("hidden");
+        modal.style.display = "flex";
+        modal.style.zIndex = "100000";
+    }
+    const drawer = document.getElementById("google-sso-drawer");
+    if (drawer) {
+        drawer.classList.remove("hidden");
+    }
 }
 
 function closeGoogleOAuthModal() {
     const modal = document.getElementById("oauth-google-modal");
-    if (modal) modal.classList.add("hidden");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+    }
 }
 
 async function selectGoogleAccount(email) {
