@@ -81,6 +81,11 @@ function switchMainTab(tabName) {
         if (view) view.classList.add("active");
         initCrdSimulator();
     } else if (tabName === "telemetry") {
+        if (currentRole !== "Admin") {
+            showToast("Operational Telemetry & System Health is restricted to IT Administrators.", "warning");
+            switchMainTab("adjudicate");
+            return;
+        }
         const btn = document.getElementById("tab-telemetry-btn");
         if (btn) btn.classList.add("active");
         const view = document.getElementById("telemetry-view");
@@ -786,9 +791,12 @@ function updateUserBadge() {
 }
 
 function updateRoleBasedNavigation() {
-    const benchmarkBtn = document.getElementById("tab-benchmark-btn");
     const isClinician = (currentRole === "Clinician");
+    const isAuditor = (currentRole === "Auditor");
+    const isAdmin = (currentRole === "Admin");
 
+    // 1. Benchmark Tab: Visible to Auditor & Admin only (hidden for Clinicians)
+    const benchmarkBtn = document.getElementById("tab-benchmark-btn");
     if (benchmarkBtn) {
         if (isClinician) {
             benchmarkBtn.style.display = "none";
@@ -799,6 +807,26 @@ function updateRoleBasedNavigation() {
         } else {
             benchmarkBtn.style.display = "";
         }
+    }
+
+    // 2. Telemetry Tab: Visible to Admin only (hidden for Clinicians & Auditors)
+    const telemetryBtn = document.getElementById("tab-telemetry-btn");
+    if (telemetryBtn) {
+        if (!isAdmin) {
+            telemetryBtn.style.display = "none";
+            const telemetryView = document.getElementById("telemetry-view");
+            if (telemetryView && telemetryView.classList.contains("active")) {
+                switchMainTab("adjudicate");
+            }
+        } else {
+            telemetryBtn.style.display = "";
+        }
+    }
+
+    // 3. Purge Audit Records Button: Visible to Admin only
+    const purgeAllBtn = document.getElementById("btn-purge-all-audit");
+    if (purgeAllBtn) {
+        purgeAllBtn.style.display = isAdmin ? "inline-flex" : "none";
     }
 }
 
