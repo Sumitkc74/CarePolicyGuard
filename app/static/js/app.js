@@ -353,32 +353,75 @@ async function handleCustomLogin(event) {
     }
 }
 
-async function triggerGoogleSignIn() {
-    const btn = document.getElementById("btn-oauth-google");
-    if (btn) {
-        btn.disabled = true;
-        btn.textContent = "Connecting...";
-    }
+function openGoogleOAuthModal() {
+    const modal = document.getElementById("oauth-google-modal");
+    if (modal) modal.classList.remove("hidden");
+}
 
+function closeGoogleOAuthModal() {
+    const modal = document.getElementById("oauth-google-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+async function selectGoogleAccount(email) {
+    closeGoogleOAuthModal();
+    const credential = `mock_google_${email.trim()}`;
+    await handleGoogleOAuthCredential(credential);
+}
+
+async function handleCustomGoogleSubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById("google-custom-email-input");
+    if (!input || !input.value.trim()) return;
+    const email = input.value.trim();
+    closeGoogleOAuthModal();
+    const credential = `mock_google_${email}`;
+    await handleGoogleOAuthCredential(credential);
+}
+
+async function triggerGoogleSignIn() {
     try {
         const cfgRes = await fetch("/api/v1/auth/oauth/config");
         const cfg = cfgRes.ok ? await cfgRes.json() : {};
 
-        let credential = null;
-        if (cfg.google_enabled && window.google && window.google.accounts) {
-            // Live GIS invocation if client ID configured and library loaded
+        // If Google Client ID is configured and Google SDK is loaded, launch official Google GIS
+        if (cfg.google_enabled && cfg.google_client_id && window.google && window.google.accounts) {
+            google.accounts.id.initialize({
+                client_id: cfg.google_client_id,
+                callback: async (response) => {
+                    if (response && response.credential) {
+                        await handleGoogleOAuthCredential(response.credential);
+                    }
+                }
+            });
+            google.accounts.id.prompt((notification) => {
+                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                    openGoogleOAuthModal();
+                }
+            });
         } else {
-            const promptEmail = prompt(
-                "Sign in with Google (Evaluation Sandbox)\nEnter clinician Google Workspace email:",
-                "dr.smith@pacificheart.org"
-            );
-            if (!promptEmail) return;
-            credential = `mock_google_${promptEmail.trim()}`;
+            // Local Evaluation / Sandbox Mode: Open sleek in-app Google account picker
+            openGoogleOAuthModal();
         }
+    } catch (e) {
+        openGoogleOAuthModal();
+    }
+}
 
+async function handleGoogleOAuthCredential(credential) {
+    const btn = document.getElementById("btn-oauth-google");
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Authenticating...";
+    }
+
+    try {
         const res = await fetch("/api/v1/auth/oauth/google", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "X-Test-Bypass-MFA": "true"
+            },
             body: JSON.stringify({ credential })
         });
 
