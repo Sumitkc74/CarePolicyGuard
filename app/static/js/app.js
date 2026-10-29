@@ -85,9 +85,9 @@ function switchMainTab(tabName) {
         document.getElementById("benchmark-view").classList.add("active");
         runLiveBenchmark();
     } else if (tabName === "crd") {
-        if (currentRole !== "Clinician") {
-            showToast("EHR CDS Hooks & DTR simulation is restricted to licensed clinicians.", "warning");
-            switchMainTab(currentRole === "Auditor" ? "audit" : "telemetry");
+        if (currentRole !== "Admin") {
+            showToast("EHR CDS Hooks & DTR simulation is restricted to IT Administrators and Health Informatics.", "warning");
+            switchMainTab(currentRole === "Auditor" ? "audit" : "adjudicate");
             return;
         }
         const btn = document.getElementById("tab-crd-btn");
@@ -849,20 +849,26 @@ function updateRoleBasedNavigation() {
     if (batchBtn) {
         batchBtn.style.display = isClinician ? "" : "none";
     }
-    const crdBtn = document.getElementById("tab-crd-btn");
-    if (crdBtn) {
-        crdBtn.style.display = isClinician ? "" : "none";
-    }
 
-    // If Auditor or Admin is currently on a note entry view, redirect them
+    // If Auditor or Admin is currently on a clinical note entry view, redirect them
     if (!isClinician) {
         const adjView = document.getElementById("adjudicate-view");
         const batchView = document.getElementById("batch-view");
-        const crdView = document.getElementById("crd-view");
         if ((adjView && adjView.classList.contains("active")) || 
-            (batchView && batchView.classList.contains("active")) ||
-            (crdView && crdView.classList.contains("active"))) {
+            (batchView && batchView.classList.contains("active"))) {
             switchMainTab(isAuditor ? "audit" : "telemetry");
+        }
+    }
+
+    // 2. EHR CDS Hooks & DTR Simulation Engine: IT Administrator ONLY
+    const crdBtn = document.getElementById("tab-crd-btn");
+    if (crdBtn) {
+        crdBtn.style.display = isAdmin ? "" : "none";
+    }
+    if (!isAdmin) {
+        const crdView = document.getElementById("crd-view");
+        if (crdView && crdView.classList.contains("active")) {
+            switchMainTab(isClinician ? "adjudicate" : "audit");
         }
     }
 
