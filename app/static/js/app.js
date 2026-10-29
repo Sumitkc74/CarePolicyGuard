@@ -579,12 +579,20 @@ const DEFAULT_CLINICIAN_PROFILE = {
     facility: "MetroHealth Heart & Vascular Institute"
 };
 
+// Immediate purge of legacy Eleanor Vance clinician name from browser cache
+try {
+    const _legacyProfile = localStorage.getItem("carepolicyguard_clinician_profile");
+    if (_legacyProfile && (_legacyProfile.includes("Eleanor Vance") || _legacyProfile.includes("Dr. Eleanor"))) {
+        localStorage.removeItem("carepolicyguard_clinician_profile");
+    }
+} catch (e) {}
+
 function getClinicianProfile() {
     try {
         const stored = localStorage.getItem("carepolicyguard_clinician_profile");
         if (stored) {
             const parsed = JSON.parse(stored);
-            if (parsed.full_name && parsed.full_name.includes("Eleanor Vance")) {
+            if (parsed.full_name && (parsed.full_name.includes("Eleanor Vance") || parsed.full_name.includes("Dr. Eleanor"))) {
                 parsed.full_name = "Dr. Sarah Jenkins, MD, FACC";
                 localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(parsed));
             }
