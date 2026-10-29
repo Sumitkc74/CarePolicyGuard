@@ -1857,6 +1857,10 @@ function clearLoadedSample() {
     if (pasteBox) pasteBox.value = "";
     if (banner) banner.classList.add("hidden");
     if (authCard) authCard.classList.add("hidden");
+    const titleElem = document.getElementById("actual-upload-title");
+    const subElem = document.getElementById("actual-upload-subtitle");
+    if (titleElem) titleElem.textContent = "Drop clinical notes";
+    if (subElem) subElem.textContent = "PDF, Scanned Images (OCR), Word, or plain text";
     if (patElem) patElem.value = "PT-ACTUAL-" + Math.floor(1000 + Math.random() * 9000);
 
     maxUnlockedStep = 1;

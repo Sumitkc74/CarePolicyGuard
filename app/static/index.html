@@ -366,8 +366,8 @@
                             <span class="med-icon icon-lg icon-cyan">
                                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                             </span>
-                            <h3 id="actual-upload-title">Drop clinical notes, multi-page PDF, or scanned pages</h3>
-                            <p id="actual-upload-subtitle">Multi-Page PDF, Scanned Images (RapidOCR), Word, or select multiple pages</p>
+                            <h3 id="actual-upload-title">Drop clinical notes</h3>
+                            <p id="actual-upload-subtitle">PDF, Scanned Images (OCR), Word, or plain text</p>
                         </div>
 
                         <!-- OR PASTE NOTE DIRECTLY -->
@@ -639,7 +639,7 @@
                     <div class="wizard-card-header">
                         <span class="wizard-step-pill">STEP 4</span>
                         <h2 id="step4-screen-title">Prior Authorization Packet</h2>
-                        <p class="wizard-step-subtext" id="step4-screen-subtext">This is the official Medicare prior authorization document that will be submitted directly to the insurance payer.</p>
+                        <p class="wizard-step-subtext" id="step4-screen-subtext">Official Medicare documentation ready for clinical review and electronic signature.</p>
                     </div>
 
                     <!-- EXCLUSION / DENIAL WARNING BANNER (SHOWN ONLY IF COVERAGE IS EXCLUDED) -->
@@ -1442,7 +1442,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                     <div>
                         <h2 style="font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">Operational Telemetry &amp; System Health</h2>
-                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Real-time Prometheus scraping metrics, latency analytics, and clinical throughput telemetry.</p>
+                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Real-time Prometheus metrics, latency percentiles, and clinical system throughput.</p>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 12px;" onclick="loadLiveTelemetry()">
@@ -2400,7 +2400,7 @@
                     </span>
                     <div>
                         <h3 style="margin:0;font-size:1.05rem;font-weight:600;color:#F8FAFC;">Clinician Signing PIN</h3>
-                        <p class="modal-sub" style="font-size:0.75rem;color:#94A3B8;margin:2px 0 0 0;">Authorize Medicare transmission with personal PIN</p>
+                        <p class="modal-sub" style="font-size:0.75rem;color:#94A3B8;margin:2px 0 0 0;">Authorize Medicare transmission with your 4-digit attestation code</p>
                     </div>
                 </div>
                 <button class="modal-close-btn" onclick="closeClinicianPinModal()">&times;</button>
@@ -2475,6 +2475,6 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261027_15" defer></script>
+    <script src="/static/js/app.js?v=20261027_16" defer></script>
 </body>
 </html>
