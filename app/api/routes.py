@@ -68,6 +68,7 @@ from app.schemas.contracts import (
 )
 from app.api.deps import get_current_user, require_role, get_optional_current_user
 from app.agents.pipeline import MultiAgentVerificationPipeline
+from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.agents.benchmark_engine import BenchmarkRunner, BENCHMARK_VIGNETTES
 from app.agents.packet_generator import CoveragePacketGenerator
 from app.agents.policy_retriever import PolicyRetrievalAgent
@@ -912,12 +913,12 @@ async def extract_clinical_text(
     # Verify physician name, signature, and clinical authenticity
     auth_check = verify_clinical_document_authenticity(extracted_text)
 
-    # Suggest matching policy
-    retriever = PolicyRetrievalAgent(db=db)
-    candidates = retriever.search_policies_by_narrative(extracted_text)
+    # Suggest matching policy using Hybrid BM25 + Semantic Retriever
+    hybrid_retriever = HybridPolicyRetriever(db=db)
+    candidates = hybrid_retriever.retrieve_hybrid(extracted_text, top_k=3)
     suggested_policy = "NCD-20.4"
     policy_title = "Implantable Automatic Defibrillators"
-    if candidates and candidates[0]["relevance_score"] > 0.05:
+    if candidates and candidates[0].get("rrf_score", 0.0) > 0.01:
         suggested_policy = candidates[0]["policy_id"]
         policy_title = candidates[0].get("title", suggested_policy)
 

@@ -20,6 +20,13 @@ class Settings(BaseSettings):
     ABSTENTION_THRESHOLD: float = float(os.getenv("ABSTENTION_THRESHOLD", "0.85"))
     ENABLE_PHI_MASKING: bool = True
     
+    # LLM Inference Gateway (OpenAI-compatible, Ollama, vLLM, or Gemini)
+    LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
+    LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "gemini-1.5-flash")
+    LLM_TEMPERATURE: float = float(os.getenv("LLM_TEMPERATURE", "0.7"))
+    LLM_SAMPLE_PASSES: int = int(os.getenv("LLM_SAMPLE_PASSES", "3"))
+    
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["*"]
     

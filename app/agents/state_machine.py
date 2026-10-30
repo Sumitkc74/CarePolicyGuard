@@ -9,7 +9,8 @@ from pydantic import BaseModel, Field
 from app.agents.llm_extractor import CandidateExtraction, StructuredExtractorAgent, ExtractorTools
 from app.agents.adversarial_verifier import AdversarialVerificationAgent
 from app.agents.abstention_gate import CalibratedAbstentionGate
-from app.schemas.contracts import AdjudicationDecision, DeterminationStatus
+from app.services.hybrid_retriever import HybridPolicyRetriever
+from app.schemas.contracts import AdjudicationDecision, DeterminationStatus, CriterionAssessment, ClinicalEvidenceSpan
 
 class PipelineStage(str, Enum):
     INIT = "STAGE_0_INITIALIZATION"
@@ -40,11 +41,17 @@ class ClinicalAdjudicationStateMachine:
     """
     Explicit, auditable state machine orchestrating clinical coverage verification.
     Zero third-party framework magic (No LangGraph, No CrewAI).
-    Every transition is deterministic, logged, and included in the SHA-256 audit digest.
+    Delegates directly to existing verified agents:
+    - HybridPolicyRetriever (BM25 + Semantic)
+    - StructuredExtractorAgent (Pydantic candidates)
+    - AdversarialVerificationAgent (NegEx, contradiction, character slice)
+    - CalibratedAbstentionGate (tau=0.85 calibrated gate)
     """
 
-    def __init__(self, tau: float = 0.85):
+    def __init__(self, db: Optional[Any] = None, tau: float = 0.85):
+        self.db = db
         self.tau = tau
+        self.hybrid_retriever = HybridPolicyRetriever(db=db) if db else None
         self.extractor = StructuredExtractorAgent()
         self.adversarial_verifier = AdversarialVerificationAgent()
         self.abstention_gate = CalibratedAbstentionGate(tau=tau)
@@ -75,7 +82,7 @@ class ClinicalAdjudicationStateMachine:
     ) -> Dict[str, Any]:
         """
         Executes explicit state machine:
-        Stage 1: Retrieval verification
+        Stage 1: Hybrid Policy Retrieval verification
         Stage 2: Structured Extractor proposal (with self-consistency sampling)
         Stage 3: Critic adversarial cross-examination (disagreement = deferral signal)
         Stage 4: Programmatic character-slice verification
@@ -92,11 +99,20 @@ class ClinicalAdjudicationStateMachine:
             {"patient_id": patient_id, "policy_id": policy_id, "note_length": len(raw_ehr_text)}
         )
 
-        # Stage 1: Retrieval
+        # Stage 1: Hybrid Policy Retrieval
+        matched_policies = []
+        if self.hybrid_retriever:
+            matched_policies = self.hybrid_retriever.retrieve_hybrid(raw_ehr_text, top_k=3)
+
         self._record_transition(
             PipelineStage.POLICY_RETRIEVAL,
             "SUCCESS",
-            {"policy_id": policy_id, "policy_title": policy_title, "criteria_count": len(criteria_list)}
+            {
+                "policy_id": policy_id,
+                "policy_title": policy_title,
+                "criteria_count": len(criteria_list),
+                "hybrid_retrieval_matches": matched_policies
+            }
         )
 
         # Stage 2: Extractor Proposal
@@ -111,41 +127,60 @@ class ClinicalAdjudicationStateMachine:
             {"candidates_proposed": [p.model_dump() for p in proposals]}
         )
 
-        # Stage 3: Critic Cross-Examination
+        # Stage 3: Critic Adversarial Cross-Examination (Delegating to AdversarialVerificationAgent)
         critic_verdicts: List[CriticVerdict] = []
         disagreements = []
+        adversarial_audits = []
+        criteria_assessments_for_gate = []
 
         for candidate, crit in zip(proposals, criteria_list):
-            is_exclusion = crit.get("is_exclusion", False)
-            quote = candidate.exact_quote
-            crit_code = candidate.criterion_code
+            det_status = (
+                DeterminationStatus.MET if candidate.status_proposed == "MET"
+                else (DeterminationStatus.NOT_MET if candidate.status_proposed == "NOT_MET"
+                      else DeterminationStatus.INSUFFICIENT_EVIDENCE)
+            )
+            # Create CriterionAssessment for AdversarialVerificationAgent
+            assessment_obj = CriterionAssessment(
+                criterion_id=crit.get("id", crit.get("criterion_code", "CRIT-01")),
+                criterion_code=candidate.criterion_code,
+                name=crit.get("name", ""),
+                description=crit.get("description", ""),
+                is_exclusion=crit.get("is_exclusion", False),
+                required_temporal_window=crit.get("required_temporal_window", "Not specified"),
+                status=det_status,
+                clinical_rationale=candidate.rationale,
+                raw_confidence=candidate.sampling_agreement_rate,
+                verified_spans=[
+                    ClinicalEvidenceSpan(
+                        source_text=candidate.exact_quote,
+                        start_char=candidate.char_offset_start,
+                        end_char=candidate.char_offset_end,
+                        clinical_section="Clinical Progress Note",
+                        confidence=candidate.sampling_agreement_rate
+                    )
+                ] if candidate.exact_quote and candidate.exact_quote != "No explicit evidence span found" else []
+            )
 
-            # Check for contradiction terms
-            contradiction = False
-            negation = False
-            if quote and quote != "No explicit evidence span found":
-                q_low = quote.lower()
-                neg_terms = ["denies", "no history", "without", "resolved", "absent", "ruled out"]
-                if any(nt in q_low for nt in neg_terms):
-                    negation = True
+            criteria_assessments_for_gate.append(assessment_obj)
+            # Delegate to existing AdversarialVerificationAgent
+            audit_result = self.adversarial_verifier.audit_assessment(assessment_obj, crit, raw_ehr_text)
+            adversarial_audits.append(audit_result)
 
-            # Critic determination
-            critic_status = candidate.status_proposed
-            if negation and candidate.status_proposed == "MET" and not is_exclusion:
-                critic_status = "NOT_MET"
-                contradiction = True
+            has_discordance = bool(getattr(audit_result, "discordance_flag", False))
+            has_hallucination = bool(getattr(audit_result, "hallucination_flag", False))
+            has_omission = bool(getattr(audit_result, "unverified_omission_flag", False))
 
-            agrees = (critic_status == candidate.status_proposed) and not contradiction
+            agrees = not (has_discordance or has_hallucination)
             if not agrees:
-                disagreements.append(crit_code)
+                disagreements.append(candidate.criterion_code)
 
             critic_verdicts.append(CriticVerdict(
-                criterion_code=crit_code,
+                criterion_code=candidate.criterion_code,
                 agrees_with_extractor=agrees,
-                critic_status=critic_status,
-                negation_detected=negation,
-                contradiction_flagged=contradiction,
-                critic_notes="Verified consistent." if agrees else f"Disagreement on status ({candidate.status_proposed} vs {critic_status}) or negation flagged."
+                critic_status=candidate.status_proposed if agrees else "DISPUTED",
+                negation_detected=has_omission,
+                contradiction_flagged=has_discordance,
+                critic_notes=audit_result.audit_notes
             ))
 
         self._record_transition(
@@ -182,49 +217,26 @@ class ClinicalAdjudicationStateMachine:
             {"slice_failures_count": len(slice_failures), "failures": slice_failures}
         )
 
-        # Stage 5: Calibrated Abstention Gate
-        # Compute empirical aggregate confidence from candidate sampling agreement
-        confidences = [p.sampling_agreement_rate for p in proposals]
-        avg_confidence = round(sum(confidences) / len(confidences), 3) if confidences else 0.5
-        
-        # Penalize confidence if disagreements or slice failures occurred
-        calibrated_confidence = avg_confidence
-        if disagreements:
-            calibrated_confidence = round(calibrated_confidence * 0.75, 3)
-        if slice_failures:
-            calibrated_confidence = round(calibrated_confidence * 0.50, 3)
-
-        abstain_triggered = False
-        abstain_reasons = []
-
-        if disagreements:
-            abstain_triggered = True
-            abstain_reasons.append(f"Extractor-Critic agent disagreement on {disagreements}")
-        if slice_failures:
-            abstain_triggered = True
-            abstain_reasons.append(f"Grounding failure: {len(slice_failures)} citations failed character slice verification")
-        if calibrated_confidence < self.tau:
-            abstain_triggered = True
-            abstain_reasons.append(f"Calibrated confidence {calibrated_confidence:.3f} below safety floor tau {self.tau:.2f}")
-
-        # Compute decision
-        if abstain_triggered:
-            final_decision = AdjudicationDecision.DEFERRED_TO_HUMAN
-        else:
-            # Check if any inclusion criteria NOT_MET or exclusion criteria MET
-            has_unmet_inclusion = any(
-                p.status_proposed in ("NOT_MET", "INSUFFICIENT_EVIDENCE") 
-                for p, c in zip(proposals, criteria_list) if not c.get("is_exclusion", False)
+        # Stage 5: Calibrated Abstention Gate (Delegating directly to CalibratedAbstentionGate)
+        gate_decision, abstain_triggered, raw_conf, calibrated_confidence, abstain_reason, clinician_notes = (
+            self.abstention_gate.evaluate(
+                criteria_assessments=criteria_assessments_for_gate,
+                audit_results=adversarial_audits
             )
-            has_met_exclusion = any(
-                p.status_proposed == "MET"
-                for p, c in zip(proposals, criteria_list) if c.get("is_exclusion", False)
-            )
+        )
 
-            if has_unmet_inclusion or has_met_exclusion:
-                final_decision = AdjudicationDecision.DENIED
-            else:
-                final_decision = AdjudicationDecision.APPROVED
+        abstain_reasons = [abstain_reason] if abstain_reason else []
+
+        # If extractor-critic disagreed or slice failed, safely defer to human review
+        if disagreements and not abstain_triggered:
+            abstain_triggered = True
+            gate_decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+            abstain_reasons.append(f"Extractor-Critic agent disagreement on: {disagreements}")
+
+        if slice_failures and not abstain_triggered:
+            abstain_triggered = True
+            gate_decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+            abstain_reasons.append(f"Grounding failure: {len(slice_failures)} ungrounded quotes")
 
         self._record_transition(
             PipelineStage.CALIBRATED_ABSTENTION_GATE,
@@ -234,14 +246,12 @@ class ClinicalAdjudicationStateMachine:
                 "tau_threshold": self.tau,
                 "abstain_triggered": abstain_triggered,
                 "abstain_reasons": abstain_reasons,
-                "preliminary_decision": final_decision.value
+                "final_decision": gate_decision.value
             }
         )
 
         # Stage 6: Finalized State
         total_latency_ms = (time.perf_counter() - self._start_perf) * 1000.0
-        
-        # Compute SHA-256 seal of the state transitions
         transition_json = json.dumps([t.model_dump() for t in self.transitions], sort_keys=True)
         state_hash = hashlib.sha256(transition_json.encode("utf-8")).hexdigest()
 
@@ -249,16 +259,16 @@ class ClinicalAdjudicationStateMachine:
             PipelineStage.FINALIZED,
             "COMPLETED",
             {
-                "final_decision": final_decision.value,
+                "final_decision": gate_decision.value,
                 "state_hash": state_hash,
                 "total_latency_ms": round(total_latency_ms, 2)
             }
         )
 
         return {
-            "final_decision": final_decision.value,
+            "final_decision": gate_decision.value,
             "calibrated_confidence": calibrated_confidence,
-            "raw_confidence": avg_confidence,
+            "raw_confidence": sum(p.sampling_agreement_rate for p in proposals) / max(1, len(proposals)),
             "abstention_status": abstain_triggered,
             "abstention_reasons": abstain_reasons,
             "total_latency_ms": round(total_latency_ms, 2),
@@ -267,4 +277,3 @@ class ClinicalAdjudicationStateMachine:
             "proposals": [p.model_dump() for p in proposals],
             "critic_verdicts": [v.model_dump() for v in critic_verdicts]
         }
-
