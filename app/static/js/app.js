@@ -1,3 +1,39 @@
+
+function showMfaChallengeScreen(data, username) {
+    const card = document.querySelector(".login-gate-card");
+    if (card) {
+        card.classList.add("mfa-active");
+        card.scrollTop = 0;
+    }
+    const signinSection = document.getElementById("login-section-signin");
+    const registerSection = document.getElementById("login-section-register");
+    const mfaSection = document.getElementById("login-section-mfa");
+
+    if (signinSection) signinSection.classList.add("hidden");
+    if (registerSection) registerSection.classList.add("hidden");
+    if (mfaSection) mfaSection.classList.remove("hidden");
+
+    renderMfaFactorSelectionButtons();
+    updateMfaChallengeCardUI(data);
+
+    if (username) {
+        showToast(`Two-factor authentication required for ${username}.`);
+    } else {
+        showToast("Two-factor authentication challenge required.");
+    }
+}
+
+function hideMfaChallengeScreen() {
+    window._mfaSessionToken = null;
+    const card = document.querySelector(".login-gate-card");
+    if (card) card.classList.remove("mfa-active");
+
+    const signinSection = document.getElementById("login-section-signin");
+    const mfaSection = document.getElementById("login-section-mfa");
+    if (mfaSection) mfaSection.classList.add("hidden");
+    if (signinSection) signinSection.classList.remove("hidden");
+}
+
 let currentToken = null;
 let currentRole = "Auditor";
 let currentUser = "auditor@medicare.cms.gov";
@@ -142,6 +178,8 @@ function hideLoginGate() {
 }
 
 function switchLoginMode(mode) {
+    const card = document.querySelector(".login-gate-card");
+    if (card) card.classList.remove("mfa-active");
     const signinBtn = document.getElementById("btn-tab-signin");
     const registerBtn = document.getElementById("btn-tab-register-pro");
     const signinSec = document.getElementById("login-section-signin");
@@ -489,15 +527,7 @@ async function handleGoogleOAuthCredential(credential) {
                 window._mfaSessionToken = data.mfa_session_token;
                 window._mfaAvailableMethods = data.available_methods || [data.mfa_method];
                 window._selectedMfaMethod = data.mfa_method;
-
-                const signinSection = document.getElementById("login-section-signin");
-                const mfaSection = document.getElementById("login-section-mfa");
-                if (signinSection) signinSection.classList.add("hidden");
-                if (mfaSection) mfaSection.classList.remove("hidden");
-
-                renderMfaFactorSelectionButtons();
-                updateMfaChallengeCardUI(data);
-                showToast("Google authentication verified. Complete clinical two-factor challenge.");
+                showMfaChallengeScreen(data, "Google Account");
                 return;
             }
 
@@ -546,16 +576,7 @@ async function executeLogin(username, password) {
                 window._mfaSessionToken = data.mfa_session_token;
                 window._mfaAvailableMethods = data.available_methods || [data.mfa_method];
                 window._selectedMfaMethod = data.mfa_method;
-
-                const signinSection = document.getElementById("login-section-signin");
-                const mfaSection = document.getElementById("login-section-mfa");
-                if (signinSection) signinSection.classList.add("hidden");
-                if (mfaSection) mfaSection.classList.remove("hidden");
-
-                renderMfaFactorSelectionButtons();
-                updateMfaChallengeCardUI(data);
-
-                showToast(`Two-factor authentication required for ${username}.`);
+                showMfaChallengeScreen(data, username);
                 return;
             }
 
@@ -567,6 +588,8 @@ async function executeLogin(username, password) {
             sessionStorage.setItem("carepolicyguard_role", currentRole);
             sessionStorage.setItem("carepolicyguard_user", currentUser);
 
+            const card = document.querySelector(".login-gate-card");
+            if (card) card.classList.remove("mfa-active");
             updateUserBadge();
             routeToRoleDefaultTab();
             hideLoginGate();
@@ -1131,6 +1154,8 @@ async function handleMfaChallengeSubmit(event) {
             sessionStorage.setItem("carepolicyguard_role", currentRole);
             sessionStorage.setItem("carepolicyguard_user", currentUser);
 
+            const card = document.querySelector(".login-gate-card");
+            if (card) card.classList.remove("mfa-active");
             updateUserBadge();
             routeToRoleDefaultTab();
             hideLoginGate();
@@ -1158,11 +1183,7 @@ async function handleMfaChallengeSubmit(event) {
 }
 
 function cancelMfaChallenge() {
-    window._mfaSessionToken = null;
-    const signinSection = document.getElementById("login-section-signin");
-    const mfaSection = document.getElementById("login-section-mfa");
-    if (mfaSection) mfaSection.classList.add("hidden");
-    if (signinSection) signinSection.classList.remove("hidden");
+    hideMfaChallengeScreen();
 }
 
 async function loadAuthModalSecurityDetails() {

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=20261027_02">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261029_03">
 </head>
 <body class="dark-theme">
     <!-- DEDICATED FULL-SCREEN LOGIN GATE SCREEN -->
@@ -25,13 +25,13 @@
                 <p class="login-gate-subtitle">Authorized Healthcare Portal &bull; CMS Prior Authorization CDS</p>
             </div>
 
-            <div class="login-notice-banner">
+            <div class="login-notice-banner" id="login-notice-banner">
                 <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
                 <span>Restricted Access: Valid credentials required to access patient records &amp; policy determinations.</span>
             </div>
 
             <!-- TAB SELECTOR: SIGN IN vs REGISTER MEDICAL PRO -->
-            <div class="login-tab-strip">
+            <div class="login-tab-strip" id="login-tab-strip">
                 <button class="login-tab-btn active" id="btn-tab-signin" onclick="switchLoginMode('signin')">Sign In</button>
                 <button class="login-tab-btn" id="btn-tab-register-pro" onclick="switchLoginMode('register')">Register as Medical Pro</button>
             </div>
@@ -95,48 +95,48 @@
 
             <!-- MFA CHALLENGE VERIFICATION SCREEN (STEP 2 OF LOGIN) -->
             <div id="login-section-mfa" class="login-section-content hidden">
-                <div class="mfa-challenge-header" style="text-align: center; margin-bottom: 18px;">
-                    <div class="shield-icon" style="margin: 0 auto 10px auto; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: rgba(56, 189, 248, 0.15); border-radius: 50%;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                <div class="mfa-challenge-header">
+                    <div class="mfa-shield-icon-wrap">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                     </div>
-                    <h3 style="color: #f8fafc; margin: 0 0 4px 0;">Two-Factor Authentication</h3>
-                    <p id="mfa-challenge-subtitle" style="color: #94a3b8; font-size: 13px; margin: 0;">Enter the 6-digit verification code</p>
+                    <h3>Two-Factor Authentication</h3>
+                    <p id="mfa-challenge-subtitle">Enter the 6-digit clinical security code</p>
                 </div>
 
                 <!-- MULTI-MFA FACTOR SELECTOR (WHEN USER HAS MULTIPLE METHODS) -->
-                <div id="mfa-factor-selection-container" class="hidden" style="margin-bottom: 14px;">
+                <div id="mfa-factor-selection-container" class="hidden" style="margin-bottom: 12px;">
                     <div style="font-size: 11px; color: #94a3b8; text-align: center; margin-bottom: 6px;">Choose verification method:</div>
                     <div id="mfa-factor-buttons-row" style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;"></div>
                 </div>
 
-                <div id="mfa-destination-banner" style="background: rgba(15, 23, 42, 0.8); border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #cbd5e1; text-align: center;">
+                <div id="mfa-destination-banner" class="mfa-destination-banner">
                     <span id="mfa-destination-text">Authenticating clinical session...</span>
                 </div>
 
-                <form id="mfa-verify-form" onsubmit="handleMfaChallengeSubmit(event)">
-                    <div class="login-form-group">
-                        <label for="mfa-code-input" style="text-align: center; display: block;">6-Digit Security Code:</label>
-                        <input type="text" id="mfa-code-input" class="login-input" maxlength="6" placeholder="000000" required autocomplete="one-time-code" style="font-size: 26px; text-align: center; letter-spacing: 8px; font-family: monospace; font-weight: 700;">
+                <form id="mfa-verify-form" onsubmit="handleMfaChallengeSubmit(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="login-form-group" style="align-items: center;">
+                        <label for="mfa-code-input" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #38bdf8; font-weight: 700; margin-bottom: 4px;">6-Digit Security Code:</label>
+                        <input type="text" id="mfa-code-input" class="login-input mfa-code-input-lg" maxlength="6" placeholder="000000" required autocomplete="one-time-code">
                     </div>
                     
-                    <button type="submit" class="btn-primary full-width btn-login-submit" id="btn-mfa-submit" style="margin-top: 14px;">
+                    <button type="submit" class="btn-primary full-width btn-login-submit" id="btn-mfa-submit" style="padding: 13px; font-size: 14px; font-weight: 700; background: #38bdf8; color: #020617; border-radius: 8px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35); cursor: pointer; border: none; margin-top: 4px;">
                         Verify Code &amp; Access Chart System
                     </button>
                     
-                    <button type="button" class="btn-side-tutorial full-width" style="margin-top: 10px; padding: 8px;" onclick="cancelMfaChallenge()">
+                    <button type="button" class="btn-side-tutorial full-width" style="padding: 9px; font-size: 12px; background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; color: #94a3b8; border-radius: 8px; cursor: pointer;" onclick="cancelMfaChallenge()">
                         Cancel &amp; Return to Sign In
                     </button>
                 </form>
 
-                <div id="mfa-dev-hint-box" class="demo-creds-hint-box hidden" style="margin-top: 16px;">
-                    <div class="demo-creds-header">
+                <div id="mfa-dev-hint-box" class="demo-creds-hint-box hidden" style="margin-top: 14px; background: rgba(15, 23, 42, 0.9); border: 1px dashed #38bdf8; border-radius: 8px; padding: 10px;">
+                    <div class="demo-creds-header" style="margin-bottom: 6px;">
                         <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>
-                        <span>Evaluation Code Detected:</span>
+                        <span style="color: #38bdf8; font-weight: 600;">Evaluation Sandbox Code Detected:</span>
                     </div>
-                    <button type="button" class="btn-demo-chip" id="btn-autofill-mfa-code" style="width: 100%; text-align: center; font-weight: 700; color: #38bdf8;">
+                    <button type="button" class="btn-demo-chip" id="btn-autofill-mfa-code" style="width: 100%; text-align: center; font-weight: 700; color: #020617; background: #38bdf8; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer;">
                         Autofill Dispatched Code
                     </button>
                 </div>
@@ -2495,7 +2495,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261029_13" defer></script>
+    <script src="/static/js/app.js?v=20261029_14" defer></script>
 
     <!-- GOOGLE WORKSPACE OAUTH MODAL -->
     <div class="modal-overlay hidden" id="oauth-google-modal" style="position: fixed; inset: 0; z-index: 100000; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target===this)closeGoogleOAuthModal()">
