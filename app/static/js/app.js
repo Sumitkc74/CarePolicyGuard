@@ -3321,6 +3321,8 @@ function copyAuditHash() {
 // =============================================================================
 // AUDIT LEDGER
 // =============================================================================
+window._cachedAuditLogs = [];
+
 async function loadAuditLogs() {
     try {
         // Enforce RBAC privacy banner & control visibility
@@ -3382,83 +3384,161 @@ async function loadAuditLogs() {
             }
         }
 
-        const res = await fetch("/api/v1/audit-logs?limit=25", {
+        const res = await fetch("/api/v1/audit-logs?limit=100", {
             headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
         });
         if (res.ok) {
             const logs = await res.json();
-            const tbody = document.getElementById("audit-table-body");
-            tbody.innerHTML = "";
-
-            if (logs.length === 0) {
-                const emptyMsg = (currentRole === "Clinician")
-                    ? "No cases found. Adjudicate or sign a case to record it in your personal ledger."
-                    : "No adjudication audit logs recorded yet. Ephemeral zero-retention mode is active.";
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">${emptyMsg}</td></tr>`;
-                return;
-            }
-
-            logs.forEach(log => {
-                const tr = document.createElement("tr");
-                const ts = new Date(log.created_at).toLocaleString();
-                const shortHash = log.audit_hash.slice(0, 16) + "...";
-                let decisionChip = `<span class="badge-status not-met">${escapeHtml(log.decision)}</span>`;
-                if (log.decision === "APPROVED") decisionChip = `<span class="badge-status met">${escapeHtml(log.decision)}</span>`;
-                else if (log.decision === "DEFERRED_TO_HUMAN") decisionChip = `<span class="badge-status insufficient">${escapeHtml(log.decision)}</span>`;
-
-                let patientCellContent = escapeHtml(log.patient_id_masked);
-                if (currentRole === "Admin") {
-                    patientCellContent += ` <span class="badge-status insufficient" style="font-size: 0.72rem; padding: 2px 6px;">Metadata Only</span>`;
-                }
-
-                let actionsCell = "";
-                if (currentRole === "Auditor") {
-                    actionsCell = `
-                        <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="Inspect Forensic Evidence & Offsets" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
-                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                            <span>Inspect</span>
-                        </button>
-                    `;
-                } else if (currentRole === "Admin") {
-                    actionsCell = `
-                        <div style="display:inline-flex;align-items:center;gap:6px;">
-                            <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="Inspect Technical Metadata" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
-                                <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                                <span>Inspect</span>
-                            </button>
-                            <button type="button" class="btn-icon-subtle" title="Purge Record (System Maintenance)" onclick="deleteSingleAuditRecord('${escapeHtml(log.case_id)}')">
-                                <span class="med-icon icon-sm text-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    actionsCell = `
-                        <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="View Adjudication Summary" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
-                            <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
-                            <span>Inspect</span>
-                        </button>
-                    `;
-                }
-
-                tr.innerHTML = `
-                    <td class="mono-cell" style="color: var(--accent-cyan); font-weight: 600; cursor: pointer;" title="Click to inspect audit record" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')"><span style="border-bottom: 1px dashed rgba(56, 189, 248, 0.4);">${escapeHtml(log.case_id)}</span></td>
-                    <td class="mono-cell">${patientCellContent}</td>
-                    <td><strong>${escapeHtml(log.policy_id)}</strong></td>
-                    <td>${decisionChip}</td>
-                    <td class="mono-cell">${log.abstention_status ? "<strong style='color: var(--accent-amber);'>YES</strong>" : "NO"}</td>
-                    <td class="mono-cell">${(log.calibrated_confidence * 100).toFixed(1)}%</td>
-                    <td class="mono-cell" title="${escapeHtml(log.audit_hash)}" style="cursor: pointer;" onclick="copySpecificHash('${escapeHtml(log.audit_hash)}')">
-                        <span style="border-bottom: 1px dotted var(--accent-cyan);">${shortHash}</span>
-                    </td>
-                    <td class="mono-cell">${ts}</td>
-                    <td>${actionsCell}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+            window._cachedAuditLogs = Array.isArray(logs) ? logs : [];
+            filterAuditLogs();
         }
     } catch (e) {
         console.error("Failed to load audit logs:", e);
     }
+}
+
+function filterAuditLogs(query) {
+    const input = document.getElementById("audit-search-input");
+    const clearBtn = document.getElementById("btn-clear-audit-search");
+    const decisionSelect = document.getElementById("audit-filter-decision");
+    const counter = document.getElementById("audit-search-counter");
+    const tbody = document.getElementById("audit-table-body");
+
+    const q = (query !== undefined ? query : (input ? input.value : "")).trim().toLowerCase();
+    const decisionFilter = decisionSelect ? decisionSelect.value : "ALL";
+
+    if (clearBtn) {
+        clearBtn.style.display = q ? "block" : "none";
+    }
+
+    const allLogs = window._cachedAuditLogs || [];
+    const filtered = allLogs.filter(log => {
+        // Decision filter
+        if (decisionFilter !== "ALL") {
+            const dec = (log.decision || "").toUpperCase();
+            if (decisionFilter === "APPROVED" && dec !== "APPROVED") return false;
+            if (decisionFilter === "DEFERRED_TO_HUMAN" && dec !== "DEFERRED_TO_HUMAN") return false;
+            if (decisionFilter === "DENIED" && dec !== "DENIED" && dec !== "NOT_COVERED" && !dec.includes("DENI") && !dec.includes("NOT")) return false;
+        }
+
+        // Text search match across multiple fields
+        if (!q) return true;
+
+        const caseId = (log.case_id || "").toLowerCase();
+        const patientId = (log.patient_id_masked || "").toLowerCase();
+        const policyId = (log.policy_id || "").toLowerCase();
+        const decision = (log.decision || "").toLowerCase();
+        const hash = (log.audit_hash || "").toLowerCase();
+        const ts = log.created_at ? new Date(log.created_at).toLocaleString().toLowerCase() : "";
+
+        return caseId.includes(q) ||
+               patientId.includes(q) ||
+               policyId.includes(q) ||
+               decision.includes(q) ||
+               hash.includes(q) ||
+               ts.includes(q);
+    });
+
+    if (counter) {
+        if (q || decisionFilter !== "ALL") {
+            counter.innerHTML = `Showing <strong style="color: #38bdf8;">${filtered.length}</strong> of ${allLogs.length} cases`;
+        } else {
+            counter.textContent = `Showing ${allLogs.length} cases`;
+        }
+    }
+
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    if (allLogs.length === 0) {
+        const emptyMsg = (currentRole === "Clinician")
+            ? "No cases found. Adjudicate or sign a case to record it in your personal ledger."
+            : "No adjudication audit logs recorded yet. Ephemeral zero-retention mode is active.";
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 32px;">${emptyMsg}</td></tr>`;
+        return;
+    }
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 36px 16px;">
+                    <div style="font-size: 0.95rem; color: #f8fafc; font-weight: 600; margin-bottom: 6px;">No matching cases found</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 12px;">No audit records match "${escapeHtml(q || decisionFilter)}"</div>
+                    <button type="button" class="btn-secondary" onclick="clearAuditSearch()" style="padding: 6px 14px; font-size: 0.78rem;">
+                        Clear Search &amp; Filters
+                    </button>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    filtered.forEach(log => {
+        const tr = document.createElement("tr");
+        const ts = new Date(log.created_at).toLocaleString();
+        const shortHash = log.audit_hash ? (log.audit_hash.slice(0, 16) + "...") : "Awaiting...";
+        
+        let decisionChip = `<span class="badge-status not-met">${escapeHtml(log.decision || "DENIED")}</span>`;
+        if (log.decision === "APPROVED") decisionChip = `<span class="badge-status met">${escapeHtml(log.decision)}</span>`;
+        else if (log.decision === "DEFERRED_TO_HUMAN") decisionChip = `<span class="badge-status insufficient">${escapeHtml(log.decision)}</span>`;
+
+        let patientCellContent = escapeHtml(log.patient_id_masked || "--");
+        if (currentRole === "Admin") {
+            patientCellContent += ` <span class="badge-status insufficient" style="font-size: 0.72rem; padding: 2px 6px;">Metadata Only</span>`;
+        }
+
+        let actionsCell = "";
+        if (currentRole === "Auditor") {
+            actionsCell = `
+                <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="Inspect Forensic Evidence & Offsets" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                    <span>Inspect</span>
+                </button>
+            `;
+        } else if (currentRole === "Admin") {
+            actionsCell = `
+                <div style="display:inline-flex;align-items:center;gap:6px;">
+                    <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="Inspect Technical Metadata" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                        <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                        <span>Inspect</span>
+                    </button>
+                    <button type="button" class="btn-icon-subtle" title="Purge Record (System Maintenance)" onclick="deleteSingleAuditRecord('${escapeHtml(log.case_id)}')">
+                        <span class="med-icon icon-sm text-red"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></span>
+                    </button>
+                </div>
+            `;
+        } else {
+            actionsCell = `
+                <button type="button" class="btn-batch-action" style="padding: 4px 10px; font-size: 0.75rem;" title="View Adjudication Summary" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')">
+                    <span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                    <span>Inspect</span>
+                </button>
+            `;
+        }
+
+        tr.innerHTML = `
+            <td class="mono-cell" style="color: var(--accent-cyan); font-weight: 600; cursor: pointer;" title="Click to inspect audit record" onclick="viewAuditRecordDetails('${escapeHtml(log.case_id)}')"><span style="border-bottom: 1px dashed rgba(56, 189, 248, 0.4);">${escapeHtml(log.case_id)}</span></td>
+            <td class="mono-cell">${patientCellContent}</td>
+            <td><strong>${escapeHtml(log.policy_id || "--")}</strong></td>
+            <td>${decisionChip}</td>
+            <td class="mono-cell">${log.abstention_status ? "<strong style='color: var(--accent-amber);'>YES</strong>" : "NO"}</td>
+            <td class="mono-cell">${(typeof log.calibrated_confidence === 'number' ? (log.calibrated_confidence * 100).toFixed(1) : "0.0")}%</td>
+            <td class="mono-cell" title="${escapeHtml(log.audit_hash || '')}" style="cursor: pointer;" onclick="copySpecificHash('${escapeHtml(log.audit_hash || '')}')">
+                <span style="border-bottom: 1px dotted var(--accent-cyan);">${shortHash}</span>
+            </td>
+            <td class="mono-cell">${ts}</td>
+            <td>${actionsCell}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function clearAuditSearch() {
+    const input = document.getElementById("audit-search-input");
+    const decisionSelect = document.getElementById("audit-filter-decision");
+    if (input) input.value = "";
+    if (decisionSelect) decisionSelect.value = "ALL";
+    filterAuditLogs("");
 }
 
 function dismissAuditBanner() {

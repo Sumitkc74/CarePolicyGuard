@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
-[![Tests Passing](https://img.shields.io/badge/Tests-90%2F90%20Passing-brightgreen.svg)](tests/)
+[![Tests Passing](https://img.shields.io/badge/Tests-109%2F109%20Passing-brightgreen.svg)](tests/)
 [![HIPAA Compliance](https://img.shields.io/badge/HIPAA-Safe%20Harbor%20%26%20Minimum%20Necessary-success.svg)](#security-privacy--hipaa-minimum-necessary)
 [![Audit Grounding](https://img.shields.io/badge/Evidence%20Faithfulness-100%25%20Character--Anchored-informational.svg)](#4-agent-pipeline-specification)
 

@@ -911,6 +911,35 @@
                     </div>
                 </div>
                 <div id="audit-role-privacy-banner" style="margin: 16px 24px; padding: 12px 16px; border-radius: 8px; font-size: 0.88rem; display: flex; align-items: center; gap: 12px;"></div>
+
+                <!-- AUDIT SEARCH & FILTER TOOLBAR -->
+                <div class="audit-search-toolbar" style="margin: 0 24px 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 260px; max-width: 480px;">
+                        <div style="position: relative; flex: 1;">
+                            <input type="text" id="audit-search-input" placeholder="Search Case ID, Patient ID, Policy ID, or Seal..." oninput="filterAuditLogs(this.value)" style="width: 100%; padding: 8px 32px 8px 34px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 8px; font-size: 0.82rem; color: #F8FAFC; box-sizing: border-box; transition: all 0.2s;" onfocus="this.style.borderColor='#38bdf8';this.style.boxShadow='0 0 0 2px rgba(56, 189, 248, 0.2)'" onblur="this.style.borderColor='rgba(255, 255, 255, 0.14)';this.style.boxShadow='none'" />
+                            <span style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; display: flex; align-items: center;">
+                                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            </span>
+                            <button type="button" id="btn-clear-audit-search" onclick="clearAuditSearch()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; display: none; padding: 0 4px; line-height: 1;" title="Clear search">&times;</button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="font-size: 0.76rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Filter:</span>
+                            <select id="audit-filter-decision" onchange="filterAuditLogs()" style="padding: 6px 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; font-size: 0.78rem; color: #F8FAFC; cursor: pointer;">
+                                <option value="ALL">All Decisions</option>
+                                <option value="APPROVED">Qualified / Approved</option>
+                                <option value="DEFERRED_TO_HUMAN">Auditor Review (Deferred)</option>
+                                <option value="DENIED">Criteria Unmet (Denied)</option>
+                            </select>
+                        </div>
+
+                        <span id="audit-search-counter" style="font-size: 0.78rem; color: #94a3b8; font-family: var(--font-mono); background: rgba(30, 41, 59, 0.6); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.08);">
+                            Showing 0 cases
+                        </span>
+                    </div>
+                </div>
                 <div class="table-container">
                     <table class="audit-table">
                         <thead>
@@ -2495,7 +2524,7 @@
     <!-- NOTIFICATION TOAST -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="/static/js/app.js?v=20261029_15" defer></script>
+    <script src="/static/js/app.js?v=20261029_16" defer></script>
 
     <!-- GOOGLE WORKSPACE OAUTH MODAL -->
     <div class="modal-overlay hidden" id="oauth-google-modal" style="position: fixed; inset: 0; z-index: 100000; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target===this)closeGoogleOAuthModal()">

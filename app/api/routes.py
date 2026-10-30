@@ -11,7 +11,10 @@ from app.api.session_routes import register_session_management_routes
 from app.api.smart_fhir_routes import register_smart_fhir_routes
 from app.api.pdf_routes import register_pdf_routes
 from app.api.batch_routes import register_batch_route
+import logging
 import io
+
+logger = logging.getLogger(__name__)
 import uuid
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
