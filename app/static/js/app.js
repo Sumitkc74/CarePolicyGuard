@@ -169,12 +169,35 @@ async function checkSessionOrShowGate() {
 
 function showLoginGate() {
     const gate = document.getElementById("login-gate-screen");
-    if (gate) gate.classList.remove("hidden");
+    if (gate) {
+        gate.classList.remove("hidden");
+        gate.style.display = "flex";
+        gate.style.opacity = "1";
+        gate.style.visibility = "visible";
+        gate.style.pointerEvents = "auto";
+    }
+    const card = document.querySelector(".login-gate-card");
+    if (card) card.classList.remove("mfa-active");
+
+    const signinSection = document.getElementById("login-section-signin");
+    const mfaSection = document.getElementById("login-section-mfa");
+    const registerSection = document.getElementById("login-section-register");
+    if (signinSection) signinSection.classList.remove("hidden");
+    if (mfaSection) mfaSection.classList.add("hidden");
+    if (registerSection) registerSection.classList.add("hidden");
+
+    const signinBtn = document.getElementById("btn-tab-signin");
+    const registerBtn = document.getElementById("btn-tab-register-pro");
+    if (signinBtn) signinBtn.classList.add("active");
+    if (registerBtn) registerBtn.classList.remove("active");
 }
 
 function hideLoginGate() {
     const gate = document.getElementById("login-gate-screen");
-    if (gate) gate.classList.add("hidden");
+    if (gate) {
+        gate.classList.add("hidden");
+        gate.style.display = "none";
+    }
 }
 
 function switchLoginMode(mode) {
@@ -614,13 +637,21 @@ function signOutToLoginGate() {
     sessionStorage.removeItem("carepolicyguard_token");
     sessionStorage.removeItem("carepolicyguard_role");
     sessionStorage.removeItem("carepolicyguard_user");
+    localStorage.removeItem("carepolicyguard_token");
+    localStorage.removeItem("carepolicyguard_role");
+    localStorage.removeItem("carepolicyguard_user");
 
     const authModal = document.getElementById("auth-modal");
-    if (authModal) authModal.classList.add("hidden");
+    if (authModal) {
+        authModal.classList.add("hidden");
+        authModal.style.display = "none";
+    }
 
-    updateUserBadge();
+    // Reset login card to clean sign-in state
     showLoginGate();
-    showToast("Signed out successfully. Authentication required to continue.");
+
+    // Reload page cleanly so all cached state is purged and login page appears immediately
+    window.location.href = "/";
 }
 
 // =============================================================================
@@ -6618,19 +6649,8 @@ function handleHipaaInactivityTimeout() {
     sessionStorage.removeItem("carepolicyguard_role");
     sessionStorage.removeItem("carepolicyguard_user");
 
-    const gate = document.getElementById("login-gate");
-    if (gate) gate.classList.remove("hidden");
-
-    const appHeader = document.querySelector(".app-header");
-    if (appHeader) appHeader.style.display = "none";
-    const mainContent = document.querySelector(".main-content");
-    if (mainContent) mainContent.style.display = "none";
-
-    const errBox = document.getElementById("login-error-box");
-    if (errBox) {
-        errBox.textContent = "HIPAA Security Auto-Lock: Session automatically locked after 15 minutes of inactivity to protect Protected Health Information (45 CFR § 164.312(a)(2)(iii)). Please sign in again.";
-        errBox.classList.remove("hidden");
-    }
+    showLoginGate();
+    window.location.href = "/";
 }
 
 
