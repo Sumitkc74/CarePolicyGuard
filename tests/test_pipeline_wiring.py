@@ -1,6 +1,7 @@
 import pytest
 from app.agents.pipeline import MultiAgentVerificationPipeline
 from app.schemas.contracts import AdjudicationDecision, FinalAdjudication
+from app.agents.benchmark_engine import BENCHMARK_VIGNETTES
 from fastapi.testclient import TestClient
 from main import app
 
@@ -97,6 +98,34 @@ def test_pipeline_state_machine_execution_mode():
     assert len(result.audit_hash) == 64
     assert len(result.criterion_assessments) > 0
     assert len(result.verification_audits) > 0
+
+def test_state_machine_mode_concordance_on_all_vignettes():
+    """
+    Verifies that state-machine mode achieves 10/10 concordance with gold CMS labels
+    and matches deterministic mode decisions across all 10 benchmark vignettes.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    for v in BENCHMARK_VIGNETTES:
+        gold = v["gold_decision"]
+        res_det = pipeline.adjudicate_sync(
+            patient_id=f"PT-EVAL-{v['id']}",
+            policy_id=v["policy_id"],
+            ehr_narrative=v["ehr"],
+            execution_mode="deterministic",
+            save_record=False
+        )
+        res_sm = pipeline.adjudicate_sync(
+            patient_id=f"PT-EVAL-{v['id']}",
+            policy_id=v["policy_id"],
+            ehr_narrative=v["ehr"],
+            execution_mode="state_machine",
+            save_record=False
+        )
+        # Both modes must match the gold CMS statutory determination
+        assert res_det.adjudication_decision.value == gold, f"Deterministic failed on {v['id']}"
+        assert res_sm.adjudication_decision.value == gold, f"State machine failed on {v['id']}"
+        # Both modes must yield the exact same decision
+        assert res_sm.adjudication_decision == res_det.adjudication_decision
 
 def test_api_adjudicate_endpoint_with_auto_and_state_machine():
     payload = {

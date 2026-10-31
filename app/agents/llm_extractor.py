@@ -195,12 +195,36 @@ class StructuredExtractorAgent:
                 temporal_met = (days >= 90)
                 quote, start, end = self._locate_best_span(raw_ehr_text, [gdmt_match.group(0)])
                 pass_status = "MET" if temporal_met else "NOT_MET"
-        elif "cpap" in crit_code.lower() or "ahi" in desc or "apnea" in desc:
+        elif "face-to-face" in crit_code.lower() or "face-to-face" in desc or "clinical evaluation" in desc:
+            f2f_match = re.search(r'(?i)\b(?:face-to-face|in-person|clinical evaluation|sleep specialist consultation)\b', raw_ehr_text)
+            if f2f_match:
+                quote, start, end = self._locate_best_span(raw_ehr_text, [f2f_match.group(0)])
+                pass_status = "MET"
+            else:
+                pass_status = "INSUFFICIENT_EVIDENCE"
+                quote = "Prerequisite face-to-face clinical evaluation not documented in EHR note"
+        elif "ahi" in crit_code.lower() or "ahi" in desc or "apnea" in desc or "polysomnography" in desc:
             if ahi_match:
                 num_val = float(ahi_match.group(1))
                 unit = "events/hr"
                 quote, start, end = self._locate_best_span(raw_ehr_text, [ahi_match.group(0)])
-                pass_status = "MET" if num_val >= 15.0 else ("MET" if num_val >= 5.0 and "hypertension" in raw_ehr_text.lower() else "NOT_MET")
+                if num_val >= 15.0:
+                    pass_status = "MET"
+                elif num_val >= 5.0:
+                    # Require non-negated comorbidity (hypertension, stroke, excessive daytime sleepiness)
+                    has_comorbidity = False
+                    for symp in ["hypertension", "stroke", "excessive daytime sleepiness", "insomnia"]:
+                        s_idx = raw_ehr_text.lower().find(symp)
+                        if s_idx != -1:
+                            pre = raw_ehr_text[max(0, s_idx-35):s_idx].lower()
+                            if not any(neg in pre for neg in ["no ", "denies ", "without ", "never ", "negative"]):
+                                has_comorbidity = True
+                                break
+                    pass_status = "MET" if has_comorbidity else "INSUFFICIENT_EVIDENCE"
+                else:
+                    pass_status = "NOT_MET"
+            else:
+                pass_status = "INSUFFICIENT_EVIDENCE" 
         elif is_exclusion:
             if shock_match:
                 quote, start, end = self._locate_best_span(raw_ehr_text, [shock_match.group(0)])

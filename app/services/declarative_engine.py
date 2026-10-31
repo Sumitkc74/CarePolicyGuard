@@ -1,4 +1,7 @@
+import os
 import re
+import json
+from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
 from app.schemas.declarative_policy import DeclarativeCriterion, CriterionType, DeclarativePolicy
 from app.schemas.contracts import CriterionAssessment, ClinicalEvidenceSpan, DeterminationStatus
@@ -7,15 +10,55 @@ from app.agents.criteria_evaluator import CriteriaEvaluationAgent
 class DeclarativePolicyEngine:
     """
     Policy-as-Data Declarative Evaluation Engine.
-    Executes declarative criterion schemas deterministically against clinical EHR documentation.
-    Replaces brittle hand-coded procedural branches with a modular, scalable compiler.
+    Loads and executes declarative JSON policy schemas deterministically against clinical EHR documentation.
+    Enables adding any new CMS LCD or NCD via pure structured JSON/YAML with zero Python code changes.
     """
+
+    _POLICY_CACHE: Dict[str, DeclarativePolicy] = {}
+
+    @classmethod
+    def get_policies_dir(cls) -> Path:
+        """Returns the path to the declarative policy JSON store."""
+        return Path(__file__).resolve().parent.parent / "data" / "policies"
+
+    @classmethod
+    def load_policy(cls, policy_id: str) -> Optional[DeclarativePolicy]:
+        """Loads a DeclarativePolicy from declarative JSON specification."""
+        clean_id = policy_id.strip()
+        if clean_id in cls._POLICY_CACHE:
+            return cls._POLICY_CACHE[clean_id]
+
+        file_path = cls.get_policies_dir() / f"{clean_id}.json"
+        if not file_path.exists():
+            return None
+
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            policy = DeclarativePolicy(**data)
+            cls._POLICY_CACHE[clean_id] = policy
+            return policy
+        except Exception:
+            return None
+
+    @classmethod
+    def get_all_policies(cls) -> List[DeclarativePolicy]:
+        """Loads all available declarative policies from JSON store."""
+        policies = []
+        p_dir = cls.get_policies_dir()
+        if p_dir.exists():
+            for p_file in p_dir.glob("*.json"):
+                pol = cls.load_policy(p_file.stem)
+                if pol:
+                    policies.append(pol)
+        return policies
 
     @classmethod
     def compile_from_dict(cls, data: Dict[str, Any]) -> DeclarativeCriterion:
         """
-        Translates raw database rows or dictionary criteria into strongly-typed DeclarativeCriterion.
-        Infers criterion_type, entity synonyms, and operational thresholds.
+        Translates raw dictionary or DB rows into a strongly-typed DeclarativeCriterion.
+        Prioritizes explicitly declared schema fields (threshold, operator, unit, ordinals);
+        falls back to inferred defaults if reading unannotated legacy database records.
         """
         code = data.get("criterion_code", "CRIT-UNKNOWN")
         name = data.get("name", "")
@@ -25,9 +68,36 @@ class DeclarativePolicyEngine:
         if isinstance(keywords, str):
             keywords = [k.strip() for k in keywords.split(",") if k.strip()]
 
+        # 1. Use explicitly declared fields if present in data
+        if "threshold" in data and data["threshold"] is not None:
+            c_type = data.get("criterion_type", CriterionType.NUMERIC_THRESHOLD)
+            return DeclarativeCriterion(
+                criterion_code=code,
+                name=name,
+                description=desc,
+                clinical_intent=data.get("clinical_intent", "Declared policy requirement"),
+                criterion_type=c_type,
+                entity_names=data.get("entity_names") or list(set(keywords + [name])),
+                operator=data.get("operator", "<="),
+                threshold=float(data["threshold"]),
+                target_unit=data.get("target_unit"),
+                ordinal_allowed=data.get("ordinal_allowed"),
+                min_duration_days=data.get("min_duration_days"),
+                is_exclusion=is_excl,
+                negation_sensitive=data.get("negation_sensitive", True),
+                required_temporal_window=data.get("required_temporal_window", "Within past 12 months"),
+                min_score=data.get("min_score", 0.85)
+            )
+
+        # 2. Check if a declarative policy JSON file already defines this criterion code
+        for pol in cls.get_all_policies():
+            for crit in pol.criteria:
+                if crit.criterion_code.upper() == code.upper():
+                    return crit
+
+        # 3. Fallback heuristic inference for unseeded legacy DB rows
         code_low = code.lower()
         desc_low = desc.lower()
-        name_low = name.lower()
 
         c_type = CriterionType.FINDING_PRESENCE
         operator = None
@@ -89,16 +159,12 @@ class DeclarativePolicyEngine:
         rationale = "No documented clinical evidence matching statutory criteria."
         raw_confidence = 0.50
 
-        # 1. Scope and Negation Analyzer helper from CriteriaEvaluationAgent
+        # Scope and Negation Analyzer helper from CriteriaEvaluationAgent
         analyzer = CriteriaEvaluationAgent()
 
-        # 2. Evaluation according to Declarative Paradigm
         if criterion.criterion_type == CriterionType.NUMERIC_THRESHOLD:
             # Handle numeric cutoffs (LVEF <= 35%, AHI >= 15, etc.)
             search_terms = criterion.entity_names or [criterion.name]
-            num_match = None
-
-            # Pattern for numeric clinical metrics
             metric_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*([%a-zA-Z/]*)'
             m = re.search(metric_pattern, ehr_text)
             if m:
@@ -108,7 +174,6 @@ class DeclarativePolicyEngine:
                     s_idx = m.start()
                     e_idx = m.end()
 
-                    # NegEx scope check
                     scope = analyzer.analyze_clinical_scope(ehr_text, s_idx, e_idx)
                     if not scope["is_negated"]:
                         op = criterion.operator or "<="
@@ -146,7 +211,6 @@ class DeclarativePolicyEngine:
                     pass
 
         elif criterion.criterion_type == CriterionType.ORDINAL_RANK:
-            # Handle ordinal stages (e.g. NYHA Class II/III, MR Grade 3+/4+)
             search_terms = criterion.entity_names or [criterion.name]
             ord_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\n\.]*?\b(?:class\s+|grade\s+)?([ivx0-9\+\-]+)'
             m = re.search(ord_pattern, ehr_text)
@@ -176,8 +240,8 @@ class DeclarativePolicyEngine:
                         rationale = f"Non-qualifying stage: {found_rank} not in qualifying list {allowed}."
 
         elif criterion.criterion_type == CriterionType.TEMPORAL_DURATION:
-            # Handle medical therapy duration (e.g. GDMT >= 90 days)
-            duration_pattern = r'(?i)\b(?:gdmt|medical therapy|optimal therapy|treatment)[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months)'
+            search_terms = list(criterion.entity_names) + ["therapy", "treatment", "management", "gdmt"] if criterion.entity_names else ["therapy", "treatment", "management", "gdmt"]
+            duration_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months)'
             m = re.search(duration_pattern, ehr_text)
             if m:
                 count = int(m.group(1))
@@ -207,7 +271,6 @@ class DeclarativePolicyEngine:
                         rationale = f"Insufficient therapy duration ({days} days < statutory requirement of {min_req} days)."
 
         elif criterion.criterion_type == CriterionType.EXCLUSION_SYMPTOM:
-            # Handle statutory exclusions (e.g. cardiogenic shock, life expectancy < 1 yr)
             search_terms = criterion.entity_names or [criterion.name]
             excl_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')\b'
             m = re.search(excl_pattern, ehr_text)
@@ -226,23 +289,20 @@ class DeclarativePolicyEngine:
                 spans.append(span_obj)
 
                 if scope["is_negated"]:
-                    # Condition is negated e.g. "No cardiogenic shock" -> Exclusion NOT met (Coverage Allowed)
                     status = DeterminationStatus.NOT_MET
                     raw_confidence = 0.95
                     rationale = f"Statutory exclusion condition ruled out: documented as absent or resolved ({scope['negation_trigger']})."
                 else:
-                    # Condition is active -> Exclusion MET (Coverage Blocked)
                     status = DeterminationStatus.MET
                     raw_confidence = 0.95
-                    rationale = f"Active statutory exclusion identified: patient manifests disqualifying condition."
+                    rationale = "Active statutory exclusion identified: patient manifests disqualifying condition."
             else:
-                # Absence of mention for exclusion defaults to NOT_MET (clean)
                 status = DeterminationStatus.NOT_MET
                 raw_confidence = 0.90
                 rationale = "No documented statutory exclusion conditions identified in EHR narrative."
 
         else:
-            # CriterionType.FINDING_PRESENCE (General diagnostic finding)
+            # CriterionType.FINDING_PRESENCE
             search_terms = criterion.entity_names or [criterion.name]
             found = False
             for term in search_terms:
@@ -284,3 +344,7 @@ class DeclarativePolicyEngine:
             verified_spans=spans
         )
 
+    @classmethod
+    def evaluate_policy(cls, policy: DeclarativePolicy, ehr_text: str) -> List[CriterionAssessment]:
+        """Evaluates all criteria declared in a DeclarativePolicy."""
+        return [cls.evaluate(crit, ehr_text) for crit in policy.criteria]

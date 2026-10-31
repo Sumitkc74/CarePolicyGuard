@@ -1,0 +1,38 @@
+{
+  "policy_id": "NCD-220.13",
+  "title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
+  "jurisdiction": "National Coverage Determination (NCD)",
+  "effective_date": "2016-02-08",
+  "category": "Cardiology / Electrophysiology",
+  "description": "CMS coverage for percutaneous LAAC in non-valvular atrial fibrillation patients. Requires high thromboembolic risk (CHA2DS2-VASc >= 2), formal contraindication to long-term oral anticoagulation (HAS-BLED >= 3 or prior major hemorrhage), and shared decision-making consultation.",
+  "criteria": [
+    {
+      "criterion_code": "CRIT-LAAC-01",
+      "name": "High Thromboembolic Risk (CHA2DS2-VASc >= 2)",
+      "description": "Documented non-valvular atrial fibrillation with high stroke risk evidenced by CHA2DS2-VASc score >= 2.",
+      "clinical_intent": "Establish statutory stroke risk threshold",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": ["CHA2DS2-VASc", "stroke risk", "chads vasc", "atrial fibrillation"],
+      "operator": ">=",
+      "threshold": 2.0,
+      "target_unit": "score",
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "At current clinical evaluation",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-LAAC-02",
+      "name": "Contraindication to Long-Term Oral Anticoagulation",
+      "description": "Documented formal contraindication or high bleeding risk (HAS-BLED >= 3, intracranial hemorrhage, recurrent gastrointestinal bleeding).",
+      "clinical_intent": "Establish clinical unsuitability for warfarin/DOAC therapy",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": ["HAS-BLED", "contraindication to oral anticoagulation", "intracranial hemorrhage", "bleeding risk"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in clinical history",
+      "min_score": 0.85
+    }
+  ],
+  "statutory_waiting_periods": []
+}

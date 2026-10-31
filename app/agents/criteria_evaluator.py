@@ -206,7 +206,7 @@ class CriteriaEvaluationAgent:
 
         elif "nyha" in code.lower() or "functional class" in name.lower() or "nyha" in desc.lower():
             # NYHA Class II or III
-            nyha_match = re.search(r'(?i)\b(nyha|new york heart association)\s*(?:class)?\s*([I|V|X]+|\d)\b', ehr_text)
+            nyha_match = re.search(r'(?i)\b(nyha|new york heart association)\s*(?:functional\s+)?(?:class)?\s*([IVX]+|\d)\b', ehr_text)
             if nyha_match:
                 cls_str = nyha_match.group(2).upper()
                 span = ClinicalEvidenceSpan(
@@ -337,7 +337,7 @@ class CriteriaEvaluationAgent:
                 rationale = "No documented guideline-directed heart failure medical therapy found."
                 raw_confidence = 0.88
 
-        elif "revascularization" in code.lower() or "post-mi" in code.lower() or "waiting period" in name.lower():
+        elif "crit-icd-04" in code.lower() or "revascularization" in code.lower() or "post-mi" in code.lower() or "waiting period" in name.lower() or "revascularization" in name.lower() or "cardiomyopathy etiology" in name.lower():
             # Temporal waiting period: >= 40 days post-MI, >= 90 days post-CABG/PCI
             mi_match = re.search(r'(?i)\b(myocardial infarction|mi|stemi|nstemi|cabg|pci|revascularization)\b(?:\s*.*?(\d+)\s*(days|months|weeks|years)\s*ago)?', ehr_text)
             if mi_match:
@@ -401,7 +401,7 @@ class CriteriaEvaluationAgent:
         # =========================================================================
         # 2. SLEEP APNEA / CPAP CRITERIA (LCD L33829)
         # =========================================================================
-        elif "ahi" in code.lower() or "sleep study" in name.lower() or "apnea" in desc.lower():
+        elif "crit-cpap-01" in code.lower() or "ahi" in code.lower() or "sleep study" in name.lower() or "polysomnography" in name.lower() or "apnea" in desc.lower():
             # AHI >= 15 or AHI 5-14 with symptoms (hypertension, excessive daytime sleepiness, stroke)
             ahi_match = re.search(r'(?i)\b(ahi|apnea-hypopnea index|rdi)\b(?:\s*\([a-z0-9]+\))?\s*(?:of|is|:)?\s*(\d{1,3}(?:\.\d+)?)\s*(?:events\/hr)?\b', ehr_text)
             if not ahi_match:
@@ -523,7 +523,7 @@ class CriteriaEvaluationAgent:
         # =========================================================================
         # 4. TRANSCATHETER MITRAL VALVE REPAIR (NCD 20.33 TEER / MitraClip)
         # =========================================================================
-        elif "crit-teer-01" in code.lower() or "mitral regurgitation" in name.lower() or "aortic stenosis" in name.lower():
+        elif "crit-teer-01" in code.lower() or "crit-tavr-01" in code.lower() or "mitral regurgitation" in name.lower() or "aortic stenosis" in name.lower():
             # Check for either Severe Mitral Regurgitation OR Severe Aortic Stenosis
             mr_match = re.search(r"(?i)\b(moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\s*(?:primary|secondary|functional)?\s*(?:mitral regurgitation|mr)\b|\b(?:mitral regurgitation|mr)\s*(?:is\s*)?(?:moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\b", ehr_text)
             as_match = re.search(r"(?i)\b(severe calcific aortic stenosis|severe aortic stenosis|aortic valve area \(ava\):?\s*0?\.[0-9]+|mean (?:transvalvular )?gradient:?\s*(?:4[0-9]|[5-9][0-9])\s*mm\s*hg)\b", ehr_text)
@@ -579,7 +579,7 @@ class CriteriaEvaluationAgent:
         # 4B. PERCUTANEOUS LEFT ATRIAL APPENDAGE CLOSURE (CMS NCD 220.13 LAAC / WATCHMAN)
         # =========================================================================
         elif "crit-laac-01" in code.lower() or "atrial fibrillation" in name.lower() or "stroke risk" in name.lower() or "cha2ds2" in desc.lower():
-            chads_match = re.search(r"(?i)\b(cha2ds2-vasc score (?:calculated at )?([2-9]|\d{2})|persistent non-valvular atrial fibrillation|atrial fibrillation)\b", ehr_text)
+            chads_match = re.search(r"(?i)\b((?:cha2ds2-vasc|chads-vasc|chads2)(?:\s+score)?\s*(?:calculated at |is |: )?([2-9]|\d{2})|persistent non-valvular atrial fibrillation|atrial fibrillation|afib|a-fib)\b", ehr_text)
             if chads_match:
                 span = ClinicalEvidenceSpan(
                     source_text=ehr_text[chads_match.start():chads_match.end()],
@@ -728,18 +728,26 @@ class CriteriaEvaluationAgent:
                         )
                         matched_kw_spans.append(s)
 
-            if matched_kw_spans:
+            is_quantitative = any(re.search(r'\b' + re.escape(term) + r'\b', (code + " " + name + " " + desc).lower()) for term in [
+                "threshold", "lvef", "ahi", "rdi", "ava", "gradient", "velocity", "wagner", "cha2ds2", "has-bled", "ejection fraction"
+            ])
+            if matched_kw_spans and not is_quantitative:
                 spans = matched_kw_spans[:2]
                 status = DeterminationStatus.NOT_MET if is_excl else DeterminationStatus.MET
                 rationale = f"Identified supporting clinical terminology: {', '.join([s.source_text for s in spans])}."
                 raw_confidence = 0.82
+            elif matched_kw_spans and is_quantitative:
+                spans = matched_kw_spans[:2]
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = f"Supporting clinical terms detected ({', '.join([s.source_text for s in spans])}), but quantitative threshold or diagnostic score is not substantiated."
+                raw_confidence = 0.65
             else:
                 status = DeterminationStatus.INSUFFICIENT_EVIDENCE
                 rationale = f"No explicit clinical documentation found corresponding to criterion requirement: {desc[:60]}..."
                 raw_confidence = 0.65
 
         # Negation and Family History Scope Verification
-        is_negative_req = is_excl or "waiting period" in name.lower() or "post-mi" in code.lower() or "revascularization" in code.lower() or "exclusion" in name.lower()
+        is_negative_req = is_excl or "waiting period" in name.lower() or "post-mi" in code.lower() or "revascularization" in code.lower() or "exclusion" in name.lower() or "crit-icd-04" in code.lower() or "revascularization" in name.lower() or "timeline" in name.lower()
 
         if spans:
             for sp in spans:
@@ -750,7 +758,7 @@ class CriteriaEvaluationAgent:
                     raw_confidence = 0.40
                     break
                 elif scope["is_negated"]:
-                    if not is_negative_req and status == DeterminationStatus.MET:
+                    if not is_negative_req:
                         status = DeterminationStatus.NOT_MET
                         rationale = f"Condition explicitly negated in chart: '{scope['negation_trigger']}'. Mandatory requirement unmet."
                         raw_confidence = 0.90

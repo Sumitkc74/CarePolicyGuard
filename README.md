@@ -131,13 +131,14 @@ The benchmark framework compares CarePolicyGuard against three conventional clin
 
 | Metric | Config A: Zero-Shot Baseline (Simulated) | Config B: Single-Pass RAG (Ablation) | Config C: Multi-Agent (No Gate Ablation) | Config D: CarePolicyGuard (Proposed) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Architecture** | Unverified Monolithic Prompt | Retrieval without Slice Auditing | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
+| **Architecture** | Unverified Monolithic Prompt | Retrieval without Timeline Engine | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
 | **Decision Concordance (Accuracy)** | 60.0% | 80.0% | 80.0% | **100.0%** |
 | **Evidence Faithfulness (% Grounded)** | 45.0% | 68.0% | 87.5% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.313 (Severe Overconf.) | 0.110 (Miscalibrated) | 0.111 (Moderate) | **0.076 (Calibrated on Covered Decisions)** |
+| **Expected Calibration Error (ECE)** | 0.310 (Severe Overconf.) | 0.109 (Miscalibrated) | 0.111 (Moderate) | **0.076 (Calibrated on Covered Decisions)** |
 | **Safe Abstention Rate** | 0.0% | 0.0% | 0.0% | **20.0% (Safe Deferral on Ambiguity)** |
-| **Overall Clinical Safety Score** | **0.185** | **0.484** | **0.622** | **0.924** |
-| **Average Latency (In-Process)** | ~18 ms | ~6 ms | ~10 ms | **~8–16 ms** |
+| **False Approval Rate (RAC Clawback Risk)** | **100.0%** (4/4 on ineligible cases) | **25.0%** (1/4, premature GDMT) | **0.0%** (0/4, forced denials) | **0.0% (0/4 Zero Clawback Risk)** |
+| **Overall Clinical Safety Score** | **0.186** | **0.484** | **0.622** | **0.924** |
+| **Average Latency (In-Process)** | ~14 ms | ~1 ms | ~1 ms | **~28 ms** |
 
 > [!NOTE]
 > **Ablation Provenance & Methodology:** The benchmark configurations are executed via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py). Config A represents an unverified direct single-prompt baseline without criteria decomposition. Config B is an architectural ablation isolating `TimelineAnalyzerService` by bypassing statutory waiting periods (e.g., post-MI 40d, GDMT 90d). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$). Config D is the full proposed neuro-symbolic framework ($\tau = 0.85$). Faithfulness is evaluated against exact character-level offsets; ECE is measured on the covered adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*). Robustness against clinical phrasing variation is validated via programmatic perturbation testing in [app/services/perturbation_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/perturbation_engine.py). The 10 vignettes represent synthetic Medicare coverage stress tests rather than an external multi-center clinical cohort.
@@ -154,12 +155,12 @@ $$\text{Clinical Safety Score} = \text{Accuracy} \times \text{Faithfulness} \tim
 | **BENCH-02** | Premature Referral - Inadequate GDMT (21 days) (`NCD-20.4`) | **DEFERRED** | **APPROVED** *(Hallucinated)* | **APPROVED** *(Missed Window)* | DENIED | **DEFERRED** | Grounded: `"total GDMT duration 21 days"`. Calibrated gate safely abstains (<90d). |
 | **BENCH-03** | Disqualified - Shock & Recent Stent (`NCD-20.4`) | **DENIED** | **APPROVED** *(Missed Shock)* | DENIED | DENIED | **DENIED** | Grounded: `"active cardiogenic shock"`, `"IABP"`. Disqualifying exclusion flagged. |
 | **BENCH-04** | Severe OSA, AHI 34.2, Face-to-Face Eval (`LCD-L33829`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AHI: 34.2 events/hr"`, `"Face-to-face clinical evaluation"`. |
-| **BENCH-05** | Borderline AHI 11.4 Without Documented Comorbidity (`LCD-L33829`) | **DEFERRED** | **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DEFERRED** | Grounded: `"AHI: 11.4 events/hr"`. Missing comorbidity; routed to human review. |
+| **BENCH-05** | Borderline AHI 7.2 Without Documented Comorbidity (`LCD-L33829`) | **DEFERRED** | **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DEFERRED** | Grounded: `"AHI 7.2"`. Missing comorbidity; safely routed to human review. |
 | **BENCH-06** | Contradictory / Negative Omission Stress Test (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 24%"`, `"metoprolol succinate and valsartan for 8 months"`. |
 | **BENCH-07** | Severe Symptomatic AS for TAVR (`NCD-20.33`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AVA: 0.68 cm2"`, `"Mean Transvalvular Gradient: 48 mmHg"`, `"Heart Team"`. |
-| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | DENIED | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc score is 4"`, `"HAS-BLED score is 4"`, `"intracranial hemorrhage"`. |
+| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc score is 4"`, `"HAS-BLED score is 4"`, `"intracranial hemorrhage"`. |
 | **BENCH-09** | Premature Post-MI Evaluation (<40d Timeline Deficit) (`NCD-20.4`) | **DENIED** | **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DENIED** | Grounded: `"STEMI occurred 18 days ago"`. Statutory 40-day waiting period deficit. |
-| **BENCH-10** | Wagner Grade III DFU Failing Standard Care (`NCD-20.29`) | **APPROVED** | DENIED | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"deep probe-to-bone ulceration"`, `">30 days standard care"`. |
+| **BENCH-10** | Wagner Grade III DFU Failing Standard Care (`NCD-20.29`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"deep probe-to-bone ulceration"`, `">30 days standard care"`. |
 
 ---
 

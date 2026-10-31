@@ -1,32 +1,17 @@
-# CarePolicyGuard: Empirical Clinical Benchmark & Reliability Analysis
+# CarePolicyGuard: Empirical Benchmarks & Ablation Evaluation
 
-## 1. Executive Summary
-
-This document details the design, clinical accuracy, and empirical performance of the **CarePolicyGuard Research Benchmark Suite**. The benchmark evaluates four AI architectural configurations across **10 complex clinical vignettes** spanning all five operational Centers for Medicare & Medicaid Services (CMS) coverage policies:
-1. **CMS NCD 20.4**: *Implantable Automatic Defibrillators (ICD)*
-2. **CMS LCD L33829**: *Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea*
-3. **CMS NCD 20.33**: *Transcatheter Aortic Valve Replacement (TAVR)*
-4. **CMS NCD 220.13**: *Left Atrial Appendage Closure (LAAC / Watchman)*
-5. **CMS NCD 20.29**: *Hyperbaric Oxygen Therapy (HBOT) for Diabetic Foot Ulcers*
-
-The benchmark measures foundational safety and efficacy dimensions:
-- **Decision Concordance (Accuracy)**: Alignment with official CMS statutory coverage determination.
-- **Evidence Faithfulness (% Grounded)**: Percentage of extracted evidence citations verified byte-for-byte in the patient record without hallucination or offset drift.
-- **Expected Calibration Error (ECE)**: Statistical divergence between model confidence and empirical accuracy across reliability bins.
-- **Safe Abstention Rate**: Frequency with which ambiguous or deficient cases are deferred to human medical directors rather than guessing.
-- **Clinical Safety Score**: Composite metric penalizing overconfident false approvals and ungrounded hallucinations:
-  $$\text{Safety Score} = \text{Accuracy} \times \text{Faithfulness} \times (1 - \text{ECE})$$
+This document outlines the clinical benchmark methodology, quantitative evaluation results, statistical calibration analysis, programmatic ablation studies, and peer-reviewed literature underpinning **CarePolicyGuard**.
 
 ---
 
-## 1.1 Data & Benchmark Provenance
+## 1. Benchmark Dataset & Case Methodology
 
-### A. Statutory Policy Ground Truth (CMS Medicare Coverage Database)
-The criteria, rules, hemodynamic thresholds, and exclusion windows are derived from official CMS federal coverage publications:
-- **CMS NCD 20.4**: *Implantable Automatic Defibrillators (ICDs)* (Effective Feb 15, 2018).
-- **CMS LCD L33829**: *Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea* (DME MACs: Noridian, CGS, Palmetto, Novitas).
+### A. Statutory Policy Scope
+The benchmark spans **5 active Centers for Medicare & Medicaid Services (CMS) coverage guidelines**:
+- **CMS NCD 20.4**: *Implantable Automatic Defibrillators (ICDs)*.
+- **CMS LCD L33829**: *Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea (CPAP/APAP)*.
 - **CMS NCD 20.33**: *Transcatheter Aortic Valve Replacement (TAVR)*.
-- **CMS NCD 220.13**: *Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)*.
+- **CMS NCD 220.13**: *Left Atrial Appendage Closure (LAAC / Watchman)*.
 - **CMS NCD 20.29**: *Hyperbaric Oxygen Therapy (HBOT) for Diabetic Wounds*.
 
 ### B. Clinical Case Vignette Synthesis
@@ -44,17 +29,17 @@ The benchmark vignettes were constructed by clinical domain specialists using:
 
 ## 2. Quantitative Performance Across 4 System Configurations
 
-The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times$ 4 system configurations) executed via `app.agents.empirical_harness.EmpiricalResearchHarness`:
+The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times$ 4 system configurations) executed via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py):
 
-| Architectural Configuration | Description / Paradigm | Adjudication Accuracy | Evidence Faithfulness | Expected Calibration Error (ECE) | Safe Abstention Rate | Overall Clinical Safety Score | Latency (In-Process) |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Config A: Zero-Shot Baseline (Simulated)** | Unverified Monolithic Prompting | 60.0% | 45.0% | 0.313 (Severe Overconf.) | 0.0% | **0.185** | ~18 ms |
-| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Adversarial / Temporal Auditing | 80.0% | 68.0% | 0.110 (Miscalibrated) | 0.0% | **0.484** | ~6 ms |
-| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Criteria Mapping without Abstention Gate | 80.0% | 87.5% | 0.111 (Moderate) | 0.0% | **0.622** | ~10 ms |
-| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.076 (Calibrated)** | **20.0%** | **0.924** | **~8–16 ms** |
+| Architectural Configuration | Description / Paradigm | Adjudication Accuracy | Evidence Faithfulness | Expected Calibration Error (ECE) | Safe Abstention Rate | False Approval Rate (RAC Risk) | Overall Clinical Safety Score | Latency (In-Process) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Config A: Zero-Shot Baseline (Simulated)** | Unverified Monolithic Prompting (Synthetic Baseline) | 60.0% | 45.0% | 0.310 (Severe Overconf.) | 0.0% | **100.0%** (4/4) | **0.186** | ~14 ms |
+| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 80.0% | 68.0% | 0.109 (Miscalibrated) | 0.0% | **25.0%** (1/4) | **0.484** | ~1 ms |
+| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.111 (Moderate) | 0.0% | **0.0%** (0/4) | **0.622** | ~1 ms |
+| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.076 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.924** | **~28 ms** |
 
 > [!NOTE]
-> **Methodological Provenance:** Config D, Config C, and Config B are executed dynamically in the live test harness. Config A represents an unverified single-prompt baseline simulation. Config B is an architectural ablation of Config C that disables adversarial verification and statutory temporal waiting-period checks. Faithfulness percentages for Configs A, B, and C are modeled comparative estimates; Config D enforces live character-slice verification. Confidence metrics represent deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ threshold; ECE is measured over the accepted adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
+> **Methodological Provenance & Integrity:** Config D, Config C, and Config B are executed dynamically in the live test harness. Config A represents an unverified direct single-prompt baseline simulation; it discloses what an ungrounded prompt yields without transmitting PHI to external remote LLM endpoints. Config B is an architectural ablation of Config C that programmatically disables `TimelineAnalyzerService` and bypasses statutory temporal waiting periods (e.g. approving premature 21-day GDMT). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$), showing that while it avoids false approvals, it lacks nuanced selective classification. Config D achieves 100% adherence and 0% False Approval Rate via calibrated selective abstention. Faithfulness percentages for Configs A, B, and C are modeled comparative estimates; Config D enforces live character-slice verification. Confidence metrics represent deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ threshold; ECE is measured over the accepted adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
 
 ---
 
@@ -64,12 +49,13 @@ Rather than comparing against proprietary commercial black-box platforms without
 
 | Architectural Capability | 1. Manual / Static Portal Rules | 2. Monolithic LLM Copilot | 3. CarePolicyGuard (Neuro-Symbolic Multi-Agent) |
 | :--- | :---: | :---: | :---: |
-| **Turnaround Latency** | 1 to 3 business days | Batched background queues | **< 20 milliseconds (In-Process)** |
+| **Turnaround Latency** | 1 to 3 business days | Batched background queues | **< 30 milliseconds (In-Process)** |
 | **Evidence Grounding** | Manual form entry | Free-form summary | **100% Character-Slice Exact Matching** |
 | **Temporal Logic Execution** | Manual date calculation | LLM context reasoning | **Deterministic Python Date Calculus** |
 | **Uncertainty Handling** | Forced manual routing | Forced binary classification | **Calibrated Abstention Gate ($\tau = 0.85$)** |
 | **Audit Verification** | Payer database logs | Cloud audit logs | **SHA-256 Tamper-Evident Hash Chaining** |
 | **Provider Defense** | None (Payer-side denial) | Unstructured summary | **Statutory Briefs & CARC/RARC Mapping** |
+| **Policy Ingestion** | Hardcoded code branches | Fine-tuning / RAG Prompts | **Declarative JSON Policy-as-Data Store** |
 
 ---
 
@@ -77,31 +63,33 @@ Rather than comparing against proprietary commercial black-box platforms without
 
 | Case ID | Clinical Presentation & Governing Policy | CMS Gold Standard | Config A (Simulated) | Config B (RAG Ablation) | Config C (No Gate) | Config D (CarePolicyGuard) | Character-Grounded Evidence & Audit Verification |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **BENCH-01** | Post-MI ICM, LVEF 28%, NYHA II, >90d GDMT (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 28%"` at chars 194–202. SHA-256 sealed. |
-| **BENCH-02** | Acute MI at Day 14 (<40-day CMS exclusion) (`NCD-20.4`) | **DENIED** | APPROVED *(Miscalibrated)* | APPROVED *(Miscalibrated)* | DENIED | **DENIED** | Grounded: `"myocardial infarction occurred 14 days ago"`. Exclusion flagged. |
-| **BENCH-03** | Severe OSA, AHI 34.2, documented face-to-face (`LCD-L33829`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AHI 34.2 events/hr"` at chars 155–171. |
-| **BENCH-04** | Borderline AHI 11.4, No Documented Comorbidity (`LCD-L33829`) | **DENIED** | APPROVED *(Miscalibrated)* | DENIED | DENIED | **DENIED** | Grounded: `"AHI 11.4"`. Insufficient for mild OSA without comorbidity. |
-| **BENCH-05** | Ambiguous Heart Failure Note, Missing LVEF (`NCD-20.4`) | **DEFERRED** | APPROVED *(Miscalibrated)* | APPROVED *(Miscalibrated)* | DENIED | **DEFERRED** | Raw conf 0.60 < $\tau=0.85$. Safely routed to human medical director. |
-| **BENCH-06** | Severe OSA, CPAP Intolerance, Missing BiPAP (`LCD-L33829`) | **DEFERRED** | APPROVED *(Miscalibrated)* | APPROVED *(Miscalibrated)* | DENIED | **DEFERRED** | Missing trial adherence data. Calibrated gate triggered deferral. |
-| **BENCH-07** | Severe Symptomatic AS for TAVR (`NCD-20.33`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AVA 0.65 cm²"`, `"mean gradient 48 mmHg"`, `"Heart Team"`. |
-| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | DENIED | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc 4"`, `"HAS-BLED 4"`, `"intracranial hemorrhage"`. |
-| **BENCH-09** | Premature Post-MI Evaluation at Day 18 (`NCD-20.4`) | **DENIED** | APPROVED *(Miscalibrated)* | APPROVED *(Miscalibrated)* | DENIED | **DENIED** | Grounded: `"PCI performed 18 days ago"`. Waiting period violation. |
-| **BENCH-10** | Wagner Grade III DFU Failing Standard Care >30d (`NCD-20.29`) | **APPROVED** | DENIED | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"osteomyelitis"`, `">30 days standard care"`. |
+| **BENCH-01** | Post-MI ICM, LVEF 28%, NYHA II, >90d GDMT (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 28%"`, `"Carvedilol 25 mg BID"`. SHA-256 sealed. |
+| **BENCH-02** | Premature Referral - Inadequate GDMT (21 days) (`NCD-20.4`) | **DEFERRED** | APPROVED *(Miscalibrated)* | APPROVED *(Missed Window)* | DENIED | **DEFERRED** | Grounded: `"total GDMT duration 21 days"`. Calibrated gate safely abstains (<90d). |
+| **BENCH-03** | Disqualified - Shock & Recent Stent (`NCD-20.4`) | **DENIED** | APPROVED *(Miscalibrated)* | DENIED | DENIED | **DENIED** | Grounded: `"active cardiogenic shock"`, `"IABP"`. Disqualifying exclusion flagged. |
+| **BENCH-04** | Severe OSA, AHI 34.2, Face-to-Face Eval (`LCD-L33829`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AHI: 34.2 events/hr"`, `"Face-to-face clinical evaluation"`. |
+| **BENCH-05** | Borderline AHI 7.2 Without Comorbidity (`LCD-L33829`) | **DEFERRED** | APPROVED *(Miscalibrated)* | DENIED | DENIED | **DEFERRED** | Grounded: `"AHI 7.2"`. Missing comorbidity; safely routed to human review. |
+| **BENCH-06** | Contradictory / Negative Omission Stress Test (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 24%"`, `"metoprolol succinate and valsartan for 8 months"`. |
+| **BENCH-07** | Severe Symptomatic AS for TAVR (`NCD-20.33`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AVA: 0.68 cm2"`, `"Mean Transvalvular Gradient: 48 mmHg"`, `"Heart Team"`. |
+| **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc score is 4"`, `"HAS-BLED score is 4"`, `"intracranial hemorrhage"`. |
+| **BENCH-09** | Premature Post-MI Evaluation (<40d Timeline Deficit) (`NCD-20.4`) | **DENIED** | APPROVED *(Miscalibrated)* | DENIED | DENIED | **DENIED** | Grounded: `"STEMI occurred 18 days ago"`. Statutory 40-day waiting period deficit. |
+| **BENCH-10** | Wagner Grade III DFU Failing Standard Care (`NCD-20.29`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"deep probe-to-bone ulceration"`, `">30 days standard care"`. |
 
 ---
 
 ## 4. Key Clinical & Failure Mode Findings
 
-### A. The False Approval Hazard of Monolithic LLMs
-In prior-authorization review, a false approval can result in unindicated invasive procedures and False Claims Act liability:
-- In **BENCH-02** and **BENCH-09**, patients presented with severely depressed ejection fractions ($\text{LVEF } 25\text{--}28\%$) following acute myocardial infarctions that occurred **14 and 18 days prior**.
-- Medicare NCD 20.4 mandates an absolute **40-day waiting period** post-MI before primary prevention ICD placement because myocardial stunning often recovers spontaneously.
-- Unverified baselines approve these cases prematurely due to the presence of low LVEF tokens, failing to enforce statutory temporal exclusion windows.
+### A. The False Approval Hazard of Monolithic LLMs & RAC Clawback Risk
+In prior-authorization review, a false approval results in unindicated invasive procedures, patient harm, and False Claims Act liability.
+- In **BENCH-02**, the patient had only **21 days of GDMT** (< 90-day minimum requirement under NCD 20.4).
+- Config A falsely approves due to keyword presence alone.
+- **Config B (Timeline Ablation)** demonstrates the mechanistic consequence of removing timeline validation: it falsely approves BENCH-02, creating an immediate RAC audit clawback risk.
+- **Config C** denies the case without recognizing that the patient is progressing toward eligibility, offering no guidance on remediation.
+- **Config D** correctly identifies the documentation deficiency, abstains via the Calibrated Abstention Gate, and generates a structured deficiency addendum request.
 
-### B. Missing Diagnostic Information (BENCH-05 & BENCH-06)
-- In **BENCH-05**, the clinical narrative describes severe functional limitations but omits the quantitative echocardiographic ejection fraction.
-- Unconstrained prompting produces unsupported inferences.
-- Config D detects the documentation deficit, produces a confidence score ($0.60$) below $\tau = 0.85$, and activates the **Calibrated Abstention Gate**, generating specific guidance on required supplemental tests.
+### B. Missing Diagnostic Information & Borderline Thresholds (BENCH-05)
+- In **BENCH-05**, the patient exhibits mild-to-moderate sleep apnea with AHI 7.2 (5–14 events/hr range). Under LCD L33829, coverage requires documented comorbid hypertension, stroke, or excessive daytime sleepiness. The chart explicitly documents absence of hypertension.
+- Unconstrained prompting approves the case inappropriately.
+- Config D detects the documentation deficit, produces a confidence score ($0.355$) well below $\tau = 0.85$, and triggers the **Calibrated Abstention Gate**.
 
 ### C. Character-Level Evidence Faithfulness
 - Config D achieves **100% Evidence Faithfulness** by enforcing byte-for-byte programmatic slice verification:
@@ -116,8 +104,8 @@ Expected Calibration Error (ECE) measures how reliably a system's confidence pre
 
 $$\text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|$$
 
-- **Config A (ECE = 0.313)**: Overconfident miscalibration where high certainty coexists with guideline violations.
-- **Config B (ECE = 0.110)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
+- **Config A (ECE = 0.310)**: Overconfident miscalibration where high certainty coexists with guideline violations.
+- **Config B (ECE = 0.109)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
 - **Config C (ECE = 0.111)**: Multi-agent criteria mapping improves accuracy but forces decisions on underspecified cases.
 - **Config D (ECE = 0.076)**: Calibrated via adversarial verification and safe deferral of sub-threshold cases ($\tau = 0.85$), evaluated across the covered decision subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
 
@@ -128,11 +116,14 @@ $$\text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{con
 To reproduce the benchmark locally:
 
 ```bash
-# Execute via Pytest
-python -m pytest tests/test_benchmark.py -v
+# Execute full pytest suite (131 tests)
+pytest -v
 
-# Or execute via the Python CLI / interactive script
-python -c "from app.agents.benchmark_engine import BenchmarkRunner; print(BenchmarkRunner().run_benchmark().model_dump_json(indent=2))"
+# Execute benchmark suite specifically
+pytest tests/test_benchmark.py -v
+
+# Run the empirical ablation harness CLI
+python -c "from app.agents.empirical_harness import EmpiricalResearchHarness; from app.agents.benchmark_engine import BENCHMARK_VIGNETTES; print(EmpiricalResearchHarness().run_full_benchmark(BENCHMARK_VIGNETTES).model_dump_json(indent=2))"
 ```
 
 The benchmark results can also be inspected interactively in the web dashboard at **http://127.0.0.1:8000** under the **"Benchmark"** tab.
@@ -142,28 +133,29 @@ The benchmark results can also be inspected interactively in the web dashboard a
 ## 7. Research Methodology, Ablation Design & Limitations
 
 ### 7.1 Programmatic Architectural Ablation Design
-The benchmark harness (`app.agents.empirical_harness.EmpiricalResearchHarness`) executes four distinct programmatic configurations to isolate the contribution of each architectural subsystem:
-1. **Config A (Zero-Shot Direct Baseline)**: Evaluates the complete clinical narrative and governing policy using a monolithic prompt without atomic criteria decomposition or character-level slice grounding. Disclosed prompt template:
+The benchmark harness ([app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py)) executes four distinct programmatic configurations to isolate the contribution of each architectural subsystem:
+1. **Config A (Zero-Shot Direct Baseline - Simulated Reference)**: An unverified direct single-prompt reference model without criteria decomposition or character-level slice grounding. Disclosed prompt template:
    ```text
    You are a medical director reviewing a Medicare Prior Authorization request for {policy_id}.
    Clinical Narrative: """{ehr}"""
    Determine if the request is APPROVED or DENIED based on Medicare coverage guidelines.
    ```
-2. **Config B (Ablation: No Longitudinal Timeline Engine)**: Multi-agent criteria mapping with `TimelineAnalyzerService` disabled. Demonstrates that without statutory temporal tracking, premature evaluations (e.g., BENCH-02 with 21-day GDMT < 90-day minimum, or acute post-MI < 40-day exclusion) are falsely approved by standard criteria matching alone.
+   *Note*: Config A is an in-process simulated baseline that reflects monolithic LLM failure modes without querying external cloud APIs with unprotected clinical narratives.
+2. **Config B (Ablation: No Longitudinal Timeline Engine)**: Multi-agent criteria mapping with `TimelineAnalyzerService` disabled. Demonstrates that without statutory temporal tracking, premature evaluations (e.g., BENCH-02 with 21-day GDMT < 90-day minimum) are falsely approved by standard criteria matching alone.
 3. **Config C (Ablation: No Calibrated Abstention Gate, tau=0.0)**: Multi-agent criteria evaluation without adversarial cross-examination and with the abstention gate deactivated (tau=0.0), forcing binary classification on underspecified or contradictory documentation.
 4. **Config D (CarePolicyGuard Full Framework, tau=0.85)**: Full four-agent neuro-symbolic pipeline combining exact character-slice grounding, adversarial verification, longitudinal timeline checks, and the calibrated abstention gate (tau=0.85).
 
 ### 7.2 Programmatic Linguistic Perturbation Stress Testing
-To evaluate rule stability against clinical variation, `app.services.perturbation_engine.LinguisticPerturbationEngine` executes controlled perturbations across three dimensions:
-- **Synonym Substitution**: Swapping clinical acronyms with full names (e.g., `LVEF` <-> `Left Ventricular Ejection Fraction`, `NYHA Class II` <-> `New York Heart Association Functional Class 2`, `AHI` <-> `Apnea-Hypopnea Index`).
-- **Syntactic Negation Displacement**: Moving pre-negation markers to post-negation structures (e.g., `"no cardiogenic shock"` to `"cardiogenic shock is absent and ruled out"`).
+To evaluate rule stability against clinical variation, [app/services/perturbation_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/perturbation_engine.py) executes controlled perturbations across three dimensions, verified in [tests/test_linguistic_perturbations.py](file:///e:/Class/GitHub/CarePolicyGuard/tests/test_linguistic_perturbations.py) across all 5 CMS statutory policies:
+- **Synonym Substitution**: Swapping clinical acronyms with full names (e.g., `LVEF` <-> `Left Ventricular Ejection Fraction`, `NYHA Class II` <-> `New York Heart Association Functional Class 2`, `AHI` <-> `Apnea-Hypopnea Index`, `AFib` <-> `Atrial Fibrillation`, `DFU` <-> `Diabetic Foot Ulcer`).
+- **Syntactic Negation Displacement**: Moving pre-negation markers to post-negation structures (e.g., `"no cardiogenic shock"` to `"cardiogenic shock is absent and ruled out"`, `"no hypertension"` to `"hypertension: negative"`).
 - **Semi-Structured Shorthand & Formatting Noise**: Converting narrative prose into bulleted diagnostic lab blocks.
-- **Adversarial Evidence Omission**: Stripping required diagnostic metrics (e.g., removing LVEF) to verify that the calibrated abstention gate safely defers or denies rather than hallucinating approvals.
+- **Adversarial Evidence Omission**: Stripping required diagnostic metrics (e.g., removing LVEF, AHI, AVA, or Wagner grade) across all medical specialties to verify that the calibrated abstention gate safely defers or denies rather than hallucinating approvals.
 
 ### 7.3 Methodological Limitations
 1. **Benchmark Scope**: The 10 vignettes represent synthetic clinical edge cases curated from CMS statutory manuals, ACC/AHA guidelines, and MAC/RAC denial patterns. They provide a reproducible unit-testing verification harness for coverage logic rather than an external multi-center clinical validation study on real-world EHR warehouses (e.g., MIMIC-IV).
-2. **Confidence Metric Interpretation**: Confidence scores are deterministic evidence sufficiency weights evaluated against the $	au = 0.85$ gate threshold rather than posterior probabilities from a trained neural network. ECE is computed across the covered adjudication subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
-3. **Policy-as-Data Transition**: Hand-crafted regex rules have a scalability ceiling. The project implements a declarative schema (`app.schemas.declarative_policy.DeclarativeCriterion`) and compiler (`app.services.declarative_engine.DeclarativePolicyEngine`) to enable zero-code JSON/YAML ingestion for scaling across hundreds of CMS LCDs and NCDs.
+2. **Confidence Metric Interpretation**: Confidence scores are deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ gate threshold rather than posterior probabilities from a trained neural network. ECE is computed across the covered adjudication subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
+3. **Policy-as-Data Architecture**: The framework includes declarative policy definitions stored in [app/data/policies/](file:///e:/Class/GitHub/CarePolicyGuard/app/data/policies/) compiled dynamically by [app/services/declarative_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/declarative_engine.py), enabling zero-code policy authoring without editing underlying evaluation algorithms.
 
 ---
 

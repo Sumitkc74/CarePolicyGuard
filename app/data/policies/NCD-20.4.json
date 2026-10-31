@@ -1,0 +1,90 @@
+{
+  "policy_id": "NCD-20.4",
+  "title": "Implantable Automatic Defibrillators (ICDs)",
+  "jurisdiction": "National Coverage Determination (NCD)",
+  "effective_date": "2018-02-15",
+  "category": "Cardiology / Electrophysiology",
+  "description": "CMS coverage policy for primary and secondary prevention implantable cardioverter defibrillators. Mandates documented severe systolic dysfunction (LVEF <= 35%), NYHA Class II/III functional symptoms, optimal GDMT for >= 90 days, post-MI waiting period > 40 days, and absence of cardiogenic shock.",
+  "criteria": [
+    {
+      "criterion_code": "CRIT-ICD-01",
+      "name": "Severe LV Systolic Dysfunction",
+      "description": "Documented Left Ventricular Ejection Fraction (LVEF) <= 35% on diagnostic echocardiography or cardiac MRI.",
+      "clinical_intent": "Mandatory primary prevention threshold",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": ["LVEF", "left ventricular ejection fraction", "ejection fraction", "EF"],
+      "operator": "<=",
+      "threshold": 35.0,
+      "target_unit": "%",
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-ICD-02",
+      "name": "Heart Failure Functional Classification",
+      "description": "Patient classified as New York Heart Association (NYHA) Class II or Class III functional symptoms.",
+      "clinical_intent": "Confirm clinical symptom burden",
+      "criterion_type": "ORDINAL_RANK",
+      "entity_names": ["NYHA", "New York Heart Association", "functional class", "class ii", "class iii"],
+      "ordinal_allowed": ["II", "III", "IV", "CLASS 2", "CLASS 3", "CLASS 4"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "At current clinical evaluation",
+      "min_score": 0.80
+    },
+    {
+      "criterion_code": "CRIT-ICD-03",
+      "name": "Guideline-Directed Medical Therapy Duration",
+      "description": "Patient has received optimal guideline-directed medical therapy (GDMT) including beta-blocker and ACEi/ARB/ARNI for >= 90 days.",
+      "clinical_intent": "Ensure medical therapy trial before invasive device",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": ["GDMT", "medical therapy", "optimal therapy", "carvedilol", "metoprolol", "lisinopril", "entresto"],
+      "operator": ">=",
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-ICD-04",
+      "name": "Cardiomyopathy Etiology & Revascularization Timeline",
+      "description": "Ischemic cardiomyopathy >= 40 days post-MI or >= 90 days post-CABG/PCI, or non-ischemic dilated cardiomyopathy >= 9 months.",
+      "clinical_intent": "Enforce mandatory myocardial stunning recovery period",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": ["ischemic cardiomyopathy", "non-ischemic", "dilated cardiomyopathy", "post-mi", "cabg", "pci", "prior mi"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Past medical history",
+      "min_score": 0.80
+    },
+    {
+      "criterion_code": "CRIT-ICD-EXCL-01",
+      "name": "Cardiogenic Shock & Acute Ischemia Exclusion",
+      "description": "Patient must not have active cardiogenic shock, ongoing acute cardiac ischemia, or non-cardiac disease limiting life expectancy to < 1 year.",
+      "clinical_intent": "Exclude non-beneficial emergency presentations",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": ["cardiogenic shock", "shock", "acute ischemia", "refractory shock", "terminal"],
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "At current clinical evaluation",
+      "min_score": 0.90
+    }
+  ],
+  "statutory_waiting_periods": [
+    {
+      "rule_id": "WP-ICD-01",
+      "antecedent_event": "ACUTE_MI",
+      "mandated_waiting_days": 40,
+      "statutory_authority": "CMS NCD 20.4 Section A"
+    },
+    {
+      "rule_id": "WP-ICD-02",
+      "antecedent_event": "CABG_OR_PCI",
+      "mandated_waiting_days": 90,
+      "statutory_authority": "CMS NCD 20.4 Section A"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 from typing import List, Optional, Dict, Any
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 
 class CriterionType(str, Enum):
     NUMERIC_THRESHOLD = "NUMERIC_THRESHOLD"
@@ -34,6 +34,15 @@ class DeclarativeCriterion(BaseModel):
     icd10_preconditions: List[str] = Field(default_factory=list, description="Diagnostic ICD-10 code patterns")
     cpt_preconditions: List[str] = Field(default_factory=list, description="Procedure CPT code patterns")
     min_score: float = Field(default=0.85, description="Evidence sufficiency weight")
+    keywords: List[str] = Field(default_factory=list, description="Legacy keywords list alias for backward compatibility")
+
+    @model_validator(mode="after")
+    def sync_keywords_alias(self):
+        if not self.keywords and self.entity_names:
+            self.keywords = list(self.entity_names)
+        elif not self.entity_names and self.keywords:
+            self.entity_names = list(self.keywords)
+        return self
 
 class DeclarativePolicy(BaseModel):
     """

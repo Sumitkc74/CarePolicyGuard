@@ -1,0 +1,38 @@
+{
+  "policy_id": "NCD-20.33",
+  "title": "Transcatheter Aortic Valve Replacement (TAVR)",
+  "jurisdiction": "National Coverage Determination (NCD)",
+  "effective_date": "2019-06-21",
+  "category": "Cardiology / Interventional Cardiology",
+  "description": "CMS coverage for TAVR in patients with severe symptomatic native aortic stenosis. Requires documented AVA <= 1.0 cm2 or mean gradient >= 40 mmHg, NYHA functional Class >= II, and formal multidisciplinary Heart Team consultation.",
+  "criteria": [
+    {
+      "criterion_code": "CRIT-TAVR-01",
+      "name": "Severe Aortic Stenosis Hemodynamic Threshold",
+      "description": "Aortic valve area (AVA) <= 1.0 cm2 or mean aortic gradient >= 40 mmHg or peak velocity >= 4.0 m/s on echocardiography.",
+      "clinical_intent": "Confirm statutory hemodynamic threshold for severe AS",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": ["aortic valve area", "AVA", "mean gradient", "peak velocity"],
+      "operator": "<=",
+      "threshold": 1.0,
+      "target_unit": "cm2",
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-TAVR-02",
+      "name": "Heart Team Consultation",
+      "description": "Documented formal multidisciplinary Heart Team collaborative consultation involving cardiac surgeon and interventional cardiologist.",
+      "clinical_intent": "Mandatory multidisciplinary decision-making",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": ["Heart Team", "multidisciplinary", "cardiac surgeon", "interventional cardiologist"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Prior to procedure",
+      "min_score": 0.80
+    }
+  ],
+  "statutory_waiting_periods": []
+}

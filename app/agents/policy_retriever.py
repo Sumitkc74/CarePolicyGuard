@@ -24,13 +24,30 @@ class PolicyRetrievalAgent:
     def __init__(self, db: Optional[Session] = None):
         self.db = db
 
-    def retrieve_policy(self, policy_id: str) -> Optional[MedicarePolicy]:
+    def retrieve_policy(self, policy_id: str) -> Optional[Any]:
         """
         Retrieves a policy and its complete criteria tree by policy_id.
+        Falls back to DeclarativePolicyEngine (Policy-as-Data JSON) if DB is unseeded.
         """
-        if not self.db:
-            return None
-        return self.db.query(MedicarePolicy).filter(MedicarePolicy.policy_id == policy_id).first()
+        if self.db:
+            res = self.db.query(MedicarePolicy).filter(MedicarePolicy.policy_id == policy_id).first()
+            if res:
+                return res
+
+        from app.services.declarative_engine import DeclarativePolicyEngine
+        decl = DeclarativePolicyEngine.load_policy(policy_id)
+        if decl:
+            class MockPolicyObj:
+                def __init__(self, p):
+                    self.policy_id = p.policy_id
+                    self.title = p.title
+                    self.jurisdiction = p.jurisdiction
+                    self.effective_date = p.effective_date
+                    self.category = p.category
+                    self.description = p.description
+                    self.criteria = []
+            return MockPolicyObj(decl)
+        return None
 
     def search_policies_by_narrative(self, narrative: str) -> List[Dict[str, Any]]:
         """
@@ -106,21 +123,33 @@ class PolicyRetrievalAgent:
 
         policy = self.retrieve_policy(policy_id)
         if not policy:
+            from app.services.declarative_engine import DeclarativePolicyEngine
+            decl = DeclarativePolicyEngine.load_policy(policy_id)
+            if decl:
+                crit_list = [c.model_dump() for c in decl.criteria]
+                policy_cache.set(cache_key, crit_list, ttl_seconds=3600)
+                return crit_list
             return []
 
         criteria_list = []
-        for c in policy.criteria:
-            criteria_list.append({
-                "id": c.id,
-                "criterion_code": c.criterion_code,
-                "name": c.name,
-                "description": c.description,
-                "clinical_intent": c.clinical_intent,
-                "is_exclusion": c.is_exclusion,
-                "required_temporal_window": c.required_temporal_window,
-                "keywords": [k.strip().lower() for k in c.keywords.split(",") if k.strip()],
-                "min_score": c.min_score
-            })
+        if hasattr(policy, "criteria") and policy.criteria:
+            for c in policy.criteria:
+                criteria_list.append({
+                    "id": c.id,
+                    "criterion_code": c.criterion_code,
+                    "name": c.name,
+                    "description": c.description,
+                    "clinical_intent": c.clinical_intent,
+                    "is_exclusion": c.is_exclusion,
+                    "required_temporal_window": c.required_temporal_window,
+                    "keywords": [k.strip().lower() for k in c.keywords.split(",") if k.strip()],
+                    "min_score": c.min_score
+                })
+        else:
+            from app.services.declarative_engine import DeclarativePolicyEngine
+            decl = DeclarativePolicyEngine.load_policy(policy_id)
+            if decl:
+                criteria_list = [c.model_dump() for c in decl.criteria]
 
         policy_cache.set(cache_key, criteria_list, ttl_seconds=3600)
         return criteria_list

@@ -1,0 +1,38 @@
+{
+  "policy_id": "LCD-L33829",
+  "title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+  "jurisdiction": "Local Coverage Determination (LCD)",
+  "effective_date": "2015-10-01",
+  "category": "Pulmonology / Durable Medical Equipment",
+  "description": "Medicare local coverage determination for CPAP/APAP therapy in adult obstructive sleep apnea (OSA). Requires documented diagnostic polysomnography with AHI >= 15 events/hr or AHI 5-14 with documented comorbid hypertension, stroke, or excessive daytime sleepiness, and face-to-face clinical evaluation prior to sleep study.",
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CPAP-01",
+      "name": "Diagnostic Polysomnography (AHI/RDI)",
+      "description": "Documented overnight diagnostic polysomnography demonstrating AHI or RDI >= 15 events/hr, or AHI 5-14 accompanied by documented comorbid symptoms (hypertension, excessive daytime sleepiness, stroke, ischemic heart disease).",
+      "clinical_intent": "Confirm objective sleep apnea severity meeting statutory threshold",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": ["AHI", "apnea-hypopnea index", "RDI", "polysomnography", "sleep study"],
+      "operator": ">=",
+      "threshold": 15.0,
+      "target_unit": "events/hr",
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Diagnostic sleep study",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-CPAP-02",
+      "name": "Face-to-Face Clinical Evaluation",
+      "description": "Documented in-person face-to-face clinical evaluation by prescribing clinician prior to the diagnostic sleep study.",
+      "clinical_intent": "Mandatory clinical pre-test evaluation",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": ["face-to-face", "in-person", "clinical evaluation", "sleep specialist consultation"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Prior to diagnostic sleep study",
+      "min_score": 0.80
+    }
+  ],
+  "statutory_waiting_periods": []
+}

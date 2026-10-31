@@ -1,0 +1,38 @@
+{
+  "policy_id": "NCD-20.29",
+  "title": "Hyperbaric Oxygen Therapy (HBOT) for Diabetic Wounds",
+  "jurisdiction": "National Coverage Determination (NCD)",
+  "effective_date": "2017-04-03",
+  "category": "Wound Care / Hyperbaric Medicine",
+  "description": "CMS coverage for systemic hyperbaric oxygen therapy in diabetic lower extremity wounds. Requires documented type 1 or 2 diabetes, Wagner Grade III or deeper ulceration (deep tissue, tendon, bone involvement, or osteomyelitis), and failure of >= 30 days of standard conservative wound therapy.",
+  "criteria": [
+    {
+      "criterion_code": "CRIT-HBOT-01",
+      "name": "Diabetic Foot Ulcer Severity (Wagner Grade >= 3)",
+      "description": "Documented lower extremity diabetic wound classified as Wagner Grade 3 or deeper (involving deep tissue, capsule, tendon, or osteomyelitis).",
+      "clinical_intent": "Mandatory tissue depth and severity threshold",
+      "criterion_type": "ORDINAL_RANK",
+      "entity_names": ["Wagner Grade", "wagner", "osteomyelitis", "probe-to-bone"],
+      "ordinal_allowed": ["3", "4", "5", "III", "IV", "V", "GRADE 3", "GRADE 4", "GRADE 5"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "At current clinical evaluation",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-HBOT-02",
+      "name": "Failure of Standard Conservative Wound Therapy >= 30 Days",
+      "description": "Documented trial of standard conservative wound management for >= 30 days without significant healing.",
+      "clinical_intent": "Ensure medical conservative therapy before hyperbaric intervention",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": ["standard care", "conservative therapy", "wound care", "debridement", "offloading"],
+      "operator": ">=",
+      "min_duration_days": 30,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 30 days conservative care",
+      "min_score": 0.80
+    }
+  ],
+  "statutory_waiting_periods": []
+}
