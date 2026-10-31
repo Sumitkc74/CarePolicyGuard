@@ -104,7 +104,9 @@ class StructuredExtractorAgent:
 
     async def _call_llm_json(self, raw_ehr_text: str, criterion: Dict[str, Any], temp: float) -> Optional[Dict[str, Any]]:
         """Calls real OpenAI-compatible / Gemini chat completion endpoint with JSON mode."""
-        if not self.api_key:
+        if not (self.api_key and settings.ENABLE_REMOTE_LLM_EGRESS):
+            if self.api_key and not settings.ENABLE_REMOTE_LLM_EGRESS:
+                logger.info("Remote LLM egress prevented: ENABLE_REMOTE_LLM_EGRESS=False enforces local-only zero-leakage safe harbor.")
             return None
 
         prompt = (
@@ -237,7 +239,7 @@ class StructuredExtractorAgent:
         """
         crit_code = criterion.get("criterion_code", "CRIT-UNKNOWN")
         samples: List[Dict[str, Any]] = []
-        is_live_llm = bool(self.api_key)
+        is_live_llm = bool(self.api_key and settings.ENABLE_REMOTE_LLM_EGRESS)
 
         for pass_idx in range(self.sample_passes):
             llm_result = None

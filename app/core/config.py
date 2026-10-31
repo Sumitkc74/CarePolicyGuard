@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     ENABLE_PHI_MASKING: bool = True
     
     # LLM Inference Gateway (OpenAI-compatible, Ollama, vLLM, or Gemini)
+    # HIPAA & Privacy Guardrail: Hard default-off for network egress of clinical text
+    ENABLE_REMOTE_LLM_EGRESS: bool = os.getenv("ENABLE_REMOTE_LLM_EGRESS", "false").lower() in ("true", "1", "yes")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
     LLM_MODEL: str = os.getenv("LLM_MODEL", "gemini-1.5-flash")

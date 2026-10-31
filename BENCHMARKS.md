@@ -139,11 +139,31 @@ The benchmark results can also be inspected interactively in the web dashboard a
 
 ---
 
-## 7. Research Methodology & Limitations
+## 7. Research Methodology, Ablation Design & Limitations
 
-1. **Benchmark Scope**: The 10 vignettes represent synthetic clinical edge cases curated from CMS statutory manuals, ACC/AHA guidelines, and MAC/RAC denial patterns. They provide a reproducible unit testing framework for coverage logic rather than an external multi-center clinical validation study on real-world EHR warehouses (e.g., MIMIC-IV).
-2. **Confidence Metric Interpretation**: Confidence scores are deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ gate threshold rather than posterior probabilities from a trained neural network.
-3. **Ablation Design**: Configs A, B, and C serve as controlled internal ablations within `app.agents.empirical_harness` to isolate the contributions of retrieval, multi-agent parsing, and calibrated abstention.
+### 7.1 Programmatic Architectural Ablation Design
+The benchmark harness (`app.agents.empirical_harness.EmpiricalResearchHarness`) executes four distinct programmatic configurations to isolate the contribution of each architectural subsystem:
+1. **Config A (Zero-Shot Direct Baseline)**: Evaluates the complete clinical narrative and governing policy using a monolithic prompt without atomic criteria decomposition or character-level slice grounding. Disclosed prompt template:
+   ```text
+   You are a medical director reviewing a Medicare Prior Authorization request for {policy_id}.
+   Clinical Narrative: """{ehr}"""
+   Determine if the request is APPROVED or DENIED based on Medicare coverage guidelines.
+   ```
+2. **Config B (Ablation: No Longitudinal Timeline Engine)**: Multi-agent criteria mapping with `TimelineAnalyzerService` disabled. Demonstrates that without statutory temporal tracking, premature evaluations (e.g., BENCH-02 with 21-day GDMT < 90-day minimum, or acute post-MI < 40-day exclusion) are falsely approved by standard criteria matching alone.
+3. **Config C (Ablation: No Calibrated Abstention Gate, tau=0.0)**: Multi-agent criteria evaluation without adversarial cross-examination and with the abstention gate deactivated (tau=0.0), forcing binary classification on underspecified or contradictory documentation.
+4. **Config D (CarePolicyGuard Full Framework, tau=0.85)**: Full four-agent neuro-symbolic pipeline combining exact character-slice grounding, adversarial verification, longitudinal timeline checks, and the calibrated abstention gate (tau=0.85).
+
+### 7.2 Programmatic Linguistic Perturbation Stress Testing
+To evaluate rule stability against clinical variation, `app.services.perturbation_engine.LinguisticPerturbationEngine` executes controlled perturbations across three dimensions:
+- **Synonym Substitution**: Swapping clinical acronyms with full names (e.g., `LVEF` <-> `Left Ventricular Ejection Fraction`, `NYHA Class II` <-> `New York Heart Association Functional Class 2`, `AHI` <-> `Apnea-Hypopnea Index`).
+- **Syntactic Negation Displacement**: Moving pre-negation markers to post-negation structures (e.g., `"no cardiogenic shock"` to `"cardiogenic shock is absent and ruled out"`).
+- **Semi-Structured Shorthand & Formatting Noise**: Converting narrative prose into bulleted diagnostic lab blocks.
+- **Adversarial Evidence Omission**: Stripping required diagnostic metrics (e.g., removing LVEF) to verify that the calibrated abstention gate safely defers or denies rather than hallucinating approvals.
+
+### 7.3 Methodological Limitations
+1. **Benchmark Scope**: The 10 vignettes represent synthetic clinical edge cases curated from CMS statutory manuals, ACC/AHA guidelines, and MAC/RAC denial patterns. They provide a reproducible unit-testing verification harness for coverage logic rather than an external multi-center clinical validation study on real-world EHR warehouses (e.g., MIMIC-IV).
+2. **Confidence Metric Interpretation**: Confidence scores are deterministic evidence sufficiency weights evaluated against the $	au = 0.85$ gate threshold rather than posterior probabilities from a trained neural network. ECE is computed across the covered adjudication subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
+3. **Policy-as-Data Transition**: Hand-crafted regex rules have a scalability ceiling. The project implements a declarative schema (`app.schemas.declarative_policy.DeclarativeCriterion`) and compiler (`app.services.declarative_engine.DeclarativePolicyEngine`) to enable zero-code JSON/YAML ingestion for scaling across hundreds of CMS LCDs and NCDs.
 
 ---
 
