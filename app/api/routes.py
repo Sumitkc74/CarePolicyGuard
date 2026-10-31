@@ -482,7 +482,8 @@ async def adjudicate_record(
         custom_tau=custom_tau,
         save_record=save_record,
         cpt_codes=request.cpt_codes,
-        icd10_codes=request.icd10_codes
+        icd10_codes=request.icd10_codes,
+        execution_mode=request.execution_mode or "deterministic"
     )
 
     if idempotency_key:

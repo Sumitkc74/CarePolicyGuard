@@ -160,10 +160,10 @@ class StructuredExtractorAgent:
         keywords = criterion.get("keywords", [])
         is_exclusion = criterion.get("is_exclusion", False)
 
-        lvef_match = re.search(r'(?:lvef|ejection fraction)[^\d]*(\d{1,2})%', raw_ehr_text, re.IGNORECASE)
-        nyha_match = re.search(r'nyha\s+(?:class\s+)?([ivx]+)', raw_ehr_text, re.IGNORECASE)
-        ahi_match = re.search(r'ahi[^\d]*(\d{1,2}(?:\.\d+)?)', raw_ehr_text, re.IGNORECASE)
-        gdmt_match = re.search(r'gdmt[^\n\.]*(?:for\s+)?(\d+)\s*(days|weeks|months)', raw_ehr_text, re.IGNORECASE)
+        lvef_match = re.search(r'(?:lvef|ejection fraction)[^\d]*?(\d{1,2})%', raw_ehr_text, re.IGNORECASE)
+        nyha_match = re.search(r'nyha[^\n\.]*?\b(?:class\s+)?([ivx]+)', raw_ehr_text, re.IGNORECASE)
+        ahi_match = re.search(r'ahi[^\d]*?(\d{1,2}(?:\.\d+)?)', raw_ehr_text, re.IGNORECASE)
+        gdmt_match = re.search(r'(?:gdmt|medical therapy)[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months)', raw_ehr_text, re.IGNORECASE)
         shock_match = re.search(r'(cardiogenic shock|end-stage|terminal|refractory shock)', raw_ehr_text, re.IGNORECASE)
 
         pass_status = "INSUFFICIENT_EVIDENCE"

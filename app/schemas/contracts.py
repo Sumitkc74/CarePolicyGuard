@@ -117,6 +117,9 @@ class FinalAdjudication(BaseModel):
     timeline_analysis: Optional[TimelineAnalysisResult] = None
     carc_codes: List[Dict[str, str]] = Field(default_factory=list)
     rarc_codes: List[Dict[str, str]] = Field(default_factory=list)
+    execution_mode: str = Field(default="deterministic", description="Adjudication engine utilized: deterministic or state_machine")
+    state_transitions: Optional[List[Dict[str, Any]]] = Field(default=None, description="State machine audit transitions if executed under state_machine mode")
+    retrieval_insights: Optional[Dict[str, Any]] = Field(default=None, description="Hybrid retrieval candidate ranking if policy was auto-discovered")
 
 # Request / Response DTOs
 class PolicyMatchSummary(BaseModel):
@@ -155,10 +158,11 @@ class MultiPolicyScanResponse(BaseModel):
 
 class AdjudicationRequest(BaseModel):
     patient_id: str = Field(default="PT-10829", description="Patient or record identifier")
-    policy_id: str = Field(..., description="Selected Medicare LCD or NCD policy ID (e.g., NCD-20.4)")
+    policy_id: Optional[str] = Field(default="AUTO", description="Selected Medicare LCD or NCD policy ID (e.g., NCD-20.4), or 'AUTO' for hybrid retrieval auto-discovery")
     ehr_narrative: str = Field(..., min_length=20, description="Raw clinical EHR documentation / progress note")
     cpt_codes: Optional[List[str]] = Field(default=None, description="Optional procedure codes to validate")
     icd10_codes: Optional[List[str]] = Field(default=None, description="Optional diagnosis codes to validate")
+    execution_mode: Optional[str] = Field(default="deterministic", description="Adjudication engine: 'deterministic' (fast rules) or 'state_machine' (multi-pass extractor & state transitions)")
     options: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Pipeline configuration overrides (e.g. tau, debug)")
 
 class LoginRequest(BaseModel):

@@ -51,7 +51,7 @@ class ClinicalAdjudicationStateMachine:
     def __init__(self, db: Optional[Any] = None, tau: float = 0.85):
         self.db = db
         self.tau = tau
-        self.hybrid_retriever = HybridPolicyRetriever(db=db) if db else None
+        self.hybrid_retriever = HybridPolicyRetriever(db=db)
         self.extractor = StructuredExtractorAgent()
         self.adversarial_verifier = AdversarialVerificationAgent()
         self.abstention_gate = CalibratedAbstentionGate(tau=tau)
@@ -271,9 +271,13 @@ class ClinicalAdjudicationStateMachine:
             "raw_confidence": sum(p.sampling_agreement_rate for p in proposals) / max(1, len(proposals)),
             "abstention_status": abstain_triggered,
             "abstention_reasons": abstain_reasons,
+            "abstention_reason": "; ".join(abstain_reasons) if abstain_reasons else None,
             "total_latency_ms": round(total_latency_ms, 2),
             "state_audit_hash": state_hash,
             "transitions_log": [t.model_dump() for t in self.transitions],
             "proposals": [p.model_dump() for p in proposals],
-            "critic_verdicts": [v.model_dump() for v in critic_verdicts]
+            "critic_verdicts": [v.model_dump() for v in critic_verdicts],
+            "criterion_assessments": criteria_assessments_for_gate,
+            "verification_audits": adversarial_audits,
+            "clinician_action_notes": clinician_notes
         }

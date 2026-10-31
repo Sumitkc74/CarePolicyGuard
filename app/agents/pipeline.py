@@ -18,6 +18,8 @@ from app.agents.policy_retriever import PolicyRetrievalAgent
 from app.agents.criteria_evaluator import CriteriaEvaluationAgent
 from app.agents.adversarial_verifier import AdversarialVerificationAgent
 from app.agents.abstention_gate import CalibratedAbstentionGate
+from app.services.hybrid_retriever import HybridPolicyRetriever
+from app.agents.state_machine import ClinicalAdjudicationStateMachine
 from app.db.models import AdjudicationLog, MedicarePolicy
 from app.services.billing_validator import BillingValidatorService
 from app.services.timeline_analyzer import TimelineAnalyzerService
@@ -36,20 +38,23 @@ class MultiAgentVerificationPipeline:
     def __init__(self, db: Optional[Session] = None):
         self.db = db
         self.retrieval_agent = PolicyRetrievalAgent(db=db)
+        self.hybrid_retriever = HybridPolicyRetriever(db=db)
         self.evaluator_agent = CriteriaEvaluationAgent()
         self.verifier_agent = AdversarialVerificationAgent()
         self.abstention_gate = CalibratedAbstentionGate(tau=settings.ABSTENTION_THRESHOLD)
+        self.state_machine = ClinicalAdjudicationStateMachine(db=db, tau=settings.ABSTENTION_THRESHOLD)
 
     async def adjudicate(
         self,
         patient_id: str,
-        policy_id: str,
+        policy_id: Optional[str],
         ehr_narrative: str,
         user_id: Optional[int] = None,
         custom_tau: Optional[float] = None,
         save_record: bool = True,
         cpt_codes: Optional[List[str]] = None,
         icd10_codes: Optional[List[str]] = None,
+        execution_mode: str = "deterministic",
     ) -> FinalAdjudication:
         """Asynchronous wrapper executing the end-to-end multi-agent clinical verification workflow."""
         return self.adjudicate_sync(
@@ -60,19 +65,21 @@ class MultiAgentVerificationPipeline:
             custom_tau=custom_tau,
             save_record=save_record,
             cpt_codes=cpt_codes,
-            icd10_codes=icd10_codes
+            icd10_codes=icd10_codes,
+            execution_mode=execution_mode,
         )
 
     def adjudicate_sync(
         self,
         patient_id: str,
-        policy_id: str,
+        policy_id: Optional[str],
         ehr_narrative: str,
         user_id: Optional[int] = None,
         custom_tau: Optional[float] = None,
         save_record: bool = True,
         cpt_codes: Optional[List[str]] = None,
         icd10_codes: Optional[List[str]] = None,
+        execution_mode: str = "deterministic",
     ) -> FinalAdjudication:
         """
         Executes the end-to-end multi-agent clinical verification workflow.
@@ -85,6 +92,35 @@ class MultiAgentVerificationPipeline:
         sanitized_ehr = sanitize_phi(ehr_narrative) if settings.ENABLE_PHI_MASKING else ehr_narrative
         masked_patient_id = f"PT-***{patient_id[-4:]}" if len(patient_id) > 4 else f"PT-***"
 
+        # 1b. Policy Auto-Discovery via Hybrid Policy Retrieval (BM25 + Dense RRF)
+        retrieval_insights = None
+        is_auto_policy = (not policy_id) or str(policy_id).strip().upper() in ("AUTO", "AUTOMATIC", "DETECT", "HYBRID", "NONE")
+        if is_auto_policy:
+            hybrid_results = self.hybrid_retriever.retrieve_hybrid(sanitized_ehr, top_k=3)
+            if hybrid_results:
+                policy_id = hybrid_results[0]["policy_id"]
+                retrieval_insights = {
+                    "auto_discovered": True,
+                    "selected_policy_id": policy_id,
+                    "selected_policy_title": hybrid_results[0].get("policy_title", ""),
+                    "candidates": hybrid_results
+                }
+            else:
+                policy_id = "NCD-20.4"
+                retrieval_insights = {
+                    "auto_discovered": True,
+                    "selected_policy_id": policy_id,
+                    "selected_policy_title": "Implantable Automatic Defibrillators",
+                    "candidates": []
+                }
+        else:
+            hybrid_results = self.hybrid_retriever.retrieve_hybrid(sanitized_ehr, top_k=3)
+            retrieval_insights = {
+                "auto_discovered": False,
+                "selected_policy_id": policy_id,
+                "candidates": hybrid_results
+            }
+
         # 2. Agent 1: Policy Retrieval
         policy_obj = self.retrieval_agent.retrieve_policy(policy_id)
         if not policy_obj:
@@ -95,40 +131,64 @@ class MultiAgentVerificationPipeline:
             policy_title = policy_obj.title
             criteria_defs = self.retrieval_agent.get_structured_criteria(policy_id)
 
-        # 3. Agent 2: Criteria Evaluation
-        criteria_assessments = []
-        for crit in criteria_defs:
-            assessment = self.evaluator_agent.evaluate_criterion(crit, sanitized_ehr)
-            criteria_assessments.append(assessment)
+        gate_tau = custom_tau or settings.ABSTENTION_THRESHOLD
+        state_transitions = None
 
-        # 4. Agent 3: Adversarial Verification
-        verification_audits = []
-        for assessment, crit_def in zip(criteria_assessments, criteria_defs):
-            audit_result = self.verifier_agent.audit_assessment(assessment, crit_def, sanitized_ehr)
-            verification_audits.append(audit_result)
+        if execution_mode == "state_machine":
+            # State Machine Adjudication Mode:
+            # Stages 0-6 with Structured Extractor, Critic Cross-Examination, Slice Check & Calibrated Gate
+            sm_engine = ClinicalAdjudicationStateMachine(db=self.db, tau=gate_tau)
+            sm_res = sm_engine.execute_state_machine(
+                patient_id=masked_patient_id,
+                policy_id=policy_id,
+                policy_title=policy_title,
+                criteria_list=criteria_defs,
+                raw_ehr_text=sanitized_ehr
+            )
+            decision = AdjudicationDecision(sm_res["final_decision"])
+            abstention_status = sm_res["abstention_status"]
+            raw_aggregate_conf = sm_res["raw_confidence"]
+            calibrated_aggregate_conf = sm_res["calibrated_confidence"]
+            abstention_reason = sm_res.get("abstention_reason") or ("; ".join(sm_res.get("abstention_reasons", [])) if sm_res.get("abstention_reasons") else None)
+            clinician_action_notes = sm_res.get("clinician_action_notes")
+            state_transitions = [t.model_dump() for t in sm_engine.transitions]
+            criteria_assessments = sm_res.get("criterion_assessments", [])
+            verification_audits = sm_res.get("verification_audits", [])
+        else:
+            # 3. Agent 2: Criteria Evaluation
+            criteria_assessments = []
+            for crit in criteria_defs:
+                assessment = self.evaluator_agent.evaluate_criterion(crit, sanitized_ehr)
+                criteria_assessments.append(assessment)
 
-        # 4b. Autonomous Offset Drift Healing Feedback Loop
-        for assessment, audit in zip(criteria_assessments, verification_audits):
-            if audit.offset_drift_detected and not audit.hallucination_flag:
-                for span in assessment.verified_spans:
-                    healed = self.verifier_agent.heal_offset_drift(span, sanitized_ehr)
-                    if healed:
-                        audit.offset_drift_detected = False
-                        audit.healed_offset_drift = True
-                        audit.grounding_status = True
-                        audit.calibrated_confidence = assessment.raw_confidence
-                        audit.audit_notes += " [AUTONOMOUSLY HEALED: Offset drift corrected to true text position.]"
+            # 4. Agent 3: Adversarial Verification
+            verification_audits = []
+            for assessment, crit_def in zip(criteria_assessments, criteria_defs):
+                audit_result = self.verifier_agent.audit_assessment(assessment, crit_def, sanitized_ehr)
+                verification_audits.append(audit_result)
 
-        # 5. Agent 4: Calibrated Abstention Gate
-        gate = CalibratedAbstentionGate(tau=custom_tau or settings.ABSTENTION_THRESHOLD)
-        (
-            decision,
-            abstention_status,
-            raw_aggregate_conf,
-            calibrated_aggregate_conf,
-            abstention_reason,
-            clinician_action_notes
-        ) = gate.evaluate(criteria_assessments, verification_audits)
+            # 4b. Autonomous Offset Drift Healing Feedback Loop
+            for assessment, audit in zip(criteria_assessments, verification_audits):
+                if audit.offset_drift_detected and not audit.hallucination_flag:
+                    for span in assessment.verified_spans:
+                        healed = self.verifier_agent.heal_offset_drift(span, sanitized_ehr)
+                        if healed:
+                            audit.offset_drift_detected = False
+                            audit.healed_offset_drift = True
+                            audit.grounding_status = True
+                            audit.calibrated_confidence = assessment.raw_confidence
+                            audit.audit_notes += " [AUTONOMOUSLY HEALED: Offset drift corrected to true text position.]"
+
+            # 5. Agent 4: Calibrated Abstention Gate
+            gate = CalibratedAbstentionGate(tau=gate_tau)
+            (
+                decision,
+                abstention_status,
+                raw_aggregate_conf,
+                calibrated_aggregate_conf,
+                abstention_reason,
+                clinician_action_notes
+            ) = gate.evaluate(criteria_assessments, verification_audits)
 
         # 5b. Clinical Timeline & Longitudinal Waiting Period Engine
         timeline_res = TimelineAnalyzerService.evaluate_timeline(
@@ -185,7 +245,7 @@ class MultiAgentVerificationPipeline:
             abstention_status=abstention_status,
             raw_aggregate_confidence=raw_aggregate_conf,
             calibrated_aggregate_confidence=calibrated_aggregate_conf,
-            abstention_threshold=gate.tau,
+            abstention_threshold=gate_tau,
             abstention_reason=abstention_reason,
             criterion_assessments=criteria_assessments,
             verification_audits=verification_audits,
@@ -197,7 +257,10 @@ class MultiAgentVerificationPipeline:
             billing_validation=billing_res,
             timeline_analysis=timeline_res,
             carc_codes=carc_codes,
-            rarc_codes=rarc_codes
+            rarc_codes=rarc_codes,
+            execution_mode=execution_mode,
+            state_transitions=state_transitions,
+            retrieval_insights=retrieval_insights
         )
 
         # 7. Persistence (Zero-Retention Medical Privacy Safe Harbor)
