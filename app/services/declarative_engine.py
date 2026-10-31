@@ -240,9 +240,11 @@ class DeclarativePolicyEngine:
                         rationale = f"Non-qualifying stage: {found_rank} not in qualifying list {allowed}."
 
         elif criterion.criterion_type == CriterionType.TEMPORAL_DURATION:
-            search_terms = list(criterion.entity_names) + ["therapy", "treatment", "management", "gdmt"] if criterion.entity_names else ["therapy", "treatment", "management", "gdmt"]
-            duration_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months)'
-            m = re.search(duration_pattern, ehr_text)
+            search_terms = list(criterion.entity_names) + ["therapy", "treatment", "management", "care", "gdmt"] if criterion.entity_names else ["therapy", "treatment", "management", "care", "gdmt"]
+            terms_alt = '|'.join(re.escape(t) for t in search_terms)
+            m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months)', ehr_text)
+            if not m:
+                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months)\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
             if m:
                 count = int(m.group(1))
                 unit_str = m.group(2).lower()

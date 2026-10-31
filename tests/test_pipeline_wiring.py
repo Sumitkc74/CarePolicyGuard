@@ -99,33 +99,42 @@ def test_pipeline_state_machine_execution_mode():
     assert len(result.criterion_assessments) > 0
     assert len(result.verification_audits) > 0
 
-def test_state_machine_mode_concordance_on_all_vignettes():
+@pytest.mark.parametrize("use_db", [False, True])
+def test_state_machine_mode_concordance_on_all_vignettes(use_db):
     """
     Verifies that state-machine mode achieves 10/10 concordance with gold CMS labels
-    and matches deterministic mode decisions across all 10 benchmark vignettes.
+    and matches deterministic mode decisions across all 10 benchmark vignettes,
+    testing BOTH isolated declarative store (db=None) and seeded DB (db=SessionLocal())
+    to guarantee test-order and cache isolation.
     """
-    pipeline = MultiAgentVerificationPipeline()
-    for v in BENCHMARK_VIGNETTES:
-        gold = v["gold_decision"]
-        res_det = pipeline.adjudicate_sync(
-            patient_id=f"PT-EVAL-{v['id']}",
-            policy_id=v["policy_id"],
-            ehr_narrative=v["ehr"],
-            execution_mode="deterministic",
-            save_record=False
-        )
-        res_sm = pipeline.adjudicate_sync(
-            patient_id=f"PT-EVAL-{v['id']}",
-            policy_id=v["policy_id"],
-            ehr_narrative=v["ehr"],
-            execution_mode="state_machine",
-            save_record=False
-        )
-        # Both modes must match the gold CMS statutory determination
-        assert res_det.adjudication_decision.value == gold, f"Deterministic failed on {v['id']}"
-        assert res_sm.adjudication_decision.value == gold, f"State machine failed on {v['id']}"
-        # Both modes must yield the exact same decision
-        assert res_sm.adjudication_decision == res_det.adjudication_decision
+    from app.db.session import SessionLocal
+    db = SessionLocal() if use_db else None
+    pipeline = MultiAgentVerificationPipeline(db=db)
+    try:
+        for v in BENCHMARK_VIGNETTES:
+            gold = v["gold_decision"]
+            res_det = pipeline.adjudicate_sync(
+                patient_id=f"PT-EVAL-{v['id']}",
+                policy_id=v["policy_id"],
+                ehr_narrative=v["ehr"],
+                execution_mode="deterministic",
+                save_record=False
+            )
+            res_sm = pipeline.adjudicate_sync(
+                patient_id=f"PT-EVAL-{v['id']}",
+                policy_id=v["policy_id"],
+                ehr_narrative=v["ehr"],
+                execution_mode="state_machine",
+                save_record=False
+            )
+            # Both modes must match the gold CMS statutory determination
+            assert res_det.adjudication_decision.value == gold, f"Deterministic failed on {v['id']} (use_db={use_db})"
+            assert res_sm.adjudication_decision.value == gold, f"State machine failed on {v['id']} (use_db={use_db})"
+            # Both modes must yield the exact same decision
+            assert res_sm.adjudication_decision == res_det.adjudication_decision
+    finally:
+        if db:
+            db.close()
 
 def test_api_adjudicate_endpoint_with_auto_and_state_machine():
     payload = {
