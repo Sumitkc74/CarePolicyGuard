@@ -34,12 +34,12 @@ The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times
 | Architectural Configuration | Description / Paradigm | Adjudication Accuracy | Evidence Faithfulness | Expected Calibration Error (ECE) | Safe Abstention Rate | False Approval Rate (RAC Risk) | Overall Clinical Safety Score | Latency (In-Process) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Config A: Zero-Shot Baseline (Simulated)** | Unverified Monolithic Prompting (Synthetic Baseline) | 60.0% | 45.0% | 0.310 (Severe Overconf.) | 0.0% | **100.0%** (4/4) | **0.186** | ~14 ms |
-| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 80.0% | 68.0% | 0.109 (Miscalibrated) | 0.0% | **25.0%** (1/4) | **0.484** | ~1 ms |
+| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 70.0% | 68.0% | 0.217 (Miscalibrated) | 0.0% | **50.0%** (2/4) | **0.373** | ~1 ms |
 | **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.111 (Moderate) | 0.0% | **0.0%** (0/4) | **0.622** | ~1 ms |
-| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.076 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.924** | **~28 ms** |
+| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.066 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.934** | **~28 ms** |
 
 > [!NOTE]
-> **Methodological Provenance & Integrity:** Config D, Config C, and Config B are executed dynamically in the live test harness. Config A represents an unverified direct single-prompt baseline simulation; it discloses what an ungrounded prompt yields without transmitting PHI to external remote LLM endpoints. Config B is an architectural ablation of Config C that programmatically disables `TimelineAnalyzerService` and bypasses statutory temporal waiting periods (e.g. approving premature 21-day GDMT). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$), showing that while it avoids false approvals, it lacks nuanced selective classification. Config D achieves 100% adherence and 0% False Approval Rate via calibrated selective abstention. Faithfulness percentages for Configs A, B, and C are modeled comparative estimates; Config D enforces live character-slice verification. Confidence metrics represent deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ threshold; ECE is measured over the accepted adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
+> **Methodological Provenance & Integrity:** Config D, Config C, and Config B are executed dynamically in the live test harness. Config A represents an unverified direct single-prompt baseline simulation; it discloses what an ungrounded prompt yields without transmitting PHI to external remote LLM endpoints. Config B is an architectural ablation of Config C that programmatically disables `TimelineAnalyzerService` and bypasses statutory temporal waiting periods (e.g. approving premature 21-day GDMT and <40d post-MI). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$), showing that while it avoids false approvals, it lacks nuanced selective classification. Config D achieves 100% adherence and 0% False Approval Rate via calibrated selective abstention. Faithfulness percentages for Configs A, B, and C are modeled comparative estimates; Config D enforces live character-slice verification. Confidence metrics represent deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ threshold; ECE is measured over the accepted adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
 
 ---
 
@@ -71,7 +71,7 @@ Rather than comparing against proprietary commercial black-box platforms without
 | **BENCH-06** | Contradictory / Negative Omission Stress Test (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 24%"`, `"metoprolol succinate and valsartan for 8 months"`. |
 | **BENCH-07** | Severe Symptomatic AS for TAVR (`NCD-20.33`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AVA: 0.68 cm2"`, `"Mean Transvalvular Gradient: 48 mmHg"`, `"Heart Team"`. |
 | **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc score is 4"`, `"HAS-BLED score is 4"`, `"intracranial hemorrhage"`. |
-| **BENCH-09** | Premature Post-MI Evaluation (<40d Timeline Deficit) (`NCD-20.4`) | **DENIED** | APPROVED *(Miscalibrated)* | DENIED | DENIED | **DENIED** | Grounded: `"STEMI occurred 18 days ago"`. Statutory 40-day waiting period deficit. |
+| **BENCH-09** | Premature Post-MI Evaluation (<40d Timeline Deficit) (`NCD-20.4`) | **DENIED** | APPROVED *(Miscalibrated)* | APPROVED *(Missed Window)* | DENIED | **DENIED** | Grounded: `"STEMI occurred 18 days ago"`. Statutory 40-day waiting period deficit. |
 | **BENCH-10** | Wagner Grade III DFU Failing Standard Care (`NCD-20.29`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"deep probe-to-bone ulceration"`, `">30 days standard care"`. |
 
 ---
@@ -105,9 +105,9 @@ Expected Calibration Error (ECE) measures how reliably a system's confidence pre
 $$\text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|$$
 
 - **Config A (ECE = 0.310)**: Overconfident miscalibration where high certainty coexists with guideline violations.
-- **Config B (ECE = 0.109)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
+- **Config B (ECE = 0.217)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
 - **Config C (ECE = 0.111)**: Multi-agent criteria mapping improves accuracy but forces decisions on underspecified cases.
-- **Config D (ECE = 0.076)**: Calibrated via adversarial verification and safe deferral of sub-threshold cases ($\tau = 0.85$), evaluated across the covered decision subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
+- **Config D (ECE = 0.066)**: Calibrated via adversarial verification and safe deferral of sub-threshold cases ($\tau = 0.85$), evaluated across the covered decision subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
 
 ---
 

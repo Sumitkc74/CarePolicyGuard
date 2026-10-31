@@ -107,6 +107,8 @@ def test_state_machine_mode_concordance_on_all_vignettes(use_db):
     testing BOTH isolated declarative store (db=None) and seeded DB (db=SessionLocal())
     to guarantee test-order and cache isolation.
     """
+    from app.core.cache import policy_cache
+    policy_cache.clear()
     from app.db.session import SessionLocal
     db = SessionLocal() if use_db else None
     pipeline = MultiAgentVerificationPipeline(db=db)
@@ -135,6 +137,7 @@ def test_state_machine_mode_concordance_on_all_vignettes(use_db):
     finally:
         if db:
             db.close()
+        policy_cache.clear()
 
 def test_api_adjudicate_endpoint_with_auto_and_state_machine():
     payload = {

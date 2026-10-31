@@ -132,12 +132,12 @@ The benchmark framework compares CarePolicyGuard against three conventional clin
 | Metric | Config A: Zero-Shot Baseline (Simulated) | Config B: Single-Pass RAG (Ablation) | Config C: Multi-Agent (No Gate Ablation) | Config D: CarePolicyGuard (Proposed) |
 | :--- | :---: | :---: | :---: | :---: |
 | **Architecture** | Unverified Monolithic Prompt | Retrieval without Timeline Engine | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
-| **Decision Concordance (Accuracy)** | 60.0% | 80.0% | 80.0% | **100.0%** |
+| **Decision Concordance (Accuracy)** | 60.0% | 70.0% | 80.0% | **100.0%** |
 | **Evidence Faithfulness (% Grounded)** | 45.0% | 68.0% | 87.5% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.310 (Severe Overconf.) | 0.109 (Miscalibrated) | 0.111 (Moderate) | **0.076 (Calibrated on Covered Decisions)** |
+| **Expected Calibration Error (ECE)** | 0.310 (Severe Overconf.) | 0.217 (Miscalibrated) | 0.111 (Moderate) | **0.066 (Calibrated on Covered Decisions)** |
 | **Safe Abstention Rate** | 0.0% | 0.0% | 0.0% | **20.0% (Safe Deferral on Ambiguity)** |
-| **False Approval Rate (RAC Clawback Risk)** | **100.0%** (4/4 on ineligible cases) | **25.0%** (1/4, premature GDMT) | **0.0%** (0/4, forced denials) | **0.0% (0/4 Zero Clawback Risk)** |
-| **Overall Clinical Safety Score** | **0.186** | **0.484** | **0.622** | **0.924** |
+| **False Approval Rate (RAC Clawback Risk)** | **100.0%** (4/4 on ineligible cases) | **50.0%** (2/4, premature GDMT & post-MI) | **0.0%** (0/4, forced denials) | **0.0% (0/4 Zero Clawback Risk)** |
+| **Overall Clinical Safety Score** | **0.186** | **0.373** | **0.622** | **0.934** |
 | **Average Latency (In-Process)** | ~14 ms | ~1 ms | ~1 ms | **~28 ms** |
 
 > [!NOTE]
@@ -159,7 +159,7 @@ $$\text{Clinical Safety Score} = \text{Accuracy} \times \text{Faithfulness} \tim
 | **BENCH-06** | Contradictory / Negative Omission Stress Test (`NCD-20.4`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"LVEF 24%"`, `"metoprolol succinate and valsartan for 8 months"`. |
 | **BENCH-07** | Severe Symptomatic AS for TAVR (`NCD-20.33`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"AVA: 0.68 cm2"`, `"Mean Transvalvular Gradient: 48 mmHg"`, `"Heart Team"`. |
 | **BENCH-08** | Non-Valvular AFib for LAAC / Watchman (`NCD-220.13`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"CHA2DS2-VASc score is 4"`, `"HAS-BLED score is 4"`, `"intracranial hemorrhage"`. |
-| **BENCH-09** | Premature Post-MI Evaluation (<40d Timeline Deficit) (`NCD-20.4`) | **DENIED** | **APPROVED** *(Hallucinated)* | DENIED | DENIED | **DENIED** | Grounded: `"STEMI occurred 18 days ago"`. Statutory 40-day waiting period deficit. |
+| **BENCH-09** | Premature Post-MI Evaluation (<40d Timeline Deficit) (`NCD-20.4`) | **DENIED** | **APPROVED** *(Hallucinated)* | **APPROVED** *(Missed Window)* | DENIED | **DENIED** | Grounded: `"STEMI occurred 18 days ago"`. Statutory 40-day waiting period deficit. |
 | **BENCH-10** | Wagner Grade III DFU Failing Standard Care (`NCD-20.29`) | **APPROVED** | APPROVED | APPROVED | APPROVED | **APPROVED** | Grounded: `"Wagner Grade 3"`, `"deep probe-to-bone ulceration"`, `">30 days standard care"`. |
 
 ---
@@ -281,7 +281,7 @@ flowchart TD
 * **Why it is better than Forced Binary Classification (Approve/Deny):**
   * *Softmax Miscalibration:* Standard foundation models exhibit severe uncalibrated overconfidence ($\text{ECE} \approx 0.20\text{--}0.31$), reporting 95% subjective confidence on cases that are clinically incorrect (*Nori et al., NEJM AI 2023; Guo et al., ICML 2017*).
   * *Clinician Distrust:* Hospital field evaluations prove clinicians actively distrust and reject automated systems that force decisions on ambiguous or borderline charts (*Zając et al., ACM TOCHI 2023; Banerji et al., Nature Medicine 2023*).
-  * CarePolicyGuard’s abstention gate achieves **20.0% safe deferral** on incomplete records while maintaining **100% precision on accepted cases**, reducing Expected Calibration Error to an optimal **$\text{ECE} = 0.076$**.
+  * CarePolicyGuard’s abstention gate achieves **20.0% safe deferral** on incomplete records while maintaining **100% precision on accepted cases**, reducing Expected Calibration Error to an optimal **$\text{ECE} = 0.066$**.
 
 ---
 
