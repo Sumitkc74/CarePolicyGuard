@@ -88,3 +88,4 @@ def test_formatting_shorthand_noise_handling(pipeline):
     )
     
     assert result.adjudication_decision == AdjudicationDecision.APPROVED
+

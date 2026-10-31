@@ -49,3 +49,4 @@ class DeclarativePolicy(BaseModel):
     description: str = Field(..., description="Summary of policy coverage")
     criteria: List[DeclarativeCriterion] = Field(default_factory=list, description="Declarative criteria set")
     statutory_waiting_periods: List[Dict[str, Any]] = Field(default_factory=list, description="Longitudinal timeline rules")
+

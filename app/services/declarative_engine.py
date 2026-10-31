@@ -283,3 +283,4 @@ class DeclarativePolicyEngine:
             raw_confidence=raw_confidence,
             verified_spans=spans
         )
+
