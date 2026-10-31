@@ -115,25 +115,34 @@ class PolicyRetrievalAgent:
         """
         Retrieves normalized criteria definitions for evaluation.
         Utilizes policy_cache for high-throughput sub-millisecond retrieval.
+        Unifies declarative policy schemas and database criteria into a single
+        canonical representation containing both keywords and entity_names.
         """
         cache_key = f"criteria:{policy_id}"
         cached = policy_cache.get(cache_key)
         if cached is not None:
             return cached
 
-        policy = self.retrieve_policy(policy_id)
-        if not policy:
-            from app.services.declarative_engine import DeclarativePolicyEngine
-            decl = DeclarativePolicyEngine.load_policy(policy_id)
-            if decl:
-                crit_list = [c.model_dump() for c in decl.criteria]
-                policy_cache.set(cache_key, crit_list, ttl_seconds=3600)
-                return crit_list
-            return []
+        # Canonical source of truth: DeclarativePolicyEngine (Policy-as-Data JSON)
+        from app.services.declarative_engine import DeclarativePolicyEngine
+        decl = DeclarativePolicyEngine.load_policy(policy_id)
+        if decl:
+            crit_list = []
+            for c in decl.criteria:
+                crit_dict = c.model_dump()
+                # Ensure backward-compatible keywords list is always populated from entity_names
+                crit_dict["keywords"] = [k.strip().lower() for k in c.entity_names]
+                crit_dict["entity_names"] = list(c.entity_names)
+                crit_list.append(crit_dict)
+            policy_cache.set(cache_key, crit_list, ttl_seconds=3600)
+            return crit_list
 
+        # Dynamic / DB-only fallback for policies created directly at runtime
+        policy = self.retrieve_policy(policy_id)
         criteria_list = []
-        if hasattr(policy, "criteria") and policy.criteria:
+        if policy and hasattr(policy, "criteria") and policy.criteria:
             for c in policy.criteria:
+                kw_list = [k.strip().lower() for k in c.keywords.split(",") if k.strip()]
                 criteria_list.append({
                     "id": c.id,
                     "criterion_code": c.criterion_code,
@@ -142,14 +151,10 @@ class PolicyRetrievalAgent:
                     "clinical_intent": c.clinical_intent,
                     "is_exclusion": c.is_exclusion,
                     "required_temporal_window": c.required_temporal_window,
-                    "keywords": [k.strip().lower() for k in c.keywords.split(",") if k.strip()],
+                    "keywords": kw_list,
+                    "entity_names": kw_list,
                     "min_score": c.min_score
                 })
-        else:
-            from app.services.declarative_engine import DeclarativePolicyEngine
-            decl = DeclarativePolicyEngine.load_policy(policy_id)
-            if decl:
-                criteria_list = [c.model_dump() for c in decl.criteria]
 
         policy_cache.set(cache_key, criteria_list, ttl_seconds=3600)
         return criteria_list

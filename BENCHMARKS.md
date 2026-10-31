@@ -35,7 +35,7 @@ The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Config A: Zero-Shot Baseline (Simulated)** | Unverified Monolithic Prompting (Synthetic Baseline) | 60.0% | 45.0% | 0.310 (Severe Overconf.) | 0.0% | **100.0%** (4/4) | **0.186** | ~14 ms |
 | **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 70.0% | 68.0% | 0.217 (Miscalibrated) | 0.0% | **50.0%** (2/4) | **0.373** | ~1 ms |
-| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.111 (Moderate) | 0.0% | **0.0%** (0/4) | **0.622** | ~1 ms |
+| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.119 (Moderate) | 0.0% | **0.0%** (0/4) | **0.617** | ~1 ms |
 | **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.066 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.934** | **~28 ms** |
 
 > [!NOTE]
@@ -106,7 +106,7 @@ $$\text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{con
 
 - **Config A (ECE = 0.310)**: Overconfident miscalibration where high certainty coexists with guideline violations.
 - **Config B (ECE = 0.217)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
-- **Config C (ECE = 0.111)**: Multi-agent criteria mapping improves accuracy but forces decisions on underspecified cases.
+- **Config C (ECE = 0.119)**: Multi-agent criteria mapping improves accuracy but forces decisions on underspecified cases.
 - **Config D (ECE = 0.066)**: Calibrated via adversarial verification and safe deferral of sub-threshold cases ($\tau = 0.85$), evaluated across the covered decision subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
 
 ---

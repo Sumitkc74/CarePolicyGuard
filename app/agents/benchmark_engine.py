@@ -411,4 +411,6 @@ class BenchmarkRunner:
         self.harness = EmpiricalResearchHarness(db=db)
 
     def run_benchmark(self) -> BenchmarkResponse:
+        from app.core.cache import policy_cache
+        policy_cache.clear()
         return self.harness.run_full_benchmark(BENCHMARK_VIGNETTES)

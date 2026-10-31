@@ -134,10 +134,10 @@ The benchmark framework compares CarePolicyGuard against three conventional clin
 | **Architecture** | Unverified Monolithic Prompt | Retrieval without Timeline Engine | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
 | **Decision Concordance (Accuracy)** | 60.0% | 70.0% | 80.0% | **100.0%** |
 | **Evidence Faithfulness (% Grounded)** | 45.0% | 68.0% | 87.5% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.310 (Severe Overconf.) | 0.217 (Miscalibrated) | 0.111 (Moderate) | **0.066 (Calibrated on Covered Decisions)** |
+| **Expected Calibration Error (ECE)** | 0.310 (Severe Overconf.) | 0.217 (Miscalibrated) | 0.119 (Moderate) | **0.066 (Calibrated on Covered Decisions)** |
 | **Safe Abstention Rate** | 0.0% | 0.0% | 0.0% | **20.0% (Safe Deferral on Ambiguity)** |
 | **False Approval Rate (RAC Clawback Risk)** | **100.0%** (4/4 on ineligible cases) | **50.0%** (2/4, premature GDMT & post-MI) | **0.0%** (0/4, forced denials) | **0.0% (0/4 Zero Clawback Risk)** |
-| **Overall Clinical Safety Score** | **0.186** | **0.373** | **0.622** | **0.934** |
+| **Overall Clinical Safety Score** | **0.186** | **0.373** | **0.617** | **0.934** |
 | **Average Latency (In-Process)** | ~14 ms | ~1 ms | ~1 ms | **~28 ms** |
 
 > [!NOTE]

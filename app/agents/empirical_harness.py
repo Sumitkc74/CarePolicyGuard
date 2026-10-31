@@ -231,7 +231,9 @@ class EmpiricalResearchHarness:
         }
 
     def run_full_benchmark(self, vignettes: List[Dict[str, Any]]) -> BenchmarkResponse:
-        """Executes full 4-condition comparative evaluation."""
+        """Executes full 4-condition comparative evaluation with pinned cache isolation."""
+        from app.core.cache import policy_cache
+        policy_cache.clear()
         res_d = self.run_condition_d(vignettes)
         res_c = self.run_condition_c(vignettes)
         res_b = self.run_condition_b(vignettes, res_c)
