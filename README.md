@@ -134,13 +134,13 @@ The benchmark framework compares CarePolicyGuard against three conventional clin
 | **Architecture** | Unverified Monolithic Prompt | Retrieval without Slice Auditing | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
 | **Decision Concordance (Accuracy)** | 60.0% | 80.0% | 80.0% | **100.0%** |
 | **Evidence Faithfulness (% Grounded)** | 45.0% | 68.0% | 87.5% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.313 (Severe Overconf.) | 0.163 (Miscalibrated) | 0.164 (Moderate) | **0.076 (Calibrated on Covered Decisions)** |
+| **Expected Calibration Error (ECE)** | 0.313 (Severe Overconf.) | 0.110 (Miscalibrated) | 0.111 (Moderate) | **0.076 (Calibrated on Covered Decisions)** |
 | **Safe Abstention Rate** | 0.0% | 0.0% | 0.0% | **20.0% (Safe Deferral on Ambiguity)** |
-| **Overall Clinical Safety Score** | **0.185** | **0.455** | **0.585** | **0.924** |
+| **Overall Clinical Safety Score** | **0.185** | **0.484** | **0.622** | **0.924** |
 | **Average Latency (In-Process)** | ~18 ms | ~6 ms | ~10 ms | **~8–16 ms** |
 
 > [!NOTE]
-> **Ablation Provenance & Methodology:** Config D, Config C, and Config B are executed dynamically via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py). Config A represents an unverified single-prompt baseline simulation illustrating the lower-bound failure mode of ungrounded prompting. Criteria confidence scores reflect deterministic clinical evidence sufficiency weights evaluated against the $\tau = 0.85$ abstention threshold; ECE is measured across the accepted adjudication subset in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
+> **Ablation Provenance & Methodology:** Config D, Config C, and Config B are executed dynamically via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py). Config A represents an unverified single-prompt baseline simulation. Config B is an ablation that removes adversarial verification and temporal eligibility logic; its faithfulness and baseline figures (along with Configs A and C) are modeled comparative estimates, whereas Config D enforces runtime character-slice verification. Confidence values represent deterministic clinical sufficiency weights evaluated against the $\tau = 0.85$ threshold; ECE is computed across the accepted adjudication subset in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*). The 10 vignettes represent synthetic Medicare coverage stress tests rather than an external multi-center clinical cohort.
 
 $$\text{Clinical Safety Score} = \text{Accuracy} \times \text{Faithfulness} \times (1 - \text{ECE})$$
 
