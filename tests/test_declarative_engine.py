@@ -139,3 +139,4 @@ def test_policy_retriever_without_db_loads_declarative_criteria():
     assert "CRIT-ICD-01" in codes
     assert "CRIT-ICD-02" in codes
     assert "CRIT-ICD-03" in codes
+
