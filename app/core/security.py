@@ -156,7 +156,7 @@ def sanitize_phi(text: str) -> str:
     sanitized = re.sub(r'(?i)(dob|date of birth|birth\s*date)\s*:\s*\d{1,2}[/-]\d{1,2}[/-]\d{2,4}', r'\1: [REDACTED-DOB]', sanitized)
 
     # 8. Street addresses (e.g. "124 Medical Center Blvd", "45 Main Street", "78 Oak Ave")
-    sanitized = re.sub(r'(?i)\b\d{1,5}\s+[A-Za-z0-9\.\s]+(Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Way)\b', '[REDACTED-ADDRESS]', sanitized)
+    sanitized = re.sub(r'(?i)\b\d{1,5}[^\S\r\n]+[A-Za-z0-9\.\, ]{1,40}?[^\S\r\n]+\b(Street|St\.?|Avenue|Ave\.?|Road|Rd\.?|Boulevard|Blvd\.?|Lane|Ln\.?|Drive|Court|Ct\.?|Way)\b', '[REDACTED-ADDRESS]', sanitized)
 
     # 9. Zip codes (e.g. "Zip: 90210", "Postal Code: 10001-1234")
     sanitized = re.sub(r'(?i)\b(zip|postal\s*code)[\s:#]+(\d{5}(?:-\d{4})?)\b', r'\1: [REDACTED-ZIP]', sanitized)

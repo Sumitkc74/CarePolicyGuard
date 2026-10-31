@@ -263,12 +263,12 @@ def seed_database(db: Session):
             "criteria": [
                 {
                     "criterion_code": "CRIT-TEER-01",
-                    "name": "Severe Mitral Regurgitation (Grade 3+ to 4+)",
-                    "description": "Documented moderate-to-severe (Grade 3+) or severe (Grade 4+) primary or functional mitral regurgitation on comprehensive echocardiogram.",
-                    "clinical_intent": "Establish severe valvular regurgitation threshold",
+                    "name": "Severe Valvular Disease (Severe Mitral Regurgitation or Severe Aortic Stenosis)",
+                    "description": "Documented severe valvular disease: severe mitral regurgitation (Grade 3+ to 4+) or severe aortic stenosis (AVA <= 1.0 cm2, mean gradient >= 40 mmHg, or peak velocity >= 4.0 m/s).",
+                    "clinical_intent": "Establish severe structural valvular disease threshold for percutaneous repair/replacement",
                     "is_exclusion": False,
                     "required_temporal_window": "Within past 6 months",
-                    "keywords": "mitral regurgitation, mr, grade 3+, grade 4+, severe mr, echo",
+                    "keywords": "mitral regurgitation, mr, grade 3+, grade 4+, severe mr, aortic stenosis, ava, mean gradient, aortic jet, tavr, echo",
                     "min_score": 0.85
                 },
                 {
@@ -320,6 +320,46 @@ def seed_database(db: Session):
                     "required_temporal_window": "Procedure plan and equipment verification",
                     "keywords": "embolic protection device, epd, distal filter, embolic protection, stent",
                     "min_score": 0.85
+                }
+            ]
+        },
+        {
+            "policy_id": "NCD-220.13",
+            "title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
+            "jurisdiction": "National Coverage Determination (CMS)",
+            "effective_date": "2024-01-01",
+            "category": "Electrophysiology & Interventional Cardiology",
+            "description": "CMS coverage for Percutaneous Left Atrial Appendage Closure (LAAC) for patients with non-valvular atrial fibrillation at high stroke risk who are unsuitable for long-term oral anticoagulation.",
+            "criteria": [
+                {
+                    "criterion_code": "CRIT-LAAC-01",
+                    "name": "Non-Valvular Atrial Fibrillation with High Stroke Risk (CHA2DS2-VASc >= 3)",
+                    "description": "Documented non-valvular atrial fibrillation with high thromboembolic stroke risk (CHA2DS2-VASc score >= 2 for men or >= 3 for women).",
+                    "clinical_intent": "Confirm clinical indication for stroke risk reduction in non-valvular AF",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Documented in clinical record",
+                    "keywords": "atrial fibrillation, afib, cha2ds2-vasc, stroke risk, chads",
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-LAAC-02",
+                    "name": "Contraindication to Long-Term Oral Anticoagulation (HAS-BLED >= 3)",
+                    "description": "Documented formal contraindication or clinical rationale demonstrating patient is unsuitable for long-term oral anticoagulation (e.g. major recurrent bleed, HAS-BLED >= 3).",
+                    "clinical_intent": "Establish necessity of device-based closure over medical anticoagulation",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Documented medical history",
+                    "keywords": "has-bled, bleeding risk, hemorrhage, contraindication, anticoagulation, eliquis, bleed",
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-LAAC-03",
+                    "name": "Pre-Procedural Imaging Verifying Absence of LA Thrombus",
+                    "description": "TEE or CTA within 48 hours of procedure confirming absence of intracardiac or left atrial appendage thrombus and appropriate ostial anatomy.",
+                    "clinical_intent": "Ensure safety of percutaneous transseptal puncture and closure deployment",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Within pre-procedure timeframe",
+                    "keywords": "tee, transesophageal, thrombus, left atrial, watchman, ostium, anatomy",
+                    "min_score": 0.80
                 }
             ]
         }

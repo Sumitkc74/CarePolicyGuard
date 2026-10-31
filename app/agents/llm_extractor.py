@@ -299,14 +299,16 @@ class StructuredExtractorAgent:
     ) -> CandidateExtraction:
         """Synchronous wrapper for candidate extraction."""
         import asyncio
+        import concurrent.futures
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # Running inside existing event loop
-                import nest_asyncio
-                nest_asyncio.apply()
-                return loop.run_until_complete(self.propose_candidates_async(raw_ehr_text, criterion))
-            else:
-                return loop.run_until_complete(self.propose_candidates_async(raw_ehr_text, criterion))
-        except Exception:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # If called from within an active async loop, run in a separate thread worker
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(asyncio.run, self.propose_candidates_async(raw_ehr_text, criterion))
+                return future.result()
+        else:
             return asyncio.run(self.propose_candidates_async(raw_ehr_text, criterion))

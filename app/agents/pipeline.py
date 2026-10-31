@@ -51,6 +51,29 @@ class MultiAgentVerificationPipeline:
         cpt_codes: Optional[List[str]] = None,
         icd10_codes: Optional[List[str]] = None,
     ) -> FinalAdjudication:
+        """Asynchronous wrapper executing the end-to-end multi-agent clinical verification workflow."""
+        return self.adjudicate_sync(
+            patient_id=patient_id,
+            policy_id=policy_id,
+            ehr_narrative=ehr_narrative,
+            user_id=user_id,
+            custom_tau=custom_tau,
+            save_record=save_record,
+            cpt_codes=cpt_codes,
+            icd10_codes=icd10_codes
+        )
+
+    def adjudicate_sync(
+        self,
+        patient_id: str,
+        policy_id: str,
+        ehr_narrative: str,
+        user_id: Optional[int] = None,
+        custom_tau: Optional[float] = None,
+        save_record: bool = True,
+        cpt_codes: Optional[List[str]] = None,
+        icd10_codes: Optional[List[str]] = None,
+    ) -> FinalAdjudication:
         """
         Executes the end-to-end multi-agent clinical verification workflow.
         """

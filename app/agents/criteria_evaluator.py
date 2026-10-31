@@ -523,9 +523,23 @@ class CriteriaEvaluationAgent:
         # =========================================================================
         # 4. TRANSCATHETER MITRAL VALVE REPAIR (NCD 20.33 TEER / MitraClip)
         # =========================================================================
-        elif "crit-teer-01" in code.lower() or "mitral regurgitation" in name.lower():
-            mr_match = re.search(r'(?i)\b(moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\s*(?:primary|secondary|functional)?\s*(?:mitral regurgitation|mr)\b|\b(?:mitral regurgitation|mr)\s*(?:is\s*)?(?:moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\b', ehr_text)
-            if mr_match:
+        elif "crit-teer-01" in code.lower() or "mitral regurgitation" in name.lower() or "aortic stenosis" in name.lower():
+            # Check for either Severe Mitral Regurgitation OR Severe Aortic Stenosis
+            mr_match = re.search(r"(?i)\b(moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\s*(?:primary|secondary|functional)?\s*(?:mitral regurgitation|mr)\b|\b(?:mitral regurgitation|mr)\s*(?:is\s*)?(?:moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\b", ehr_text)
+            as_match = re.search(r"(?i)\b(severe calcific aortic stenosis|severe aortic stenosis|aortic valve area \(ava\):?\s*0?\.[0-9]+|mean (?:transvalvular )?gradient:?\s*(?:4[0-9]|[5-9][0-9])\s*mm\s*hg)\b", ehr_text)
+            if as_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[as_match.start():as_match.end()],
+                    start_char=as_match.start(),
+                    end_char=as_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, as_match.start()),
+                    confidence=0.96
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Documented severe aortic stenosis: '{span.source_text}', satisfying NCD 20.33 AVA/gradient requirements."
+                raw_confidence = 0.96
+            elif mr_match:
                 span = ClinicalEvidenceSpan(
                     source_text=ehr_text[mr_match.start():mr_match.end()],
                     start_char=mr_match.start(),
@@ -538,24 +552,9 @@ class CriteriaEvaluationAgent:
                 rationale = f"Documented severe valvular regurgitation: '{span.source_text}', satisfying NCD 20.33 Grade 3+/4+ criteria."
                 raw_confidence = 0.96
             else:
-                mild_mr = re.search(r'(?i)\b(mild|trace|1\+|grade\s*1|grade\s*i)\s*(?:mitral regurgitation|mr)\b', ehr_text)
-                if mild_mr:
-                    span = ClinicalEvidenceSpan(
-                        source_text=ehr_text[mild_mr.start():mild_mr.end()],
-                        start_char=mild_mr.start(),
-                        end_char=mild_mr.end(),
-                        clinical_section=self.detect_clinical_section(ehr_text, mild_mr.start()),
-                        confidence=0.92
-                    )
-                    spans.append(span)
-                    status = DeterminationStatus.NOT_MET
-                    rationale = f"Echocardiogram demonstrates only non-severe mitral regurgitation: '{span.source_text}'. Fails Grade 3+/4+ severity requirement."
-                    raw_confidence = 0.92
-                else:
-                    status = DeterminationStatus.INSUFFICIENT_EVIDENCE
-                    rationale = "No documented quantification of mitral regurgitation severity found in diagnostic echocardiogram reports."
-                    raw_confidence = 0.65
-
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = "No documented quantification of severe valvular regurgitation or aortic stenosis found."
+                raw_confidence = 0.65
         elif "crit-teer-02" in code.lower() or "heart team" in name.lower() or "sts score" in desc.lower():
             team_match = re.search(r'(?i)\b(multidisciplinary heart team|heart team consensus|sts score\s*(?:is\s*)?(?:[89]|\d{2})%?|prohibitive surgical risk|high surgical risk)\b', ehr_text)
             if team_match:
@@ -576,6 +575,66 @@ class CriteriaEvaluationAgent:
                 raw_confidence = 0.68
 
         # =========================================================================
+        # =========================================================================
+        # 4B. PERCUTANEOUS LEFT ATRIAL APPENDAGE CLOSURE (CMS NCD 220.13 LAAC / WATCHMAN)
+        # =========================================================================
+        elif "crit-laac-01" in code.lower() or "atrial fibrillation" in name.lower() or "stroke risk" in name.lower() or "cha2ds2" in desc.lower():
+            chads_match = re.search(r"(?i)\b(cha2ds2-vasc score (?:calculated at )?([2-9]|\d{2})|persistent non-valvular atrial fibrillation|atrial fibrillation)\b", ehr_text)
+            if chads_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[chads_match.start():chads_match.end()],
+                    start_char=chads_match.start(),
+                    end_char=chads_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, chads_match.start()),
+                    confidence=0.95
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Documented high thromboembolic stroke risk: '{span.source_text}', satisfying NCD 220.13 criteria."
+                raw_confidence = 0.95
+            else:
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = "Non-valvular atrial fibrillation with high CHA2DS2-VASc stroke risk is not documented."
+                raw_confidence = 0.60
+
+        elif "crit-laac-02" in code.lower() or "has-bled" in name.lower() or "contraindication" in name.lower():
+            contra_match = re.search(r"(?i)\b(has-bled score:?\s*([3-9]|\d{2})|oral anticoagulation is contraindicated|major recurrent (?:gastrointestinal )?hemorrhage)\b", ehr_text)
+            if contra_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[contra_match.start():contra_match.end()],
+                    start_char=contra_match.start(),
+                    end_char=contra_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, contra_match.start()),
+                    confidence=0.95
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Documented contraindication to long-term anticoagulation: '{span.source_text}', satisfying NCD 220.13 criteria."
+                raw_confidence = 0.95
+            else:
+                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                rationale = "Formal contraindication to oral anticoagulation or HAS-BLED >= 3 is not documented."
+                raw_confidence = 0.60
+
+        elif "crit-laac-03" in code.lower() or "thrombus" in name.lower():
+            tee_match = re.search(r"(?i)\b(absence of (?:left atrial )?thrombus|tee[^\.\n]*absence of (?:left atrial )?thrombus)\b", ehr_text)
+            if tee_match:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[tee_match.start():tee_match.end()],
+                    start_char=tee_match.start(),
+                    end_char=tee_match.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, tee_match.start()),
+                    confidence=0.95
+                )
+                spans.append(span)
+                status = DeterminationStatus.MET
+                rationale = f"Imaging verified: '{span.source_text}', confirming absence of intracardiac thrombus."
+                raw_confidence = 0.95
+            else:
+                status = DeterminationStatus.NOT_MET
+                rationale = "Pre-procedural imaging ruling out left atrial thrombus was not documented."
+                raw_confidence = 0.85
+
         # 5. CAROTID ARTERY STENTING (CMS NCD 20.7 CAS / PTA)
         # =========================================================================
         elif "crit-cas-01" in code.lower() or "carotid stenosis" in name.lower() or "stenosis" in desc.lower():
