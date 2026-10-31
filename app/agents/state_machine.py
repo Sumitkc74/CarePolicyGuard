@@ -238,6 +238,30 @@ class ClinicalAdjudicationStateMachine:
             gate_decision = AdjudicationDecision.DEFERRED_TO_HUMAN
             abstain_reasons.append(f"Grounding failure: {len(slice_failures)} ungrounded quotes")
 
+        # Explicit Safety Invariant: Pattern-matched extraction CANNOT approve without
+        # grounded, verified evidence and a passing calibrated gate.
+        if gate_decision == AdjudicationDecision.APPROVED:
+            ungrounded_or_unmet = [
+                c.criterion_code for c in criteria_assessments_for_gate
+                if not c.is_exclusion and (
+                    c.status != DeterminationStatus.MET
+                    or not c.verified_spans
+                    or c.verified_spans[0].source_text == "No explicit evidence span found"
+                )
+            ]
+            if ungrounded_or_unmet:
+                gate_decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+                abstain_triggered = True
+                abstain_reasons.append(
+                    f"Safety Guardrail: Approval blocked due to missing or ungrounded mandatory criteria: {ungrounded_or_unmet}"
+                )
+            elif calibrated_confidence < self.tau:
+                gate_decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+                abstain_triggered = True
+                abstain_reasons.append(
+                    f"Safety Guardrail: Calibrated confidence ({calibrated_confidence:.3f}) below safety threshold tau ({self.tau:.2f})"
+                )
+
         self._record_transition(
             PipelineStage.CALIBRATED_ABSTENTION_GATE,
             "ABSTAIN" if abstain_triggered else "PASS",

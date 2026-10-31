@@ -43,7 +43,7 @@
       "description": "TEE or CTA within 48 hours of procedure confirming absence of intracardiac or left atrial appendage thrombus and appropriate ostial anatomy.",
       "clinical_intent": "Ensure safety of percutaneous transseptal puncture and closure deployment",
       "criterion_type": "FINDING_PRESENCE",
-      "entity_names": ["TEE", "CTA", "transesophageal echocardiogram", "absence of left atrial thrombus", "no thrombus", "thrombus excluded"],
+      "entity_names": ["absence of left atrial thrombus", "confirms absence of left atrial thrombus", "absence of thrombus", "no thrombus", "thrombus excluded", "no intracardiac thrombus"],
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Within pre-procedure timeframe",

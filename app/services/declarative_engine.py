@@ -163,24 +163,32 @@ class DeclarativePolicyEngine:
         analyzer = CriteriaEvaluationAgent()
 
         if criterion.criterion_type == CriterionType.NUMERIC_THRESHOLD:
-            # Handle numeric cutoffs (LVEF <= 35%, AHI >= 15, etc.)
+            # Handle numeric cutoffs (LVEF <= 35%, AHI >= 15, CHA2DS2-VASc >= 3, etc.)
             search_terms = criterion.entity_names or [criterion.name]
             target_unit = (criterion.target_unit or "").strip()
             
-            # Identify core metric abbreviations/names (e.g., AHI, LVEF, AVA, PaO2, SpO2)
-            core_metrics = [t for t in search_terms if len(t) <= 6 or t.isupper() or t.lower() in ("apnea-hypopnea index", "ejection fraction", "aortic valve area")]
+            # Identify core metric abbreviations/names (e.g., AHI, LVEF, AVA, PaO2, SpO2, CHA2DS2-VASc, HAS-BLED)
+            score_metrics = {"cha2ds2-vasc", "chads-vasc", "has-bled", "cha2ds2", "chads2", "sts score", "epworth", "ahi", "lvef", "ava", "pao2", "spo2"}
+            core_metrics = [t for t in search_terms if len(t) <= 6 or t.isupper() or t.lower() in score_metrics or t.lower() in ("apnea-hypopnea index", "ejection fraction", "aortic valve area")]
             metric_candidates = []
 
-            # Strategy 1: Look for matches anchored to the specific target_unit (events/hr, %, mmHg, cm2)
-            if target_unit:
+            # Strategy 0: Dedicated clinical score extraction for score-based scales (e.g. CHA2DS2-VASc score is 4, HAS-BLED: 3)
+            score_terms = [t for t in search_terms if "cha" in t.lower() or "bled" in t.lower() or "score" in t.lower()]
+            if score_terms:
+                score_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in score_terms) + r')\b(?:\s*score)?\s*(?:calculated at|is|of|:|=)?\s*(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,2}(?:\.\d+)?))(?![a-zA-Z0-9])'
+                for m_cand in re.finditer(score_pattern, ehr_text):
+                    metric_candidates.append(m_cand)
+
+            # Strategy 1: Look for matches anchored to the specific target_unit (events/hr, %, mmHg, cm2, points)
+            if not metric_candidates and target_unit and target_unit.lower() != "points":
                 escaped_unit = re.escape(target_unit)
-                unit_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n\.]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*' + escaped_unit
+                unit_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*' + escaped_unit + r'(?![a-zA-Z0-9])'
                 for m_cand in re.finditer(unit_pattern, ehr_text):
                     metric_candidates.append(m_cand)
 
-            # Strategy 2: Look for core metric tokens directly adjacent to values, skipping date patterns
+            # Strategy 2: Look for core metric tokens directly adjacent to values, skipping date patterns and preventing internal token digit extraction
             if not metric_candidates and core_metrics:
-                core_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in core_metrics) + r')[^\d\n\.]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))'
+                core_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in core_metrics) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))(?![a-zA-Z0-9])'
                 for m_cand in re.finditer(core_pattern, ehr_text):
                     end_pos = m_cand.end(2)
                     after_text = ehr_text[end_pos:end_pos+5]
@@ -189,9 +197,9 @@ class DeclarativePolicyEngine:
                         continue
                     metric_candidates.append(m_cand)
 
-            # Strategy 3: General fallback search across all synonyms, filtering out date-shaped numbers
+            # Strategy 3: General fallback search across all synonyms, filtering out date-shaped numbers and forbidding sentence crossing
             if not metric_candidates:
-                fallback_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*([%a-zA-Z/]*)'
+                fallback_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))(?![a-zA-Z0-9])\s*([%a-zA-Z/]*)'
                 for m_cand in re.finditer(fallback_pattern, ehr_text):
                     end_pos = m_cand.end(2)
                     after_text = ehr_text[end_pos:end_pos+5]

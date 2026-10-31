@@ -361,40 +361,44 @@ class CriteriaEvaluationAgent:
                 raw_confidence = 0.88
 
         elif is_excl and ("shock" in desc.lower() or "terminal" in desc.lower() or "survival" in desc.lower() or "exclusion" in code.lower()):
-            # Exclusion criteria check with clinical negation support
-            neg_match = re.search(r'(?i)\b(no|without|denies|negative for|absence of)\s+(?:active\s+|acute\s+)?(cardiogenic shock|terminal illness|end-stage malignancy|hospice)\b', ehr_text)
-            if neg_match:
-                span = ClinicalEvidenceSpan(
-                    source_text=ehr_text[neg_match.start():neg_match.end()],
-                    start_char=neg_match.start(),
-                    end_char=neg_match.end(),
-                    clinical_section=self.detect_clinical_section(ehr_text, neg_match.start()),
-                    confidence=0.96
-                )
-                spans.append(span)
-                status = DeterminationStatus.NOT_MET  # Exclusion NOT MET -> qualifies for coverage!
-                rationale = f"Documented absence of disqualifying exclusion: {span.source_text}."
-                raw_confidence = 0.95
-            else:
-                shock_match = re.search(r'(?i)\b(active cardiogenic shock|in cardiogenic shock|refractory cardiogenic shock|end-stage malignancy|terminal illness|hospice|life expectancy < 1 year)\b', ehr_text)
-                if not shock_match:
-                    # Generic cardiogenic shock only if not negated
-                    shock_match = re.search(r'(?i)\b(cardiogenic shock)\b', ehr_text)
-
-                if shock_match:
+            # Disqualifying Exclusion Check (Active Cardiogenic Shock, Metastatic Cancer / Terminal Illness < 1 Year)
+            pos_pattern = r'(?i)\b(?:active cardiogenic shock|in cardiogenic shock|refractory cardiogenic shock|cardiogenic shock|metastatic\s+(?:[a-z]+\s+)?(?:cancer|malignancy|disease)|end-stage malignancy|terminal illness|terminal non-cardiac illness|hospice(?:-directed)?|life expectancy\s*(?:<|less than)\s*1\s*year)\b'
+            active_exclusion_found = False
+            for m in re.finditer(pos_pattern, ehr_text):
+                s_idx = m.start()
+                e_idx = m.end()
+                scope = self.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                if not scope["is_negated"]:
                     span = ClinicalEvidenceSpan(
-                        source_text=ehr_text[shock_match.start():shock_match.end()],
-                        start_char=shock_match.start(),
-                        end_char=shock_match.end(),
-                        clinical_section=self.detect_clinical_section(ehr_text, shock_match.start()),
-                        confidence=0.95
+                        source_text=ehr_text[s_idx:e_idx],
+                        start_char=s_idx,
+                        end_char=e_idx,
+                        clinical_section=self.detect_clinical_section(ehr_text, s_idx),
+                        confidence=0.96
                     )
                     spans.append(span)
-                    status = DeterminationStatus.MET  # Exclusion MET -> disqualifies!
+                    status = DeterminationStatus.MET
                     rationale = f"Disqualifying exclusion criterion detected: {span.source_text}."
+                    raw_confidence = 0.96
+                    active_exclusion_found = True
+                    break
+
+            if not active_exclusion_found:
+                neg_match = re.search(r'(?i)\b(no|without|denies|negative for|absence of)\s+(?:active\s+|acute\s+)?(cardiogenic shock|terminal illness|terminal non-cardiac illness|end-stage malignancy|hospice)\b', ehr_text)
+                if neg_match:
+                    span = ClinicalEvidenceSpan(
+                        source_text=ehr_text[neg_match.start():neg_match.end()],
+                        start_char=neg_match.start(),
+                        end_char=neg_match.end(),
+                        clinical_section=self.detect_clinical_section(ehr_text, neg_match.start()),
+                        confidence=0.96
+                    )
+                    spans.append(span)
+                    status = DeterminationStatus.NOT_MET
+                    rationale = f"Documented absence of disqualifying exclusion: {span.source_text}."
                     raw_confidence = 0.95
                 else:
-                    status = DeterminationStatus.NOT_MET  # Exclusion NOT MET -> good for coverage
+                    status = DeterminationStatus.NOT_MET
                     rationale = "No documented disqualifying cardiogenic shock or non-cardiac disease limiting 1-year survival."
                     raw_confidence = 0.93
 
@@ -521,25 +525,23 @@ class CriteriaEvaluationAgent:
 
 
         # =========================================================================
-        # 4. TRANSCATHETER MITRAL VALVE REPAIR (NCD 20.33 TEER / MitraClip)
+        # 4. TRANSCATHETER MITRAL / AORTIC VALVE (NCD 20.33 TEER & TAVR)
         # =========================================================================
         elif "crit-teer-01" in code.lower() or "crit-tavr-01" in code.lower() or "mitral regurgitation" in name.lower() or "aortic stenosis" in name.lower():
-            # Check for either Severe Mitral Regurgitation OR Severe Aortic Stenosis
+            # Check for Severe Mitral Regurgitation (TEER)
             mr_match = re.search(r"(?i)\b(moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\s*(?:primary|secondary|functional)?\s*(?:mitral regurgitation|mr)\b|\b(?:mitral regurgitation|mr)\s*(?:is\s*)?(?:moderate-to-severe|severe|grade\s*[34]\+?|grade\s*(?:iii|iv)\+?|3\+|4\+)\b", ehr_text)
-            as_match = re.search(r"(?i)\b(severe calcific aortic stenosis|severe aortic stenosis|aortic valve area \(ava\):?\s*0?\.[0-9]+|mean (?:transvalvular )?gradient:?\s*(?:4[0-9]|[5-9][0-9])\s*mm\s*hg)\b", ehr_text)
-            if as_match:
-                span = ClinicalEvidenceSpan(
-                    source_text=ehr_text[as_match.start():as_match.end()],
-                    start_char=as_match.start(),
-                    end_char=as_match.end(),
-                    clinical_section=self.detect_clinical_section(ehr_text, as_match.start()),
-                    confidence=0.96
-                )
-                spans.append(span)
-                status = DeterminationStatus.MET
-                rationale = f"Documented severe aortic stenosis: '{span.source_text}', satisfying NCD 20.33 AVA/gradient requirements."
-                raw_confidence = 0.96
-            elif mr_match:
+            
+            # Check for Quantified Aortic Stenosis (TAVR)
+            ava_m = re.search(r'(?i)\b(?:aortic valve area|ava)\s*(?:\(ava\))?\s*(?:is|of|:)?\s*([<>]?=?\s*(\d+(?:\.\d+)?))\s*(?:cm2|cm²)?\b', ehr_text)
+            grad_m = re.search(r'(?i)\b(?:mean (?:transvalvular )?gradient)\s*(?:is|of|:)?\s*([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*mm\s*hg\b', ehr_text)
+            vel_m = re.search(r'(?i)\b(?:peak (?:aortic )?velocity|vmax|peak velocity)\s*(?:is|of|:)?\s*([<>]?=?\s*(\d+(?:\.\d+)?))\s*m\/s\b', ehr_text)
+
+            ava_val = float(ava_m.group(2)) if ava_m else None
+            grad_val = float(grad_m.group(2)) if grad_m else None
+            vel_val = float(vel_m.group(2)) if vel_m else None
+            quantified_as_present = (ava_val is not None or grad_val is not None or vel_val is not None)
+
+            if mr_match and ("mitral" in ehr_text.lower() or not "aortic" in ehr_text.lower()):
                 span = ClinicalEvidenceSpan(
                     source_text=ehr_text[mr_match.start():mr_match.end()],
                     start_char=mr_match.start(),
@@ -551,11 +553,67 @@ class CriteriaEvaluationAgent:
                 status = DeterminationStatus.MET
                 rationale = f"Documented severe valvular regurgitation: '{span.source_text}', satisfying NCD 20.33 Grade 3+/4+ criteria."
                 raw_confidence = 0.96
+            elif quantified_as_present:
+                is_severe = (
+                    (ava_val is not None and ava_val <= 1.0) or
+                    (grad_val is not None and grad_val >= 40.0) or
+                    (vel_val is not None and vel_val >= 4.0)
+                )
+                evidence_texts = []
+                if ava_m:
+                    spans.append(ClinicalEvidenceSpan(
+                        source_text=ehr_text[ava_m.start():ava_m.end()],
+                        start_char=ava_m.start(),
+                        end_char=ava_m.end(),
+                        clinical_section=self.detect_clinical_section(ehr_text, ava_m.start()),
+                        confidence=0.98
+                    ))
+                    evidence_texts.append(ehr_text[ava_m.start():ava_m.end()])
+                if grad_m:
+                    spans.append(ClinicalEvidenceSpan(
+                        source_text=ehr_text[grad_m.start():grad_m.end()],
+                        start_char=grad_m.start(),
+                        end_char=grad_m.end(),
+                        clinical_section=self.detect_clinical_section(ehr_text, grad_m.start()),
+                        confidence=0.98
+                    ))
+                    evidence_texts.append(ehr_text[grad_m.start():grad_m.end()])
+                if vel_m:
+                    spans.append(ClinicalEvidenceSpan(
+                        source_text=ehr_text[vel_m.start():vel_m.end()],
+                        start_char=vel_m.start(),
+                        end_char=vel_m.end(),
+                        clinical_section=self.detect_clinical_section(ehr_text, vel_m.start()),
+                        confidence=0.98
+                    ))
+                    evidence_texts.append(ehr_text[vel_m.start():vel_m.end()])
+
+                if is_severe:
+                    status = DeterminationStatus.MET
+                    rationale = f"Severe aortic stenosis verified by quantified hemodynamics ({'; '.join(evidence_texts)}), satisfying NCD 20.33."
+                    raw_confidence = 0.96
+                else:
+                    status = DeterminationStatus.NOT_MET
+                    rationale = f"Aortic stenosis hemodynamics ({'; '.join(evidence_texts)}) do not meet severe thresholds (AVA <= 1.0 cm2, gradient >= 40 mmHg, velocity >= 4.0 m/s); fails NCD 20.33."
+                    raw_confidence = 0.94
             else:
-                status = DeterminationStatus.INSUFFICIENT_EVIDENCE
-                rationale = "No documented quantification of severe valvular regurgitation or aortic stenosis found."
-                raw_confidence = 0.65
-        elif "crit-teer-02" in code.lower() or "heart team" in name.lower() or "sts score" in desc.lower():
+                qual_match = re.search(r'(?i)\b(severe calcific aortic stenosis|severe aortic stenosis|calcific aortic stenosis)\b', ehr_text)
+                if qual_match:
+                    spans.append(ClinicalEvidenceSpan(
+                        source_text=ehr_text[qual_match.start():qual_match.end()],
+                        start_char=qual_match.start(),
+                        end_char=qual_match.end(),
+                        clinical_section=self.detect_clinical_section(ehr_text, qual_match.start()),
+                        confidence=0.70
+                    ))
+                    status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                    rationale = "Echocardiogram describes severe aortic stenosis in qualitative terms only; no quantified AVA (<= 1.0 cm2), mean gradient (>= 40 mmHg), or peak velocity (>= 4.0 m/s) recorded. Deferral required for quantified report."
+                    raw_confidence = 0.65
+                else:
+                    status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                    rationale = "No documented quantification of severe valvular regurgitation or aortic stenosis found."
+                    raw_confidence = 0.65
+        elif "crit-teer-02" in code.lower() or "crit-tavr-02" in code.lower() or ("heart team" in name.lower() and "carotid" not in name.lower() and "cas" not in code.lower()):
             team_match = re.search(r'(?i)\b(multidisciplinary heart team|heart team consensus|sts score\s*(?:is\s*)?(?:[89]|\d{2})%?|prohibitive surgical risk|high surgical risk)\b', ehr_text)
             if team_match:
                 span = ClinicalEvidenceSpan(
@@ -671,8 +729,8 @@ class CriteriaEvaluationAgent:
                 rationale = "No documented carotid stenosis percentage found on diagnostic carotid duplex, CTA, or MRA."
                 raw_confidence = 0.65
 
-        elif "crit-cas-02" in code.lower() or "high risk for cea" in name.lower() or "hostile neck" in desc.lower():
-            risk_match = re.search(r'(?i)\b(high risk for cea|hostile neck|prior neck radiation|prior radical neck dissection|tracheostomy|severe copd|sts score\s*[>]=?\s*8%|contralateral carotid occlusion|severe cervical arthritis)\b', ehr_text)
+        elif "crit-cas-02" in code.lower() or "high risk for cea" in name.lower() or "hostile neck" in desc.lower() or "surgical risk" in name.lower() or "carotid endarterectomy" in name.lower():
+            risk_match = re.search(r'(?i)\b(high risk for open carotid endarterectomy|high risk for open cea|high risk for cea|hostile neck(?: anatomy)?|prior neck radiation|prior radiation|prior radical neck dissection|tracheostomy|severe copd|sts score\s*[>]=?\s*8%|contralateral carotid occlusion|severe cervical arthritis)\b', ehr_text)
             if risk_match:
                 span = ClinicalEvidenceSpan(
                     source_text=ehr_text[risk_match.start():risk_match.end()],

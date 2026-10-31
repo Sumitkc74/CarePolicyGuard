@@ -162,7 +162,10 @@ class AdjudicationRequest(BaseModel):
     ehr_narrative: str = Field(..., min_length=20, description="Raw clinical EHR documentation / progress note")
     cpt_codes: Optional[List[str]] = Field(default=None, description="Optional procedure codes to validate")
     icd10_codes: Optional[List[str]] = Field(default=None, description="Optional diagnosis codes to validate")
-    execution_mode: Optional[str] = Field(default="deterministic", description="Adjudication engine: 'deterministic' (fast rules) or 'state_machine' (multi-pass extractor & state transitions)")
+    execution_mode: Optional[str] = Field(
+        default="deterministic",
+        description="Adjudication engine: 'deterministic' (production rule pipeline), 'declarative' (production declarative schema engine), or 'state_machine' [EXPERIMENTAL] (multi-pass extractor with explicit state transitions). Note: state_machine mode is labeled EXPERIMENTAL due to lower precision and safety vulnerability on unconstrained clinical phrasing."
+    )
     options: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Pipeline configuration overrides (e.g. tau, debug)")
 
 class LoginRequest(BaseModel):

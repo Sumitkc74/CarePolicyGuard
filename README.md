@@ -123,6 +123,15 @@ CarePolicyGuard is structured as an enterprise-grade **3-Tier Clinical Architect
 | **Agent 4: Abstention Gate** | `app.agents.abstention_gate` | Enforces calibrated safety threshold ($\tau = 0.85$). If any criterion exhibits hallucination, negative omission, or drops below $\tau$, the engine withholds autonomous decisions and safely defers to human clinical review. |
 | **Agent 5: Defense Packet & Appeal Generator** | `app.agents.packet_generator` | Synthesizes official CMS prior-authorization defense packets, character-offset audit exhibits, and formal physician peer-to-peer appeal letters mapped to CARC/RARC billing codes. |
 
+### Execution Engines & Operational Modes
+
+CarePolicyGuard supports three execution modes via `execution_mode`:
+* **`deterministic` (Default / Production)**: High-performance procedural clinical rules pipeline executing deterministic regex patterns, unit-anchored cutoffs, and longitudinal timeline analysis. Recommended for production clinical prior authorization workflows.
+* **`declarative` (Production Policy-as-Data)**: Zero-code schema-driven policy execution engine ([app/services/declarative_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/declarative_engine.py)). Ingests typed criterion definitions (`NUMERIC_THRESHOLD`, `TEMPORAL_DURATION`, `EXCLUSION_SYMPTOM`, `FINDING_PRESENCE`) directly from versioned JSON files without requiring Python code changes.
+* **`state_machine` [EXPERIMENTAL]**: Multi-pass candidate extractor with explicit state transitions ([app/agents/state_machine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/state_machine.py)).
+  > [!WARNING]
+  > **Experimental Mode Notice**: State-machine mode is explicitly labeled **EXPERIMENTAL**. Evaluation on unconstrained held-out clinical phrasing demonstrated lower precision and safety vulnerabilities compared to the declarative and deterministic engines. It should not be used in production prior authorization or presented as equivalent to the primary production engines.
+
 ---
 
 ## 4-Configuration Empirical Research Benchmark

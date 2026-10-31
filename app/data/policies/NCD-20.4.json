@@ -69,7 +69,7 @@
       "description": "Exclusion: Patient has active cardiogenic shock or non-cardiac disease with life expectancy less than 1 year (e.g., metastatic cancer, hospice).",
       "clinical_intent": "Exclude non-beneficial device placement under futile conditions",
       "criterion_type": "EXCLUSION_SYMPTOM",
-      "entity_names": ["cardiogenic shock", "shock", "terminal illness", "end-stage malignancy", "hospice"],
+      "entity_names": ["cardiogenic shock", "shock", "terminal illness", "terminal non-cardiac illness", "end-stage malignancy", "hospice", "metastatic", "metastatic cancer", "life expectancy less than 1 year"],
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current clinical encounter",

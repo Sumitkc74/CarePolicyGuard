@@ -154,102 +154,38 @@ class StructuredExtractorAgent:
 
     def _heuristic_proposer(self, raw_ehr_text: str, criterion: Dict[str, Any], pass_idx: int) -> Dict[str, Any]:
         """
-        Fast heuristic candidate proposer.
-        Slightly varies candidate spans based on pass_idx to simulate natural variance.
+        Fast heuristic candidate proposer delegating to DeclarativePolicyEngine for
+        sound clinical evaluation with typed criteria, numeric bounds, temporal durations,
+        and exclusion/negation verification.
         """
-        crit_code = criterion.get("criterion_code", "CRIT-UNKNOWN")
-        desc = criterion.get("description", "").lower()
-        keywords = criterion.get("keywords", [])
-        is_exclusion = criterion.get("is_exclusion", False)
+        from app.services.declarative_engine import DeclarativePolicyEngine
+        decl_crit = DeclarativePolicyEngine.compile_from_dict(criterion)
+        assessment = DeclarativePolicyEngine.evaluate(decl_crit, raw_ehr_text)
 
-        lvef_match = re.search(r'(?:lvef|ejection fraction)[^\d]*?(\d{1,2})%', raw_ehr_text, re.IGNORECASE)
-        nyha_match = re.search(r'nyha[^\n\.]*?\b(?:class\s+)?([ivx]+)', raw_ehr_text, re.IGNORECASE)
-        ahi_match = re.search(r'ahi[^\d]*?(\d{1,2}(?:\.\d+)?)', raw_ehr_text, re.IGNORECASE)
-        gdmt_match = re.search(r'(?:gdmt|medical therapy)[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months)', raw_ehr_text, re.IGNORECASE)
-        shock_match = re.search(r'(cardiogenic shock|end-stage|terminal|refractory shock)', raw_ehr_text, re.IGNORECASE)
+        quote = assessment.verified_spans[0].source_text if assessment.verified_spans else ""
+        start = assessment.verified_spans[0].start_char if assessment.verified_spans else 0
+        end = assessment.verified_spans[0].end_char if assessment.verified_spans else 0
 
-        pass_status = "INSUFFICIENT_EVIDENCE"
+        # Extract numeric value if numeric threshold
         num_val = None
-        unit = None
-        quote = ""
-        start = 0
-        end = 0
-        temporal_met = None
-
-        if "lvef" in crit_code.lower() or "systolic" in desc:
-            if lvef_match:
-                num_val = float(lvef_match.group(1))
-                unit = "%"
-                quote, start, end = self._locate_best_span(raw_ehr_text, [lvef_match.group(0)])
-                pass_status = "MET" if self.tools.evaluate_numeric_cutoff(num_val, "<=", 35.0) else "NOT_MET"
-        elif "nyha" in crit_code.lower() or "functional" in desc:
-            if nyha_match:
-                cls_str = nyha_match.group(1).upper()
-                quote, start, end = self._locate_best_span(raw_ehr_text, [nyha_match.group(0)])
-                pass_status = "MET" if cls_str in ("II", "III", "IV") else "NOT_MET"
-        elif "gdmt" in crit_code.lower() or "medical therapy" in desc:
-            if gdmt_match:
-                val = int(gdmt_match.group(1))
-                time_unit = gdmt_match.group(2).lower()
-                days = val * 30 if "month" in time_unit else (val * 7 if "week" in time_unit else val)
-                temporal_met = (days >= 90)
-                quote, start, end = self._locate_best_span(raw_ehr_text, [gdmt_match.group(0)])
-                pass_status = "MET" if temporal_met else "NOT_MET"
-        elif "face-to-face" in crit_code.lower() or "face-to-face" in desc or "clinical evaluation" in desc:
-            f2f_match = re.search(r'(?i)\b(?:face-to-face|in-person|clinical evaluation|sleep specialist consultation)\b', raw_ehr_text)
-            if f2f_match:
-                quote, start, end = self._locate_best_span(raw_ehr_text, [f2f_match.group(0)])
-                pass_status = "MET"
-            else:
-                pass_status = "INSUFFICIENT_EVIDENCE"
-                quote = "Prerequisite face-to-face clinical evaluation not documented in EHR note"
-        elif "ahi" in crit_code.lower() or "ahi" in desc or "apnea" in desc or "polysomnography" in desc:
-            if ahi_match:
-                num_val = float(ahi_match.group(1))
-                unit = "events/hr"
-                quote, start, end = self._locate_best_span(raw_ehr_text, [ahi_match.group(0)])
-                if num_val >= 15.0:
-                    pass_status = "MET"
-                elif num_val >= 5.0:
-                    # Require non-negated comorbidity (hypertension, stroke, excessive daytime sleepiness)
-                    has_comorbidity = False
-                    for symp in ["hypertension", "stroke", "excessive daytime sleepiness", "insomnia"]:
-                        s_idx = raw_ehr_text.lower().find(symp)
-                        if s_idx != -1:
-                            pre = raw_ehr_text[max(0, s_idx-35):s_idx].lower()
-                            if not any(neg in pre for neg in ["no ", "denies ", "without ", "never ", "negative"]):
-                                has_comorbidity = True
-                                break
-                    pass_status = "MET" if has_comorbidity else "INSUFFICIENT_EVIDENCE"
-                else:
-                    pass_status = "NOT_MET"
-            else:
-                pass_status = "INSUFFICIENT_EVIDENCE" 
-        elif is_exclusion:
-            if shock_match:
-                quote, start, end = self._locate_best_span(raw_ehr_text, [shock_match.group(0)])
-                q_low = quote.lower()
-                if any(neg in q_low for neg in ["no ", "without", "denies", "resolved", "absent", "negative"]):
-                    pass_status = "NOT_MET"
-                else:
-                    pass_status = "MET"
-            else:
-                pass_status = "NOT_MET"
-        else:
-            found_kws = [k for k in keywords if k.lower() in raw_ehr_text.lower()]
-            if found_kws:
-                quote, start, end = self._locate_best_span(raw_ehr_text, found_kws[:2])
-                pass_status = "MET"
+        unit = decl_crit.target_unit
+        if decl_crit.criterion_type.value == "NUMERIC_THRESHOLD" and quote:
+            num_m = re.search(r'\d+(?:\.\d+)?', quote)
+            if num_m:
+                try:
+                    num_val = float(num_m.group(0))
+                except ValueError:
+                    pass
 
         return {
-            "status": pass_status,
+            "status": assessment.status.value,
             "num_val": num_val,
             "unit": unit,
-            "quote": quote,
+            "quote": quote or "No explicit evidence span found",
             "start": start,
             "end": end,
-            "temporal_met": temporal_met,
-            "rationale": "Extracted via clinical pattern matching."
+            "temporal_met": (assessment.status.value == "MET") if decl_crit.criterion_type.value == "TEMPORAL_DURATION" else None,
+            "rationale": assessment.clinical_rationale
         }
 
     async def propose_candidates_async(

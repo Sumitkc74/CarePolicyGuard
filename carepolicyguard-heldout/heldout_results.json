@@ -2,7 +2,7 @@
   "metadata": {
     "set_name": "CarePolicyGuard Held-Out Vignette Set v1",
     "status": "UNSEALED - Evaluated once across deterministic, state_machine, and declarative modes",
-    "evaluation_timestamp": "2026-10-31T23:09:42.977625+00:00",
+    "evaluation_timestamp": "2026-10-31T23:40:58.169266+00:00",
     "total_vignettes": 15,
     "gold_distribution": {
       "APPROVED": 7,
@@ -16,27 +16,15 @@
   "mode_summaries": {
     "deterministic": {
       "total_cases": 15,
-      "correct_count": 8,
-      "accuracy": 0.5333,
-      "false_approvals_count": 2,
-      "false_approval_rate": 0.1333,
-      "abstentions_count": 5,
-      "abstention_rate": 0.3333,
-      "mean_latency_ms": 31.7,
-      "false_approval_cases": [
-        "HOLD-02",
-        "HOLD-08"
-      ],
+      "correct_count": 11,
+      "accuracy": 0.7333,
+      "false_approvals_count": 0,
+      "false_approval_rate": 0.0,
+      "abstentions_count": 6,
+      "abstention_rate": 0.4,
+      "mean_latency_ms": 25.32,
+      "false_approval_cases": [],
       "mismatched_cases": [
-        {
-          "id": "HOLD-02",
-          "policy_id": "NCD-20.4",
-          "case_type": "exclusion-deny",
-          "gold": "DENIED",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-ICD-01: Documented LVEF is 29% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class II heart failure symptoms.; CRIT-ICD-03: Documented guideline-directed medical therapy sustained for 6 months (meets >=90 day / 3 month CMS threshold).; CRIT-ICD-04: Event timeline documented: myocardial infarction 6 months ago; satisfies CMS mandatory post-event waiting periods.; CRIT-ICD-EXCL-01: Documented absence of disqualifying exclusion: No cardiogenic shock."
-        },
         {
           "id": "HOLD-03",
           "policy_id": "NCD-20.4",
@@ -56,15 +44,6 @@
           "rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.667) falls below safety threshold tau (0.85)."
         },
         {
-          "id": "HOLD-08",
-          "policy_id": "NCD-20.33",
-          "case_type": "omission-defer",
-          "gold": "DEFERRED_TO_HUMAN",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-TAVR-01: Documented severe aortic stenosis: 'severe aortic stenosis', satisfying NCD 20.33 AVA/gradient requirements.; CRIT-TAVR-02: Documented multidisciplinary evaluation: 'multidisciplinary Heart Team', confirming high/prohibitive surgical risk consensus."
-        },
-        {
           "id": "HOLD-09",
           "policy_id": "NCD-220.13",
           "case_type": "clear-approve",
@@ -81,54 +60,20 @@
           "predicted": "DEFERRED_TO_HUMAN",
           "is_false_approval": false,
           "rationale": "Calibrated aggregate confidence (0.800) falls below safety threshold tau (0.85)."
-        },
-        {
-          "id": "HOLD-13",
-          "policy_id": "NCD-20.7",
-          "case_type": "clear-approve",
-          "gold": "APPROVED",
-          "predicted": "DENIED",
-          "is_false_approval": false,
-          "rationale": "CRIT-CAS-01: Documented 85% carotid stenosis in symptomatic patient with neurological history (meets CMS NCD 20.7 threshold >=70%).; CRIT-CAS-02: Documented consensus between a cardiothoracic surgeon and interventional cardiologist confirming prohibitive surgical risk is missing.; CRIT-CAS-03: Documented utilization of mandatory CMS embolic protection system: 'embolic protection device'."
         }
       ]
     },
     "state_machine": {
       "total_cases": 15,
-      "correct_count": 6,
-      "accuracy": 0.4,
-      "false_approvals_count": 6,
-      "false_approval_rate": 0.4,
-      "abstentions_count": 1,
-      "abstention_rate": 0.0667,
-      "mean_latency_ms": 73.33,
-      "false_approval_cases": [
-        "HOLD-02",
-        "HOLD-06",
-        "HOLD-08",
-        "HOLD-10",
-        "HOLD-12",
-        "HOLD-15"
-      ],
+      "correct_count": 10,
+      "accuracy": 0.6667,
+      "false_approvals_count": 0,
+      "false_approval_rate": 0.0,
+      "abstentions_count": 3,
+      "abstention_rate": 0.2,
+      "mean_latency_ms": 55.39,
+      "false_approval_cases": [],
       "mismatched_cases": [
-        {
-          "id": "HOLD-01",
-          "policy_id": "NCD-20.4",
-          "case_type": "clear-approve",
-          "gold": "APPROVED",
-          "predicted": "DENIED",
-          "is_false_approval": false,
-          "rationale": "CRIT-ICD-01: Extracted via clinical pattern matching.; CRIT-ICD-02: Extracted via clinical pattern matching.; CRIT-ICD-03: Extracted via clinical pattern matching.; CRIT-ICD-04: Extracted via clinical pattern matching.; CRIT-ICD-EXCL-01: Extracted via clinical pattern matching."
-        },
-        {
-          "id": "HOLD-02",
-          "policy_id": "NCD-20.4",
-          "case_type": "exclusion-deny",
-          "gold": "DENIED",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-ICD-01: Extracted via clinical pattern matching.; CRIT-ICD-02: Extracted via clinical pattern matching.; CRIT-ICD-03: Extracted via clinical pattern matching.; CRIT-ICD-04: Extracted via clinical pattern matching.; CRIT-ICD-EXCL-01: Extracted via clinical pattern matching."
-        },
         {
           "id": "HOLD-03",
           "policy_id": "NCD-20.4",
@@ -136,7 +81,16 @@
           "gold": "DEFERRED_TO_HUMAN",
           "predicted": "DENIED",
           "is_false_approval": false,
-          "rationale": "CRIT-ICD-01: Extracted via clinical pattern matching.; CRIT-ICD-02: Extracted via clinical pattern matching.; CRIT-ICD-03: Extracted via clinical pattern matching.; CRIT-ICD-04: Extracted via clinical pattern matching.; CRIT-ICD-EXCL-01: Extracted via clinical pattern matching."
+          "rationale": "CRIT-ICD-01: Statutory metric verified: 33.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: II in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: No documented clinical evidence matching statutory criteria.; CRIT-ICD-04: No documented clinical evidence matching statutory criteria.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (no)."
+        },
+        {
+          "id": "HOLD-04",
+          "policy_id": "LCD-L33829",
+          "case_type": "borderline-approve",
+          "gold": "APPROVED",
+          "predicted": "DEFERRED_TO_HUMAN",
+          "is_false_approval": false,
+          "rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.720) falls below safety threshold tau (0.85)."
         },
         {
           "id": "HOLD-05",
@@ -148,49 +102,22 @@
           "rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.720) falls below safety threshold tau (0.85)."
         },
         {
-          "id": "HOLD-06",
-          "policy_id": "LCD-L33829",
-          "case_type": "omission-defer",
-          "gold": "DEFERRED_TO_HUMAN",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-CPAP-01: Extracted via clinical pattern matching.; CRIT-CPAP-02: Extracted via clinical pattern matching."
-        },
-        {
           "id": "HOLD-08",
           "policy_id": "NCD-20.33",
           "case_type": "omission-defer",
           "gold": "DEFERRED_TO_HUMAN",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-TAVR-01: Extracted via clinical pattern matching.; CRIT-TAVR-02: Extracted via clinical pattern matching."
-        },
-        {
-          "id": "HOLD-10",
-          "policy_id": "NCD-220.13",
-          "case_type": "safety-deny",
-          "gold": "DENIED",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-LAAC-01: Extracted via clinical pattern matching.; CRIT-LAAC-02: Extracted via clinical pattern matching.; CRIT-LAAC-03: Extracted via clinical pattern matching."
+          "predicted": "DENIED",
+          "is_false_approval": false,
+          "rationale": "CRIT-TAVR-01: No documented clinical evidence matching statutory criteria.; CRIT-TAVR-02: Documented finding was explicitly negated (no)."
         },
         {
           "id": "HOLD-12",
           "policy_id": "NCD-20.29",
           "case_type": "omission-defer",
           "gold": "DEFERRED_TO_HUMAN",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-HBOT-01: Extracted via clinical pattern matching.; CRIT-HBOT-02: Extracted via clinical pattern matching.; CRIT-HBOT-03: Extracted via clinical pattern matching."
-        },
-        {
-          "id": "HOLD-15",
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "case_type": "exclusion-deny",
-          "gold": "DENIED",
-          "predicted": "APPROVED",
-          "is_false_approval": true,
-          "rationale": "CRIT-TKA-01: Extracted via clinical pattern matching.; CRIT-TKA-02: Extracted via clinical pattern matching.; CRIT-TKA-EXCL-01: Extracted via clinical pattern matching."
+          "predicted": "DENIED",
+          "is_false_approval": false,
+          "rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 3 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: No documented clinical evidence matching statutory criteria.; CRIT-HBOT-03: Documented finding was explicitly negated (no)."
         }
       ]
     },
@@ -200,9 +127,9 @@
       "accuracy": 0.8,
       "false_approvals_count": 0,
       "false_approval_rate": 0.0,
-      "abstentions_count": 6,
-      "abstention_rate": 0.4,
-      "mean_latency_ms": 32.84,
+      "abstentions_count": 7,
+      "abstention_rate": 0.4667,
+      "mean_latency_ms": 23.23,
       "false_approval_cases": [],
       "mismatched_cases": [
         {
@@ -224,13 +151,13 @@
           "rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.674) falls below safety threshold tau (0.85)."
         },
         {
-          "id": "HOLD-09",
+          "id": "HOLD-10",
           "policy_id": "NCD-220.13",
-          "case_type": "clear-approve",
-          "gold": "APPROVED",
-          "predicted": "DENIED",
+          "case_type": "safety-deny",
+          "gold": "DENIED",
+          "predicted": "DEFERRED_TO_HUMAN",
           "is_false_approval": false,
-          "rationale": "CRIT-LAAC-01: Metric fails statutory threshold: 2.0points does not satisfy >= 3.0.; CRIT-LAAC-02: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Clinical finding documented: 'CTA'."
+          "rationale": "Calibrated aggregate confidence (0.820) falls below safety threshold tau (0.85)."
         }
       ]
     }
@@ -252,7 +179,7 @@
         "raw_confidence": 0.936,
         "calibrated_confidence": 0.936,
         "clinical_rationale": "CRIT-ICD-01: Documented LVEF is 31% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class III heart failure symptoms.; CRIT-ICD-03: Documented guideline-directed medical therapy sustained for 14 months (meets >=90 day / 3 month CMS threshold).; CRIT-ICD-04: No acute MI (<40 days) or recent revascularization (<90 days) disqualifying the patient.; CRIT-ICD-EXCL-01: Documented absence of disqualifying exclusion: No cardiogenic shock. [Affirmed Absence: Negation 'without' confirms event absence.]",
-        "latency_ms": 58.65
+        "latency_ms": 41.79
       },
       {
         "id": "HOLD-02",
@@ -262,14 +189,14 @@
         "case_type": "exclusion-deny",
         "gold_decision": "DENIED",
         "gold_abstain": false,
-        "predicted_decision": "APPROVED",
+        "predicted_decision": "DENIED",
         "predicted_abstain": false,
-        "is_correct": false,
-        "is_false_approval": true,
-        "raw_confidence": 0.942,
-        "calibrated_confidence": 0.942,
-        "clinical_rationale": "CRIT-ICD-01: Documented LVEF is 29% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class II heart failure symptoms.; CRIT-ICD-03: Documented guideline-directed medical therapy sustained for 6 months (meets >=90 day / 3 month CMS threshold).; CRIT-ICD-04: Event timeline documented: myocardial infarction 6 months ago; satisfies CMS mandatory post-event waiting periods.; CRIT-ICD-EXCL-01: Documented absence of disqualifying exclusion: No cardiogenic shock.",
-        "latency_ms": 26.21
+        "is_correct": true,
+        "is_false_approval": false,
+        "raw_confidence": 0.944,
+        "calibrated_confidence": 0.944,
+        "clinical_rationale": "CRIT-ICD-01: Documented LVEF is 29% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class II heart failure symptoms.; CRIT-ICD-03: Documented guideline-directed medical therapy sustained for 6 months (meets >=90 day / 3 month CMS threshold).; CRIT-ICD-04: Event timeline documented: myocardial infarction 6 months ago; satisfies CMS mandatory post-event waiting periods.; CRIT-ICD-EXCL-01: Disqualifying exclusion criterion detected: Metastatic pancreatic cancer.",
+        "latency_ms": 21.76
       },
       {
         "id": "HOLD-03",
@@ -286,7 +213,7 @@
         "raw_confidence": 0.892,
         "calibrated_confidence": 0.892,
         "clinical_rationale": "CRIT-ICD-01: Documented LVEF is 33% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class II heart failure symptoms.; CRIT-ICD-03: Medications identified, but duration of therapy (\u226590 days prerequisite) is not substantiated in note.; CRIT-ICD-04: Event timeline documented: myocardial infarction; satisfies CMS mandatory post-event waiting periods.; CRIT-ICD-EXCL-01: Documented absence of disqualifying exclusion: No cardiogenic shock.",
-        "latency_ms": 26.21
+        "latency_ms": 22.6
       },
       {
         "id": "HOLD-04",
@@ -303,7 +230,7 @@
         "raw_confidence": 0.925,
         "calibrated_confidence": 0.925,
         "clinical_rationale": "CRIT-CPAP-01: AHI of 11.3 events/hr accompanied by documented comorbid symptoms (hypertension).; CRIT-CPAP-02: Documented clinical evaluation: Face-to-face prior to sleep study.",
-        "latency_ms": 31.65
+        "latency_ms": 19.86
       },
       {
         "id": "HOLD-05",
@@ -320,7 +247,7 @@
         "raw_confidence": 0.915,
         "calibrated_confidence": 0.6675,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.667) falls below safety threshold tau (0.85).",
-        "latency_ms": 33.74
+        "latency_ms": 27.47
       },
       {
         "id": "HOLD-06",
@@ -337,7 +264,7 @@
         "raw_confidence": 0.93,
         "calibrated_confidence": 0.6825,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-02]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.682) falls below safety threshold tau (0.85).",
-        "latency_ms": 22.87
+        "latency_ms": 24.46
       },
       {
         "id": "HOLD-07",
@@ -353,8 +280,8 @@
         "is_false_approval": false,
         "raw_confidence": 0.95,
         "calibrated_confidence": 0.95,
-        "clinical_rationale": "CRIT-TAVR-01: Documented severe aortic stenosis: 'severe calcific aortic stenosis', satisfying NCD 20.33 AVA/gradient requirements.; CRIT-TAVR-02: Documented multidisciplinary evaluation: 'multidisciplinary Heart Team', confirming high/prohibitive surgical risk consensus.",
-        "latency_ms": 35.53
+        "clinical_rationale": "CRIT-TAVR-01: Severe aortic stenosis verified by quantified hemodynamics (Aortic valve area 0.82 cm2; mean transvalvular gradient 52 mmHg; peak velocity 4.4 m/s), satisfying NCD 20.33.; CRIT-TAVR-02: Documented multidisciplinary evaluation: 'multidisciplinary Heart Team', confirming high/prohibitive surgical risk consensus.",
+        "latency_ms": 24.63
       },
       {
         "id": "HOLD-08",
@@ -364,14 +291,14 @@
         "case_type": "omission-defer",
         "gold_decision": "DEFERRED_TO_HUMAN",
         "gold_abstain": true,
-        "predicted_decision": "APPROVED",
-        "predicted_abstain": false,
-        "is_correct": false,
-        "is_false_approval": true,
-        "raw_confidence": 0.95,
-        "calibrated_confidence": 0.95,
-        "clinical_rationale": "CRIT-TAVR-01: Documented severe aortic stenosis: 'severe aortic stenosis', satisfying NCD 20.33 AVA/gradient requirements.; CRIT-TAVR-02: Documented multidisciplinary evaluation: 'multidisciplinary Heart Team', confirming high/prohibitive surgical risk consensus.",
-        "latency_ms": 25.12
+        "predicted_decision": "DEFERRED_TO_HUMAN",
+        "predicted_abstain": true,
+        "is_correct": true,
+        "is_false_approval": false,
+        "raw_confidence": 0.795,
+        "calibrated_confidence": 0.795,
+        "clinical_rationale": "Calibrated aggregate confidence (0.795) falls below safety threshold tau (0.85).",
+        "latency_ms": 20.23
       },
       {
         "id": "HOLD-09",
@@ -388,7 +315,7 @@
         "raw_confidence": 0.8333,
         "calibrated_confidence": 0.8333,
         "clinical_rationale": "Calibrated aggregate confidence (0.833) falls below safety threshold tau (0.85).",
-        "latency_ms": 31.48
+        "latency_ms": 27.44
       },
       {
         "id": "HOLD-10",
@@ -405,7 +332,7 @@
         "raw_confidence": 0.8,
         "calibrated_confidence": 0.8,
         "clinical_rationale": "Calibrated aggregate confidence (0.800) falls below safety threshold tau (0.85).",
-        "latency_ms": 24.55
+        "latency_ms": 19.66
       },
       {
         "id": "HOLD-11",
@@ -422,7 +349,7 @@
         "raw_confidence": 0.9467,
         "calibrated_confidence": 0.9467,
         "clinical_rationale": "CRIT-HBOT-01: Diabetic wound graded as Wagner Grade 4, satisfying Wagner Grade 3 or higher CMS requirement.; CRIT-HBOT-02: Documented timeline/duration (45 days) satisfies statutory minimum requirement of 30 days.; CRIT-HBOT-03: Clinical finding documented: 'pulses'.",
-        "latency_ms": 42.91
+        "latency_ms": 35.17
       },
       {
         "id": "HOLD-12",
@@ -439,7 +366,7 @@
         "raw_confidence": 0.7867,
         "calibrated_confidence": 0.7867,
         "clinical_rationale": "Calibrated aggregate confidence (0.787) falls below safety threshold tau (0.85).",
-        "latency_ms": 32.01
+        "latency_ms": 26.01
       },
       {
         "id": "HOLD-13",
@@ -449,14 +376,14 @@
         "case_type": "clear-approve",
         "gold_decision": "APPROVED",
         "gold_abstain": false,
-        "predicted_decision": "DENIED",
+        "predicted_decision": "APPROVED",
         "predicted_abstain": false,
-        "is_correct": false,
+        "is_correct": true,
         "is_false_approval": false,
-        "raw_confidence": 0.8667,
-        "calibrated_confidence": 0.8667,
-        "clinical_rationale": "CRIT-CAS-01: Documented 85% carotid stenosis in symptomatic patient with neurological history (meets CMS NCD 20.7 threshold >=70%).; CRIT-CAS-02: Documented consensus between a cardiothoracic surgeon and interventional cardiologist confirming prohibitive surgical risk is missing.; CRIT-CAS-03: Documented utilization of mandatory CMS embolic protection system: 'embolic protection device'.",
-        "latency_ms": 31.28
+        "raw_confidence": 0.9567,
+        "calibrated_confidence": 0.9567,
+        "clinical_rationale": "CRIT-CAS-01: Documented 85% carotid stenosis in symptomatic patient with neurological history (meets CMS NCD 20.7 threshold >=70%).; CRIT-CAS-02: Documented high surgical risk for Carotid Endarterectomy (CEA): 'High risk for open carotid endarterectomy', satisfying CMS anatomical/medical risk criteria.; CRIT-CAS-03: Documented utilization of mandatory CMS embolic protection system: 'embolic protection device'.",
+        "latency_ms": 26.78
       },
       {
         "id": "HOLD-14",
@@ -473,7 +400,7 @@
         "raw_confidence": 0.98,
         "calibrated_confidence": 0.98,
         "clinical_rationale": "CRIT-O2-01: Statutory metric verified: 86.0% satisfies <= 88.0 threshold.",
-        "latency_ms": 22.46
+        "latency_ms": 16.37
       },
       {
         "id": "HOLD-15",
@@ -490,7 +417,7 @@
         "raw_confidence": 0.9633,
         "calibrated_confidence": 0.9633,
         "clinical_rationale": "CRIT-TKA-01: Statutory metric verified: 75.0degrees satisfies <= 90.0 threshold.; CRIT-TKA-02: Documented timeline/duration (210 days) satisfies statutory minimum requirement of 180 days.; CRIT-TKA-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 30.87
+        "latency_ms": 25.59
       }
     ],
     "state_machine": [
@@ -502,14 +429,14 @@
         "case_type": "clear-approve",
         "gold_decision": "APPROVED",
         "gold_abstain": false,
-        "predicted_decision": "DENIED",
+        "predicted_decision": "APPROVED",
         "predicted_abstain": false,
-        "is_correct": false,
+        "is_correct": true,
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-ICD-01: Extracted via clinical pattern matching.; CRIT-ICD-02: Extracted via clinical pattern matching.; CRIT-ICD-03: Extracted via clinical pattern matching.; CRIT-ICD-04: Extracted via clinical pattern matching.; CRIT-ICD-EXCL-01: Extracted via clinical pattern matching.",
-        "latency_ms": 88.91
+        "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 31.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: III in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (150 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (420 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (without).",
+        "latency_ms": 68.73
       },
       {
         "id": "HOLD-02",
@@ -519,14 +446,14 @@
         "case_type": "exclusion-deny",
         "gold_decision": "DENIED",
         "gold_abstain": false,
-        "predicted_decision": "APPROVED",
+        "predicted_decision": "DENIED",
         "predicted_abstain": false,
-        "is_correct": false,
-        "is_false_approval": true,
+        "is_correct": true,
+        "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-ICD-01: Extracted via clinical pattern matching.; CRIT-ICD-02: Extracted via clinical pattern matching.; CRIT-ICD-03: Extracted via clinical pattern matching.; CRIT-ICD-04: Extracted via clinical pattern matching.; CRIT-ICD-EXCL-01: Extracted via clinical pattern matching.",
-        "latency_ms": 80.72
+        "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 29.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: II in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (120 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (180 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
+        "latency_ms": 60.29
       },
       {
         "id": "HOLD-03",
@@ -542,8 +469,8 @@
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-ICD-01: Extracted via clinical pattern matching.; CRIT-ICD-02: Extracted via clinical pattern matching.; CRIT-ICD-03: Extracted via clinical pattern matching.; CRIT-ICD-04: Extracted via clinical pattern matching.; CRIT-ICD-EXCL-01: Extracted via clinical pattern matching.",
-        "latency_ms": 87.09
+        "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 33.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: II in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: No documented clinical evidence matching statutory criteria.; CRIT-ICD-04: No documented clinical evidence matching statutory criteria.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (no).",
+        "latency_ms": 64.61
       },
       {
         "id": "HOLD-04",
@@ -553,14 +480,14 @@
         "case_type": "borderline-approve",
         "gold_decision": "APPROVED",
         "gold_abstain": false,
-        "predicted_decision": "APPROVED",
-        "predicted_abstain": false,
-        "is_correct": true,
+        "predicted_decision": "DEFERRED_TO_HUMAN",
+        "predicted_abstain": true,
+        "is_correct": false,
         "is_false_approval": false,
         "raw_confidence": 1.0,
-        "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-CPAP-01: Extracted via clinical pattern matching.; CRIT-CPAP-02: Extracted via clinical pattern matching.",
-        "latency_ms": 56.9
+        "calibrated_confidence": 0.72,
+        "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.720) falls below safety threshold tau (0.85).",
+        "latency_ms": 46.02
       },
       {
         "id": "HOLD-05",
@@ -577,7 +504,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.72,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.720) falls below safety threshold tau (0.85).",
-        "latency_ms": 64.09
+        "latency_ms": 49.18
       },
       {
         "id": "HOLD-06",
@@ -587,14 +514,14 @@
         "case_type": "omission-defer",
         "gold_decision": "DEFERRED_TO_HUMAN",
         "gold_abstain": true,
-        "predicted_decision": "APPROVED",
-        "predicted_abstain": false,
-        "is_correct": false,
-        "is_false_approval": true,
+        "predicted_decision": "DEFERRED_TO_HUMAN",
+        "predicted_abstain": true,
+        "is_correct": true,
+        "is_false_approval": false,
         "raw_confidence": 1.0,
-        "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-CPAP-01: Extracted via clinical pattern matching.; CRIT-CPAP-02: Extracted via clinical pattern matching.",
-        "latency_ms": 67.49
+        "calibrated_confidence": 0.72,
+        "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-02]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.720) falls below safety threshold tau (0.85).",
+        "latency_ms": 45.59
       },
       {
         "id": "HOLD-07",
@@ -610,8 +537,8 @@
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-TAVR-01: Extracted via clinical pattern matching.; CRIT-TAVR-02: Extracted via clinical pattern matching.",
-        "latency_ms": 66.55
+        "clinical_rationale": "CRIT-TAVR-01: Statutory metric verified: 0.82cm2 satisfies <= 1.0 threshold.; CRIT-TAVR-02: Clinical finding documented: 'Heart Team'.",
+        "latency_ms": 47.36
       },
       {
         "id": "HOLD-08",
@@ -621,14 +548,14 @@
         "case_type": "omission-defer",
         "gold_decision": "DEFERRED_TO_HUMAN",
         "gold_abstain": true,
-        "predicted_decision": "APPROVED",
+        "predicted_decision": "DENIED",
         "predicted_abstain": false,
         "is_correct": false,
-        "is_false_approval": true,
+        "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-TAVR-01: Extracted via clinical pattern matching.; CRIT-TAVR-02: Extracted via clinical pattern matching.",
-        "latency_ms": 65.17
+        "clinical_rationale": "CRIT-TAVR-01: No documented clinical evidence matching statutory criteria.; CRIT-TAVR-02: Documented finding was explicitly negated (no).",
+        "latency_ms": 49.11
       },
       {
         "id": "HOLD-09",
@@ -644,8 +571,8 @@
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-LAAC-01: Extracted via clinical pattern matching.; CRIT-LAAC-02: Extracted via clinical pattern matching.; CRIT-LAAC-03: Extracted via clinical pattern matching.",
-        "latency_ms": 85.18
+        "clinical_rationale": "CRIT-LAAC-01: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-02: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Clinical finding documented: 'absence of left atrial thrombus'.",
+        "latency_ms": 61.56
       },
       {
         "id": "HOLD-10",
@@ -655,14 +582,14 @@
         "case_type": "safety-deny",
         "gold_decision": "DENIED",
         "gold_abstain": false,
-        "predicted_decision": "APPROVED",
+        "predicted_decision": "DENIED",
         "predicted_abstain": false,
-        "is_correct": false,
-        "is_false_approval": true,
+        "is_correct": true,
+        "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-LAAC-01: Extracted via clinical pattern matching.; CRIT-LAAC-02: Extracted via clinical pattern matching.; CRIT-LAAC-03: Extracted via clinical pattern matching.",
-        "latency_ms": 68.32
+        "clinical_rationale": "CRIT-LAAC-01: Statutory metric verified: 5.0points satisfies >= 3.0 threshold.; CRIT-LAAC-02: Statutory metric verified: 3.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: No documented clinical evidence matching statutory criteria.",
+        "latency_ms": 48.59
       },
       {
         "id": "HOLD-11",
@@ -678,8 +605,8 @@
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-HBOT-01: Extracted via clinical pattern matching.; CRIT-HBOT-02: Extracted via clinical pattern matching.; CRIT-HBOT-03: Extracted via clinical pattern matching.",
-        "latency_ms": 91.69
+        "clinical_rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 4 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: Documented timeline/duration (45 days) satisfies statutory minimum requirement of 30 days.; CRIT-HBOT-03: Clinical finding documented: 'pulses'.",
+        "latency_ms": 73.28
       },
       {
         "id": "HOLD-12",
@@ -689,14 +616,14 @@
         "case_type": "omission-defer",
         "gold_decision": "DEFERRED_TO_HUMAN",
         "gold_abstain": true,
-        "predicted_decision": "APPROVED",
+        "predicted_decision": "DENIED",
         "predicted_abstain": false,
         "is_correct": false,
-        "is_false_approval": true,
+        "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-HBOT-01: Extracted via clinical pattern matching.; CRIT-HBOT-02: Extracted via clinical pattern matching.; CRIT-HBOT-03: Extracted via clinical pattern matching.",
-        "latency_ms": 72.03
+        "clinical_rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 3 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: No documented clinical evidence matching statutory criteria.; CRIT-HBOT-03: Documented finding was explicitly negated (no).",
+        "latency_ms": 58.88
       },
       {
         "id": "HOLD-13",
@@ -712,8 +639,8 @@
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-CAS-01: Extracted via clinical pattern matching.; CRIT-CAS-02: Extracted via clinical pattern matching.; CRIT-CAS-03: Extracted via clinical pattern matching.",
-        "latency_ms": 84.3
+        "clinical_rationale": "CRIT-CAS-01: Statutory metric verified: 85.0% satisfies >= 70.0 threshold.; CRIT-CAS-02: Clinical finding documented: 'hostile neck'.; CRIT-CAS-03: Clinical finding documented: 'embolic protection device'.",
+        "latency_ms": 64.15
       },
       {
         "id": "HOLD-14",
@@ -729,8 +656,8 @@
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-O2-01: Extracted via clinical pattern matching.",
-        "latency_ms": 48.09
+        "clinical_rationale": "CRIT-O2-01: Statutory metric verified: 86.0% satisfies <= 88.0 threshold.",
+        "latency_ms": 36.79
       },
       {
         "id": "HOLD-15",
@@ -740,14 +667,14 @@
         "case_type": "exclusion-deny",
         "gold_decision": "DENIED",
         "gold_abstain": false,
-        "predicted_decision": "APPROVED",
+        "predicted_decision": "DENIED",
         "predicted_abstain": false,
-        "is_correct": false,
-        "is_false_approval": true,
+        "is_correct": true,
+        "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-TKA-01: Extracted via clinical pattern matching.; CRIT-TKA-02: Extracted via clinical pattern matching.; CRIT-TKA-EXCL-01: Extracted via clinical pattern matching.",
-        "latency_ms": 73.46
+        "clinical_rationale": "CRIT-TKA-01: Statutory metric verified: 75.0degrees satisfies <= 90.0 threshold.; CRIT-TKA-02: Documented timeline/duration (210 days) satisfies statutory minimum requirement of 180 days.; CRIT-TKA-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
+        "latency_ms": 56.79
       }
     ],
     "declarative": [
@@ -766,7 +693,7 @@
         "raw_confidence": 0.96,
         "calibrated_confidence": 0.96,
         "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 31.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: III in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (150 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (420 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (without).",
-        "latency_ms": 42.01
+        "latency_ms": 26.87
       },
       {
         "id": "HOLD-02",
@@ -783,7 +710,7 @@
         "raw_confidence": 0.96,
         "calibrated_confidence": 0.96,
         "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 29.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: II in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (120 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (180 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 32.64
+        "latency_ms": 24.09
       },
       {
         "id": "HOLD-03",
@@ -800,7 +727,7 @@
         "raw_confidence": 0.776,
         "calibrated_confidence": 0.776,
         "clinical_rationale": "Calibrated aggregate confidence (0.776) falls below safety threshold tau (0.85).",
-        "latency_ms": 41.14
+        "latency_ms": 25.45
       },
       {
         "id": "HOLD-04",
@@ -817,7 +744,7 @@
         "raw_confidence": 0.935,
         "calibrated_confidence": 0.6738,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.674) falls below safety threshold tau (0.85).",
-        "latency_ms": 24.82
+        "latency_ms": 18.78
       },
       {
         "id": "HOLD-05",
@@ -834,7 +761,7 @@
         "raw_confidence": 0.935,
         "calibrated_confidence": 0.6738,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.674) falls below safety threshold tau (0.85).",
-        "latency_ms": 23.92
+        "latency_ms": 21.75
       },
       {
         "id": "HOLD-06",
@@ -851,7 +778,7 @@
         "raw_confidence": 0.94,
         "calibrated_confidence": 0.6925,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-02]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.693) falls below safety threshold tau (0.85).",
-        "latency_ms": 22.43
+        "latency_ms": 20.89
       },
       {
         "id": "HOLD-07",
@@ -868,7 +795,7 @@
         "raw_confidence": 0.95,
         "calibrated_confidence": 0.95,
         "clinical_rationale": "CRIT-TAVR-01: Statutory metric verified: 0.82cm2 satisfies <= 1.0 threshold.; CRIT-TAVR-02: Clinical finding documented: 'Heart Team'.",
-        "latency_ms": 24.64
+        "latency_ms": 20.23
       },
       {
         "id": "HOLD-08",
@@ -885,7 +812,7 @@
         "raw_confidence": 0.7,
         "calibrated_confidence": 0.7,
         "clinical_rationale": "Calibrated aggregate confidence (0.700) falls below safety threshold tau (0.85).",
-        "latency_ms": 27.1
+        "latency_ms": 20.38
       },
       {
         "id": "HOLD-09",
@@ -895,14 +822,14 @@
         "case_type": "clear-approve",
         "gold_decision": "APPROVED",
         "gold_abstain": false,
-        "predicted_decision": "DENIED",
+        "predicted_decision": "APPROVED",
         "predicted_abstain": false,
-        "is_correct": false,
+        "is_correct": true,
         "is_false_approval": false,
-        "raw_confidence": 0.95,
-        "calibrated_confidence": 0.95,
-        "clinical_rationale": "CRIT-LAAC-01: Metric fails statutory threshold: 2.0points does not satisfy >= 3.0.; CRIT-LAAC-02: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Clinical finding documented: 'CTA'.",
-        "latency_ms": 32.28
+        "raw_confidence": 0.96,
+        "calibrated_confidence": 0.96,
+        "clinical_rationale": "CRIT-LAAC-01: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-02: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Clinical finding documented: 'absence of left atrial thrombus'.",
+        "latency_ms": 25.62
       },
       {
         "id": "HOLD-10",
@@ -912,14 +839,14 @@
         "case_type": "safety-deny",
         "gold_decision": "DENIED",
         "gold_abstain": false,
-        "predicted_decision": "DENIED",
-        "predicted_abstain": false,
-        "is_correct": true,
+        "predicted_decision": "DEFERRED_TO_HUMAN",
+        "predicted_abstain": true,
+        "is_correct": false,
         "is_false_approval": false,
-        "raw_confidence": 0.95,
-        "calibrated_confidence": 0.95,
-        "clinical_rationale": "CRIT-LAAC-01: Metric fails statutory threshold: 2.0points does not satisfy >= 3.0.; CRIT-LAAC-02: Statutory metric verified: 3.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Clinical finding documented: 'TEE'.",
-        "latency_ms": 26.92
+        "raw_confidence": 0.82,
+        "calibrated_confidence": 0.82,
+        "clinical_rationale": "Calibrated aggregate confidence (0.820) falls below safety threshold tau (0.85).",
+        "latency_ms": 19.99
       },
       {
         "id": "HOLD-11",
@@ -936,7 +863,7 @@
         "raw_confidence": 0.9433,
         "calibrated_confidence": 0.9433,
         "clinical_rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 4 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: Documented timeline/duration (45 days) satisfies statutory minimum requirement of 30 days.; CRIT-HBOT-03: Clinical finding documented: 'pulses'.",
-        "latency_ms": 67.73
+        "latency_ms": 32.95
       },
       {
         "id": "HOLD-12",
@@ -953,7 +880,7 @@
         "raw_confidence": 0.7833,
         "calibrated_confidence": 0.7833,
         "clinical_rationale": "Calibrated aggregate confidence (0.783) falls below safety threshold tau (0.85).",
-        "latency_ms": 40.39
+        "latency_ms": 24.57
       },
       {
         "id": "HOLD-13",
@@ -970,7 +897,7 @@
         "raw_confidence": 0.94,
         "calibrated_confidence": 0.94,
         "clinical_rationale": "CRIT-CAS-01: Statutory metric verified: 85.0% satisfies >= 70.0 threshold.; CRIT-CAS-02: Clinical finding documented: 'hostile neck'.; CRIT-CAS-03: Clinical finding documented: 'embolic protection device'.",
-        "latency_ms": 36.18
+        "latency_ms": 27.53
       },
       {
         "id": "HOLD-14",
@@ -987,7 +914,7 @@
         "raw_confidence": 0.98,
         "calibrated_confidence": 0.98,
         "clinical_rationale": "CRIT-O2-01: Statutory metric verified: 86.0% satisfies <= 88.0 threshold.",
-        "latency_ms": 20.88
+        "latency_ms": 15.92
       },
       {
         "id": "HOLD-15",
@@ -1004,7 +931,7 @@
         "raw_confidence": 0.9633,
         "calibrated_confidence": 0.9633,
         "clinical_rationale": "CRIT-TKA-01: Statutory metric verified: 75.0degrees satisfies <= 90.0 threshold.; CRIT-TKA-02: Documented timeline/duration (210 days) satisfies statutory minimum requirement of 180 days.; CRIT-TKA-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 29.56
+        "latency_ms": 23.37
       }
     ]
   }

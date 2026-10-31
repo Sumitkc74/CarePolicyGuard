@@ -445,11 +445,17 @@ async def adjudicate_record(
     db: Session = Depends(get_db)
 ):
     """
-    Executes the 4-Agent Verification Pipeline on incoming patient EHR documentation:
-    1. Agent 1: Policy Retrieval
-    2. Agent 2: Criteria Evaluation
+    Executes the Clinical Verification Pipeline on incoming patient EHR documentation:
+    1. Agent 1: Policy Retrieval (BM25 + Dense Semantic Hybrid RRF)
+    2. Agent 2: Criteria Evaluation (Deterministic, Declarative, or State-Machine)
     3. Agent 3: Adversarial Verification (Programmatic string offsets & omission audits)
     4. Agent 4: Calibrated Abstention Gate (tau = 0.85)
+
+    Execution Modes:
+    - `deterministic` (Default): High-speed procedural adjudication. Recommended for production.
+    - `declarative`: Zero-code schema-driven policy evaluation. Recommended for production.
+    - `state_machine` [EXPERIMENTAL]: Multi-pass extractor with explicit state transitions. Labeled EXPERIMENTAL due to lower precision on unconstrained clinical phrasing.
+
     Computes cryptographic SHA-256 chain-of-custody seal and logs audit trail.
     """
     pipeline = MultiAgentVerificationPipeline(db=db)
