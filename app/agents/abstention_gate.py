@@ -46,7 +46,29 @@ class CalibratedAbstentionGate:
         raw_aggregate_conf = round(sum(raw_confs) / len(raw_confs), 4)
         calibrated_aggregate_conf = round(sum(calibrated_confs) / len(calibrated_confs), 4)
 
-        # 2. Check adversarial triggers
+        # 2. Exclusion Precedence: Grounded disqualifying exclusions short-circuit to DENIED.
+        # Clinically and statutorily, if a disqualifying condition is verified and grounded in the chart
+        # (e.g. active cardiogenic shock), coverage is autonomously denied rather than deferred
+        # for missing elective documentation on other inclusion criteria.
+        grounded_met_exclusions = [
+            crit for crit, audit in zip(criteria_assessments, audit_results)
+            if crit.is_exclusion
+            and crit.status == DeterminationStatus.MET
+            and audit.grounding_status
+            and not audit.hallucination_flag
+        ]
+        if grounded_met_exclusions:
+            excl_names = ", ".join([e.name or e.criterion_code for e in grounded_met_exclusions])
+            return (
+                AdjudicationDecision.DENIED,
+                False,
+                raw_aggregate_conf,
+                calibrated_aggregate_conf,
+                None,
+                f"Autonomous Denial: Patient satisfies disqualifying exclusion criterion: {excl_names}."
+            )
+
+        # 3. Check adversarial triggers
         abstention_triggers: List[str] = []
         action_items: List[str] = []
 

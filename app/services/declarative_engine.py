@@ -165,9 +165,44 @@ class DeclarativePolicyEngine:
         if criterion.criterion_type == CriterionType.NUMERIC_THRESHOLD:
             # Handle numeric cutoffs (LVEF <= 35%, AHI >= 15, etc.)
             search_terms = criterion.entity_names or [criterion.name]
-            metric_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*([%a-zA-Z/]*)'
-            m = re.search(metric_pattern, ehr_text)
-            if m:
+            target_unit = (criterion.target_unit or "").strip()
+            
+            # Identify core metric abbreviations/names (e.g., AHI, LVEF, AVA, PaO2, SpO2)
+            core_metrics = [t for t in search_terms if len(t) <= 6 or t.isupper() or t.lower() in ("apnea-hypopnea index", "ejection fraction", "aortic valve area")]
+            metric_candidates = []
+
+            # Strategy 1: Look for matches anchored to the specific target_unit (events/hr, %, mmHg, cm2)
+            if target_unit:
+                escaped_unit = re.escape(target_unit)
+                unit_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n\.]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*' + escaped_unit
+                for m_cand in re.finditer(unit_pattern, ehr_text):
+                    metric_candidates.append(m_cand)
+
+            # Strategy 2: Look for core metric tokens directly adjacent to values, skipping date patterns
+            if not metric_candidates and core_metrics:
+                core_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in core_metrics) + r')[^\d\n\.]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))'
+                for m_cand in re.finditer(core_pattern, ehr_text):
+                    end_pos = m_cand.end(2)
+                    after_text = ehr_text[end_pos:end_pos+5]
+                    before_text = ehr_text[max(0, m_cand.start(2)-5):m_cand.start(2)]
+                    if re.match(r'^\s*[/-]\s*\d', after_text) or re.search(r'\d\s*[/-]\s*$', before_text):
+                        continue
+                    metric_candidates.append(m_cand)
+
+            # Strategy 3: General fallback search across all synonyms, filtering out date-shaped numbers
+            if not metric_candidates:
+                fallback_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n]*?([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*([%a-zA-Z/]*)'
+                for m_cand in re.finditer(fallback_pattern, ehr_text):
+                    end_pos = m_cand.end(2)
+                    after_text = ehr_text[end_pos:end_pos+5]
+                    before_text = ehr_text[max(0, m_cand.start(2)-5):m_cand.start(2)]
+                    if re.match(r'^\s*[/-]\s*\d', after_text) or re.search(r'\d\s*[/-]\s*$', before_text):
+                        continue
+                    metric_candidates.append(m_cand)
+                    break
+
+            if metric_candidates:
+                m = metric_candidates[0]
                 raw_num_str = m.group(2)
                 try:
                     val = float(raw_num_str)
@@ -242,13 +277,27 @@ class DeclarativePolicyEngine:
         elif criterion.criterion_type == CriterionType.TEMPORAL_DURATION:
             search_terms = list(criterion.entity_names) + ["therapy", "treatment", "management", "care", "gdmt"] if criterion.entity_names else ["therapy", "treatment", "management", "care", "gdmt"]
             terms_alt = '|'.join(re.escape(t) for t in search_terms)
-            m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months)', ehr_text)
+            min_req = criterion.min_duration_days or 90
+            
+            # Pass 1: Stated therapy duration (e.g., "for 35 days", "35 days of wound therapy")
+            m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months|years)', ehr_text)
             if not m:
-                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months)\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
+                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months|years)\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
+            
+            # Pass 2: Relative-date elapsed / waiting period (e.g., "13 days post-acute MI", "3 years ago", "14 months ago", "13 days elapsed")
+            if not m:
+                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months|years)\s*(?:post[- ]|after|since|elapsed|ago)\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
+            if not m:
+                m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(\d+)\s*(days|weeks|months|years)\s*(?:post[- ]|after|since|elapsed|ago)\b', ehr_text)
+            if not m:
+                m = re.search(r'(?i)\b(?:currently\s+)?(\d+)\s*(days|weeks|months|years)\s*(?:post[- ]acute|post[- ]|elapsed)\b', ehr_text)
+            if not m:
+                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months|years)\s*elapsed\b', ehr_text)
+
             if m:
                 count = int(m.group(1))
                 unit_str = m.group(2).lower()
-                days = count * 30 if "month" in unit_str else (count * 7 if "week" in unit_str else count)
+                days = count * 365 if "year" in unit_str else (count * 30 if "month" in unit_str else (count * 7 if "week" in unit_str else count))
                 s_idx = m.start()
                 e_idx = m.end()
 
@@ -262,15 +311,14 @@ class DeclarativePolicyEngine:
                         confidence=0.96
                     )
                     spans.append(span_obj)
-                    min_req = criterion.min_duration_days or 90
                     if days >= min_req:
                         status = DeterminationStatus.MET
                         raw_confidence = 0.96
-                        rationale = f"Documented therapy duration ({days} days) satisfies statutory minimum of {min_req} days."
+                        rationale = f"Documented timeline/duration ({days} days) satisfies statutory minimum requirement of {min_req} days."
                     else:
                         status = DeterminationStatus.NOT_MET
-                        raw_confidence = 0.92
-                        rationale = f"Insufficient therapy duration ({days} days < statutory requirement of {min_req} days)."
+                        raw_confidence = 0.95
+                        rationale = f"Statutory waiting period unmet: documented timeline ({days} days) does not satisfy requirement of {min_req} days."
 
         elif criterion.criterion_type == CriterionType.EXCLUSION_SYMPTOM:
             search_terms = criterion.entity_names or [criterion.name]

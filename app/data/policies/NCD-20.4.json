@@ -54,11 +54,13 @@
       "name": "Cardiomyopathy Etiology & Revascularization Timeline",
       "description": "Ischemic cardiomyopathy >= 40 days post-MI or >= 90 days post-CABG/PCI, or non-ischemic dilated cardiomyopathy >= 9 months.",
       "clinical_intent": "Enforce mandatory myocardial stunning recovery period",
-      "criterion_type": "FINDING_PRESENCE",
-      "entity_names": ["ischemic cardiomyopathy", "non-ischemic", "dilated cardiomyopathy", "post-mi", "cabg", "pci", "prior mi"],
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": ["post-mi", "myocardial infarction", "post-acute mi", "stemi", "mi", "revascularization", "cabg", "pci", "ischemic cardiomyopathy", "non-ischemic", "dilated cardiomyopathy"],
+      "operator": ">=",
+      "min_duration_days": 40,
       "is_exclusion": false,
       "negation_sensitive": true,
-      "required_temporal_window": "Past medical history",
+      "required_temporal_window": ">= 40 days post-MI or >= 90 days post-CABG/PCI",
       "min_score": 0.80
     },
     {
