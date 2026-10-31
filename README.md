@@ -429,7 +429,7 @@ Open your browser to:
 
 ## Academic & Regulatory References (Peer-Reviewed Literature Post-2022)
 
-The multi-agent architecture, evidence-grounded verification, uncertainty quantification, and clinical governance protocols are evaluated against 15 peer-reviewed publications published strictly after 2022 across **IEEE**, **ACM Digital Library**, and leading clinical AI venues:
+The multi-agent architecture, evidence-grounded verification, uncertainty quantification, and clinical governance protocols are evaluated against 14 peer-reviewed publications published strictly after 2022 (across **IEEE**, **ACM Digital Library**, and leading clinical AI venues) alongside the CMS federal regulatory standard:
 
 ### A. IEEE Literature (Clinical Multi-Agent Systems, RAG, & Uncertainty)
 1. **Nguyen, P., Wu, Y., Anderson, B., Mayorga-Carlin, M., Sorkin, J., Yesha, Y., & Lal, B.** (2026). *"Clinical reasoning-augmented prediction: Agentic verification improves reliability of VTE detection from radiology reports."* **2026 IEEE International Conference on Digital Health (ICDH)**, pp. 1–11. [DOI: 10.1109/ICDH72779.2026.00010](https://doi.org/10.1109/ICDH72779.2026.00010).
@@ -445,7 +445,7 @@ The multi-agent architecture, evidence-grounded verification, uncertainty quanti
 9. **Pandey, H. G., Amod, A., & Kumar, S.** (2024). *"Advancing Healthcare Automation: Multi-Agent System for Medical Necessity Justification."* **Proceedings of the 23rd Workshop on Biomedical Natural Language Processing (BioNLP 2024)**, Association for Computational Linguistics (ACL), pp. 39–49. [DOI: 10.18653/v1/2024.bionlp-1.4](https://doi.org/10.18653/v1/2024.bionlp-1.4).
 10. **Gao, T., Yen, H., Yu, J., & Chen, D.** (2023). *"Enabling Large Language Models to Generate Text with Citations via Post-Hoc Grounding."* **Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing (EMNLP 2023)**, pp. 608–624. [DOI: 10.18653/v1/2023.emnlp-main.40](https://doi.org/10.18653/v1/2023.emnlp-main.40).
 
-### C. Clinical Medicine, Electronic Health Records, & Regulatory Mandates
+### C. Clinical Medicine, Electronic Health Records, & Federal Regulation
 11. **Zakka, C., Shad, R., Chaurasia, A., et al.** (2024). *"Almanac — Retrieval-Augmented Language Models for Clinical Medicine."* **NEJM AI**, 1(2), AIoa2300068. [DOI: 10.1056/AIoa2300068](https://doi.org/10.1056/AIoa2300068).
 12. **Wornow, M., Xu, Y., Thapa, R., Patel, B., Steinberg, E., Fleming, S., Pfeffer, M. A., Fries, J., & Shah, N. H.** (2023). *"The shaky foundations of large language models and foundation models for electronic health records."* **npj Digital Medicine**, 6, Article 135. [DOI: 10.1038/s41746-023-00879-8](https://doi.org/10.1038/s41746-023-00879-8).
 13. **Banerji, C. R. S., Chakraborti, T., Harbron, C., & MacArthur, B. D.** (2023). *"Clinical AI tools must convey predictive uncertainty for each individual patient."* **Nature Medicine**, 29(12), pp. 2996–2998. [DOI: 10.1038/s41591-023-02562-7](https://doi.org/10.1038/s41591-023-02562-7).
