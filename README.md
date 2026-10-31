@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
-[![Tests Passing](https://img.shields.io/badge/Tests-109%2F109%20Passing-brightgreen.svg)](tests/)
+[![Tests Passing](https://img.shields.io/badge/Tests-110%2F110%20Passing-brightgreen.svg)](tests/)
 [![HIPAA Compliance](https://img.shields.io/badge/HIPAA-Safe%20Harbor%20%26%20Minimum%20Necessary-success.svg)](#security-privacy--hipaa-minimum-necessary)
 [![Audit Grounding](https://img.shields.io/badge/Evidence%20Faithfulness-100%25%20Character--Anchored-informational.svg)](#4-agent-pipeline-specification)
 
@@ -23,7 +23,7 @@ By replacing monolithic, hallucination-prone Large Language Models with a **veri
 6. [Security, Privacy & HIPAA Minimum Necessary (RBAC)](#security-privacy--hipaa-minimum-necessary)
 7. [Enterprise Clinical Automation Features](#enterprise-clinical-automation-features)
 8. [Architectural Decisions & Technology Stack Justifications](#architectural-decisions--technology-stack-justifications)
-9. [Head-to-Head Comparison with the Two Closest Present Systems](#head-to-head-comparison-with-the-two-closest-present-systems)
+9. [Architectural Positioning Relative to Prior Authorization Paradigms](#architectural-positioning-relative-to-prior-authorization-paradigms)
 10. [Directory Structure](#directory-structure)
 11. [Quickstart & Installation](#quickstart--installation)
 12. [Demo User Credentials](#demo-user-credentials)
@@ -129,15 +129,18 @@ CarePolicyGuard is structured as an enterprise-grade **3-Tier Clinical Architect
 
 The benchmark framework compares CarePolicyGuard against three conventional clinical AI architectures across 40 discrete evaluations. For full technical proofs and mathematical formulas, see [BENCHMARKS.md](file:///e:/Class/GitHub/CarePolicyGuard/BENCHMARKS.md).
 
-| Metric | Config A: Zero-Shot Baseline | Config B: Single-Pass RAG | Config C: Multi-Agent Extraction | Config D: CarePolicyGuard (Proposed) |
+| Metric | Config A: Zero-Shot Baseline (Simulated) | Config B: Single-Pass RAG (Ablation) | Config C: Multi-Agent (No Gate Ablation) | Config D: CarePolicyGuard (Proposed) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Architecture** | Monolithic Prompt (LLM) | Vector DB Context Injection | Micro-Agent Extraction | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
-| **Decision Concordance (Accuracy)** | 60.0% | 70.0% | 80.0% | **100.0%** |
+| **Architecture** | Unverified Monolithic Prompt | Retrieval without Slice Auditing | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
+| **Decision Concordance (Accuracy)** | 60.0% | 80.0% | 80.0% | **100.0%** |
 | **Evidence Faithfulness (% Grounded)** | 45.0% | 68.0% | 87.5% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.313 (Severe Overconf.) | 0.198 (Moderate Mismatch) | 0.209 (Fair) | **0.064 (Optimal Calibration)** |
-| **Safe Abstention Rate** | 0.0% | 0.0% | 0.0% | **20.0% (Safe Deferral)** |
-| **Overall Clinical Safety Score** | **0.185** | **0.382** | **0.554** | **0.936** |
-| **Average Latency** | 185 ms | 240 ms | 310 ms | 360 ms |
+| **Expected Calibration Error (ECE)** | 0.313 (Severe Overconf.) | 0.163 (Miscalibrated) | 0.164 (Moderate) | **0.076 (Calibrated on Covered Decisions)** |
+| **Safe Abstention Rate** | 0.0% | 0.0% | 0.0% | **20.0% (Safe Deferral on Ambiguity)** |
+| **Overall Clinical Safety Score** | **0.185** | **0.455** | **0.585** | **0.924** |
+| **Average Latency (In-Process)** | ~18 ms | ~6 ms | ~10 ms | **~8–16 ms** |
+
+> [!NOTE]
+> **Ablation Provenance & Methodology:** Config D, Config C, and Config B are executed dynamically via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py). Config A represents an unverified single-prompt baseline simulation illustrating the lower-bound failure mode of ungrounded prompting. Criteria confidence scores reflect deterministic clinical evidence sufficiency weights evaluated against the $\tau = 0.85$ abstention threshold; ECE is measured across the accepted adjudication subset in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
 
 $$\text{Clinical Safety Score} = \text{Accuracy} \times \text{Faithfulness} \times (1 - \text{ECE})$$
 
@@ -261,7 +264,7 @@ flowchart TD
 ### 3. RAG Strategy: Hybrid Lexical-Semantic Grounding vs. Pure Dense Vector RAG
 * **What was chosen:** **Hybrid Lexical-Semantic Retrieval** combined with **Exact Character-Level Slice Verification** (`RawEHR[start_char : end_char] == ExtractedQuote`).
 * **Why it is better than Pure Dense Vector RAG (e.g., Pinecone/LangChain semantic search):**
-  * *Citation Drift:* Standard dense embedding RAG displays a **30%–35% citation drift rate**, frequently fabricating source quotes or attributing clinical findings to the wrong encounter date (*Gao et al., ACL 2023; Zakka et al., NEJM AI 2024*).
+  * *Citation Drift:* Standard dense embedding RAG pipelines frequently exhibit citation drift and attribution errors, quoting text approximately rather than with character-exact verification or referencing mismatched clinical encounters (*Gao et al., EMNLP 2023; Zakka et al., NEJM AI 2024*).
   * *Loss of Medical Nuance:* Dense semantic embeddings conflate clinically distinct conditions that share similar semantic vectors (e.g. confusing Heart Failure with Preserved Ejection Fraction [HFpEF] with Reduced Ejection Fraction [HFrEF], or missing documented drug contraindications like ACEi angioedema) (*Zakka et al., NEJM AI 2024*).
   * CarePolicyGuard’s character-slice validator guarantees **100% Evidence Faithfulness (0% drift)**.
 
@@ -281,28 +284,19 @@ flowchart TD
 
 ---
 
-## Head-to-Head Comparison with the Two Closest Present Systems
+## Architectural Positioning Relative to Prior Authorization Paradigms
 
-To provide a focused, rigorous benchmark, CarePolicyGuard is compared directly against the **two closest real-world systems** built for AI prior authorization:
+To contextualize CarePolicyGuard within healthcare technology, the table below outlines the core architectural trade-offs across current utilization review and prior authorization approaches:
 
-1. **[Cohere Health](https://coherehealth.com)**: The commercial enterprise market leader (\$200M+ funding, Humana partnership, MCG Health integration).
-2. **[basys.ai](https://basys.ai)**: The leading agentic AI peer (Harvard alumni-founded, CMS AI Challenge winner, multi-agent utilization management).
-
-### Focused Statistical & Operational Benchmark Matrix
-
-| Statistical / Performance Metric | 1. **Cohere Health** *(Enterprise Rules/ML Platform)* | 2. **basys.ai** *(Enterprise Agentic AI Platform)* | 3. **CarePolicyGuard** *(Neuro-Symbolic Multi-Agent)* | Validation / Literature Provenance |
-| :--- | :---: | :---: | :---: | :--- |
-| **Median Decision Latency (Turnaround Time)** | **1 to 3 business days** *(Instant for greenlit paths; days for complex)* | **Minutes to hours** *(Batched medical director copilot queue)* | **1.8 seconds** *(Deterministic end-to-end multi-agent execution)* | AMA Prior Auth Survey (2023); Cohere Health (2024) |
-| **First-Pass Clinical Concordance (Accuracy)** | **~85.0%** *(High on standard MCG pathways; degrades on open text)* | **~88.0% – 91.0%** *(Reported on agentic chart reviews)* | **100.0%** *(Empirically validated on statutory CMS criteria)* | Industry Literature (MCG / CAQH 2023-2024) |
-| **Evidence Faithfulness (Hallucination Rate)** | **N/A** *(Uses structured dropdowns; does not slice raw notes)* | **~85.0% – 90.0%** *(Proprietary XAI; occasional semantic drift)* | **100.0%** *(**0.0% drift**; byte-for-byte character offset assertion)* | Gao et al., *ACL* (2023); Zakka et al., *NEJM AI* (2024) |
-| **Expected Calibration Error ($\text{ECE}$)** | **Unreported / Non-probabilistic** *(Deterministic rule-tree)* | **~0.150 – 0.180** *(Standard foundation model miscalibration)* | **0.064** *(Near-optimal; recalibrated via adversarial critic)* | Banerji et al., *Nature Med* (2023); Nori et al., *NEJM AI* (2023) |
-| **Temporal Logic Error Rate** *(e.g. 40d wait)* | **< 5%** *(Relies on staff typing dates into portal fields)* | **~15% – 20%** *(LLM date reasoning vulnerabilities)* | **0.0%** *(Programmatic Python $\Delta t$ date execution)* | Wornow et al., *npj Digit Med* (2023) |
-| **Safe Abstention Rate ($\tau \ge 0.85$)** | **0.0%** *(Diverts all non-approved files into slow human nurse queues)* | Checkpoint-based *(Ad-hoc human-in-the-loop review)* | **20.0%** *(Mathematical selective classification threshold)* | Zając et al., *ACM TOCHI* (2023); Geifman & El-Yaniv, *NeurIPS* |
-| **Denial Overturn Rate on Appeal** | **~15% – 20%** on contested denials | **~10% – 15%** on payer-reviewed denials | **< 2%** *(Character-grounded statutory CMS evidence)* | KFF Prior Authorization Audit (2023); California DMHC |
-| **Staff Labor Time per Submission** | **5 – 15 minutes** *(Navigating web portal drop-downs)* | **3 – 8 minutes** *(Reviewing copilot extraction)* | **< 10 seconds** *(Instant unstructured EHR note ingestion)* | CAQH Index on Administrative Burden (2023) |
-| **Administrative Cost per Authorization** | **\$15 – \$35** per submission | **\$8 – \$20** per copilot review | **< \$0.05** in automated compute | CAQH Index (2023); AMA Survey (2023) |
-| **Audit Verifiability (CMS-0057-F)** | **0% Cryptographic** *(Proprietary cloud database)* | **0% Cryptographic** *(Enterprise cloud audit logs)* | **100% Cryptographic** *(SHA-256 tamper-evident hash chaining)* | Federal Register 89 FR 8758 (CMS-0057-F Mandate) |
-| **Automated Peer-to-Peer Appeal Generation** | **0.0%** *(Payer platform; does not defend providers)* | **0.0%** *(Payer platform; issues denial notices only)* | **100.0%** *(Synthesizes CARC/RARC codes & statutory briefs)* | CMS-0057-F Provider Appeal Standards |
+| Architectural Dimension | 1. Traditional Payer Portals | 2. Generative LLM Copilots | 3. CarePolicyGuard (Proposed Framework) | Clinical & Regulatory Rationale |
+| :--- | :--- | :--- | :--- | :--- |
+| **Underlying Approach** | Manual web forms & deterministic rule-trees | Conversational LLM summaries & copilot queues | Neuro-symbolic multi-agent verification pipeline | Combines generative extraction with deterministic verification |
+| **Evidence Grounding** | Manual staff data entry (dropdowns, check boxes) | Free-text generation with approximate citations | Exact character-slice matching (`ehr[start:end] == span`) | Guarantees auditability under CMS-0057-F mandate |
+| **Offset Drift & Hallucination Defense** | Not applicable (structured forms) | Susceptible to semantic drift and source misattribution | Programmatic offset verification and drift healing | Eliminates false citations in appeal and audit packets |
+| **Temporal Waiting Period Verification** | Manual staff date calculation | Frequently vulnerable to multi-event date reasoning errors | Programmatic calendar-day delta verification (Delta t) | Enforces statutory recovery periods (e.g. 40d post-MI) |
+| **Uncertainty & Deferral Mechanism** | Binary approval/denial or slow human review queues | Uncalibrated generation; forces plausible-sounding text | Calibrated selective abstention gate (tau = 0.85) | Safely routes ambiguous edge cases to clinical auditors |
+| **Chain-of-Custody Governance** | Proprietary cloud database audit logs | Cloud conversation history (non-deterministic) | Immutable SHA-256 cryptographic hash seal | Provides legally admissible tamper-evident audit records |
+| **Interoperability Standards** | Proprietary portal formats, fax, and PDFs | Unstructured text notes or summary bullet points | HL7 Da Vinci FHIR R4 JSON bundles (CRD/DTR/PAS) | Complies with federal FHIR electronic prior auth mandates |
 
 ---
 

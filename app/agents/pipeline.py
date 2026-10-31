@@ -492,6 +492,85 @@ class MultiAgentVerificationPipeline:
                     "min_score": 0.85
                 }
             ]
+        elif policy_id == "NCD-220.13":
+            return [
+                {
+                    "criterion_code": "CRIT-LAAC-01",
+                    "name": "Non-Valvular Atrial Fibrillation with High Stroke Risk (CHA2DS2-VASc >= 3)",
+                    "description": "Patient has documented non-valvular atrial fibrillation with high thromboembolic stroke risk (CHA2DS2-VASc score >= 2 for men, >= 3 for women).",
+                    "clinical_intent": "Establish indication for non-pharmacologic stroke prevention",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Documented in clinical record",
+                    "keywords": ["atrial fibrillation", "afib", "cha2ds2-vasc", "stroke risk", "chads"],
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-LAAC-02",
+                    "name": "Contraindication to Long-Term Oral Anticoagulation (HAS-BLED >= 3)",
+                    "description": "Documented formal contraindication or clinical rationale demonstrating patient is unsuitable for long-term oral anticoagulation (e.g. major recurrent bleed, HAS-BLED >= 3).",
+                    "clinical_intent": "Establish necessity of device-based closure over medical anticoagulation",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Documented medical history",
+                    "keywords": ["has-bled", "bleeding risk", "hemorrhage", "contraindication", "anticoagulation", "eliquis", "bleed"],
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-LAAC-03",
+                    "name": "Pre-Procedural Imaging Verifying Absence of LA Thrombus",
+                    "description": "TEE or CTA within 48 hours of procedure confirming absence of intracardiac or left atrial appendage thrombus and appropriate ostial anatomy.",
+                    "clinical_intent": "Ensure safety of percutaneous transseptal puncture and closure deployment",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Within pre-procedure timeframe",
+                    "keywords": ["tee", "transesophageal", "thrombus", "left atrial", "watchman", "ostium", "anatomy"],
+                    "min_score": 0.80
+                }
+            ]
+        elif policy_id == "NCD-20.33":
+            return [
+                {
+                    "criterion_code": "CRIT-TEER-01",
+                    "name": "Severe Valvular Disease (Severe MR or Severe Symptomatic AS)",
+                    "description": "Grade 3+ or Grade 4+ mitral regurgitation, or severe aortic stenosis (AVA <= 1.0 cm2, mean gradient >= 40 mmHg).",
+                    "clinical_intent": "Establish hemodynamic severity for transcatheter valve intervention",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Diagnostic echocardiography within 6 months",
+                    "keywords": ["mitral regurgitation", "aortic stenosis", "ava", "mean gradient", "echocardiogram"],
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-TEER-02",
+                    "name": "Multidisciplinary Heart Team Consensus on High Surgical Risk",
+                    "description": "Evaluation by multidisciplinary Heart Team (cardiac surgeon and interventional cardiologist) establishing high or prohibitive surgical risk (STS PROM >= 8%).",
+                    "clinical_intent": "Validate surgical risk consensus for transcatheter approach",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Pre-procedure consultation",
+                    "keywords": ["heart team", "multidisciplinary", "sts score", "high surgical risk", "prohibitive risk"],
+                    "min_score": 0.85
+                }
+            ]
+        elif policy_id == "NCD-20.29":
+            return [
+                {
+                    "criterion_code": "CRIT-HBOT-01",
+                    "name": "Severe Diabetic Foot Ulcer (Wagner Grade III or Higher)",
+                    "description": "Deep diabetic lower extremity wound with bone involvement, osteomyelitis, or gangrene classified as Wagner Grade III, IV, or V.",
+                    "clinical_intent": "Confirm anatomical severity warranting systemic hyperbaric therapy",
+                    "is_exclusion": False,
+                    "required_temporal_window": "Documented at clinical examination",
+                    "keywords": ["wagner", "wagner grade 3", "osteomyelitis", "deep ulcer", "diabetic foot ulcer", "gangrene"],
+                    "min_score": 0.85
+                },
+                {
+                    "criterion_code": "CRIT-HBOT-02",
+                    "name": "Failure of Standard Conservative Wound Therapy (>= 30 Days)",
+                    "description": "Documented lack of significant healing following at least 30 consecutive days of conventional wound therapy (debridement, offloading, moist dressing).",
+                    "clinical_intent": "Ensure standard medical care exhausted prior to hyperbaric referral",
+                    "is_exclusion": False,
+                    "required_temporal_window": ">= 30 days conservative care",
+                    "keywords": ["30 days", "conservative therapy", "offloading", "standard care", "debridement"],
+                    "min_score": 0.80
+                }
+            ]
         else:
             return [
                 {

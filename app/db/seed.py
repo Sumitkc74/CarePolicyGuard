@@ -394,4 +394,21 @@ def seed_database(db: Session):
                 )
                 db.add(crit)
             db.commit()
+        else:
+            existing_codes = {c.criterion_code for c in pol.criteria}
+            for c_info in p_info["criteria"]:
+                if c_info["criterion_code"] not in existing_codes:
+                    crit = PolicyCriterion(
+                        policy_id=pol.id,
+                        criterion_code=c_info["criterion_code"],
+                        name=c_info["name"],
+                        description=c_info["description"],
+                        clinical_intent=c_info["clinical_intent"],
+                        is_exclusion=c_info["is_exclusion"],
+                        required_temporal_window=c_info["required_temporal_window"],
+                        keywords=c_info["keywords"],
+                        min_score=c_info["min_score"]
+                    )
+                    db.add(crit)
+            db.commit()
 

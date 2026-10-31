@@ -65,3 +65,21 @@ def test_benchmark_vignettes_cross_policy_coverage():
     assert "BENCH-02" in abstain_ids  # Inadequate GDMT duration
     assert "BENCH-05" in abstain_ids  # Borderline AHI without comorbidity
 
+def test_empirical_harness_standalone_execution():
+    """Verifies that EmpiricalResearchHarness executes standalone across all experimental conditions."""
+    from app.agents.empirical_harness import EmpiricalResearchHarness
+    from app.agents.benchmark_engine import BENCHMARK_VIGNETTES
+
+    harness = EmpiricalResearchHarness()
+    response = harness.run_full_benchmark(BENCHMARK_VIGNETTES)
+    assert response.dataset_size == 10
+    assert len(response.configs) == 4
+
+    config_names = [c.config_name for c in response.configs]
+    assert "Config A" in config_names
+    assert "Config B" in config_names
+    assert "Config C" in config_names
+    assert "Config D" in config_names
+
+    harness.close()
+
