@@ -1,0 +1,27 @@
+{
+  "policy_id": "NCD-240.2",
+  "title": "Home Use of Oxygen",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2021-09-27",
+  "category": "Pulmonology",
+  "description": "CMS coverage for long-term home oxygen therapy in chronic respiratory disease. Requires documented arterial blood gas PaO2 <= 55 mmHg or SaO2/SpO2 <= 88% at rest on room air.",
+  "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
+  "criteria": [
+    {
+      "criterion_code": "CRIT-O2-01",
+      "name": "Resting Hypoxemia (PaO2 <= 55 mmHg or SpO2 <= 88%)",
+      "description": "Arterial blood gas PaO2 <= 55 mmHg or pulse oximetry oxygen saturation (SpO2) <= 88% measured at rest on room air in a stable state.",
+      "clinical_intent": "Objective demonstration of severe chronic resting hypoxemia",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": ["PaO2", "SpO2", "oxygen saturation", "resting hypoxemia", "room air"],
+      "operator": "<=",
+      "threshold": 88.0,
+      "target_unit": "%",
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within 30 days of order",
+      "min_score": 0.85
+    }
+  ],
+  "statutory_waiting_periods": []
+}

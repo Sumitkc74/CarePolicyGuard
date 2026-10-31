@@ -1,0 +1,53 @@
+{
+  "policy_id": "LCD-TOTAL-KNEE-01",
+  "title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+  "jurisdiction": "Local Coverage Determination (LCD)",
+  "effective_date": "2024-01-01",
+  "category": "Orthopedic Surgery",
+  "description": "Coverage policy for elective total knee arthroplasty in adult patients with end-stage osteoarthritis. Requires documented range of motion flexion <= 90 degrees, failure of conservative therapy >= 180 days, and absence of active joint sepsis.",
+  "scope_note": "Benchmark reference policy demonstrating zero-code declarative policy ingestion; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
+  "criteria": [
+    {
+      "criterion_code": "CRIT-TKA-01",
+      "name": "Severe Flexion Limitation (<= 90 degrees)",
+      "description": "Physical exam documenting right or left knee range of motion with active flexion <= 90 degrees.",
+      "clinical_intent": "Demonstrate severe mechanical functional limitation",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": ["flexion", "knee flexion", "range of motion"],
+      "operator": "<=",
+      "threshold": 90.0,
+      "target_unit": "degrees",
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 3 months",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-TKA-02",
+      "name": "Failure of Conservative Therapy Duration",
+      "description": "Failure of non-surgical conservative therapy (physical therapy, NSAIDs, injections) for >= 180 days.",
+      "clinical_intent": "Conservative management prerequisite",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": ["conservative therapy", "conservative management", "physical therapy", "PT", "injections"],
+      "operator": ">=",
+      "min_duration_days": 180,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 180 days",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-TKA-EXCL-01",
+      "name": "Active Joint Infection Exclusion",
+      "description": "Patient must not have active septic arthritis or active systemic infection.",
+      "clinical_intent": "Surgical infection risk exclusion",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": ["septic arthritis", "active infection", "joint sepsis"],
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "min_score": 0.90
+    }
+  ],
+  "statutory_waiting_periods": []
+}

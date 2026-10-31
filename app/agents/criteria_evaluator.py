@@ -710,6 +710,17 @@ class CriteriaEvaluationAgent:
                 raw_confidence = 0.70
 
         # =========================================================================
+        # 5B. DECLARATIVE POLICY ENGINE DELEGATION
+        # =========================================================================
+        # If the criterion has declarative fields or matches an unseeded declarative policy,
+        # route evaluation directly through DeclarativePolicyEngine for zero-code policy execution.
+        elif "threshold" in criterion or "min_duration_days" in criterion or "ordinal_allowed" in criterion or ("criterion_type" in criterion and criterion["criterion_type"] != "FINDING_PRESENCE"):
+            from app.services.declarative_engine import DeclarativePolicyEngine
+            decl_crit = DeclarativePolicyEngine.compile_from_dict(criterion)
+            decl_assessment = DeclarativePolicyEngine.evaluate(decl_crit, ehr_text)
+            return decl_assessment
+
+        # =========================================================================
         # 6. GENERAL KEYWORD FALLBACK
         # =========================================================================
         else:

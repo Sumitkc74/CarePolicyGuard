@@ -154,6 +154,44 @@ class MultiAgentVerificationPipeline:
             state_transitions = [t.model_dump() for t in sm_engine.transitions]
             criteria_assessments = sm_res.get("criterion_assessments", [])
             verification_audits = sm_res.get("verification_audits", [])
+        elif execution_mode == "declarative":
+            # Declarative Adjudication Mode:
+            # Direct policy-as-data evaluation using DeclarativePolicyEngine, followed by Agent 3 & Agent 4
+            from app.services.declarative_engine import DeclarativePolicyEngine
+            criteria_assessments = []
+            for crit in criteria_defs:
+                decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
+                assessment = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
+                criteria_assessments.append(assessment)
+
+            # 4. Agent 3: Adversarial Verification
+            verification_audits = []
+            for assessment, crit_def in zip(criteria_assessments, criteria_defs):
+                audit_result = self.verifier_agent.audit_assessment(assessment, crit_def, sanitized_ehr)
+                verification_audits.append(audit_result)
+
+            # 4b. Autonomous Offset Drift Healing Feedback Loop
+            for assessment, audit in zip(criteria_assessments, verification_audits):
+                if audit.offset_drift_detected and not audit.hallucination_flag:
+                    for span in assessment.verified_spans:
+                        healed = self.verifier_agent.heal_offset_drift(span, sanitized_ehr)
+                        if healed:
+                            audit.offset_drift_detected = False
+                            audit.healed_offset_drift = True
+                            audit.grounding_status = True
+                            audit.calibrated_confidence = assessment.raw_confidence
+                            audit.audit_notes += " [AUTONOMOUSLY HEALED: Offset drift corrected to true text position.]"
+
+            # 5. Agent 4: Calibrated Abstention Gate
+            gate = CalibratedAbstentionGate(tau=gate_tau)
+            (
+                decision,
+                abstention_status,
+                raw_aggregate_conf,
+                calibrated_aggregate_conf,
+                abstention_reason,
+                clinician_action_notes
+            ) = gate.evaluate(criteria_assessments, verification_audits)
         else:
             # 3. Agent 2: Criteria Evaluation
             criteria_assessments = []

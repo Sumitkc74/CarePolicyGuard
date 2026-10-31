@@ -5,6 +5,7 @@
   "effective_date": "2015-10-01",
   "category": "Pulmonology / Durable Medical Equipment",
   "description": "Medicare local coverage determination for CPAP/APAP therapy in adult obstructive sleep apnea (OSA). Requires documented diagnostic polysomnography with AHI >= 15 events/hr or AHI 5-14 with documented comorbid hypertension, stroke, or excessive daytime sleepiness, and face-to-face clinical evaluation prior to sleep study.",
+  "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
     {
       "criterion_code": "CRIT-CPAP-01",
@@ -36,4 +37,3 @@
   ],
   "statutory_waiting_periods": []
 }
-

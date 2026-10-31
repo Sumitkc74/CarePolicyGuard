@@ -55,7 +55,7 @@ Rather than comparing against proprietary commercial black-box platforms without
 | **Uncertainty Handling** | Forced manual routing | Forced binary classification | **Calibrated Abstention Gate ($\tau = 0.85$)** |
 | **Audit Verification** | Payer database logs | Cloud audit logs | **SHA-256 Tamper-Evident Hash Chaining** |
 | **Provider Defense** | None (Payer-side denial) | Unstructured summary | **Statutory Briefs & CARC/RARC Mapping** |
-| **Policy Ingestion** | Hardcoded code branches | Fine-tuning / RAG Prompts | **Declarative JSON Policy-as-Data Store** |
+| **Policy Ingestion & Authoring** | Hardcoded code branches | Fine-tuning / RAG Prompts | **Declarative Schema Ingestion & Dual Evaluation Pathways** |
 
 ---
 
@@ -153,9 +153,9 @@ To evaluate rule stability against clinical variation, [app/services/perturbatio
 - **Adversarial Evidence Omission**: Stripping required diagnostic metrics (e.g., removing LVEF, AHI, AVA, or Wagner grade) across all medical specialties to verify that the calibrated abstention gate safely defers or denies rather than hallucinating approvals.
 
 ### 7.3 Methodological Limitations
-1. **Benchmark Scope**: The 10 vignettes represent synthetic clinical edge cases curated from CMS statutory manuals, ACC/AHA guidelines, and MAC/RAC denial patterns. They provide a reproducible unit-testing verification harness for coverage logic rather than an external multi-center clinical validation study on real-world EHR warehouses (e.g., MIMIC-IV).
+1. **Benchmark Scope & Policy Curations**: The 10 vignettes represent synthetic clinical edge cases curated from CMS statutory manuals, ACC/AHA guidelines, and MAC/RAC denial patterns. Similarly, the JSON definitions in [app/data/policies/](file:///e:/Class/GitHub/CarePolicyGuard/app/data/policies/) represent curated benchmark criterion sets (targeting primary statutory indications, exclusions, and waiting periods) rather than exhaustive legal transcriptions of full multi-page CMS coverage manuals.
 2. **Confidence Metric Interpretation**: Confidence scores are deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ gate threshold rather than posterior probabilities from a trained neural network. ECE is computed across the covered adjudication subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
-3. **Policy-as-Data Architecture**: The framework includes declarative policy definitions stored in [app/data/policies/](file:///e:/Class/GitHub/CarePolicyGuard/app/data/policies/) compiled dynamically by [app/services/declarative_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/declarative_engine.py), enabling zero-code policy authoring without editing underlying evaluation algorithms.
+3. **Policy-as-Data Execution Pathways**: The framework implements a declarative schema ([app/schemas/declarative_policy.py](file:///e:/Class/GitHub/CarePolicyGuard/app/schemas/declarative_policy.py)) and engine ([app/services/declarative_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/declarative_engine.py)). Ingestion and criteria fallback are fully declarative; evaluation currently operates via dual pathways: specialized procedural adjudication for the established CMS benchmark cases, alongside a live declarative mode (`execution_mode="declarative"`) and automatic fallback routing for zero-code custom policies (e.g. `LCD-TOTAL-KNEE-01`).
 
 ---
 

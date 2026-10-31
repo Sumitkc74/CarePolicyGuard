@@ -140,3 +140,63 @@ def test_policy_retriever_without_db_loads_declarative_criteria():
     assert "CRIT-ICD-02" in codes
     assert "CRIT-ICD-03" in codes
 
+
+from app.agents.pipeline import MultiAgentVerificationPipeline
+from app.schemas.contracts import AdjudicationDecision
+
+def test_declarative_policy_live_pipeline_adjudication():
+    """
+    Verifies that a zero-code declarative policy (LCD-TOTAL-KNEE-01) defined purely as JSON
+    executes end-to-end through the live multi-agent verification pipeline in both
+    deterministic and declarative execution modes without any hardcoded evaluator code.
+    """
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    qualifying_note = """
+    ORTHOPEDIC SURGERY CLINIC
+    Patient with severe tricompartmental knee osteoarthritis.
+    Physical Exam: Right knee range of motion limited to flexion 80 degrees.
+    Conservative management: Failed physical therapy and joint injections for 7 months (210 days).
+    Labs/Infection: No active infection, no septic arthritis.
+    Plan: Proceed with Right Total Knee Arthroplasty.
+    """
+
+    # 1. Test live deterministic mode routing through declarative engine
+    result_det = pipeline.adjudicate_sync(
+        patient_id="PT-TKA-01",
+        policy_id="LCD-TOTAL-KNEE-01",
+        ehr_narrative=qualifying_note,
+        execution_mode="deterministic",
+        save_record=False
+    )
+    assert result_det.adjudication_decision == AdjudicationDecision.APPROVED
+    assert len(result_det.criterion_assessments) == 3
+    assert result_det.calibrated_aggregate_confidence >= 0.85
+
+    # 2. Test live declarative mode
+    result_decl = pipeline.adjudicate_sync(
+        patient_id="PT-TKA-01",
+        policy_id="LCD-TOTAL-KNEE-01",
+        ehr_narrative=qualifying_note,
+        execution_mode="declarative",
+        save_record=False
+    )
+    assert result_decl.adjudication_decision == AdjudicationDecision.APPROVED
+    assert len(result_decl.criterion_assessments) == 3
+    assert result_decl.calibrated_aggregate_confidence >= 0.85
+
+    # 3. Test non-qualifying case (flexion 110 degrees > 90) produces DENIED
+    non_qualifying_note = """
+    ORTHOPEDIC NOTE
+    Patient with mild right knee pain.
+    Physical Exam: Right knee flexion 110 degrees.
+    Conservative management for 30 days.
+    """
+    result_denied = pipeline.adjudicate_sync(
+        patient_id="PT-TKA-02",
+        policy_id="LCD-TOTAL-KNEE-01",
+        ehr_narrative=non_qualifying_note,
+        execution_mode="deterministic",
+        save_record=False
+    )
+    assert result_denied.adjudication_decision == AdjudicationDecision.DENIED

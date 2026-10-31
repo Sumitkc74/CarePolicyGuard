@@ -1,39 +1,57 @@
 {
   "policy_id": "NCD-20.29",
-  "title": "Hyperbaric Oxygen Therapy (HBOT) for Diabetic Wounds",
-  "jurisdiction": "National Coverage Determination (NCD)",
+  "title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+  "jurisdiction": "National Coverage Determination (CMS)",
   "effective_date": "2017-04-03",
-  "category": "Wound Care / Hyperbaric Medicine",
-  "description": "CMS coverage for systemic hyperbaric oxygen therapy in diabetic lower extremity wounds. Requires documented type 1 or 2 diabetes, Wagner Grade III or deeper ulceration (deep tissue, tendon, bone involvement, or osteomyelitis), and failure of >= 30 days of standard conservative wound therapy.",
+  "category": "Wound Care",
+  "description": "CMS coverage for systemic hyperbaric oxygen therapy (HBOT) in patients with diabetic wounds of the lower extremities. Requires Wagner Grade 3 or higher, failure of at least 30 days of standard conservative wound therapy, and vascular evaluation.",
+  "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
     {
       "criterion_code": "CRIT-HBOT-01",
-      "name": "Diabetic Foot Ulcer Severity (Wagner Grade >= 3)",
-      "description": "Documented lower extremity diabetic wound classified as Wagner Grade 3 or deeper (involving deep tissue, capsule, tendon, or osteomyelitis).",
-      "clinical_intent": "Mandatory tissue depth and severity threshold",
+      "name": "Severe Diabetic Wound Wagner Grade 3 or Higher",
+      "description": "Documented deep diabetic foot ulceration with involvement of tendon, capsule, or bone (Wagner Grade 3: deep ulcer with abscess or osteomyelitis; Grade 4: gangrene of forefoot).",
+      "clinical_intent": "Establish severe deep tissue infection or bone involvement",
       "criterion_type": "ORDINAL_RANK",
-      "entity_names": ["Wagner Grade", "wagner", "osteomyelitis", "probe-to-bone"],
-      "ordinal_allowed": ["3", "4", "5", "III", "IV", "V", "GRADE 3", "GRADE 4", "GRADE 5"],
+      "entity_names": ["wagner grade", "wagner", "diabetic foot ulcer", "ulcer"],
+      "ordinal_allowed": ["3", "4", "5", "III", "IV", "V", "STAGE III", "STAGE IV"],
       "is_exclusion": false,
       "negation_sensitive": true,
-      "required_temporal_window": "At current clinical evaluation",
+      "required_temporal_window": "At current wound evaluation",
       "min_score": 0.85
     },
     {
       "criterion_code": "CRIT-HBOT-02",
-      "name": "Failure of Standard Conservative Wound Therapy >= 30 Days",
-      "description": "Documented trial of standard conservative wound management for >= 30 days without significant healing.",
-      "clinical_intent": "Ensure medical conservative therapy before hyperbaric intervention",
+      "name": "Failure of >= 30 Days Standard Conservative Wound Therapy",
+      "description": "Patient must have completed at least 30 continuous days of standard wound care (including sharp debridement, moist dressings, and offloading) without measurable signs of healing.",
+      "clinical_intent": "Verify exhaustion of standard wound care prior to high-cost HBOT",
       "criterion_type": "TEMPORAL_DURATION",
-      "entity_names": ["standard care", "conservative therapy", "wound care", "debridement", "offloading"],
+      "entity_names": ["standard wound care", "conservative therapy", "wound care", "debridement", "dressings", "offloading"],
       "operator": ">=",
       "min_duration_days": 30,
       "is_exclusion": false,
       "negation_sensitive": true,
-      "required_temporal_window": ">= 30 days conservative care",
-      "min_score": 0.80
+      "required_temporal_window": ">= 30 days prior to HBOT initiation",
+      "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-HBOT-03",
+      "name": "Lower Extremity Vascular Assessment",
+      "description": "Documentation of peripheral perfusion assessment (palpable dorsalis pedis / posterior tibial pulses, or ABI >= 0.7) to rule out untreatable ischemic non-viability.",
+      "clinical_intent": "Confirm sufficient vascular perfusion for tissue viability",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": ["vascular", "pulses", "palpable", "abi", "perfusion", "dorsalis pedis", "posterior tibial"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 60 days",
+      "min_score": 0.75
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [
+    {
+      "event_type": "CONSERVATIVE_WOUND_CARE",
+      "minimum_duration_days": 30,
+      "statutory_citation": "CMS NCD 20.29 Section B.1"
+    }
+  ]
 }
-
