@@ -33,10 +33,10 @@ The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times
 
 | Architectural Configuration | Description / Paradigm | Adjudication Accuracy | Evidence Faithfulness | Expected Calibration Error (ECE) | Safe Abstention Rate | False Approval Rate (RAC Risk) | Overall Clinical Safety Score | Latency |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Config A: Zero-Shot Baseline (Real Local Model)** | Qwen2.5-3B-Instruct via Ollama (Zero-Shot Direct Call) | 80.0% | 61.5% | 0.120 | 0.0% (No Deferral) | **0.0%** (0/4) | **0.432** | ~12,250 ms |
-| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 70.0% | 68.0% | 0.217 (Miscalibrated) | 0.0% | **50.0%** (2/4) | **0.373** | ~1 ms |
-| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.119 (Moderate) | 0.0% | **0.0%** (0/4) | **0.617** | ~1 ms |
-| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.066 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.934** | **~28 ms** |
+| **Config A: Zero-Shot Baseline (Real Local Model)** | Qwen2.5-3B-Instruct via Ollama (Zero-Shot Direct Call) | 80.0% | 61.5% | 0.120 | 0.0% (No Deferral) | **0.0%** (0/4) | **0.433** | ~12,256 ms |
+| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 70.0% | 68.0% | 0.220 (Miscalibrated) | 0.0% | **50.0%** (2/4) | **0.371** | ~1 ms |
+| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.122 (Moderate) | 0.0% | **0.0%** (0/4) | **0.615** | ~1 ms |
+| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.065 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.935** | **~34 ms** |
 
 > [!NOTE]
 > **Methodological Provenance & Integrity:** Config D, Config C, and Config B are executed dynamically in the live test harness. Config A is executed live against a local open model (`qwen2.5:3b` via Ollama at `http://localhost:11434/v1/chat/completions`, temperature 0.0, zero clinical egress) with raw runs persisted to [app/data/benchmarks/baseline_llm_raw_runs.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/baseline_llm_raw_runs.json). Config B is an architectural ablation of Config C that programmatically disables `TimelineAnalyzerService` and bypasses statutory temporal waiting periods (e.g. approving premature 21-day GDMT and <40d post-MI). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$). Config D achieves 100% adherence and 0% False Approval Rate via calibrated selective abstention. Faithfulness for Config A is measured via exact character-slice matching in the patient record; Config D enforces live character-slice verification. Confidence metrics represent deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ threshold; ECE is measured over the accepted adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
@@ -104,10 +104,10 @@ Expected Calibration Error (ECE) measures how reliably a system's confidence pre
 
 $$\text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|$$
 
-- **Config A (ECE = 0.106)**: Moderately miscalibrated on ungrounded zero-shot neural generation; lacks selective classification to defer on documentation gaps.
-- **Config B (ECE = 0.217)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
-- **Config C (ECE = 0.119)**: Multi-agent criteria mapping improves accuracy but forces decisions on underspecified cases.
-- **Config D (ECE = 0.066)**: Calibrated via adversarial verification and safe deferral of sub-threshold cases ($\tau = 0.85$), evaluated across the covered decision subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
+- **Config A (ECE = 0.120)**: Moderately miscalibrated on ungrounded zero-shot neural generation; lacks selective classification to defer on documentation gaps.
+- **Config B (ECE = 0.220)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
+- **Config C (ECE = 0.122)**: Multi-agent criteria mapping improves accuracy but forces decisions on underspecified cases.
+- **Config D (ECE = 0.065)**: Calibrated via adversarial verification and safe deferral of sub-threshold cases ($\tau = 0.85$), evaluated across the covered decision subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
 
 ---
 
