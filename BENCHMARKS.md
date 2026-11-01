@@ -33,7 +33,7 @@ The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times
 
 | Architectural Configuration | Description / Paradigm | Adjudication Accuracy | Evidence Faithfulness | Expected Calibration Error (ECE) | Safe Abstention Rate | False Approval Rate (RAC Risk) | Overall Clinical Safety Score | Latency |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Config A: Zero-Shot Baseline (Real Local Model)** | Qwen2.5-3B-Instruct via Ollama (Zero-Shot Direct Call) | 80.0% | 56.0% | 0.106 | 0.0% (No Deferral) | **0.0%** (0/4) | **0.400** | ~31,200 ms |
+| **Config A: Zero-Shot Baseline (Real Local Model)** | Qwen2.5-3B-Instruct via Ollama (Zero-Shot Direct Call) | 80.0% | 61.5% | 0.120 | 0.0% (No Deferral) | **0.0%** (0/4) | **0.432** | ~12,250 ms |
 | **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 70.0% | 68.0% | 0.217 (Miscalibrated) | 0.0% | **50.0%** (2/4) | **0.373** | ~1 ms |
 | **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.119 (Moderate) | 0.0% | **0.0%** (0/4) | **0.617** | ~1 ms |
 | **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.066 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.934** | **~28 ms** |

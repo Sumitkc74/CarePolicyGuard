@@ -45,7 +45,7 @@ class EmpiricalResearchHarness:
         self.pipeline = MultiAgentVerificationPipeline(db=self.db)
         self._target_llm_url = None
         self._target_llm_headers = {"Content-Type": "application/json"}
-        self._target_llm_model = settings.LLM_MODEL
+        self._target_llm_model = "none (simulated)"
         self._resolve_llm_endpoint()
 
     def close(self):
@@ -304,7 +304,7 @@ class EmpiricalResearchHarness:
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": temperature,
-                "max_tokens": 350,
+                "max_tokens": 600,
                 "response_format": {"type": "json_object"}
             }
             try:
@@ -363,8 +363,8 @@ class EmpiricalResearchHarness:
             "grounded_spans": grounded_spans,
             "is_fully_grounded": is_fully_grounded,
             "faithfulness_ratio": faithfulness_ratio,
-            "endpoint_used": target_url or "none (offline simulation)",
-            "model_name": model_name,
+            "endpoint_used": target_url if call_success else "none (offline simulation)",
+            "model_name": model_name if call_success else "none (simulated)",
             "temperature": temperature,
             "raw_response": raw_response_text or str(parsed_json)
         }
@@ -391,19 +391,21 @@ class EmpiricalResearchHarness:
             faithfulness_scores.append(1.0 if res["is_fully_grounded"] else 0.45)
             raw_run_records.append({**res, "latency_ms": round(lat, 2)})
 
-        # Save raw benchmark outputs for research reproducibility
-        try:
-            out_dir = Path(__file__).resolve().parent.parent / "data" / "benchmarks"
-            out_dir.mkdir(parents=True, exist_ok=True)
-            out_file = out_dir / "baseline_llm_raw_runs.json"
-            with open(out_file, "w", encoding="utf-8") as f:
-                json.dump({
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "total_vignettes": len(vignettes),
-                    "runs": raw_run_records
-                }, f, indent=2)
-        except Exception:
-            pass
+        # Save raw benchmark outputs for research auditability ONLY on live model execution
+        is_real_run = any(r.get("endpoint_used", "").startswith("http") for r in raw_run_records)
+        if is_real_run and "PYTEST_CURRENT_TEST" not in os.environ:
+            try:
+                out_dir = Path(__file__).resolve().parent.parent / "data" / "benchmarks"
+                out_dir.mkdir(parents=True, exist_ok=True)
+                out_file = out_dir / "baseline_llm_raw_runs.json"
+                with open(out_file, "w", encoding="utf-8") as f:
+                    json.dump({
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "total_vignettes": len(vignettes),
+                        "runs": raw_run_records
+                    }, f, indent=2)
+            except Exception:
+                pass
 
         acc = [decisions[i] == vignettes[i]["gold_decision"] for i in range(len(vignettes))]
         ece = self.calculate_ece(confidences, acc, num_bins=5)

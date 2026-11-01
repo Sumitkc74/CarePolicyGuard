@@ -1,176 +1,239 @@
 {
-  "timestamp": "2026-11-01T02:18:37.134889+00:00",
+  "timestamp": "2026-11-01T21:25:11.292461+00:00",
   "total_vignettes": 10,
   "runs": [
     {
       "vignette_id": "BENCH-01",
       "policy_id": "NCD-20.4",
       "decision": "APPROVED",
-      "confidence": 0.91,
+      "confidence": 0.95,
       "quoted_spans": [
-        "Qualifying Primary Prevention Ischemic Cardiomyopathy"
+        "Patient is a 67-year-old male with ischemic cardiomyopathy secondary to anterior STEMI 18 months ago.",
+        "Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms.",
+        "Transthoracic Echocardiogram (2 weeks ago): Left ventricular internal dimension in diastole 6.2 cm. Severe global hypokinesis with Left Ventricular Ejection Fraction (LVEF) 28%",
+        "Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms.",
+        "Patient has received optimal guideline-directed medical therapy (GDMT) including beta-blocker, ACEi/ARB/ARNI, and MRA for at least 90 days (3 months).",
+        "Patient has undergone successful revascularization 14 months ago with CABG."
       ],
-      "grounded_spans": [],
+      "grounded_spans": [
+        "Patient is a 67-year-old male with ischemic cardiomyopathy secondary to anterior STEMI 18 months ago.",
+        "Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms.",
+        "Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms."
+      ],
       "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "faithfulness_ratio": 0.5,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Qualifying Primary Prevention Ischemic Cardiomyopathy'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.07
+      "raw_response": "{\"id\":\"chatcmpl-211\",\"object\":\"chat.completion\",\"created\":1793568211,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\n    \\\"Patient is a 67-year-old male with ischemic cardiomyopathy secondary to anterior STEMI 18 months ago.\\\",\\n    \\\"Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms.\\\",\\n    \\\"Transthoracic Echocardiogram (2 weeks ago): Left ventricular internal dimension in diastole 6.2 cm. Severe global hypokinesis with Left Ventricular Ejection Fraction (LVEF) 28%\\\",\\n    \\\"Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms.\\\",\\n    \\\"Patient has received optimal guideline-directed medical therapy (GDMT) including beta-blocker, ACEi/ARB/ARNI, and MRA for at least 90 days (3 months).\\\",\\n    \\\"Patient has undergone successful revascularization 14 months ago with CABG.\\\"\\n  ],\\n  \\\"clinical_rationale\\\": \\\"The patient meets all criteria for NCD-20.4, including severe LV systolic dysfunction, NYHA Class II symptoms, guideline-directed medical therapy duration, and ischemic cardiomyopathy timeline. The clinical documentation is clear and consistent with the policy requirements.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1003,\"prompt_tokens_details\":{\"cached_tokens\":406},\"completion_tokens\":279,\"total_tokens\":1282}}\n",
+      "latency_ms": 22840.64
     },
     {
       "vignette_id": "BENCH-02",
       "policy_id": "NCD-20.4",
-      "decision": "APPROVED",
-      "confidence": 0.91,
+      "decision": "DENIED",
+      "confidence": 0.85,
       "quoted_spans": [
-        "Premature Referral - Inadequate GDMT Duration"
+        "Note: Patient has only completed 3 weeks of medical therapy. Guideline recommendations require at least 90 days of optimal medical therapy before device evaluation."
       ],
-      "grounded_spans": [],
-      "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "grounded_spans": [
+        "Note: Patient has only completed 3 weeks of medical therapy. Guideline recommendations require at least 90 days of optimal medical therapy before device evaluation."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Premature Referral - Inadequate GDMT Duration'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.03
+      "raw_response": "{\"id\":\"chatcmpl-460\",\"object\":\"chat.completion\",\"created\":1793568225,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.85,\\n  \\\"quoted_evidence_spans\\\": [\\\"Note: Patient has only completed 3 weeks of medical therapy. Guideline recommendations require at least 90 days of optimal medical therapy before device evaluation.\\\"],\\n  \\\"clinical_rationale\\\": \\\"The patient has only completed 3 weeks of guideline-directed medical therapy (GDMT), which is far less than the required 90 days as per NCD-20.4 criteria. This is a critical deficiency that precludes approval.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":815,\"prompt_tokens_details\":{\"cached_tokens\":409},\"completion_tokens\":119,\"total_tokens\":934}}\n",
+      "latency_ms": 13613.51
     },
     {
       "vignette_id": "BENCH-03",
       "policy_id": "NCD-20.4",
-      "decision": "APPROVED",
-      "confidence": 0.91,
+      "decision": "DENIED",
+      "confidence": 0.95,
       "quoted_spans": [
-        "Disqualified - Cardiogenic Shock & Recent Revascularization"
+        "Patient currently admitted to CCU in active cardiogenic shock requiring intra-aortic balloon pump (IABP) and norepinephrine drip.",
+        "ICD is contraindicated during acute recovery phase (<40 days post-MI, <90 days post-PCI) and active cardiogenic shock."
       ],
-      "grounded_spans": [],
+      "grounded_spans": [
+        "ICD is contraindicated during acute recovery phase (<40 days post-MI, <90 days post-PCI) and active cardiogenic shock."
+      ],
       "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "faithfulness_ratio": 0.5,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Disqualified - Cardiogenic Shock & Recent Revascularization'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.03
+      "raw_response": "{\"id\":\"chatcmpl-904\",\"object\":\"chat.completion\",\"created\":1793568239,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Patient currently admitted to CCU in active cardiogenic shock requiring intra-aortic balloon pump (IABP) and norepinephrine drip.\\\", \\\"ICD is contraindicated during acute recovery phase (\\u003c40 days post-MI, \\u003c90 days post-PCI) and active cardiogenic shock.\\\"],\\n  \\\"clinical_rationale\\\": \\\"The patient is currently in active cardiogenic shock and ICD is contraindicated during the acute recovery phase post-PCI. The patient's LVEF is 20%, which does not meet the requirement of LVEF \\u003c= 35% for NCD-20.4.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":795,\"prompt_tokens_details\":{\"cached_tokens\":406},\"completion_tokens\":163,\"total_tokens\":958}}\n",
+      "latency_ms": 14587.84
     },
     {
       "vignette_id": "BENCH-04",
       "policy_id": "LCD-L33829",
       "decision": "APPROVED",
-      "confidence": 0.91,
+      "confidence": 0.95,
       "quoted_spans": [
-        "Qualifying CPAP for Severe Obstructive Sleep Apnea"
+        "[REDACTED] | MRN: [REDECTED]",
+        "Face-to-face clinical evaluation conducted on 01/15/2026. Prescribing physician documented severe chronic snoring, witnessed apneas, and excessive daytime sleepiness with Epworth Sleepiness Scale of 16/24.",
+        "Diagnostic overnight sleep study completed on 02/02/2026. Total sleep time: 380 minutes. Apnea-Hypopnea Index (AHI): 34.2 events/hr. Lowest oxygen saturation (SpO2): 78%.",
+        "PLAN: Meets Medicare LCD L33829 criteria for CPAP therapy based on AHI 34.2 events/hr (>15 events/hr) and documented face-to-face evaluation. Order auto-CPAP 8-14 cm H2O.",
+        "PRESCRIBING PHYSICIAN: Dr. Arthur Miller, MD, FCCP (NPI: 1548291039)",
+        "SIGNATURE: Electronically signed by Dr. Arthur Miller, MD on 02/05/2026."
       ],
-      "grounded_spans": [],
+      "grounded_spans": [
+        "Face-to-face clinical evaluation conducted on 01/15/2026. Prescribing physician documented severe chronic snoring, witnessed apneas, and excessive daytime sleepiness with Epworth Sleepiness Scale of 16/24."
+      ],
       "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "faithfulness_ratio": 0.16666666666666666,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Qualifying CPAP for Severe Obstructive Sleep Apnea'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.03
+      "raw_response": "{\"id\":\"chatcmpl-955\",\"object\":\"chat.completion\",\"created\":1793568251,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\n    \\\"[REDACTED] | MRN: [REDECTED]\\\",\\n    \\\"Face-to-face clinical evaluation conducted on 01/15/2026. Prescribing physician documented severe chronic snoring, witnessed apneas, and excessive daytime sleepiness with Epworth Sleepiness Scale of 16/24.\\\",\\n    \\\"Diagnostic overnight sleep study completed on 02/02/2026. Total sleep time: 380 minutes. Apnea-Hypopnea Index (AHI): 34.2 events/hr. Lowest oxygen saturation (SpO2): 78%.\\\",\\n    \\\"PLAN: Meets Medicare LCD L33829 criteria for CPAP therapy based on AHI 34.2 events/hr (\\u003e15 events/hr) and documented face-to-face evaluation. Order auto-CPAP 8-14 cm H2O.\\\",\\n    \\\"PRESCRIBING PHYSICIAN: Dr. Arthur Miller, MD, FCCP (NPI: 1548291039)\\\",\\n    \\\"SIGNATURE: Electronically signed by Dr. Arthur Miller, MD on 02/05/2026.\\\"\\n  ],\\n  \\\"clinical_rationale\\\": \\\"The patient meets the criteria for CPAP therapy as evidenced by a documented face-to-face evaluation and a diagnostic polysomnography with an AHI of 34.2 events/hr, which exceeds the 15 events/hr threshold set by the LCD.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":671,\"prompt_tokens_details\":{\"cached_tokens\":670},\"completion_tokens\":345,\"total_tokens\":1016}}\n",
+      "latency_ms": 11282.53
     },
     {
       "vignette_id": "BENCH-05",
       "policy_id": "LCD-L33829",
-      "decision": "APPROVED",
-      "confidence": 0.91,
+      "decision": "DENIED",
+      "confidence": 0.85,
       "quoted_spans": [
-        "Borderline AHI Without Documented Comorbidity (Abstention)"
+        "Note states 'Past Medical History: No hypertension, no stroke, no coronary artery disease.'",
+        "ASSESSMENT: Mild obstructive sleep apnea with AHI 7.2. Note lacks documentation of required CMS comorbid conditions for AHI 5-14."
       ],
       "grounded_spans": [],
       "is_fully_grounded": false,
       "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Borderline AHI Without Documented Comorbidity (Abstention)'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.02
+      "raw_response": "{\"id\":\"chatcmpl-231\",\"object\":\"chat.completion\",\"created\":1793568257,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.85,\\n  \\\"quoted_evidence_spans\\\": [\\\"Note states 'Past Medical History: No hypertension, no stroke, no coronary artery disease.'\\\", \\\"ASSESSMENT: Mild obstructive sleep apnea with AHI 7.2. Note lacks documentation of required CMS comorbid conditions for AHI 5-14.\\\"],\\n  \\\"clinical_rationale\\\": \\\"The patient's medical history lacks the required comorbid conditions (hypertension, ischemic heart disease, stroke) for AHI 5-14, as per the policy criteria. The AHI of 7.2 does not meet the threshold for requiring these comorbid conditions.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":557,\"prompt_tokens_details\":{\"cached_tokens\":556},\"completion_tokens\":156,\"total_tokens\":713}}\n",
+      "latency_ms": 6296.86
     },
     {
       "vignette_id": "BENCH-06",
       "policy_id": "NCD-20.4",
       "decision": "APPROVED",
-      "confidence": 0.91,
+      "confidence": 0.95,
       "quoted_spans": [
-        "Contradictory / Negative Omission Stress Test"
+        "Patient has been on stable optimal GDMT including metoprolol succinate and valsartan for 8 months.",
+        "Patient classified as NYHA Class III with dyspnea on walking 50 feet."
       ],
-      "grounded_spans": [],
+      "grounded_spans": [
+        "Patient has been on stable optimal GDMT including metoprolol succinate and valsartan for 8 months."
+      ],
       "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "faithfulness_ratio": 0.5,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Contradictory / Negative Omission Stress Test'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.02
+      "raw_response": "{\"id\":\"chatcmpl-497\",\"object\":\"chat.completion\",\"created\":1793568262,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\n    \\\"Patient has been on stable optimal GDMT including metoprolol succinate and valsartan for 8 months.\\\",\\n    \\\"Patient classified as NYHA Class III with dyspnea on walking 50 feet.\\\"\\n  ],\\n  \\\"clinical_rationale\\\": \\\"The patient meets all the criteria for NCD-20.4, including documented LVEF \u2264 35%, NYHA Class III heart failure, and at least 90 days of guideline-directed medical therapy. The clinical documentation is clear and consistent with the policy requirements.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":754,\"prompt_tokens_details\":{\"cached_tokens\":753},\"completion_tokens\":144,\"total_tokens\":898}}\n",
+      "latency_ms": 5590.42
     },
     {
       "vignette_id": "BENCH-07",
       "policy_id": "NCD-20.33",
       "decision": "APPROVED",
-      "confidence": 0.91,
+      "confidence": 0.95,
       "quoted_spans": [
-        "Severe Symptomatic Aortic Stenosis for TAVR"
+        "[REDACTED] | DOB: 04/18/1947 | MRN: [REDACTED]",
+        "Transthoracic echocardiogram confirms severe calcific aortic stenosis:",
+        "- Aortic Valve Area (AVA): 0.68 cm2 (Criterion <= 1.0 cm2 MET)",
+        "- Mean Transvalvular Gradient: 48 mmHg (Criterion >= 40 mmHg MET)",
+        "- Peak Aortic Jet Velocity: 4.5 m/s (Criterion >= 4.0 m/s MET)",
+        "STS PROM Risk of Mortality score: 8.6% (High surgical risk for conventional surgical aortic valve replacement).",
+        "Transfemoral arterial access confirmed suitable via multi-slice contrast CTA.",
+        "PLAN:",
+        "Transcatheter Aortic Valve Replacement (TAVR) via transfemoral approach indicated under CMS NCD 20.33.",
+        "ATTENDING PHYSICIAN:",
+        "Dr. Raymond Chang, MD, FACC, FSCAI (NPI: 1739284012)",
+        "Electronically signed on 02/18/2026."
       ],
-      "grounded_spans": [],
-      "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "grounded_spans": [
+        "[REDACTED] | DOB: 04/18/1947 | MRN: [REDACTED]",
+        "Transthoracic echocardiogram confirms severe calcific aortic stenosis:",
+        "- Aortic Valve Area (AVA): 0.68 cm2 (Criterion <= 1.0 cm2 MET)",
+        "- Mean Transvalvular Gradient: 48 mmHg (Criterion >= 40 mmHg MET)",
+        "- Peak Aortic Jet Velocity: 4.5 m/s (Criterion >= 4.0 m/s MET)",
+        "STS PROM Risk of Mortality score: 8.6% (High surgical risk for conventional surgical aortic valve replacement).",
+        "Transfemoral arterial access confirmed suitable via multi-slice contrast CTA.",
+        "PLAN:",
+        "Transcatheter Aortic Valve Replacement (TAVR) via transfemoral approach indicated under CMS NCD 20.33.",
+        "ATTENDING PHYSICIAN:",
+        "Dr. Raymond Chang, MD, FACC, FSCAI (NPI: 1739284012)",
+        "Electronically signed on 02/18/2026."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Severe Symptomatic Aortic Stenosis for TAVR'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.02
+      "raw_response": "{\"id\":\"chatcmpl-74\",\"object\":\"chat.completion\",\"created\":1793568274,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\n    \\\"[REDACTED] | DOB: 04/18/1947 | MRN: [REDACTED]\\\",\\n    \\\"Transthoracic echocardiogram confirms severe calcific aortic stenosis:\\\",\\n    \\\"- Aortic Valve Area (AVA): 0.68 cm2 (Criterion \\u003c= 1.0 cm2 MET)\\\",\\n    \\\"- Mean Transvalvular Gradient: 48 mmHg (Criterion \\u003e= 40 mmHg MET)\\\",\\n    \\\"- Peak Aortic Jet Velocity: 4.5 m/s (Criterion \\u003e= 4.0 m/s MET)\\\",\\n    \\\"STS PROM Risk of Mortality score: 8.6% (High surgical risk for conventional surgical aortic valve replacement).\\\",\\n    \\\"Transfemoral arterial access confirmed suitable via multi-slice contrast CTA.\\\",\\n    \\\"PLAN:\\\",\\n    \\\"Transcatheter Aortic Valve Replacement (TAVR) via transfemoral approach indicated under CMS NCD 20.33.\\\",\\n    \\\"ATTENDING PHYSICIAN:\\\",\\n    \\\"Dr. Raymond Chang, MD, FACC, FSCAI (NPI: 1739284012)\\\",\\n    \\\"Electronically signed on 02/18/2026.\\\"\\n  ],\\n  \\\"clinical_rationale\\\": \\\"The patient meets the criteria for NCD-20.33 as evidenced by severe calcific aortic stenosis with Aortic Valve Area (AVA) \u2264 1.0 cm2, mean aortic gradient \u2265 40 mmHg, and peak velocity \u2265 4.0 m/s, as well as a high surgical risk for conventional surgical aortic valve replacement. The Heart Team consultation is also documented.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":729,\"prompt_tokens_details\":{\"cached_tokens\":728},\"completion_tokens\":398,\"total_tokens\":1127}}\n",
+      "latency_ms": 11267.62
     },
     {
       "vignette_id": "BENCH-08",
       "policy_id": "NCD-220.13",
       "decision": "APPROVED",
-      "confidence": 0.91,
+      "confidence": 0.95,
       "quoted_spans": [
-        "Non-Valvular Atrial Fibrillation for LAAC / Watchman"
+        "[REDACTED] suffered two major recurrent gastrointestinal hemorrhages secondary to angiodysplasia while on Apixaban (Eliquis) 5mg BID, requiring 4 units PRBC transfusion and endoscopic clipping.",
+        "[REDACTED] suffered two major recurrent gastrointestinal hemorrhages secondary to angiodysplasia while on Apixaban (Eliquis) 5mg BID, requiring 4 units PRBC transfusion and endoscopic clipping.",
+        "HAS-BLED score: 4 (High bleeding risk).",
+        "Transesophageal Echocardiogram (TEE) on 02/10/2026 confirms absence of left atrial thrombus with suitable ostial dimensions for Watchman FLX closure device."
       ],
-      "grounded_spans": [],
+      "grounded_spans": [
+        "HAS-BLED score: 4 (High bleeding risk).",
+        "Transesophageal Echocardiogram (TEE) on 02/10/2026 confirms absence of left atrial thrombus with suitable ostial dimensions for Watchman FLX closure device."
+      ],
       "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "faithfulness_ratio": 0.5,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Non-Valvular Atrial Fibrillation for LAAC / Watchman'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.03
+      "raw_response": "{\"id\":\"chatcmpl-825\",\"object\":\"chat.completion\",\"created\":1793568284,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\n    \\\"[REDACTED] suffered two major recurrent gastrointestinal hemorrhages secondary to angiodysplasia while on Apixaban (Eliquis) 5mg BID, requiring 4 units PRBC transfusion and endoscopic clipping.\\\",\\n    \\\"[REDACTED] suffered two major recurrent gastrointestinal hemorrhages secondary to angiodysplasia while on Apixaban (Eliquis) 5mg BID, requiring 4 units PRBC transfusion and endoscopic clipping.\\\",\\n    \\\"HAS-BLED score: 4 (High bleeding risk).\\\",\\n    \\\"Transesophageal Echocardiogram (TEE) on 02/10/2026 confirms absence of left atrial thrombus with suitable ostial dimensions for Watchman FLX closure device.\\\"\\n  ],\\n  \\\"clinical_rationale\\\": \\\"The patient has a high CHA2DS2-VASc score (5) and a HAS-BLED score of 4, indicating a high thromboembolic risk and bleeding risk, respectively. The patient's history of recurrent major gastrointestinal hemorrhages while on oral anticoagulation (Apixaban) has been documented, and the attending physician has concurred that long-term oral anticoagulation is contraindicated. The pre-procedural imaging (TEE) confirms the absence of left atrial thrombus, meeting all criteria for NCD-220.13.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":816,\"prompt_tokens_details\":{\"cached_tokens\":815},\"completion_tokens\":323,\"total_tokens\":1139}}\n",
+      "latency_ms": 10551.08
     },
     {
       "vignette_id": "BENCH-09",
       "policy_id": "NCD-20.4",
-      "decision": "APPROVED",
-      "confidence": 0.91,
+      "decision": "DENIED",
+      "confidence": 0.85,
       "quoted_spans": [
-        "Premature Post-MI Evaluation (Statutory 40-Day Timeline Deficit)"
+        "Patient is currently 13 days post-acute MI.",
+        "CMS NCD 20.4 Section B.1 mandates waiting a minimum of 40 days post-myocardial infarction before elective device placement."
       ],
-      "grounded_spans": [],
-      "is_fully_grounded": false,
-      "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "grounded_spans": [
+        "Patient is currently 13 days post-acute MI.",
+        "CMS NCD 20.4 Section B.1 mandates waiting a minimum of 40 days post-myocardial infarction before elective device placement."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Premature Post-MI Evaluation (Statutory 40-Day Timeline Deficit)'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.02
+      "raw_response": "{\"id\":\"chatcmpl-990\",\"object\":\"chat.completion\",\"created\":1793568300,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.85,\\n  \\\"quoted_evidence_spans\\\": [\\\"Patient is currently 13 days post-acute MI.\\\", \\\"CMS NCD 20.4 Section B.1 mandates waiting a minimum of 40 days post-myocardial infarction before elective device placement.\\\"],\\n  \\\"clinical_rationale\\\": \\\"The patient is only 13 days post-myocardial infarction, which does not meet the 40-day waiting period required by CMS NCD 20.4. This criterion is critical for preventing complications such as arrhythmias and thromboembolic events.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":797,\"prompt_tokens_details\":{\"cached_tokens\":409},\"completion_tokens\":141,\"total_tokens\":938}}\n",
+      "latency_ms": 16242.6
     },
     {
       "vignette_id": "BENCH-10",
       "policy_id": "NCD-20.29",
       "decision": "APPROVED",
-      "confidence": 0.91,
+      "confidence": 0.95,
       "quoted_spans": [
-        "Wagner Grade III Diabetic Foot Ulcer Failing Standard Care (HBOT)"
+        "[REDACTED] 63-year-old male with poorly controlled Type 2 diabetes mellitus presenting with a chronic non-healing ulcer on the right plantar aspect of the midfoot.",
+        "[REDACTED] Wound depth extends to deep fascia with probe-to-bone contact and localized osteomyelitis (Wagner Grade III classification).",
+        "[REDACTED] Patient has completed 35 days of documented comprehensive standard wound therapy, including surgical debridement, pressure offloading orthotics, culture-directed oral antibiotics, and moist dressing changes with no measurable reduction in wound surface area.",
+        "[REDACTED] Arterial duplex demonstrates patent tibial vessels with adequate distal perfusion to support wound healing.",
+        "[REDACTED] Hyperbaric Oxygen Therapy (HBOT) 30 treatments (HCPCS G0277) indicated under CMS NCD 20.29 for refractory Wagner Grade III diabetic foot ulcer."
       ],
       "grounded_spans": [],
       "is_fully_grounded": false,
       "faithfulness_ratio": 0.0,
-      "endpoint_used": "none (offline simulation)",
-      "model_name": "gemini-1.5-flash",
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:3b",
       "temperature": 0.0,
-      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Wagner Grade III Diabetic Foot Ulcer Failing Standard Care (HBOT)'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
-      "latency_ms": 0.03
+      "raw_response": "{\"id\":\"chatcmpl-290\",\"object\":\"chat.completion\",\"created\":1793568311,\"model\":\"qwen2.5:3b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\n    \\\"[REDACTED] 63-year-old male with poorly controlled Type 2 diabetes mellitus presenting with a chronic non-healing ulcer on the right plantar aspect of the midfoot.\\\",\\n    \\\"[REDACTED] Wound depth extends to deep fascia with probe-to-bone contact and localized osteomyelitis (Wagner Grade III classification).\\\",\\n    \\\"[REDACTED] Patient has completed 35 days of documented comprehensive standard wound therapy, including surgical debridement, pressure offloading orthotics, culture-directed oral antibiotics, and moist dressing changes with no measurable reduction in wound surface area.\\\",\\n    \\\"[REDACTED] Arterial duplex demonstrates patent tibial vessels with adequate distal perfusion to support wound healing.\\\",\\n    \\\"[REDACTED] Hyperbaric Oxygen Therapy (HBOT) 30 treatments (HCPCS G0277) indicated under CMS NCD 20.29 for refractory Wagner Grade III diabetic foot ulcer.\\\"\\n  ],\\n  \\\"clinical_rationale\\\": \\\"The patient meets all criteria for NCD-20.29, including documented deep diabetic foot ulceration with involvement of tendon, capsule, or bone (Wagner Grade 3), failure of conservative wound therapy, and adequate lower extremity vascular assessment. The clinical documentation is clear and consistent with the policy requirements.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":746,\"prompt_tokens_details\":{\"cached_tokens\":745},\"completion_tokens\":309,\"total_tokens\":1055}}\n",
+      "latency_ms": 10290.67
     }
   ]
 }

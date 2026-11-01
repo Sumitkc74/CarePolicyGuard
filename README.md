@@ -142,12 +142,12 @@ The benchmark framework compares CarePolicyGuard against three conventional clin
 | :--- | :---: | :---: | :---: | :---: |
 | **Architecture** | Qwen2.5-3B-Instruct via Ollama | Retrieval without Timeline Engine | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
 | **Decision Concordance (Accuracy)** | 80.0% | 70.0% | 80.0% | **100.0%** |
-| **Evidence Faithfulness (% Grounded)** | 56.0% | 68.0% | 87.5% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.106 | 0.217 (Miscalibrated) | 0.119 (Moderate) | **0.066 (Calibrated on Covered Decisions)** |
+| **Evidence Faithfulness (% Grounded)** | 61.5% | 68.0% | 87.5% | **100.0%** |
+| **Expected Calibration Error (ECE)** | 0.120 | 0.217 (Miscalibrated) | 0.119 (Moderate) | **0.066 (Calibrated on Covered Decisions)** |
 | **Safe Abstention Rate** | 0.0% (Forced Binary) | 0.0% | 0.0% | **20.0% (Safe Deferral on Ambiguity)** |
 | **False Approval Rate (RAC Clawback Risk)** | **0.0%** (0/4 on ineligible cases) | **50.0%** (2/4, premature GDMT & post-MI) | **0.0%** (0/4, forced denials) | **0.0% (0/4 Zero Clawback Risk)** |
-| **Overall Clinical Safety Score** | **0.400** | **0.373** | **0.617** | **0.934** |
-| **Average Latency** | ~31,200 ms (Local Neural) | ~1 ms | ~1 ms | **~28 ms (In-Process Neuro-Symbolic)** |
+| **Overall Clinical Safety Score** | **0.432** | **0.373** | **0.617** | **0.934** |
+| **Average Latency** | ~12,250 ms (Local GPU Neural) | ~1 ms | ~1 ms | **~28 ms (In-Process Neuro-Symbolic)** |
 
 > [!NOTE]
 > **Ablation Provenance & Methodology:** The benchmark configurations are executed via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py). Config A is executed live against a local open model (`qwen2.5:3b` via Ollama at `http://localhost:11434/v1/chat/completions`, temperature 0.0, zero cloud egress) with raw runs persisted to [app/data/benchmarks/baseline_llm_raw_runs.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/baseline_llm_raw_runs.json). Config B is an architectural ablation isolating `TimelineAnalyzerService` by bypassing statutory waiting periods (e.g., post-MI 40d, GDMT 90d). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$). Config D is the full proposed neuro-symbolic framework ($\tau = 0.85$). Faithfulness is evaluated against exact character-level offsets; ECE is measured on the covered adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*). Robustness against clinical phrasing variation is validated via programmatic perturbation testing in [app/services/perturbation_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/perturbation_engine.py). The 10 vignettes represent synthetic Medicare coverage stress tests rather than an external multi-center clinical cohort.
