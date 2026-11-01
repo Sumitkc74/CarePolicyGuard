@@ -169,6 +169,11 @@ class AdversarialVerificationAgent:
                 classes = set(m.group(1).upper() for m in nyha_matches)
                 if len(classes) > 1 and ({"I", "II"} & classes) and ({"III", "IV"} & classes):
                     return True, f"CLINICAL DISCORDANCE: Conflicting NYHA functional classes documented ({', '.join(sorted(classes))})."
+        elif "risk" in code_lower or "surgical" in code_lower:
+            high_risk_found = bool(re.search(r'(?i)\b(?:high(?:-|\s+)surgical risk|high risk for (?:open|surgery|cea))\b', ehr_text))
+            low_risk_found = bool(re.search(r'(?i)\b(?:low(?:-|\s+)surgical risk|average risk|standard risk|low risk for (?:open|surgery|cea))\b', ehr_text))
+            if high_risk_found and low_risk_found:
+                return True, "CLINICAL DISCORDANCE: Conflicting surgical risk assessments documented (high risk vs low/standard risk). Requires clinician reconciliation."
         return False, None
 
     def heal_offset_drift(

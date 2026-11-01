@@ -213,3 +213,76 @@ def test_laac_thrombus_on_imaging_denies_across_all_modes():
         assert res.adjudication_decision == AdjudicationDecision.DENIED, f"Mode {mode} failed to deny HOLD-10"
         assert res.abstention_status is False, f"Mode {mode} deferred instead of denying"
 
+def test_hold_08_tavr_qualitative_omission_defers_across_all_modes():
+    """
+    Regression Test (HOLD-08):
+    Verifies that TAVR referral with qualitative stenosis and missing AVA/gradient/velocity
+    defers to human review (DEFERRED_TO_HUMAN) across deterministic, state_machine, and
+    declarative modes, and that the sentence-initial 'no aortic valve area...' does NOT
+    erroneously negate subsequent 'Heart Team' documentation.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    ehr_text = """
+    STRUCTURAL HEART NOTE
+    PATIENT: [REDACTED] | MRN: [REDACTED]
+
+    EVALUATION:
+    76-year-old male with exertional dyspnea. Echocardiogram report describes severe aortic stenosis in qualitative terms only; no aortic valve area, no mean gradient, and no peak velocity are recorded in this note.
+    Heart Team: Formal multidisciplinary Heart Team consultation completed with cardiac surgery and interventional cardiology.
+
+    PLAN:
+    TAVR referral under NCD 20.33 pending quantified imaging.
+
+    ATTENDING PHYSICIAN:
+    Dr. Laura Bennett, MD
+    Electronically signed on 02/17/2026.
+    """
+    for mode in ["deterministic", "state_machine", "declarative"]:
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-HOLD-08",
+            policy_id="NCD-20.33",
+            ehr_narrative=ehr_text,
+            execution_mode=mode,
+            save_record=False
+        )
+        assert res.adjudication_decision == AdjudicationDecision.DEFERRED_TO_HUMAN, f"Mode {mode} returned {res.adjudication_decision} instead of DEFERRED_TO_HUMAN"
+        assert res.abstention_status is True, f"Mode {mode} did not trigger abstention"
+
+def test_hold_12_hbot_duration_omission_defers_across_all_modes():
+    """
+    Regression Test (HOLD-12):
+    Verifies that HBOT referral with Wagner Grade 3 ulcer but unrecorded treatment duration
+    defers to human review (DEFERRED_TO_HUMAN) across deterministic, state_machine, and
+    declarative modes, and that preceding 'no day count' does NOT falsely negate distal perfusion.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    ehr_text = """
+    WOUND CARE CONSULTATION
+    PATIENT: [REDACTED] | MRN: [REDACTED]
+
+    WOUND ASSESSMENT:
+    61-year-old female with Type 2 diabetes and a deep right foot ulcer, Wagner Grade 3 with tendon involvement.
+    STANDARD TREATMENT COURSE:
+    Patient has received standard wound care for several weeks, including debridement and offloading; no day count is recorded in this note.
+    PERFUSION ASSESSMENT:
+    Adequate distal perfusion documented on arterial duplex.
+
+    PLAN:
+    Hyperbaric oxygen therapy requested under NCD 20.29 pending treatment-duration records.
+
+    ATTENDING PHYSICIAN:
+    Dr. Rachel Adams, MD
+    Electronically signed on 02/11/2026.
+    """
+    for mode in ["deterministic", "state_machine", "declarative"]:
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-HOLD-12",
+            policy_id="NCD-20.29",
+            ehr_narrative=ehr_text,
+            execution_mode=mode,
+            save_record=False
+        )
+        assert res.adjudication_decision == AdjudicationDecision.DEFERRED_TO_HUMAN, f"Mode {mode} returned {res.adjudication_decision} instead of DEFERRED_TO_HUMAN"
+        assert res.abstention_status is True, f"Mode {mode} did not trigger abstention"
+
+

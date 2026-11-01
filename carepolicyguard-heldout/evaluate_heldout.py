@@ -67,6 +67,7 @@ def run_heldout_evaluation():
             
             is_correct = (pred_decision == gold_decision)
             is_false_approval = (pred_decision == "APPROVED" and gold_decision != "APPROVED")
+            is_false_denial = (pred_decision == "DENIED" and gold_decision != "DENIED")
             
             rationale_summary = res.abstention_reason or "; ".join(
                 f"{c.criterion_code}: {c.clinical_rationale}" for c in res.criterion_assessments if c.clinical_rationale
@@ -84,6 +85,7 @@ def run_heldout_evaluation():
                 "predicted_abstain": pred_abstain,
                 "is_correct": is_correct,
                 "is_false_approval": is_false_approval,
+                "is_false_denial": is_false_denial,
                 "raw_confidence": res.raw_aggregate_confidence,
                 "calibrated_confidence": res.calibrated_aggregate_confidence,
                 "clinical_rationale": rationale_summary,
@@ -92,12 +94,13 @@ def run_heldout_evaluation():
             mode_results.append(item_detail)
             
             status_symbol = "MATCH" if is_correct else "MISMATCH"
-            fa_flag = " [FALSE APPROVAL!]" if is_false_approval else ""
+            fa_flag = " [FALSE APPROVAL!]" if is_false_approval else (" [FALSE DENIAL!]" if is_false_denial else "")
             print(f"  [{v['id']}] {status_symbol} | Pred: {pred_decision:<18} | Gold: {gold_decision:<18}{fa_flag}")
 
         total_cases = len(vignettes)
         correct_count = sum(1 for r in mode_results if r["is_correct"])
         false_approvals_count = sum(1 for r in mode_results if r["is_false_approval"])
+        false_denials_count = sum(1 for r in mode_results if r["is_false_denial"])
         abstentions_count = sum(1 for r in mode_results if r["predicted_decision"] == "DEFERRED_TO_HUMAN")
         
         mode_summary = {
@@ -106,10 +109,13 @@ def run_heldout_evaluation():
             "accuracy": round(correct_count / total_cases, 4),
             "false_approvals_count": false_approvals_count,
             "false_approval_rate": round(false_approvals_count / total_cases, 4),
+            "false_denials_count": false_denials_count,
+            "false_denial_rate": round(false_denials_count / total_cases, 4),
             "abstentions_count": abstentions_count,
             "abstention_rate": round(abstentions_count / total_cases, 4),
             "mean_latency_ms": round(sum(latencies) / len(latencies), 2),
             "false_approval_cases": [r["id"] for r in mode_results if r["is_false_approval"]],
+            "false_denial_cases": [r["id"] for r in mode_results if r["is_false_denial"]],
             "mismatched_cases": [
                 {
                     "id": r["id"],
@@ -118,6 +124,7 @@ def run_heldout_evaluation():
                     "gold": r["gold_decision"],
                     "predicted": r["predicted_decision"],
                     "is_false_approval": r["is_false_approval"],
+                    "is_false_denial": r["is_false_denial"],
                     "rationale": r["clinical_rationale"]
                 }
                 for r in mode_results if not r["is_correct"]
@@ -129,6 +136,8 @@ def run_heldout_evaluation():
         
         print(f"  -> Accuracy: {mode_summary['accuracy'] * 100:.1f}% ({correct_count}/{total_cases})")
         print(f"  -> False Approvals: {false_approvals_count} ({mode_summary['false_approval_rate'] * 100:.1f}%)")
+        print(f"  -> False Denials: {false_denials_count} ({mode_summary['false_denial_rate'] * 100:.1f}%)")
+        print(f"  -> Deferral Rate: {abstentions_count} ({mode_summary['abstention_rate'] * 100:.1f}%)")
 
     # Save results json
     results_path = base_dir / "heldout_results.json"
@@ -163,17 +172,18 @@ def generate_markdown_report(run_data: Dict[str, Any], output_path: Path):
         f"",
         f"## 1. Summary Performance by Execution Mode",
         f"",
-        f"| Execution Mode | Accuracy | Correct / Total | False Approvals | False Approval Rate | Abstentions | Mean Latency |",
-        f"| :--- | :--- | :--- | :--- | :--- | :--- | :--- |"
+        f"| Execution Mode | Diagnostic Accuracy ($n=15$) | False Approvals (FA) | False Denials (FD) | Deferral Rate (Abstentions) | Mean Latency |",
+        f"| :--- | :--- | :--- | :--- | :--- | :--- |"
     ]
     
     for mode, s in summaries.items():
-        acc_pct = f"{s['accuracy'] * 100:.1f}%"
-        fa_pct = f"{s['false_approval_rate'] * 100:.1f}%"
-        abs_pct = f"{s['abstention_rate'] * 100:.1f}%"
+        acc_pct = f"{s['accuracy'] * 100:.1f}% ({s['correct_count']}/{s['total_cases']})"
+        fa_pct = f"{s['false_approvals_count']} ({s['false_approval_rate'] * 100:.1f}%)"
+        fd_pct = f"{s['false_denials_count']} ({s['false_denial_rate'] * 100:.1f}%)"
+        abs_pct = f"{s['abstentions_count']} ({s['abstention_rate'] * 100:.1f}%)"
         lat = f"{s['mean_latency_ms']} ms"
         md_lines.append(
-            f"| `{mode}` | **{acc_pct}** | {s['correct_count']} / {s['total_cases']} | **{s['false_approvals_count']}** | **{fa_pct}** | {s['abstentions_count']} ({abs_pct}) | {lat} |"
+            f"| `{mode}` | **{acc_pct}** | **{fa_pct}** | **{fd_pct}** | {abs_pct} | {lat} |"
         )
         
     md_lines.extend([

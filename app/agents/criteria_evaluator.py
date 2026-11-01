@@ -85,13 +85,23 @@ class CriteriaEvaluationAgent:
         ]
         conjunctions = [r"\b(?:but|however|nevertheless|although|except|yet)\b"]
 
+        # Clinical NegEx/ConText rule: Negation does not cross sentence/clause boundaries
+        # Delimiters: newline, semicolon, or period followed by whitespace
+        sentence_boundaries = [m.end() for m in re.finditer(r'(?:\.\s+|\n+|;\s*)', preceding_window)]
+        last_boundary = max(sentence_boundaries) if sentence_boundaries else 0
+        in_sentence_preceding = preceding_window[last_boundary:]
+
         last_conjunction = -1
         for conj in conjunctions:
-            for m in re.finditer(conj, preceding_window):
+            for m in re.finditer(conj, in_sentence_preceding):
                 if m.start() > last_conjunction:
                     last_conjunction = m.start()
 
-        active_preceding = preceding_window[last_conjunction + 1:] if last_conjunction != -1 else preceding_window
+        active_preceding = in_sentence_preceding[last_conjunction + 1:] if last_conjunction != -1 else in_sentence_preceding
+
+        # Post-negation also stops at the first subsequent sentence boundary
+        following_boundary_match = re.search(r'(?:\.\s+|\n+|;)', following_window)
+        active_following = following_window[:following_boundary_match.start()] if following_boundary_match else following_window
 
         is_negated = False
         negation_trigger = None
@@ -104,7 +114,7 @@ class CriteriaEvaluationAgent:
 
         if not is_negated:
             for pat in post_negations:
-                m = re.search(pat, following_window)
+                m = re.search(pat, active_following)
                 if m:
                     is_negated = True
                     negation_trigger = m.group(0)

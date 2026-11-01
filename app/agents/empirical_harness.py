@@ -310,7 +310,7 @@ class EmpiricalResearchHarness:
             try:
                 data = json.dumps(payload).encode("utf-8")
                 req = urllib.request.Request(target_url, data=data, headers=headers, method="POST")
-                with urllib.request.urlopen(req, timeout=120.0) as resp:
+                with urllib.request.urlopen(req, timeout=240.0) as resp:
                     raw_response_text = resp.read().decode("utf-8")
                     resp_obj = json.loads(raw_response_text)
                     content = resp_obj["choices"][0]["message"]["content"]

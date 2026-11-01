@@ -2,7 +2,7 @@
   "metadata": {
     "set_name": "CarePolicyGuard Held-Out Vignette Set v1",
     "status": "UNSEALED - Evaluated once across deterministic, state_machine, and declarative modes",
-    "evaluation_timestamp": "2026-11-01T02:19:29.187144+00:00",
+    "evaluation_timestamp": "2026-11-01T23:24:52.128019+00:00",
     "total_vignettes": 15,
     "gold_distribution": {
       "APPROVED": 7,
@@ -22,40 +22,21 @@
       "false_approval_rate": 0.0,
       "abstentions_count": 4,
       "abstention_rate": 0.2667,
-      "mean_latency_ms": 25.78,
+      "mean_latency_ms": 27.15,
       "false_approval_cases": [],
       "mismatched_cases": []
     },
     "state_machine": {
       "total_cases": 15,
-      "correct_count": 13,
-      "accuracy": 0.8667,
+      "correct_count": 15,
+      "accuracy": 1.0,
       "false_approvals_count": 0,
       "false_approval_rate": 0.0,
-      "abstentions_count": 2,
-      "abstention_rate": 0.1333,
-      "mean_latency_ms": 56.89,
+      "abstentions_count": 4,
+      "abstention_rate": 0.2667,
+      "mean_latency_ms": 62.13,
       "false_approval_cases": [],
-      "mismatched_cases": [
-        {
-          "id": "HOLD-08",
-          "policy_id": "NCD-20.33",
-          "case_type": "omission-defer",
-          "gold": "DEFERRED_TO_HUMAN",
-          "predicted": "DENIED",
-          "is_false_approval": false,
-          "rationale": "CRIT-TAVR-01: No documented clinical evidence matching statutory criteria.; CRIT-TAVR-02: Documented finding was explicitly negated (no)."
-        },
-        {
-          "id": "HOLD-12",
-          "policy_id": "NCD-20.29",
-          "case_type": "omission-defer",
-          "gold": "DEFERRED_TO_HUMAN",
-          "predicted": "DENIED",
-          "is_false_approval": false,
-          "rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 3 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: No documented clinical evidence matching statutory criteria.; CRIT-HBOT-03: Documented finding was explicitly negated (no)."
-        }
-      ]
+      "mismatched_cases": []
     },
     "declarative": {
       "total_cases": 15,
@@ -65,7 +46,7 @@
       "false_approval_rate": 0.0,
       "abstentions_count": 4,
       "abstention_rate": 0.2667,
-      "mean_latency_ms": 24.45,
+      "mean_latency_ms": 24.38,
       "false_approval_cases": [],
       "mismatched_cases": []
     }
@@ -86,8 +67,8 @@
         "is_false_approval": false,
         "raw_confidence": 0.936,
         "calibrated_confidence": 0.936,
-        "clinical_rationale": "CRIT-ICD-01: Documented LVEF is 31% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class III heart failure symptoms.; CRIT-ICD-03: Documented guideline-directed medical therapy sustained for 14 months (meets >=90 day / 3 month CMS threshold).; CRIT-ICD-04: No acute MI (<40 days) or recent revascularization (<90 days) disqualifying the patient.; CRIT-ICD-EXCL-01: Documented absence of disqualifying exclusion: No cardiogenic shock. [Affirmed Absence: Negation 'without' confirms event absence.]",
-        "latency_ms": 43.46
+        "clinical_rationale": "CRIT-ICD-01: Documented LVEF is 31% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class III heart failure symptoms.; CRIT-ICD-03: Documented guideline-directed medical therapy sustained for 14 months (meets >=90 day / 3 month CMS threshold).; CRIT-ICD-04: No acute MI (<40 days) or recent revascularization (<90 days) disqualifying the patient.; CRIT-ICD-EXCL-01: Documented absence of disqualifying exclusion: No cardiogenic shock.",
+        "latency_ms": 45.57
       },
       {
         "id": "HOLD-02",
@@ -104,7 +85,7 @@
         "raw_confidence": 0.944,
         "calibrated_confidence": 0.944,
         "clinical_rationale": "CRIT-ICD-01: Documented LVEF is 29% confirmed by Echocardiography, meeting the mandatory primary prevention threshold of \u226435% (HFrEF).; CRIT-ICD-02: Patient classified as NYHA Class II heart failure symptoms.; CRIT-ICD-03: Documented guideline-directed medical therapy sustained for 6 months (meets >=90 day / 3 month CMS threshold).; CRIT-ICD-04: Event timeline documented: myocardial infarction 6 months ago; satisfies CMS mandatory post-event waiting periods.; CRIT-ICD-EXCL-01: Disqualifying exclusion criterion detected: Metastatic pancreatic cancer.",
-        "latency_ms": 23.19
+        "latency_ms": 21.58
       },
       {
         "id": "HOLD-03",
@@ -121,7 +102,7 @@
         "raw_confidence": 0.892,
         "calibrated_confidence": 0.892,
         "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-ICD-03]. Supplementary documentation required.",
-        "latency_ms": 23.81
+        "latency_ms": 22.36
       },
       {
         "id": "HOLD-04",
@@ -138,7 +119,7 @@
         "raw_confidence": 0.925,
         "calibrated_confidence": 0.925,
         "clinical_rationale": "CRIT-CPAP-01: AHI of 11.3 events/hr accompanied by documented comorbid symptoms (hypertension).; CRIT-CPAP-02: Documented clinical evaluation: Face-to-face prior to sleep study.",
-        "latency_ms": 20.17
+        "latency_ms": 20.53
       },
       {
         "id": "HOLD-05",
@@ -155,7 +136,7 @@
         "raw_confidence": 0.94,
         "calibrated_confidence": 0.94,
         "clinical_rationale": "CRIT-CPAP-01: AHI of 8.2 events/hr falls in the 5-14 band, but required comorbidities (hypertension, stroke, excessive daytime sleepiness) are explicitly absent/negated: 'denies excessive daytime sleepiness'.; CRIT-CPAP-02: Documented clinical evaluation: Face-to-face prior to sleep study.",
-        "latency_ms": 22.06
+        "latency_ms": 21.2
       },
       {
         "id": "HOLD-06",
@@ -172,7 +153,7 @@
         "raw_confidence": 0.93,
         "calibrated_confidence": 0.6825,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-02]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.682) falls below safety threshold tau (0.85).",
-        "latency_ms": 19.36
+        "latency_ms": 27.47
       },
       {
         "id": "HOLD-07",
@@ -189,7 +170,7 @@
         "raw_confidence": 0.95,
         "calibrated_confidence": 0.95,
         "clinical_rationale": "CRIT-TAVR-01: Severe aortic stenosis verified by quantified hemodynamics (Aortic valve area 0.82 cm2; mean transvalvular gradient 52 mmHg; peak velocity 4.4 m/s), satisfying NCD 20.33.; CRIT-TAVR-02: Documented multidisciplinary evaluation: 'multidisciplinary Heart Team', confirming high/prohibitive surgical risk consensus.",
-        "latency_ms": 23.47
+        "latency_ms": 34.6
       },
       {
         "id": "HOLD-08",
@@ -206,7 +187,7 @@
         "raw_confidence": 0.795,
         "calibrated_confidence": 0.795,
         "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-TAVR-01]. Supplementary documentation required. | Calibrated aggregate confidence (0.795) falls below safety threshold tau (0.85).",
-        "latency_ms": 22.0
+        "latency_ms": 21.51
       },
       {
         "id": "HOLD-09",
@@ -223,7 +204,7 @@
         "raw_confidence": 0.95,
         "calibrated_confidence": 0.95,
         "clinical_rationale": "CRIT-LAAC-01: Documented high thromboembolic stroke risk: 'persistent non-valvular atrial fibrillation', satisfying NCD 220.13 criteria.; CRIT-LAAC-02: Documented contraindication to long-term anticoagulation: 'contraindication to long-term oral anticoagulation', satisfying NCD 220.13 criteria.; CRIT-LAAC-03: Imaging verified: 'absence of left atrial thrombus', confirming absence of intracardiac thrombus.",
-        "latency_ms": 28.04
+        "latency_ms": 27.9
       },
       {
         "id": "HOLD-10",
@@ -240,7 +221,7 @@
         "raw_confidence": 0.95,
         "calibrated_confidence": 0.95,
         "clinical_rationale": "CRIT-LAAC-01: Documented high thromboembolic stroke risk: 'persistent non-valvular atrial fibrillation', satisfying NCD 220.13 criteria.; CRIT-LAAC-02: Documented contraindication to long-term anticoagulation: 'Prior intracranial hemorrhage', satisfying NCD 220.13 criteria.; CRIT-LAAC-03: Imaging demonstrated presence of left atrial thrombus: 'demonstrates a left atrial thrombus measuring 12 mm', failing mandatory safety requirement for absence of intracardiac thrombus.",
-        "latency_ms": 22.0
+        "latency_ms": 20.26
       },
       {
         "id": "HOLD-11",
@@ -257,7 +238,7 @@
         "raw_confidence": 0.9467,
         "calibrated_confidence": 0.9467,
         "clinical_rationale": "CRIT-HBOT-01: Diabetic wound graded as Wagner Grade 4, satisfying Wagner Grade 3 or higher CMS requirement.; CRIT-HBOT-02: Documented timeline/duration (45 days) satisfies statutory minimum requirement of 30 days.; CRIT-HBOT-03: Clinical finding documented: 'pulses'.",
-        "latency_ms": 37.1
+        "latency_ms": 38.31
       },
       {
         "id": "HOLD-12",
@@ -271,10 +252,10 @@
         "predicted_abstain": true,
         "is_correct": true,
         "is_false_approval": false,
-        "raw_confidence": 0.7867,
-        "calibrated_confidence": 0.7867,
-        "clinical_rationale": "Calibrated aggregate confidence (0.787) falls below safety threshold tau (0.85).",
-        "latency_ms": 27.79
+        "raw_confidence": 0.7933,
+        "calibrated_confidence": 0.7933,
+        "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-HBOT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.793) falls below safety threshold tau (0.85).",
+        "latency_ms": 28.45
       },
       {
         "id": "HOLD-13",
@@ -291,7 +272,7 @@
         "raw_confidence": 0.9567,
         "calibrated_confidence": 0.9567,
         "clinical_rationale": "CRIT-CAS-01: Documented 85% carotid stenosis in symptomatic patient with neurological history (meets CMS NCD 20.7 threshold >=70%).; CRIT-CAS-02: Documented high surgical risk for Carotid Endarterectomy (CEA): 'High risk for open carotid endarterectomy', satisfying CMS anatomical/medical risk criteria.; CRIT-CAS-03: Documented utilization of mandatory CMS embolic protection system: 'embolic protection device'.",
-        "latency_ms": 28.99
+        "latency_ms": 29.32
       },
       {
         "id": "HOLD-14",
@@ -308,7 +289,7 @@
         "raw_confidence": 0.98,
         "calibrated_confidence": 0.98,
         "clinical_rationale": "CRIT-O2-01: Statutory metric verified: 86.0% satisfies <= 88.0 threshold.",
-        "latency_ms": 17.62
+        "latency_ms": 20.12
       },
       {
         "id": "HOLD-15",
@@ -325,7 +306,7 @@
         "raw_confidence": 0.9633,
         "calibrated_confidence": 0.9633,
         "clinical_rationale": "CRIT-TKA-01: Statutory metric verified: 75.0degrees satisfies <= 90.0 threshold.; CRIT-TKA-02: Documented timeline/duration (210 days) satisfies statutory minimum requirement of 180 days.; CRIT-TKA-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 27.66
+        "latency_ms": 28.03
       }
     ],
     "state_machine": [
@@ -343,8 +324,8 @@
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 31.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: III in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (150 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (420 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (without).",
-        "latency_ms": 71.1
+        "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 31.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: III in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (150 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (420 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (no).",
+        "latency_ms": 77.64
       },
       {
         "id": "HOLD-02",
@@ -361,7 +342,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 29.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: II in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (120 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (180 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 61.05
+        "latency_ms": 66.57
       },
       {
         "id": "HOLD-03",
@@ -378,7 +359,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-ICD-03, CRIT-ICD-04]. Supplementary documentation required.",
-        "latency_ms": 64.3
+        "latency_ms": 72.53
       },
       {
         "id": "HOLD-04",
@@ -395,7 +376,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-CPAP-01: Statutory metric verified: AHI of 11.3 events/hr (5-14 band) qualifies with documented comorbidity: 'hypertension'.; CRIT-CPAP-02: Clinical finding documented: 'face-to-face'.",
-        "latency_ms": 46.9
+        "latency_ms": 49.35
       },
       {
         "id": "HOLD-05",
@@ -412,7 +393,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-CPAP-01: AHI of 8.2 events/hr falls in 5-14 band, but required comorbidities (hypertension, stroke, excessive daytime sleepiness) are explicitly absent or not documented.; CRIT-CPAP-02: Clinical finding documented: 'face-to-face'.",
-        "latency_ms": 49.98
+        "latency_ms": 54.19
       },
       {
         "id": "HOLD-06",
@@ -429,7 +410,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.72,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-02]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.720) falls below safety threshold tau (0.85).",
-        "latency_ms": 46.04
+        "latency_ms": 50.39
       },
       {
         "id": "HOLD-07",
@@ -446,7 +427,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-TAVR-01: Statutory metric verified: 0.82cm2 satisfies <= 1.0 threshold.; CRIT-TAVR-02: Clinical finding documented: 'Heart Team'.",
-        "latency_ms": 49.89
+        "latency_ms": 50.06
       },
       {
         "id": "HOLD-08",
@@ -456,14 +437,14 @@
         "case_type": "omission-defer",
         "gold_decision": "DEFERRED_TO_HUMAN",
         "gold_abstain": true,
-        "predicted_decision": "DENIED",
-        "predicted_abstain": false,
-        "is_correct": false,
+        "predicted_decision": "DEFERRED_TO_HUMAN",
+        "predicted_abstain": true,
+        "is_correct": true,
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-TAVR-01: No documented clinical evidence matching statutory criteria.; CRIT-TAVR-02: Documented finding was explicitly negated (no).",
-        "latency_ms": 51.86
+        "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-TAVR-01]. Supplementary documentation required.",
+        "latency_ms": 51.9
       },
       {
         "id": "HOLD-09",
@@ -480,7 +461,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-LAAC-01: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-02: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Clinical finding documented: 'absence of left atrial thrombus'.",
-        "latency_ms": 61.35
+        "latency_ms": 61.62
       },
       {
         "id": "HOLD-10",
@@ -497,7 +478,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-LAAC-01: Statutory metric verified: 5.0points satisfies >= 3.0 threshold.; CRIT-LAAC-02: Statutory metric verified: 3.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Mandatory safety finding not met: pre-procedural imaging confirmed presence of left atrial thrombus: 'demonstrates a left atrial thrombus measuring 12 mm'.",
-        "latency_ms": 50.66
+        "latency_ms": 58.86
       },
       {
         "id": "HOLD-11",
@@ -514,7 +495,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 4 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: Documented timeline/duration (45 days) satisfies statutory minimum requirement of 30 days.; CRIT-HBOT-03: Clinical finding documented: 'pulses'.",
-        "latency_ms": 78.88
+        "latency_ms": 83.66
       },
       {
         "id": "HOLD-12",
@@ -524,14 +505,14 @@
         "case_type": "omission-defer",
         "gold_decision": "DEFERRED_TO_HUMAN",
         "gold_abstain": true,
-        "predicted_decision": "DENIED",
-        "predicted_abstain": false,
-        "is_correct": false,
+        "predicted_decision": "DEFERRED_TO_HUMAN",
+        "predicted_abstain": true,
+        "is_correct": true,
         "is_false_approval": false,
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
-        "clinical_rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 3 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: No documented clinical evidence matching statutory criteria.; CRIT-HBOT-03: Documented finding was explicitly negated (no).",
-        "latency_ms": 61.35
+        "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-HBOT-02]. Supplementary documentation required.",
+        "latency_ms": 75.97
       },
       {
         "id": "HOLD-13",
@@ -548,7 +529,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-CAS-01: Statutory metric verified: 85.0% satisfies >= 70.0 threshold.; CRIT-CAS-02: Clinical finding documented: 'hostile neck'.; CRIT-CAS-03: Clinical finding documented: 'embolic protection device'.",
-        "latency_ms": 64.51
+        "latency_ms": 68.46
       },
       {
         "id": "HOLD-14",
@@ -565,7 +546,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-O2-01: Statutory metric verified: 86.0% satisfies <= 88.0 threshold.",
-        "latency_ms": 37.62
+        "latency_ms": 47.33
       },
       {
         "id": "HOLD-15",
@@ -582,7 +563,7 @@
         "raw_confidence": 1.0,
         "calibrated_confidence": 0.99,
         "clinical_rationale": "CRIT-TKA-01: Statutory metric verified: 75.0degrees satisfies <= 90.0 threshold.; CRIT-TKA-02: Documented timeline/duration (210 days) satisfies statutory minimum requirement of 180 days.; CRIT-TKA-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 57.85
+        "latency_ms": 63.36
       }
     ],
     "declarative": [
@@ -600,8 +581,8 @@
         "is_false_approval": false,
         "raw_confidence": 0.96,
         "calibrated_confidence": 0.96,
-        "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 31.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: III in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (150 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (420 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (without).",
-        "latency_ms": 28.59
+        "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 31.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: III in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (150 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (420 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Statutory exclusion condition ruled out: documented as absent or resolved (no).",
+        "latency_ms": 28.85
       },
       {
         "id": "HOLD-02",
@@ -618,7 +599,7 @@
         "raw_confidence": 0.96,
         "calibrated_confidence": 0.96,
         "clinical_rationale": "CRIT-ICD-01: Statutory metric verified: 29.0% satisfies <= 35.0 threshold.; CRIT-ICD-02: Qualifying functional/severity stage confirmed: II in ['II', 'III', '2', '3', 'CLASS II', 'CLASS III'].; CRIT-ICD-03: Documented timeline/duration (120 days) satisfies statutory minimum requirement of 90 days.; CRIT-ICD-04: Documented timeline/duration (180 days) satisfies statutory minimum requirement of 40 days.; CRIT-ICD-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 25.17
+        "latency_ms": 24.01
       },
       {
         "id": "HOLD-03",
@@ -635,7 +616,7 @@
         "raw_confidence": 0.776,
         "calibrated_confidence": 0.776,
         "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-ICD-03, CRIT-ICD-04]. Supplementary documentation required. | Calibrated aggregate confidence (0.776) falls below safety threshold tau (0.85).",
-        "latency_ms": 25.05
+        "latency_ms": 24.86
       },
       {
         "id": "HOLD-04",
@@ -652,7 +633,7 @@
         "raw_confidence": 0.935,
         "calibrated_confidence": 0.935,
         "clinical_rationale": "CRIT-CPAP-01: Statutory metric verified: AHI of 11.3 events/hr (5-14 band) qualifies with documented comorbidity: 'hypertension'.; CRIT-CPAP-02: Clinical finding documented: 'face-to-face'.",
-        "latency_ms": 19.44
+        "latency_ms": 19.13
       },
       {
         "id": "HOLD-05",
@@ -669,7 +650,7 @@
         "raw_confidence": 0.935,
         "calibrated_confidence": 0.935,
         "clinical_rationale": "CRIT-CPAP-01: AHI of 8.2 events/hr falls in 5-14 band, but required comorbidities (hypertension, stroke, excessive daytime sleepiness) are explicitly absent or not documented.; CRIT-CPAP-02: Clinical finding documented: 'face-to-face'.",
-        "latency_ms": 22.11
+        "latency_ms": 29.82
       },
       {
         "id": "HOLD-06",
@@ -686,7 +667,7 @@
         "raw_confidence": 0.94,
         "calibrated_confidence": 0.6925,
         "clinical_rationale": "Potential unverified negative omission detected in [CRIT-CPAP-02]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.693) falls below safety threshold tau (0.85).",
-        "latency_ms": 20.74
+        "latency_ms": 21.45
       },
       {
         "id": "HOLD-07",
@@ -703,7 +684,7 @@
         "raw_confidence": 0.95,
         "calibrated_confidence": 0.95,
         "clinical_rationale": "CRIT-TAVR-01: Statutory metric verified: 0.82cm2 satisfies <= 1.0 threshold.; CRIT-TAVR-02: Clinical finding documented: 'Heart Team'.",
-        "latency_ms": 21.84
+        "latency_ms": 20.51
       },
       {
         "id": "HOLD-08",
@@ -717,10 +698,10 @@
         "predicted_abstain": true,
         "is_correct": true,
         "is_false_approval": false,
-        "raw_confidence": 0.7,
-        "calibrated_confidence": 0.7,
-        "clinical_rationale": "Calibrated aggregate confidence (0.700) falls below safety threshold tau (0.85).",
-        "latency_ms": 22.72
+        "raw_confidence": 0.71,
+        "calibrated_confidence": 0.71,
+        "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-TAVR-01]. Supplementary documentation required. | Calibrated aggregate confidence (0.710) falls below safety threshold tau (0.85).",
+        "latency_ms": 21.01
       },
       {
         "id": "HOLD-09",
@@ -737,7 +718,7 @@
         "raw_confidence": 0.96,
         "calibrated_confidence": 0.96,
         "clinical_rationale": "CRIT-LAAC-01: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-02: Statutory metric verified: 4.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Clinical finding documented: 'absence of left atrial thrombus'.",
-        "latency_ms": 26.71
+        "latency_ms": 27.32
       },
       {
         "id": "HOLD-10",
@@ -754,7 +735,7 @@
         "raw_confidence": 0.97,
         "calibrated_confidence": 0.97,
         "clinical_rationale": "CRIT-LAAC-01: Statutory metric verified: 5.0points satisfies >= 3.0 threshold.; CRIT-LAAC-02: Statutory metric verified: 3.0points satisfies >= 3.0 threshold.; CRIT-LAAC-03: Mandatory safety finding not met: pre-procedural imaging confirmed presence of left atrial thrombus: 'demonstrates a left atrial thrombus measuring 12 mm'.",
-        "latency_ms": 21.48
+        "latency_ms": 22.65
       },
       {
         "id": "HOLD-11",
@@ -771,7 +752,7 @@
         "raw_confidence": 0.9433,
         "calibrated_confidence": 0.9433,
         "clinical_rationale": "CRIT-HBOT-01: Qualifying functional/severity stage confirmed: 4 in ['3', '4', '5', 'III', 'IV', 'V', 'STAGE III', 'STAGE IV'].; CRIT-HBOT-02: Documented timeline/duration (45 days) satisfies statutory minimum requirement of 30 days.; CRIT-HBOT-03: Clinical finding documented: 'pulses'.",
-        "latency_ms": 33.49
+        "latency_ms": 32.0
       },
       {
         "id": "HOLD-12",
@@ -785,10 +766,10 @@
         "predicted_abstain": true,
         "is_correct": true,
         "is_false_approval": false,
-        "raw_confidence": 0.7833,
-        "calibrated_confidence": 0.7833,
-        "clinical_rationale": "Calibrated aggregate confidence (0.783) falls below safety threshold tau (0.85).",
-        "latency_ms": 26.89
+        "raw_confidence": 0.79,
+        "calibrated_confidence": 0.79,
+        "clinical_rationale": "Insufficient evidence for mandatory coverage criteria: [CRIT-HBOT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.790) falls below safety threshold tau (0.85).",
+        "latency_ms": 27.11
       },
       {
         "id": "HOLD-13",
@@ -805,7 +786,7 @@
         "raw_confidence": 0.94,
         "calibrated_confidence": 0.94,
         "clinical_rationale": "CRIT-CAS-01: Statutory metric verified: 85.0% satisfies >= 70.0 threshold.; CRIT-CAS-02: Clinical finding documented: 'hostile neck'.; CRIT-CAS-03: Clinical finding documented: 'embolic protection device'.",
-        "latency_ms": 29.8
+        "latency_ms": 26.77
       },
       {
         "id": "HOLD-14",
@@ -822,7 +803,7 @@
         "raw_confidence": 0.98,
         "calibrated_confidence": 0.98,
         "clinical_rationale": "CRIT-O2-01: Statutory metric verified: 86.0% satisfies <= 88.0 threshold.",
-        "latency_ms": 17.29
+        "latency_ms": 16.15
       },
       {
         "id": "HOLD-15",
@@ -839,7 +820,7 @@
         "raw_confidence": 0.9633,
         "calibrated_confidence": 0.9633,
         "clinical_rationale": "CRIT-TKA-01: Statutory metric verified: 75.0degrees satisfies <= 90.0 threshold.; CRIT-TKA-02: Documented timeline/duration (210 days) satisfies statutory minimum requirement of 180 days.; CRIT-TKA-EXCL-01: Active statutory exclusion identified: patient manifests disqualifying condition.",
-        "latency_ms": 25.52
+        "latency_ms": 24.1
       }
     ]
   }

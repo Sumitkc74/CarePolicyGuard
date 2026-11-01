@@ -1,6 +1,13 @@
 # CarePolicyGuard: Empirical Benchmarks & Ablation Evaluation
 
-This document outlines the clinical benchmark methodology, quantitative evaluation results, statistical calibration analysis, programmatic ablation studies, and peer-reviewed literature underpinning **CarePolicyGuard**.
+This document outlines the clinical benchmark methodology, quantitative evaluation results, calibration analysis, programmatic ablation studies, policy coverage audits, and peer-reviewed literature underpinning **CarePolicyGuard**.
+
+> [!IMPORTANT]
+> **Scope & Generalization Notice**:
+> - **Benchmark Dataset (BENCH-01..10, $n=10$)**: Saturated at 10/10 across deterministic, state-machine, and declarative modes. Designed as a synthetic regression baseline covering specific known failure modes (temporal waiting periods, exclusions, omissions, quantitative bounds). It no longer measures open-domain generalization.
+> - **Development Set (v1-dev, $n=15$)**: An unsealed internal development diagnostic set used for regression testing and error analysis. Current diagnostic performance: deterministic 15/15, state-machine 15/15, declarative 15/15, with 0 false approvals across all modes. These numbers are internal diagnostic figures and must never be cited as held-out generalization claims.
+> - **Sealed Held-Out Set (v2)**: Remains strictly sealed and uninspected until external clinician certification or blind dual annotation is completed under [carepolicyguard-heldout/V2_RUN_PROTOCOL.md](file:///e:/Class/GitHub/CarePolicyGuard/carepolicyguard-heldout/V2_RUN_PROTOCOL.md).
+> - **Real-World Transfer**: 100% concordance on synthetic vignettes does **NOT** imply 100% accuracy on real-world hospital electronic health records, which contain messy optical character recognition (OCR), multi-provider progress note contradictions, unformatted PDF attachments, and unmodeled clinical edge cases.
 
 ---
 
@@ -21,25 +28,31 @@ The benchmark vignettes were constructed by clinical domain specialists using:
    - **AASM** Clinical Practice Guidelines for Diagnostic Testing and Positive Airway Pressure Therapy in Adult OSA.
    - **UHMS** Hyperbaric Oxygen Therapy Clinical Indications (14th Edition).
 2. **Medicare Administrative Contractor (MAC) & Recovery Auditor (RAC) Denial Patterns**:
-   - Cases feature realistic real-world failure modes documented by CMS CERT audits: premature post-MI evaluations, unverified medication compliance, missing baseline diagnostic values, and documented drug allergies/intolerances.
+   - Cases feature realistic failure modes documented by CMS CERT audits: premature post-MI evaluations, unverified medication compliance, missing baseline diagnostic values, and documented drug allergies/intolerances.
 3. **HIPAA Safe Harbor De-Identification (45 CFR § 164.514(b)(2))**:
    - All patient identifiers (names, dates except year, geographic subdivisions, MRNs, SSNs) are synthetically generated or sanitized. No real Protected Health Information (PHI) is present.
 
 ---
 
-## 2. Quantitative Performance Across 4 System Configurations
+## 2. Quantitative Performance Across System Configurations
 
-The benchmark evaluates 40 discrete adjudications (10 clinical vignettes $\times$ 4 system configurations) executed via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py):
+The benchmark evaluates discrete adjudications across system configurations on synthetic vignettes ($n=10$) executed via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py):
 
-| Architectural Configuration | Description / Paradigm | Adjudication Accuracy | Evidence Faithfulness | Expected Calibration Error (ECE) | Safe Abstention Rate | False Approval Rate (RAC Risk) | Overall Clinical Safety Score | Latency |
+| Architectural Configuration | Description / Model | Diagnostic Accuracy ($n=10$) | Evidence Faithfulness | Expected Calibration Error (ECE) | Safe Abstention Rate | False Approval Rate (RAC Risk) | False Denial Rate | Latency |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Config A: Zero-Shot Baseline (Real Local Model)** | Qwen2.5-3B-Instruct via Ollama (Zero-Shot Direct Call) | 80.0% | 61.5% | 0.120 | 0.0% (No Deferral) | **0.0%** (0/4) | **0.433** | ~12,256 ms |
-| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 70.0% | 68.0% | 0.220 (Miscalibrated) | 0.0% | **50.0%** (2/4) | **0.371** | ~1 ms |
-| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% | 87.5% | 0.122 (Moderate) | 0.0% | **0.0%** (0/4) | **0.615** | ~1 ms |
-| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0%** | **100.0%** | **0.065 (Calibrated)** | **20.0%** | **0.0% (0/4)** | **0.935** | **~34 ms** |
+| **Config A1: Local LLM Baseline (3B)** | Qwen2.5-3B-Instruct via Ollama (Zero-Shot Direct Call) | 80.0% (8/10) | 61.5% | 0.120 ($n=10$) | 0.0% (Forced Binary) | **0.0%** (0/4) | 20.0% (2/10) | ~12,256 ms |
+| **Config A2: Local LLM Baseline (14B)** | Qwen2.5-14B-Instruct via Ollama (Zero-Shot Direct Call) | Tested / Documented below | Exact character slice | Evaluated ($n=10$) | 0.0% (Forced Binary) | **0.0%** | Tested below | ~180,000 ms (CPU/GPU split) |
+| **Config B: Single-Pass RAG (Ablation)** | Retrieval without Longitudinal Timeline Checks | 70.0% (7/10) | 68.0% | 0.220 ($n=10$) | 0.0% | **50.0%** (2/4) | 10.0% (1/10) | ~1 ms |
+| **Config C: Multi-Agent (No Gate Ablation)** | Multi-Agent Extraction without Calibrated Abstention Gate | 80.0% (8/10) | 87.5% | 0.122 ($n=10$) | 0.0% | **0.0%** (0/4) | 20.0% (2/10) | ~1 ms |
+| **Config D: CarePolicyGuard (Proposed)** | 4-Stage Multi-Agent + Adversarial Verifier + Gate ($\tau=0.85$) | **100.0% (10/10)** | **100.0%** | **0.065 ($n=8$ covered)** | **20.0% (2/10)** | **0.0% (0/4)** | **0.0% (0/10)** | **~34 ms** |
 
 > [!NOTE]
-> **Methodological Provenance & Integrity:** Config D, Config C, and Config B are executed dynamically in the live test harness. Config A is executed live against a local open model (`qwen2.5:3b` via Ollama at `http://localhost:11434/v1/chat/completions`, temperature 0.0, zero clinical egress) with raw runs persisted to [app/data/benchmarks/baseline_llm_raw_runs.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/baseline_llm_raw_runs.json). Config B is an architectural ablation of Config C that programmatically disables `TimelineAnalyzerService` and bypasses statutory temporal waiting periods (e.g. approving premature 21-day GDMT and <40d post-MI). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$). Config D achieves 100% adherence and 0% False Approval Rate via calibrated selective abstention. Faithfulness for Config A is measured via exact character-slice matching in the patient record; Config D enforces live character-slice verification. Confidence metrics represent deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ threshold; ECE is measured over the accepted adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*).
+> **Methodological Provenance & Calibration Clarification**:
+> - **Real Baseline Execution**: Config A1 and Config A2 are executed live against local open models via Ollama at `http://localhost:11434/v1/chat/completions` (temperature 0.0, zero cloud egress). Raw runs and envelopes are permanently recorded in [app/data/benchmarks/baseline_llm_raw_runs.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/baseline_llm_raw_runs.json) and [app/data/benchmarks/baseline_llm_raw_runs_3b.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/baseline_llm_raw_runs_3b.json).
+> - **Hardware Constraints for 14B Baseline**: The evaluation machine runs an NVIDIA GeForce GTX 1650 Ti GPU with 4,096 MiB (4.0 GB) VRAM and 15.4 GB total RAM (3.7 GB available). Loading `qwen2.5:14b` (9.0 GB quantized weights) requires offloading ~85% of model layers to system RAM and the CPU threadpool, resulting in generation speeds of ~1.55 tokens/second and latencies of ~180 to 240 seconds per clinical vignette.
+> - **Deterministic Heuristic Weights (Not Posterior Probabilities)**: Evaluator confidence scores (e.g. 0.92 for a rule match, 0.50 for insufficient evidence) are deterministic evidence sufficiency weights assigned by rule heuristics, **not** empirical Bayesian posterior probabilities.
+> - **Gate Threshold $\tau=0.85$**: The threshold $\tau=0.85$ is a deterministic heuristic safety rule for selective abstention, not a statistically calibrated Bayes-optimal boundary.
+> - **ECE Scope**: Expected Calibration Error ($\text{ECE} = 0.065$) is measured strictly across the covered adjudication subset ($n=8$) where the system did not abstain ($2$ cases deferred). An ECE of 0.065 on $n=8$ synthetic cases reflects consistent rule behavior on this test set, but does not imply solved clinical calibration on open-ended patient populations.
 
 ---
 
@@ -98,16 +111,23 @@ In prior-authorization review, a false approval results in unindicated invasive 
 
 ---
 
-## 5. Statistical Calibration Analysis (ECE)
+## 5. Calibration Analysis & Expected Calibration Error (ECE)
 
-Expected Calibration Error (ECE) measures how reliably a system's confidence predicts correctness across $M=10$ confidence bins (*Guo et al., ICML 2017*):
+Expected Calibration Error (ECE) measures how reliably a system's assigned confidence tracks empirical accuracy across $M=5$ confidence bins:
 
 $$\text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|$$
 
-- **Config A (ECE = 0.120)**: Moderately miscalibrated on ungrounded zero-shot neural generation; lacks selective classification to defer on documentation gaps.
-- **Config B (ECE = 0.220)**: Retrieval improves context access but remains vulnerable to temporal logic omissions.
-- **Config C (ECE = 0.122)**: Multi-agent criteria mapping improves accuracy but forces decisions on underspecified cases.
-- **Config D (ECE = 0.065)**: Calibrated via adversarial verification and safe deferral of sub-threshold cases ($\tau = 0.85$), evaluated across the covered decision subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
+### Honest Interpretation of Confidence and Calibration
+- **Deterministic Sufficiency Weights (Not Empirical Posterior Probabilities)**: Evaluator confidence scores in CarePolicyGuard (e.g., 0.92 for a rule match, 0.50 for insufficient evidence) are deterministic sufficiency weights assigned by heuristic rules and regex matchers. They are **not** empirical posterior probabilities derived from a calibrated statistical distribution or neural softmax.
+- **Rule Threshold $\tau = 0.85$ (Not a Bayes-Optimal Boundary)**: The gate threshold $\tau = 0.85$ is a deterministic heuristic safety threshold for selective abstention, chosen to route ambiguous documentation to human review. It is **not** a statistically calibrated Bayes-optimal decision boundary.
+- **Sample Size & Covered Subset ($n=8$)**: ECE for Config D ($\text{ECE} = 0.065$) is computed exclusively across the covered adjudication subset of $n=8$ accepted decisions (the 2 deferred cases were routed away from autonomous decision-making per selective classification methodology, *Geifman & El-Yaniv, NeurIPS 2017*). **An ECE of 0.065 on $n=8$ synthetic cases reflects consistent heuristic scoring on this benchmark, but does NOT imply that CarePolicyGuard has solved clinical calibration for arbitrary real-world medical records.**
+
+| Configuration | ECE Value | Evaluation Subset ($n$) | Underlying Uncertainty Mechanism |
+| :--- | :---: | :---: | :--- |
+| **Config A1 (Qwen2.5-3B)** | 0.120 | Full set ($n=10$) | Raw zero-shot neural generation without selective deferral |
+| **Config B (Single-Pass RAG)** | 0.220 | Full set ($n=10$) | Keyword retrieval vulnerable to statutory timeline errors |
+| **Config C (Multi-Agent No-Gate)** | 0.122 | Full set ($n=10$) | Multi-agent extraction with forced binary decisions ($\tau = 0.0$) |
+| **Config D (CarePolicyGuard)** | **0.065** | Accepted subset ($n=8$) | Adversarial verification with heuristic selective abstention ($\tau = 0.85$) |
 
 ---
 
@@ -167,9 +187,27 @@ To evaluate rule stability against clinical variation, [app/services/perturbatio
 - **Adversarial Evidence Omission**: Stripping required diagnostic metrics (e.g., removing LVEF, AHI, AVA, or Wagner grade) across all medical specialties to verify that the calibrated abstention gate safely defers or denies rather than hallucinating approvals.
 
 ### 7.3 Methodological Limitations
-1. **Benchmark Scope & Policy Curations**: The 10 vignettes represent synthetic clinical edge cases curated from CMS statutory manuals, ACC/AHA guidelines, and MAC/RAC denial patterns. Similarly, the JSON definitions in [app/data/policies/](file:///e:/Class/GitHub/CarePolicyGuard/app/data/policies/) represent curated benchmark criterion sets (targeting primary statutory indications, exclusions, and waiting periods) rather than exhaustive legal transcriptions of full multi-page CMS coverage manuals.
-2. **Confidence Metric Interpretation**: Confidence scores are deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ gate threshold rather than posterior probabilities from a trained neural network. ECE is computed across the covered adjudication subset ($N=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
+1. **Benchmark Scope & Synthetic Constraints**: The 10 vignettes represent synthetic clinical edge cases curated from CMS statutory manuals, ACC/AHA guidelines, and MAC/RAC denial patterns. They measure compliance with specific statutory boundaries (e.g. 40-day post-MI wait periods, 90-day GDMT trials, ejection fraction inequalities) but do **not** represent an open-ended multi-center clinical validation study on messy, uncurated hospital electronic records.
+2. **Confidence Metric Interpretation**: Confidence scores are deterministic evidence sufficiency weights evaluated against the $\tau = 0.85$ gate threshold rather than posterior probabilities from a calibrated neural distribution. ECE is computed across the covered adjudication subset ($n=8$) per selective classification methodology (*Geifman & El-Yaniv, NeurIPS 2017*).
 3. **Policy-as-Data Execution Pathways**: The framework implements a declarative schema ([app/schemas/declarative_policy.py](file:///e:/Class/GitHub/CarePolicyGuard/app/schemas/declarative_policy.py)) and engine ([app/services/declarative_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/declarative_engine.py)). Ingestion and criteria fallback are fully declarative; evaluation currently operates via dual pathways: specialized procedural adjudication for the established CMS benchmark cases, alongside a live declarative mode (`execution_mode="declarative"`) and automatic fallback routing for zero-code custom policies (e.g. `LCD-TOTAL-KNEE-01`).
+
+### 7.4 Statutory Policy Criteria Coverage Audit (8 Policies)
+An audit of the policy definitions in [app/data/policies/](file:///e:/Class/GitHub/CarePolicyGuard/app/data/policies/) reveals varying criteria density across statutory domains:
+
+| Policy ID | Statutory Coverage Domain | Active Criteria Count | Key Inclusion / Exclusion Elements Covered | Coverage Audit Assessment |
+| :--- | :--- | :---: | :--- | :--- |
+| **NCD-20.4** | Implantable Automatic Defibrillators (ICDs) | 5 criteria | LVEF $\le 35\%$, NYHA II/III, GDMT $\ge 90$d, MI/CABG timeline, cardiogenic shock/terminal illness exclusion | **Comprehensive**: Full coverage of primary indications, exclusions, and statutory timelines. |
+| **LCD-L33829** | PAP Devices for Obstructive Sleep Apnea | 2 criteria | AHI $\ge 15$ or AHI 5–14 with qualifying comorbidities; face-to-face evaluation $\le 30$d | **Targeted**: Accurately models the two-tiered AHI coverage band and evaluation timeline. |
+| **LCD-TOTAL-KNEE-01** | Total Knee Arthroplasty (TKA) | 3 criteria | Flexion $\le 90^\circ$, failure of $\ge 90$d conservative therapy, active joint infection exclusion | **Targeted**: Enforces mandatory conservative trial and acute infection exclusion. |
+| **NCD-20.29** | Hyperbaric Oxygen Therapy (HBOT) for DFU | 3 criteria | Wagner Grade $\ge 3$, failure of $\ge 30$d standard wound care, lower extremity vascular assessment | **Targeted**: Enforces ulcer severity staging, conservative trial, and distal perfusion. |
+| **NCD-20.33** | Transcatheter Aortic Valve Replacement (TAVR) | 2 criteria | Severe AS hemodynamics (AVA $\le 1.0\text{ cm}^2$ or gradient $\ge 40$ or velocity $\ge 4.0$), Heart Team consultation | **Sparse-Adequate**: Covers mandatory hemodynamics and Heart Team; CMS manual also details surgical prohibitive risk and futility exclusions. |
+| **NCD-20.7** | Carotid Artery Stenting (CAS) | 3 criteria | Stenosis $\ge 70\%$ symptomatic or $\ge 80\%$ asymptomatic; high surgical risk for CEA; FDA-approved EPD | **Targeted**: Models dual stenosis thresholds, high surgical risk features, and mandatory embolic protection. |
+| **NCD-220.13** | Left Atrial Appendage Closure (LAAC / Watchman) | 3 criteria | AF with $\text{CHA}_2\text{DS}_2\text{-VASc} \ge 3$; OAC contraindication ($\text{HAS-BLED} \ge 3$); imaging verifying absence of thrombus | **Targeted**: Accurately enforces stroke risk, bleeding risk contraindication, and pre-op safety imaging. |
+| **NCD-240.2** | Home Use of Oxygen | 1 criterion | Severe resting hypoxemia ($\text{PaO}_2 \le 55\text{ mmHg}$ or $\text{SpO}_2 \le 88\%$ on room air at rest) | **Sparse**: Single-criterion schema covering resting hypoxemia; production deployment requires adding secondary criteria for clinical stability and reversible etiology checks. |
+
+> [!WARNING]
+> **Coverage Gap Notice (NCD-240.2)**:
+> NCD-240.2 currently contains only `CRIT-O2-01` (Resting Hypoxemia). Under full CMS manuals, home oxygen also requires clinical stability (absence of acute reversible exacerbation) and verification that optimal medical management has been tried. Deployers using NCD-240.2 must configure these additional criteria to prevent approval of acute inpatient oxygen orders.
 
 ---
 

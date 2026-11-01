@@ -136,21 +136,30 @@ CarePolicyGuard supports three execution modes via `execution_mode`:
 
 ## 4-Configuration Empirical Research Benchmark
 
-The benchmark framework compares CarePolicyGuard against three conventional clinical AI architectures across 40 discrete evaluations. For full technical proofs and mathematical formulas, see [BENCHMARKS.md](file:///e:/Class/GitHub/CarePolicyGuard/BENCHMARKS.md).
+The benchmark framework evaluates CarePolicyGuard against three conventional clinical AI architectures across 40 discrete evaluations on curated synthetic Medicare coverage vignettes ($n=10$). For full technical proofs and mathematical formulas, see [BENCHMARKS.md](file:///e:/Class/GitHub/CarePolicyGuard/BENCHMARKS.md).
+
+> [!IMPORTANT]
+> **Dataset & Scope Notice**:
+> The 100% accuracy and 0% false approval figures below are measured strictly on **BENCH-01..10 ($n=10$)**, a synthetic benchmark covering specific Medicare statutory criteria, temporal waiting periods, and exclusions. These numbers do **not** imply 100% accuracy on real-world hospital EHRs (which feature noisy OCR, multi-provider documentation conflicts, unstructured attachments, and unmodeled clinical edge cases).
 
 | Metric | Config A: Zero-Shot Baseline (Real Local Model) | Config B: Single-Pass RAG (Ablation) | Config C: Multi-Agent (No Gate Ablation) | Config D: CarePolicyGuard (Proposed) |
 | :--- | :---: | :---: | :---: | :---: |
-| **Architecture** | Qwen2.5-3B-Instruct via Ollama | Retrieval without Timeline Engine | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
-| **Decision Concordance (Accuracy)** | 80.0% | 70.0% | 80.0% | **100.0%** |
+| **Architecture** | Qwen2.5-3B-Instruct via Ollama (Local) | Retrieval without Timeline Engine | Multi-Agent Extraction (Forced Binary) | 4-Stage Multi-Agent + Gate ($\tau=0.85$) |
+| **Diagnostic Accuracy ($n=10$)** | 80.0% (8/10) | 70.0% (7/10) | 80.0% (8/10) | **100.0% (10/10)** |
 | **Evidence Faithfulness (% Grounded)** | 61.5% | 68.0% | 87.5% | **100.0%** |
-| **Expected Calibration Error (ECE)** | 0.120 | 0.220 (Miscalibrated) | 0.122 (Moderate) | **0.065 (Calibrated on Covered Decisions)** |
-| **Safe Abstention Rate** | 0.0% (Forced Binary) | 0.0% | 0.0% | **20.0% (Safe Deferral on Ambiguity)** |
+| **Expected Calibration Error (ECE)** | 0.120 ($n=10$) | 0.220 (Miscalibrated, $n=10$) | 0.122 (Moderate, $n=10$) | **0.065 ($n=8$ covered subset)** |
+| **Safe Deferral Rate (Abstentions)** | 0.0% (Forced Binary) | 0.0% | 0.0% | **20.0% (2/10 Safe Deferral on Ambiguity)** |
 | **False Approval Rate (RAC Clawback Risk)** | **0.0%** (0/4 on ineligible cases) | **50.0%** (2/4, premature GDMT & post-MI) | **0.0%** (0/4, forced denials) | **0.0% (0/4 Zero Clawback Risk)** |
+| **False Denial Rate** | 20.0% (2/10, forced denial on omissions) | 10.0% (1/10) | 20.0% (2/10) | **0.0% (0/10)** |
 | **Overall Clinical Safety Score** | **0.433** | **0.371** | **0.615** | **0.935** |
 | **Average Latency** | ~12,256 ms (Local GPU Neural) | ~1 ms | ~1 ms | **~34 ms (In-Process Neuro-Symbolic)** |
 
 > [!NOTE]
-> **Ablation Provenance & Methodology:** The benchmark configurations are executed via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py). Config A is executed live against a local open model (`qwen2.5:3b` via Ollama at `http://localhost:11434/v1/chat/completions`, temperature 0.0, zero cloud egress) with raw runs persisted to [app/data/benchmarks/baseline_llm_raw_runs.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/baseline_llm_raw_runs.json). Config B is an architectural ablation isolating `TimelineAnalyzerService` by bypassing statutory waiting periods (e.g., post-MI 40d, GDMT 90d). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$). Config D is the full proposed neuro-symbolic framework ($\tau = 0.85$). Faithfulness is evaluated against exact character-level offsets; ECE is measured on the covered adjudication subset ($N=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*). Robustness against clinical phrasing variation is validated via programmatic perturbation testing in [app/services/perturbation_engine.py](file:///e:/Class/GitHub/CarePolicyGuard/app/services/perturbation_engine.py). The 10 vignettes represent synthetic Medicare coverage stress tests rather than an external multi-center clinical cohort.
+> **Ablation Provenance & Calibration Clarification:**
+> - **Execution**: The benchmark configurations are executed via [app/agents/empirical_harness.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/empirical_harness.py). Config A is executed live against a local open model (`qwen2.5:3b` via Ollama at `http://localhost:11434/v1/chat/completions`, temperature 0.0, zero cloud egress) with raw runs persisted to [app/data/benchmarks/baseline_llm_raw_runs.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/baseline_llm_raw_runs.json). Config B ablates `TimelineAnalyzerService` by bypassing statutory waiting periods (e.g., post-MI 40d, GDMT 90d). Config C ablates adversarial verification and forces binary decisions ($\tau = 0.0$). Config D is the full proposed neuro-symbolic framework ($\tau = 0.85$).
+> - **Confidence Scores**: Evaluator confidences are deterministic sufficiency weights assigned by rules and regex matchers, not empirical Bayesian posterior probabilities.
+> - **Abstention Gate $\tau = 0.85$**: A deterministic heuristic safety threshold for selective abstention, not a statistically calibrated Bayes-optimal boundary.
+> - **ECE Scope**: ECE is measured over the covered adjudication subset ($n=8$) in accordance with selective classification literature (*Geifman & El-Yaniv, NeurIPS 2017*). An ECE of 0.065 on $n=8$ synthetic cases reflects consistent rule behavior on this benchmark, but does not represent solved medical calibration across open-domain hospital EHRs.
 
 $$\text{Clinical Safety Score} = \text{Accuracy} \times \text{Faithfulness} \times (1 - \text{ECE})$$
 
@@ -290,7 +299,7 @@ flowchart TD
 * **Why it is better than Forced Binary Classification (Approve/Deny):**
   * *Softmax Miscalibration:* Standard foundation models exhibit severe uncalibrated overconfidence ($\text{ECE} \approx 0.20\text{--}0.31$), reporting 95% subjective confidence on cases that are clinically incorrect (*Nori et al., NEJM AI 2023; Guo et al., ICML 2017*).
   * *Clinician Distrust:* Hospital field evaluations prove clinicians actively distrust and reject automated systems that force decisions on ambiguous or borderline charts (*Zając et al., ACM TOCHI 2023; Banerji et al., Nature Medicine 2023*).
-  * CarePolicyGuard’s abstention gate achieves **20.0% safe deferral** on incomplete records while maintaining **100% precision on accepted cases**, reducing Expected Calibration Error to an optimal **$\text{ECE} = 0.066$**.
+  * CarePolicyGuard’s abstention gate achieves **20.0% safe deferral** on ambiguous synthetic vignettes ($n=10$) while maintaining **100% concordance on the covered subset ($n=8$)**, reducing Expected Calibration Error on accepted decisions to **$\text{ECE} = 0.065$**.
 
 ---
 
