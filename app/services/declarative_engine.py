@@ -246,6 +246,31 @@ class DeclarativePolicyEngine:
                             status = DeterminationStatus.MET
                             raw_confidence = 0.98
                             rationale = f"Statutory metric verified: {val}{criterion.target_unit or ''} satisfies {op} {thresh} threshold."
+                        elif "ahi" in [t.lower() for t in search_terms] and val >= 5.0:
+                            # AHI 5-14 band comorbidity check
+                            symp_pattern = r'(?i)\b(excessive daytime sleepiness|eds|hypertension|htn|insomnia|ischemic heart disease|stroke)\b'
+                            qualifying_symp = None
+                            for m_s in re.finditer(symp_pattern, ehr_text):
+                                sc = analyzer.analyze_clinical_scope(ehr_text, m_s.start(), m_s.end())
+                                if not sc["is_negated"]:
+                                    qualifying_symp = m_s.group(0)
+                                    span_symp = ClinicalEvidenceSpan(
+                                        source_text=ehr_text[m_s.start():m_s.end()],
+                                        start_char=m_s.start(),
+                                        end_char=m_s.end(),
+                                        clinical_section=analyzer.detect_clinical_section(ehr_text, m_s.start()),
+                                        confidence=0.95
+                                    )
+                                    spans.append(span_symp)
+                                    break
+                            if qualifying_symp:
+                                status = DeterminationStatus.MET
+                                raw_confidence = 0.95
+                                rationale = f"Statutory metric verified: AHI of {val} events/hr (5-14 band) qualifies with documented comorbidity: '{qualifying_symp}'."
+                            else:
+                                status = DeterminationStatus.NOT_MET
+                                raw_confidence = 0.95
+                                rationale = f"AHI of {val} events/hr falls in 5-14 band, but required comorbidities (hypertension, stroke, excessive daytime sleepiness) are explicitly absent or not documented."
                         else:
                             status = DeterminationStatus.NOT_MET
                             raw_confidence = 0.95
@@ -388,6 +413,26 @@ class DeclarativePolicyEngine:
                         rationale = f"Documented finding was explicitly negated ({scope['negation_trigger']})."
                         found = True
                         break
+
+            if not found and any("absence" in t.lower() or "no thrombus" in t.lower() for t in search_terms):
+                thrombus_match = re.search(r'(?i)\b(?:demonstrates|shows|reveals|identified|presence of)?\s*(?:a\s+)?(?:left atrial\s+)?thrombus(?:\s+measuring\s+\d+\s*mm)?\b', ehr_text)
+                if thrombus_match:
+                    s_idx = thrombus_match.start()
+                    e_idx = thrombus_match.end()
+                    sc = analyzer.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                    if not sc["is_negated"]:
+                        span_obj = ClinicalEvidenceSpan(
+                            source_text=ehr_text[s_idx:e_idx],
+                            start_char=s_idx,
+                            end_char=e_idx,
+                            clinical_section=analyzer.detect_clinical_section(ehr_text, s_idx),
+                            confidence=0.95
+                        )
+                        spans.append(span_obj)
+                        status = DeterminationStatus.NOT_MET
+                        raw_confidence = 0.95
+                        rationale = f"Mandatory safety finding not met: pre-procedural imaging confirmed presence of left atrial thrombus: '{span_obj.source_text}'."
+                        found = True
 
         return CriterionAssessment(
             criterion_id=criterion.criterion_code,

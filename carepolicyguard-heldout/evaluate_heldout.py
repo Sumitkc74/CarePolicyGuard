@@ -149,12 +149,17 @@ def generate_markdown_report(run_data: Dict[str, Any], output_path: Path):
     details = run_data["vignette_details"]
     
     md_lines = [
-        f"# CarePolicyGuard Held-Out Evaluation Report",
+        f"# CarePolicyGuard Development-Set (v1) Diagnostic Evaluation Report",
         f"",
-        f"**Dataset**: {meta['set_name']}  ",
+        f"> [!IMPORTANT]",
+        f"> **Development-Set Status**: This set (v1) is an unsealed development dataset used for regression testing and failure diagnosis.",
+        f"> Diagnostic numbers reported here are internal benchmarks and must not be cited as held-out generalization claims.",
+        f"> Held-out evaluation is strictly reserved for the sealed v2 dataset pending clinician sign-off.",
+        f"",
+        f"**Dataset**: {meta['set_name']} (Development Diagnostic Set)  ",
         f"**Execution Timestamp**: {meta['evaluation_timestamp']}  ",
         f"**Total Vignettes**: {meta['total_vignettes']} (Gold: {meta['gold_distribution']})  ",
-        f"**Status**: {meta['status']}  ",
+        f"**Status**: UNSEALED DEVELOPMENT SET  ",
         f"",
         f"## 1. Summary Performance by Execution Mode",
         f"",

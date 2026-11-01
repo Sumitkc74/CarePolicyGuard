@@ -159,3 +159,57 @@ def test_state_machine_mode_safety_gate_blocks_false_approvals():
     )
     assert res_thrombus.adjudication_decision != AdjudicationDecision.APPROVED
 
+def test_cpap_5_to_14_band_negated_comorbidities_denies_across_all_modes():
+    """
+    Regression Test (HOLD-05):
+    Verifies that an AHI in the 5-14 band (8.2 events/hr) with explicitly negated
+    comorbidities (denies daytime sleepiness, no hypertension, no history of stroke)
+    evaluates to an autonomous DENIAL (not a deferral) across deterministic,
+    state_machine, and declarative modes, with zero false approvals.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    ehr_text = """
+    SLEEP MEDICINE NOTE
+    Pre-Test Evaluation: Face-to-face clinical evaluation completed on 01/12/2026.
+    Review: Patient denies excessive daytime sleepiness. No hypertension, no history of stroke, no insomnia documented.
+    Polysomnography: Diagnostic overnight sleep study completed on 02/01/2026.
+    Apnea-Hypopnea Index (AHI): 8.2 events/hr.
+    Plan: CPAP therapy requested under LCD L33829.
+    """
+    for mode in ["deterministic", "state_machine", "declarative"]:
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-HOLD-05",
+            policy_id="LCD-L33829",
+            ehr_narrative=ehr_text,
+            execution_mode=mode,
+            save_record=False
+        )
+        assert res.adjudication_decision == AdjudicationDecision.DENIED, f"Mode {mode} failed to deny HOLD-05"
+        assert res.abstention_status is False, f"Mode {mode} deferred instead of denying"
+
+def test_laac_thrombus_on_imaging_denies_across_all_modes():
+    """
+    Regression Test (HOLD-10):
+    Verifies that a patient with AF and high stroke risk who demonstrates a left atrial
+    thrombus on pre-procedural imaging is autonomously DENIED across deterministic,
+    state_machine, and declarative modes.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    ehr_text = """
+    ELECTROPHYSIOLOGY NOTE
+    71-year-old male with persistent non-valvular atrial fibrillation. CHA2DS2-VASc score is 5.
+    Anticoagulation history: Prior intracranial hemorrhage; contraindication to long-term oral anticoagulation documented. HAS-BLED score is 3.
+    Imaging: Transesophageal echocardiogram (TEE) demonstrates a left atrial thrombus measuring 12 mm in the appendage.
+    Plan: LAAC referral held pending thrombus resolution.
+    """
+    for mode in ["deterministic", "state_machine", "declarative"]:
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-HOLD-10",
+            policy_id="NCD-220.13",
+            ehr_narrative=ehr_text,
+            execution_mode=mode,
+            save_record=False
+        )
+        assert res.adjudication_decision == AdjudicationDecision.DENIED, f"Mode {mode} failed to deny HOLD-10"
+        assert res.abstention_status is False, f"Mode {mode} deferred instead of denying"
+

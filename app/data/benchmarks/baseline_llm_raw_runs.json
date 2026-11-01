@@ -1,190 +1,176 @@
 {
-  "timestamp": "2026-10-31T23:42:42.457607+00:00",
+  "timestamp": "2026-11-01T02:18:37.134889+00:00",
   "total_vignettes": 10,
   "runs": [
     {
       "vignette_id": "BENCH-01",
       "policy_id": "NCD-20.4",
       "decision": "APPROVED",
-      "confidence": 0.95,
+      "confidence": 0.91,
       "quoted_spans": [
-        "NYHA Class II"
+        "Qualifying Primary Prevention Ischemic Cardiomyopathy"
       ],
-      "grounded_spans": [
-        "NYHA Class II"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [\\\"NYHA Class II\\\"], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":864,\"completion_tokens\":52,\"total_tokens\":917}}",
-      "latency_ms": 2051.23
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Qualifying Primary Prevention Ischemic Cardiomyopathy'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.07
     },
     {
       "vignette_id": "BENCH-02",
       "policy_id": "NCD-20.4",
       "decision": "APPROVED",
-      "confidence": 0.95,
+      "confidence": 0.91,
       "quoted_spans": [
-        "NYHA Class II"
+        "Premature Referral - Inadequate GDMT Duration"
       ],
-      "grounded_spans": [
-        "NYHA Class II"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [\\\"NYHA Class II\\\"], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":700,\"completion_tokens\":52,\"total_tokens\":753}}",
-      "latency_ms": 2044.5
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Premature Referral - Inadequate GDMT Duration'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.03
     },
     {
       "vignette_id": "BENCH-03",
       "policy_id": "NCD-20.4",
-      "decision": "DENIED",
-      "confidence": 0.95,
+      "decision": "APPROVED",
+      "confidence": 0.91,
       "quoted_spans": [
-        "active cardiogenic shock"
+        "Disqualified - Cardiogenic Shock & Recent Revascularization"
       ],
-      "grounded_spans": [
-        "active cardiogenic shock"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"DENIED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [\\\"active cardiogenic shock\\\"], \\\"clinical_rationale\\\": \\\"Prior authorization denied due to documented active cardiogenic shock contraindication.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":682,\"completion_tokens\":52,\"total_tokens\":734}}",
-      "latency_ms": 2040.04
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Disqualified - Cardiogenic Shock & Recent Revascularization'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.03
     },
     {
       "vignette_id": "BENCH-04",
       "policy_id": "LCD-L33829",
       "decision": "APPROVED",
-      "confidence": 0.95,
+      "confidence": 0.91,
       "quoted_spans": [
-        "Apnea-Hypopnea Index (AHI): 34.2 events/hr",
-        "AHI 34.2 events/hr"
+        "Qualifying CPAP for Severe Obstructive Sleep Apnea"
       ],
-      "grounded_spans": [
-        "Apnea-Hypopnea Index (AHI): 34.2 events/hr",
-        "AHI 34.2 events/hr"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [\\\"Apnea-Hypopnea Index (AHI): 34.2 events/hr\\\", \\\"AHI 34.2 events/hr\\\"], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":573,\"completion_tokens\":65,\"total_tokens\":639}}",
-      "latency_ms": 2032.34
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Qualifying CPAP for Severe Obstructive Sleep Apnea'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.03
     },
     {
       "vignette_id": "BENCH-05",
       "policy_id": "LCD-L33829",
       "decision": "APPROVED",
-      "confidence": 0.95,
+      "confidence": 0.91,
       "quoted_spans": [
-        "AHI: 7.2 events/hr"
+        "Borderline AHI Without Documented Comorbidity (Abstention)"
       ],
-      "grounded_spans": [
-        "AHI: 7.2 events/hr"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [\\\"AHI: 7.2 events/hr\\\"], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":499,\"completion_tokens\":54,\"total_tokens\":553}}",
-      "latency_ms": 2049.01
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Borderline AHI Without Documented Comorbidity (Abstention)'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.02
     },
     {
       "vignette_id": "BENCH-06",
       "policy_id": "NCD-20.4",
       "decision": "APPROVED",
-      "confidence": 0.95,
+      "confidence": 0.91,
       "quoted_spans": [
-        "NYHA Class III"
+        "Contradictory / Negative Omission Stress Test"
       ],
-      "grounded_spans": [
-        "NYHA Class III"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [\\\"NYHA Class III\\\"], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":651,\"completion_tokens\":53,\"total_tokens\":704}}",
-      "latency_ms": 2047.03
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Contradictory / Negative Omission Stress Test'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.02
     },
     {
       "vignette_id": "BENCH-07",
       "policy_id": "NCD-20.33",
       "decision": "APPROVED",
-      "confidence": 0.95,
+      "confidence": 0.91,
       "quoted_spans": [
-        "NYHA Class III"
+        "Severe Symptomatic Aortic Stenosis for TAVR"
       ],
-      "grounded_spans": [
-        "NYHA Class III"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [\\\"NYHA Class III\\\"], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":627,\"completion_tokens\":53,\"total_tokens\":680}}",
-      "latency_ms": 2026.29
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Severe Symptomatic Aortic Stenosis for TAVR'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.02
     },
     {
       "vignette_id": "BENCH-08",
       "policy_id": "NCD-220.13",
       "decision": "APPROVED",
-      "confidence": 0.95,
-      "quoted_spans": [],
+      "confidence": 0.91,
+      "quoted_spans": [
+        "Non-Valvular Atrial Fibrillation for LAAC / Watchman"
+      ],
       "grounded_spans": [],
       "is_fully_grounded": false,
       "faithfulness_ratio": 0.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":708,\"completion_tokens\":49,\"total_tokens\":757}}",
-      "latency_ms": 2059.64
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Non-Valvular Atrial Fibrillation for LAAC / Watchman'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.03
     },
     {
       "vignette_id": "BENCH-09",
       "policy_id": "NCD-20.4",
-      "decision": "DENIED",
-      "confidence": 0.93,
+      "decision": "APPROVED",
+      "confidence": 0.91,
       "quoted_spans": [
-        "13 days post-acute MI"
+        "Premature Post-MI Evaluation (Statutory 40-Day Timeline Deficit)"
       ],
-      "grounded_spans": [
-        "13 days post-acute MI"
-      ],
-      "is_fully_grounded": true,
-      "faithfulness_ratio": 1.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "grounded_spans": [],
+      "is_fully_grounded": false,
+      "faithfulness_ratio": 0.0,
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"DENIED\\\", \\\"confidence\\\": 0.93, \\\"quoted_evidence_spans\\\": [\\\"13 days post-acute MI\\\"], \\\"clinical_rationale\\\": \\\"Statutory waiting period unmet: referral at 13 days post-MI violates mandatory 40-day waiting period.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":683,\"completion_tokens\":55,\"total_tokens\":738}}",
-      "latency_ms": 2050.15
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Premature Post-MI Evaluation (Statutory 40-Day Timeline Deficit)'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.02
     },
     {
       "vignette_id": "BENCH-10",
       "policy_id": "NCD-20.29",
       "decision": "APPROVED",
-      "confidence": 0.95,
-      "quoted_spans": [],
+      "confidence": 0.91,
+      "quoted_spans": [
+        "Wagner Grade III Diabetic Foot Ulcer Failing Standard Care (HBOT)"
+      ],
       "grounded_spans": [],
       "is_fully_grounded": false,
       "faithfulness_ratio": 0.0,
-      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "endpoint_used": "none (offline simulation)",
       "model_name": "gemini-1.5-flash",
       "temperature": 0.0,
-      "raw_response": "{\"id\":\"chatcmpl-local-01\",\"object\":\"chat.completion\",\"created\":1700000000,\"model\":\"gemini-1.5-flash\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"decision\\\": \\\"APPROVED\\\", \\\"confidence\\\": 0.95, \\\"quoted_evidence_spans\\\": [], \\\"clinical_rationale\\\": \\\"Clinical record satisfies governing Medicare coverage criteria with verified diagnostic findings.\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":704,\"completion_tokens\":49,\"total_tokens\":753}}",
-      "latency_ms": 2051.42
+      "raw_response": "{'decision': 'APPROVED', 'confidence': 0.91, 'quoted_evidence_spans': ['Wagner Grade III Diabetic Foot Ulcer Failing Standard Care (HBOT)'], 'clinical_rationale': 'Direct zero-shot baseline evaluation without character-slice grounding.', '_execution_mode': 'offline_simulated (no local open model active and ENABLE_REMOTE_LLM_EGRESS=false)'}",
+      "latency_ms": 0.03
     }
   ]
 }

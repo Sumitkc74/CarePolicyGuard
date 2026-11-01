@@ -428,24 +428,44 @@ class CriteriaEvaluationAgent:
                     rationale = f"Polysomnography demonstrates AHI of {val} events/hr (meets severe OSA threshold ≥15 events/hr)."
                     raw_confidence = 0.96
                 elif val >= 5.0:
-                    # Check for comorbid symptoms
-                    symp_match = re.search(r'(?i)\b(excessive daytime sleepiness|eds|hypertension|htn|insomnia|ischemic heart disease)\b', ehr_text)
-                    if symp_match:
-                        span_symp = ClinicalEvidenceSpan(
-                            source_text=ehr_text[symp_match.start():symp_match.end()],
-                            start_char=symp_match.start(),
-                            end_char=symp_match.end(),
-                            clinical_section=self.detect_clinical_section(ehr_text, symp_match.start()),
-                            confidence=0.91
-                        )
-                        spans.append(span_symp)
-                        status = DeterminationStatus.MET
-                        rationale = f"AHI of {val} events/hr accompanied by documented comorbid symptoms ({span_symp.source_text})."
-                        raw_confidence = 0.92
-                    else:
-                        status = DeterminationStatus.INSUFFICIENT_EVIDENCE
-                        rationale = f"AHI of {val} events/hr (5-14 range) requires comorbid condition documentation which is missing."
-                        raw_confidence = 0.75
+                    # Check for comorbid symptoms (must be non-negated to qualify)
+                    symp_pattern = r'(?i)\b(excessive daytime sleepiness|eds|hypertension|htn|insomnia|ischemic heart disease|stroke)\b'
+                    found_qualifying_symp = False
+                    for m_s in re.finditer(symp_pattern, ehr_text):
+                        scope = self.analyze_clinical_scope(ehr_text, m_s.start(), m_s.end())
+                        if not scope["is_negated"]:
+                            span_symp = ClinicalEvidenceSpan(
+                                source_text=ehr_text[m_s.start():m_s.end()],
+                                start_char=m_s.start(),
+                                end_char=m_s.end(),
+                                clinical_section=self.detect_clinical_section(ehr_text, m_s.start()),
+                                confidence=0.92
+                            )
+                            spans.append(span_symp)
+                            status = DeterminationStatus.MET
+                            rationale = f"AHI of {val} events/hr accompanied by documented comorbid symptoms ({span_symp.source_text})."
+                            raw_confidence = 0.92
+                            found_qualifying_symp = True
+                            break
+                    if not found_qualifying_symp:
+                        # Check if comorbidities were explicitly evaluated/negated or completely absent
+                        neg_comorb_match = re.search(r'(?i)\b(?:denies|no|without|negative for)\b[^\.\n]*\b(daytime sleepiness|hypertension|stroke|insomnia)\b', ehr_text)
+                        if neg_comorb_match:
+                            span_neg = ClinicalEvidenceSpan(
+                                source_text=ehr_text[neg_comorb_match.start():neg_comorb_match.end()],
+                                start_char=neg_comorb_match.start(),
+                                end_char=neg_comorb_match.end(),
+                                clinical_section=self.detect_clinical_section(ehr_text, neg_comorb_match.start()),
+                                confidence=0.95
+                            )
+                            spans.append(span_neg)
+                            status = DeterminationStatus.NOT_MET
+                            rationale = f"AHI of {val} events/hr falls in the 5-14 band, but required comorbidities (hypertension, stroke, excessive daytime sleepiness) are explicitly absent/negated: '{span_neg.source_text}'."
+                            raw_confidence = 0.95
+                        else:
+                            status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                            rationale = f"AHI of {val} events/hr (5-14 range) requires comorbid condition documentation which is missing."
+                            raw_confidence = 0.75
                 else:
                     status = DeterminationStatus.NOT_MET
                     rationale = f"AHI of {val} events/hr fails the minimum diagnostic threshold for covered CPAP therapy (<5 events/hr)."
@@ -656,7 +676,7 @@ class CriteriaEvaluationAgent:
                 raw_confidence = 0.60
 
         elif "crit-laac-02" in code.lower() or "has-bled" in name.lower() or "contraindication" in name.lower():
-            contra_match = re.search(r"(?i)\b(has-bled score:?\s*([3-9]|\d{2})|oral anticoagulation is contraindicated|major recurrent (?:gastrointestinal )?hemorrhage)\b", ehr_text)
+            contra_match = re.search(r"(?i)\b(?:has-bled(?:\s+score)?\s*(?:is|calculated at|:)?\s*([3-9]|\d{2})|contraindication to (?:long-term )?oral anticoagulation|oral anticoagulation is contraindicated|prior intracranial hemorrhage|intracranial hemorrhage|major recurrent (?:gastrointestinal )?hemorrhage)\b", ehr_text)
             if contra_match:
                 span = ClinicalEvidenceSpan(
                     source_text=ehr_text[contra_match.start():contra_match.end()],
@@ -676,6 +696,7 @@ class CriteriaEvaluationAgent:
 
         elif "crit-laac-03" in code.lower() or "thrombus" in name.lower():
             tee_match = re.search(r"(?i)\b(absence of (?:left atrial )?thrombus|tee[^\.\n]*absence of (?:left atrial )?thrombus)\b", ehr_text)
+            thrombus_present = re.search(r"(?i)\b(?:demonstrates|shows|reveals|identified|presence of)?\s*(?:a\s+)?(?:left atrial\s+)?thrombus(?:\s+measuring\s+\d+\s*mm)?\b", ehr_text)
             if tee_match:
                 span = ClinicalEvidenceSpan(
                     source_text=ehr_text[tee_match.start():tee_match.end()],
@@ -687,6 +708,18 @@ class CriteriaEvaluationAgent:
                 spans.append(span)
                 status = DeterminationStatus.MET
                 rationale = f"Imaging verified: '{span.source_text}', confirming absence of intracardiac thrombus."
+                raw_confidence = 0.95
+            elif thrombus_present and not self.analyze_clinical_scope(ehr_text, thrombus_present.start(), thrombus_present.end())["is_negated"]:
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[thrombus_present.start():thrombus_present.end()],
+                    start_char=thrombus_present.start(),
+                    end_char=thrombus_present.end(),
+                    clinical_section=self.detect_clinical_section(ehr_text, thrombus_present.start()),
+                    confidence=0.95
+                )
+                spans.append(span)
+                status = DeterminationStatus.NOT_MET
+                rationale = f"Imaging demonstrated presence of left atrial thrombus: '{span.source_text}', failing mandatory safety requirement for absence of intracardiac thrombus."
                 raw_confidence = 0.95
             else:
                 status = DeterminationStatus.NOT_MET

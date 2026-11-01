@@ -208,6 +208,10 @@ class EmpiricalResearchHarness:
 
     def _resolve_llm_endpoint(self):
         """Resolves active LLM endpoint once during harness initialization."""
+        # Under automated unit test runs without explicit live LLM flag, avoid blocking tests on live neural generation
+        if "PYTEST_CURRENT_TEST" in os.environ and not os.getenv("TEST_LIVE_LLM"):
+            return
+
         local_urls = [
             "http://localhost:11434/v1/chat/completions",
             "http://localhost:8000/v1/chat/completions",
@@ -217,9 +221,15 @@ class EmpiricalResearchHarness:
             try:
                 base_check = l_url.rsplit("/chat/completions", 1)[0]
                 req = urllib.request.Request(f"{base_check}/models", method="GET")
-                with urllib.request.urlopen(req, timeout=0.1) as resp:
+                with urllib.request.urlopen(req, timeout=1.5) as resp:
                     if resp.status == 200:
                         self._target_llm_url = l_url
+                        try:
+                            models_data = json.loads(resp.read().decode("utf-8"))
+                            if isinstance(models_data, dict) and "data" in models_data and models_data["data"]:
+                                self._target_llm_model = models_data["data"][0].get("id", self._target_llm_model)
+                        except Exception:
+                            pass
                         return
             except Exception:
                 pass
@@ -266,15 +276,16 @@ class EmpiricalResearchHarness:
             f"Adjudicate this prior authorization request against the Medicare policy criteria.\n"
             f"Return ONLY a valid JSON object matching this schema:\n"
             f"{{\n"
-            f"  \"decision\": \"APPROVED\" | \"DENIED\" | \"DEFERRED_TO_HUMAN\",\n"
-            f"  \"confidence\": 0.95,\n"
-            f"  \"quoted_evidence_spans\": [\"exact verbatim quote from note\", ...],\n"
-            f"  \"clinical_rationale\": \"brief rationale\"\n"
+            f'  "decision": "APPROVED" | "DENIED" | "DEFERRED_TO_HUMAN",\n'
+            f'  "confidence": <confidence score between 0.00 and 1.00>,\n'
+            f'  "quoted_evidence_spans": ["exact verbatim quote from note", ...],\n'
+            f'  "clinical_rationale": "brief rationale"\n'
             f"}}\n"
             f"Rules:\n"
             f"1. Decision must be strictly APPROVED, DENIED, or DEFERRED_TO_HUMAN.\n"
             f"2. Every quoted evidence span must be copied verbatim from the patient record.\n"
-            f"3. If clinical criteria are missing or documentation is ambiguous, select DEFERRED_TO_HUMAN."
+            f"3. If clinical criteria are missing or documentation is ambiguous, select DEFERRED_TO_HUMAN.\n"
+            f"4. Provide a realistic confidence score reflecting clinical documentation completeness."
         )
 
         target_url = self._target_llm_url
@@ -289,16 +300,17 @@ class EmpiricalResearchHarness:
             payload = {
                 "model": model_name,
                 "messages": [
-                    {"role": "system", "content": "You are a clinical utilization review medical director. Respond strictly with valid JSON."},
+                    {"role": "system", "content": "You are a clinical utilization review medical director. Respond strictly with valid JSON. Keep clinical_rationale brief (1-2 sentences)."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": temperature,
+                "max_tokens": 350,
                 "response_format": {"type": "json_object"}
             }
             try:
                 data = json.dumps(payload).encode("utf-8")
                 req = urllib.request.Request(target_url, data=data, headers=headers, method="POST")
-                with urllib.request.urlopen(req, timeout=10.0) as resp:
+                with urllib.request.urlopen(req, timeout=120.0) as resp:
                     raw_response_text = resp.read().decode("utf-8")
                     resp_obj = json.loads(raw_response_text)
                     content = resp_obj["choices"][0]["message"]["content"]

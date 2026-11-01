@@ -93,9 +93,12 @@ class CalibratedAbstentionGate:
             action_items.append(f"Verify if patient chart actually fulfills requirements for [{codes}], as salient clinical keywords were found in the note.")
 
         # Check for Insufficient Evidence in mandatory criteria
+        # Only defer for documentation gaps if patient has not already failed a confirmed NOT_MET requirement
+        has_proven_unmet = any(not a.is_exclusion and a.status == DeterminationStatus.NOT_MET for a in criteria_assessments)
         insufficient_crit = [a for a in criteria_assessments if not a.is_exclusion and a.status == DeterminationStatus.INSUFFICIENT_EVIDENCE]
-        if insufficient_crit:
+        if insufficient_crit and not has_proven_unmet:
             codes = ", ".join([a.criterion_code for a in insufficient_crit])
+            abstention_triggers.append(f"Insufficient evidence for mandatory coverage criteria: [{codes}]. Supplementary documentation required.")
             action_items.append(f"Obtain supplementary documentation for missing mandatory criteria: [{codes}].")
 
         # Check for Internal Clinical Discordances

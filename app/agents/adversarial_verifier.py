@@ -6,6 +6,7 @@ from app.schemas.contracts import (
     DeterminationStatus,
     ClinicalEvidenceSpan
 )
+from app.agents.criteria_evaluator import CriteriaEvaluationAgent
 
 class AdversarialVerificationAgent:
     """
@@ -117,9 +118,26 @@ class AdversarialVerificationAgent:
                 omission_note = "UNVERIFIED OMISSION: EHR note documents heart failure medications (beta-blocker, ACEi/ARNI), but criterion was marked NOT_MET without citing these therapies."
 
         elif "ahi" in crit_context or "apnea" in crit_context or "sleep" in crit_context:
-            if re.search(r'(?i)\bahi\b|\bapnea-hypopnea index\b', text_lower):
-                omission_flag = True
-                omission_note = "UNVERIFIED OMISSION: EHR note documents AHI / polysomnography indices, but sleep study criterion was marked NOT_MET without citation."
+            has_ahi_span = any(
+                re.search(r'(?i)\b(?:ahi|apnea-hypopnea index|polysomnography|sleep study)\b', s.source_text)
+                for s in (assessment.verified_spans or [])
+            )
+            if has_ahi_span:
+                # AHI was cited; check if there is an unnegated comorbidity in the note that was omitted
+                comorb_matches = list(re.finditer(r'(?i)\b(excessive daytime sleepiness|eds|hypertension|htn|insomnia|ischemic heart disease|stroke)\b', text_lower))
+                unnegated_comorb = False
+                for m in comorb_matches:
+                    scope = CriteriaEvaluationAgent.analyze_clinical_scope(ehr_text, m.start(), m.end())
+                    if not scope["is_negated"]:
+                        unnegated_comorb = True
+                        break
+                if unnegated_comorb:
+                    omission_flag = True
+                    omission_note = "UNVERIFIED OMISSION: EHR note mentions qualifying comorbid conditions that were not credited for AHI 5-14 band."
+            else:
+                if re.search(r'(?i)\bahi\b|\bapnea-hypopnea index\b', text_lower):
+                    omission_flag = True
+                    omission_note = "UNVERIFIED OMISSION: EHR note documents AHI / polysomnography indices, but sleep study criterion was marked NOT_MET without citation."
 
         elif "wagner" in crit_context or "ulcer" in crit_context:
             if re.search(r'(?i)\bwagner\b|\bosteomyelitis\b|\bgangrene\b|\bdeep ulcer\b', text_lower):
