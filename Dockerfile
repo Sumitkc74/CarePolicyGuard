@@ -35,8 +35,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application source code and static assets
 COPY . /app
 
-# Set file permissions for the app user
-RUN chown -R appuser:appgroup /app
+# Create data directory and set file permissions for the app user
+RUN mkdir -p /app/data && chown -R appuser:appgroup /app
 
 # Run as non-privileged user
 USER appuser

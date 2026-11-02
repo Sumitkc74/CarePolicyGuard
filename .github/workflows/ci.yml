@@ -86,15 +86,24 @@ jobs:
             -e DATABASE_URL="sqlite:///./data/ci.db" \
             -e ABSTENTION_THRESHOLD=0.85 \
             carepolicyguard:latest
-          sleep 5
 
-          # 3. Microservice health endpoint verification
-          curl -f http://localhost:8000/health
+          # 3. Microservice health endpoint verification with startup polling
+          for i in $(seq 1 15); do
+            if curl -s -f http://localhost:8000/health > /dev/null 2>&1; then
+              echo "PASS: Container healthcheck responding"
+              break
+            fi
+            echo "Waiting for container startup (attempt $i/15)..."
+            sleep 1
+          done
+
+          # Verify health status and print logs if failed
+          curl -f http://localhost:8000/health || (docker logs cpg-test-container && exit 1)
 
           # 4. Synthetic clinical adjudication smoke test (zero patient data)
           curl -f -X POST http://localhost:8000/api/v1/adjudicate \
             -H "Content-Type: application/json" \
-            -d '{"patient_id":"PT-SMOKE-01","policy_id":"NCD-20.4","ehr_narrative":"67yo male with ischemic cardiomyopathy s/p CABG 14 months ago. NYHA Class II symptoms on GDMT for 6 months. TTE confirms LVEF 28%."}'
+            -d '{"patient_id":"PT-SMOKE-01","policy_id":"NCD-20.4","ehr_narrative":"67yo male with ischemic cardiomyopathy s/p CABG 14 months ago. NYHA Class II symptoms on GDMT for 6 months. TTE confirms LVEF 28%."}' || (docker logs cpg-test-container && exit 1)
 
           # 5. Stop and clean up container
           docker stop cpg-test-container

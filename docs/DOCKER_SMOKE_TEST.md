@@ -80,3 +80,4 @@ docker rm -f cpg-smoke
   3. `CRIT-ICD-03` (Optimal Medical Therapy >= 90 Days): Documented `6 months` (180 days) -> `MET`
   4. `CRIT-ICD-04` (Post-CABG Waiting Period > 3 Months): Documented `14 months` (420 days) -> `MET`
 - **Expected Result**: `APPROVED` determination, 4 verified evidence spans, confidence score >= 0.85, and SHA-256 tamper-evident seal.
+
