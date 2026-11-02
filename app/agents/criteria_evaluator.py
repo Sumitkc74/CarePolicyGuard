@@ -18,30 +18,10 @@ class CriteriaEvaluationAgent:
 
     def detect_clinical_section(self, text: str, char_pos: int) -> str:
         """
-        Determines the clinical section of the EHR based on section headers preceding the character position.
+        Determines the clinical section of the EHR delegating to unified ClinicalSectionDetector.
         """
-        headers = [
-            ("History of Present Illness", [r"(?i)\bhistory of present illness\b", r"(?i)\bhpi\b"]),
-            ("Past Medical History", [r"(?i)\bpast medical history\b", r"(?i)\bpmh\b"]),
-            ("Medications", [r"(?i)\bmedications\b", r"(?i)\bcurrent meds\b", r"(?i)\bgdmt\b"]),
-            ("Diagnostic Studies", [r"(?i)\bdiagnostics\b", r"(?i)\bechocardiogram\b", r"(?i)\becho\b", r"(?i)\bpolysomnography\b", r"(?i)\blabs\b"]),
-            ("Physical Examination", [r"(?i)\bphysical examination\b", r"(?i)\bexam\b"]),
-            ("Assessment & Plan", [r"(?i)\bassessment & plan\b", r"(?i)\bassessment and plan\b", r"(?i)\bplan\b", r"(?i)\ba/p\b"])
-        ]
-
-        # Scan text before char_pos
-        prior_text = text[:char_pos]
-        last_found_section = "Clinical Documentation"
-        last_found_index = -1
-
-        for sec_name, patterns in headers:
-            for pat in patterns:
-                for match in re.finditer(pat, prior_text):
-                    if match.start() > last_found_index:
-                        last_found_index = match.start()
-                        last_found_section = sec_name
-
-        return last_found_section
+        from app.core.clinical_core import ClinicalSectionDetector
+        return ClinicalSectionDetector.detect_section(text, char_pos)
 
     def find_span(self, text: str, pattern: str, section: Optional[str] = None) -> Optional[ClinicalEvidenceSpan]:
         """

@@ -5,19 +5,19 @@ agree on the exact same inputs for negation boundary, numeric cutoff,
 and temporal duration, powered by the shared clinical core (app/core/clinical_core.py).
 """
 
-import pytest
-from app.core.clinical_core import (
-    ClinicalScopeAnalyzer,
-    ClinicalNumericParser,
-    ClinicalTemporalParser,
-    ClinicalGroundingVerifier,
-    ClinicalCoreEvaluator
-)
 from app.agents.criteria_evaluator import CriteriaEvaluationAgent
 from app.agents.llm_extractor import ExtractorTools
-from app.services.declarative_engine import DeclarativePolicyEngine
-from app.schemas.declarative_policy import DeclarativeCriterion, CriterionType
+from app.core.clinical_core import (
+    ClinicalCoreEvaluator,
+    ClinicalGroundingVerifier,
+    ClinicalNumericParser,
+    ClinicalScopeAnalyzer,
+    ClinicalSectionDetector,
+    ClinicalTemporalParser,
+)
 from app.schemas.contracts import DeterminationStatus
+from app.schemas.declarative_policy import CriterionType, DeclarativeCriterion
+from app.services.declarative_engine import DeclarativePolicyEngine
 
 
 def test_negation_boundary_scope_agreement():
@@ -179,3 +179,184 @@ def test_grounding_verifier_agreement():
     assert ClinicalGroundingVerifier.verify_exact_slice(note, quote, start + 1, end) is False
     assert ExtractorTools.verify_exact_character_slice(note, quote, start + 1, end) is False
 
+
+
+def test_declarative_negation_scope_integration_cross_mode():
+    """
+    Test that DeclarativePolicyEngine, CriteriaEvaluationAgent, and ClinicalScopeAnalyzer
+    agree on negation scope boundaries on exclusion criteria.
+    """
+    # Case A: Negated exclusion symptom -> Exclusion is ruled out (NOT_MET)
+    ehr_negated = (
+        "History of Present Illness: 70-year-old male with severe heart failure. "
+        "Physical Exam: Patient denies cardiogenic shock. Blood pressure is stable. "
+        "Diagnostics: LVEF is 28%. NYHA Class III symptoms."
+    )
+    excl_dict = {
+        "criterion_code": "CRIT-ICD-EXCL-01",
+        "name": "Absence of Cardiogenic Shock",
+        "description": "Patient must not be in acute cardiogenic shock",
+        "is_exclusion": True,
+        "entity_names": ["cardiogenic shock", "shock"]
+    }
+    decl_excl = DeclarativeCriterion(
+        criterion_code="CRIT-ICD-EXCL-01",
+        name="Absence of Cardiogenic Shock",
+        description="Patient must not be in acute cardiogenic shock",
+        clinical_intent="Exclude acute unstable shock",
+        criterion_type=CriterionType.EXCLUSION_SYMPTOM,
+        entity_names=["cardiogenic shock", "shock"],
+        is_exclusion=True
+    )
+
+    det_res_a = CriteriaEvaluationAgent().evaluate_criterion(excl_dict, ehr_negated)
+    decl_res_a = DeclarativePolicyEngine.evaluate(decl_excl, ehr_negated)
+    core_res_a = ClinicalCoreEvaluator.evaluate(excl_dict, ehr_negated)
+
+    assert det_res_a.status == DeterminationStatus.NOT_MET
+    assert decl_res_a.status == DeterminationStatus.NOT_MET
+    assert core_res_a.status == DeterminationStatus.NOT_MET
+
+    # Case B: Sentence boundary does not leak negation -> Active exclusion present (MET)
+    ehr_active = (
+        "History of Present Illness: Patient denies fever or chills. "
+        "Cardiogenic shock is actively documented requiring inotropes. "
+        "Diagnostics: LVEF 25%."
+    )
+    det_res_b = CriteriaEvaluationAgent().evaluate_criterion(excl_dict, ehr_active)
+    decl_res_b = DeclarativePolicyEngine.evaluate(decl_excl, ehr_active)
+    core_res_b = ClinicalCoreEvaluator.evaluate(excl_dict, ehr_active)
+
+    assert det_res_b.status == DeterminationStatus.MET
+    assert decl_res_b.status == DeterminationStatus.MET
+    assert core_res_b.status == DeterminationStatus.MET
+
+
+def test_declarative_numeric_threshold_and_date_exclusion_cross_mode():
+    """
+    Test that DeclarativePolicyEngine, CriteriaEvaluationAgent, and ExtractorTools
+    agree on numeric cutoff evaluation while ignoring embedded dates.
+    """
+    ehr_with_dates = (
+        "History of Present Illness: Progress note from 05/12/2026. "
+        "Diagnostic Studies: Transthoracic echocardiogram on 05/10/2026 confirms LVEF 30%. "
+        "Assessment & Plan: Ischemic cardiomyopathy."
+    )
+
+    crit_lvef = {
+        "criterion_code": "CRIT-ICD-01",
+        "name": "LVEF <= 35%",
+        "description": "LVEF <= 35% documented on echocardiogram",
+        "operator": "<=",
+        "threshold": 35.0,
+        "target_unit": "%",
+        "is_exclusion": False,
+        "entity_names": ["LVEF", "ejection fraction"]
+    }
+    decl_lvef = DeclarativeCriterion(
+        criterion_code="CRIT-ICD-01",
+        name="LVEF <= 35%",
+        description="LVEF <= 35% documented on echocardiogram",
+        clinical_intent="Ejection fraction cutoff",
+        criterion_type=CriterionType.NUMERIC_THRESHOLD,
+        entity_names=["LVEF", "ejection fraction"],
+        operator="<=",
+        threshold=35.0,
+        target_unit="%"
+    )
+
+    # 1. Deterministic mode
+    det_res = CriteriaEvaluationAgent().evaluate_criterion(crit_lvef, ehr_with_dates)
+    assert det_res.status == DeterminationStatus.MET
+
+    # 2. Declarative mode (using shared ClinicalNumericParser date guard & cutoff)
+    decl_res = DeclarativePolicyEngine.evaluate(decl_lvef, ehr_with_dates)
+    assert decl_res.status == DeterminationStatus.MET
+
+    # 3. Non-qualifying case (LVEF 48%)
+    ehr_failing = ehr_with_dates.replace("30%", "48%")
+    det_fail = CriteriaEvaluationAgent().evaluate_criterion(crit_lvef, ehr_failing)
+    decl_fail = DeclarativePolicyEngine.evaluate(decl_lvef, ehr_failing)
+    assert det_fail.status == DeterminationStatus.NOT_MET
+    assert decl_fail.status == DeterminationStatus.NOT_MET
+
+
+def test_declarative_temporal_duration_cross_mode():
+    """
+    Test that DeclarativePolicyEngine and CriteriaEvaluationAgent agree on
+    temporal duration evaluation via ClinicalTemporalParser.
+    """
+    crit_gdmt = {
+        "criterion_code": "CRIT-ICD-03",
+        "name": "GDMT Duration >= 90 Days",
+        "description": "Guideline-directed medical therapy sustained for >= 90 days",
+        "is_exclusion": False,
+        "entity_names": ["GDMT", "medical therapy", "carvedilol", "lisinopril"],
+        "min_duration_days": 90
+    }
+    decl_gdmt = DeclarativeCriterion(
+        criterion_code="CRIT-ICD-03",
+        name="GDMT Duration >= 90 Days",
+        description="Guideline-directed medical therapy sustained for >= 90 days",
+        clinical_intent="Ensure medical optimization prior to device",
+        criterion_type=CriterionType.TEMPORAL_DURATION,
+        entity_names=["GDMT", "medical therapy", "carvedilol", "lisinopril"],
+        operator=">=",
+        min_duration_days=90
+    )
+
+    # Case A: 6 months (180 days) -> MET across modes
+    ehr_qual = "Medications: Patient maintained on optimal medical therapy for 6 months."
+    det_a = CriteriaEvaluationAgent().evaluate_criterion(crit_gdmt, ehr_qual)
+    decl_a = DeclarativePolicyEngine.evaluate(decl_gdmt, ehr_qual)
+    assert det_a.status == DeterminationStatus.MET
+    assert decl_a.status == DeterminationStatus.MET
+
+    # Case B: 3 weeks (21 days) -> NOT_MET across modes
+    ehr_short = "Medications: Patient started on medical therapy for 3 weeks."
+    det_b = CriteriaEvaluationAgent().evaluate_criterion(crit_gdmt, ehr_short)
+    decl_b = DeclarativePolicyEngine.evaluate(decl_gdmt, ehr_short)
+    assert det_b.status == DeterminationStatus.NOT_MET
+    assert decl_b.status == DeterminationStatus.NOT_MET
+
+    # Case C: Omission (no duration stated) -> INSUFFICIENT_EVIDENCE across modes
+    ehr_omitted = "Medications: Patient currently taking carvedilol and lisinopril."
+    det_c = CriteriaEvaluationAgent().evaluate_criterion(crit_gdmt, ehr_omitted)
+    decl_c = DeclarativePolicyEngine.evaluate(decl_gdmt, ehr_omitted)
+    assert det_c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE
+    assert decl_c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE
+
+
+def test_declarative_clinical_section_detector_cross_mode():
+    """
+    Test that section detection is identical between ClinicalSectionDetector,
+    CriteriaEvaluationAgent, and DeclarativePolicyEngine evidence spans.
+    """
+    ehr_text = (
+        "History of Present Illness:\nPatient reports shortness of breath.\n\n"
+        "Diagnostic Studies:\nEchocardiogram confirms LVEF 28%.\n\n"
+        "Assessment & Plan:\nReferral for ICD placement.\n"
+    )
+
+    # Position inside Diagnostic Studies
+    pos_echo = ehr_text.find("LVEF 28%")
+    sec_core = ClinicalSectionDetector.detect_section(ehr_text, pos_echo)
+    sec_agent = CriteriaEvaluationAgent().detect_clinical_section(ehr_text, pos_echo)
+    assert sec_core == "Diagnostic Studies"
+    assert sec_agent == "Diagnostic Studies"
+
+    # Evaluated span in DeclarativePolicyEngine carries same section
+    decl_lvef = DeclarativeCriterion(
+        criterion_code="CRIT-ICD-01",
+        name="LVEF",
+        description="LVEF <= 35%",
+        clinical_intent="Ejection fraction cutoff",
+        criterion_type=CriterionType.NUMERIC_THRESHOLD,
+        entity_names=["LVEF"],
+        operator="<=",
+        threshold=35.0,
+        target_unit="%"
+    )
+    res = DeclarativePolicyEngine.evaluate(decl_lvef, ehr_text)
+    assert len(res.verified_spans) > 0
+    assert res.verified_spans[0].clinical_section == "Diagnostic Studies"

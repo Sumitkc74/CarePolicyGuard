@@ -5,7 +5,13 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
 from app.schemas.declarative_policy import DeclarativeCriterion, CriterionType, DeclarativePolicy
 from app.schemas.contracts import CriterionAssessment, ClinicalEvidenceSpan, DeterminationStatus
-from app.agents.criteria_evaluator import CriteriaEvaluationAgent
+from app.core.clinical_core import (
+    ClinicalScopeAnalyzer,
+    ClinicalSectionDetector,
+    ClinicalNumericParser,
+    ClinicalTemporalParser,
+    ClinicalGroundingVerifier,
+)
 
 class DeclarativePolicyEngine:
     """
@@ -179,8 +185,7 @@ class DeclarativePolicyEngine:
         rationale = "No documented clinical evidence matching statutory criteria."
         raw_confidence = 0.50
 
-        # Scope and Negation Analyzer helper from CriteriaEvaluationAgent
-        analyzer = CriteriaEvaluationAgent()
+        # Shared clinical core handles scope analysis, section detection, numeric cutoffs, and temporal deltas
 
         if criterion.criterion_type == CriterionType.NUMERIC_THRESHOLD:
             # Handle numeric cutoffs (LVEF <= 35%, AHI >= 15, CHA2DS2-VASc >= 3, etc.)
@@ -206,25 +211,19 @@ class DeclarativePolicyEngine:
                 for m_cand in re.finditer(unit_pattern, ehr_text):
                     metric_candidates.append(m_cand)
 
-            # Strategy 2: Look for core metric tokens directly adjacent to values, skipping date patterns and preventing internal token digit extraction
+            # Strategy 2: Look for core metric tokens directly adjacent to values, skipping date patterns via ClinicalNumericParser
             if not metric_candidates and core_metrics:
                 core_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in core_metrics) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))(?![a-zA-Z0-9])'
                 for m_cand in re.finditer(core_pattern, ehr_text):
-                    end_pos = m_cand.end(2)
-                    after_text = ehr_text[end_pos:end_pos+5]
-                    before_text = ehr_text[max(0, m_cand.start(2)-5):m_cand.start(2)]
-                    if re.match(r'^\s*[/-]\s*\d', after_text) or re.search(r'\d\s*[/-]\s*$', before_text):
+                    if ClinicalNumericParser.is_date_pattern(ehr_text, m_cand.start(2), m_cand.end(2)):
                         continue
                     metric_candidates.append(m_cand)
 
-            # Strategy 3: General fallback search across all synonyms, filtering out date-shaped numbers and forbidding sentence crossing
+            # Strategy 3: General fallback search across all synonyms, filtering out date-shaped numbers via ClinicalNumericParser
             if not metric_candidates:
                 fallback_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))(?![a-zA-Z0-9])\s*([%a-zA-Z/]*)'
                 for m_cand in re.finditer(fallback_pattern, ehr_text):
-                    end_pos = m_cand.end(2)
-                    after_text = ehr_text[end_pos:end_pos+5]
-                    before_text = ehr_text[max(0, m_cand.start(2)-5):m_cand.start(2)]
-                    if re.match(r'^\s*[/-]\s*\d', after_text) or re.search(r'\d\s*[/-]\s*$', before_text):
+                    if ClinicalNumericParser.is_date_pattern(ehr_text, m_cand.start(2), m_cand.end(2)):
                         continue
                     metric_candidates.append(m_cand)
                     break
@@ -237,27 +236,18 @@ class DeclarativePolicyEngine:
                     s_idx = m.start()
                     e_idx = m.end()
 
-                    scope = analyzer.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                    scope = ClinicalScopeAnalyzer.analyze_scope(ehr_text, s_idx, e_idx)
                     if not scope["is_negated"]:
                         op = criterion.operator or "<="
                         thresh = criterion.threshold if criterion.threshold is not None else 35.0
-                        passed = False
-                        if op in ("<=", "le"):
-                            passed = (val <= thresh)
-                        elif op in (">=", "ge"):
-                            passed = (val >= thresh)
-                        elif op in ("<", "lt"):
-                            passed = (val < thresh)
-                        elif op in (">", "gt"):
-                            passed = (val > thresh)
-                        elif op in ("==", "eq"):
-                            passed = abs(val - thresh) < 1e-4
+                        passed = ClinicalNumericParser.evaluate_cutoff(val, op, thresh)
 
+                        ClinicalGroundingVerifier.verify_exact_slice(ehr_text, ehr_text[s_idx:e_idx], s_idx, e_idx)
                         span_obj = ClinicalEvidenceSpan(
                             source_text=ehr_text[s_idx:e_idx],
                             start_char=s_idx,
                             end_char=e_idx,
-                            clinical_section=analyzer.detect_clinical_section(ehr_text, s_idx),
+                            clinical_section=ClinicalSectionDetector.detect_section(ehr_text, s_idx),
                             confidence=0.98
                         )
                         spans.append(span_obj)
@@ -271,14 +261,15 @@ class DeclarativePolicyEngine:
                             symp_pattern = r'(?i)\b(excessive daytime sleepiness|eds|hypertension|htn|insomnia|ischemic heart disease|stroke)\b'
                             qualifying_symp = None
                             for m_s in re.finditer(symp_pattern, ehr_text):
-                                sc = analyzer.analyze_clinical_scope(ehr_text, m_s.start(), m_s.end())
+                                sc = ClinicalScopeAnalyzer.analyze_scope(ehr_text, m_s.start(), m_s.end())
                                 if not sc["is_negated"]:
                                     qualifying_symp = m_s.group(0)
+                                    ClinicalGroundingVerifier.verify_exact_slice(ehr_text, m_s.group(0), m_s.start(), m_s.end())
                                     span_symp = ClinicalEvidenceSpan(
                                         source_text=ehr_text[m_s.start():m_s.end()],
                                         start_char=m_s.start(),
                                         end_char=m_s.end(),
-                                        clinical_section=analyzer.detect_clinical_section(ehr_text, m_s.start()),
+                                        clinical_section=ClinicalSectionDetector.detect_section(ehr_text, m_s.start()),
                                         confidence=0.95
                                     )
                                     spans.append(span_symp)
@@ -307,13 +298,14 @@ class DeclarativePolicyEngine:
                 s_idx = m.start()
                 e_idx = m.end()
 
-                scope = analyzer.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                scope = ClinicalScopeAnalyzer.analyze_scope(ehr_text, s_idx, e_idx)
                 if not scope["is_negated"]:
+                    ClinicalGroundingVerifier.verify_exact_slice(ehr_text, ehr_text[s_idx:e_idx], s_idx, e_idx)
                     span_obj = ClinicalEvidenceSpan(
                         source_text=ehr_text[s_idx:e_idx],
                         start_char=s_idx,
                         end_char=e_idx,
-                        clinical_section=analyzer.detect_clinical_section(ehr_text, s_idx),
+                        clinical_section=ClinicalSectionDetector.detect_section(ehr_text, s_idx),
                         confidence=0.95
                     )
                     spans.append(span_obj)
@@ -350,17 +342,18 @@ class DeclarativePolicyEngine:
             if m:
                 count = int(m.group(1))
                 unit_str = m.group(2).lower()
-                days = count * 365 if "year" in unit_str else (count * 30 if "month" in unit_str else (count * 7 if "week" in unit_str else count))
+                days = ClinicalTemporalParser.parse_duration_to_days(count, unit_str)
                 s_idx = m.start()
                 e_idx = m.end()
 
-                scope = analyzer.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                scope = ClinicalScopeAnalyzer.analyze_scope(ehr_text, s_idx, e_idx)
                 if not scope["is_negated"]:
+                    ClinicalGroundingVerifier.verify_exact_slice(ehr_text, ehr_text[s_idx:e_idx], s_idx, e_idx)
                     span_obj = ClinicalEvidenceSpan(
                         source_text=ehr_text[s_idx:e_idx],
                         start_char=s_idx,
                         end_char=e_idx,
-                        clinical_section=analyzer.detect_clinical_section(ehr_text, s_idx),
+                        clinical_section=ClinicalSectionDetector.detect_section(ehr_text, s_idx),
                         confidence=0.96
                     )
                     spans.append(span_obj)
@@ -380,13 +373,14 @@ class DeclarativePolicyEngine:
             if m:
                 s_idx = m.start()
                 e_idx = m.end()
-                scope = analyzer.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                scope = ClinicalScopeAnalyzer.analyze_scope(ehr_text, s_idx, e_idx)
 
+                ClinicalGroundingVerifier.verify_exact_slice(ehr_text, ehr_text[s_idx:e_idx], s_idx, e_idx)
                 span_obj = ClinicalEvidenceSpan(
                     source_text=ehr_text[s_idx:e_idx],
                     start_char=s_idx,
                     end_char=e_idx,
-                    clinical_section=analyzer.detect_clinical_section(ehr_text, s_idx),
+                    clinical_section=ClinicalSectionDetector.detect_section(ehr_text, s_idx),
                     confidence=0.95
                 )
                 spans.append(span_obj)
@@ -412,12 +406,13 @@ class DeclarativePolicyEngine:
                 idx = ehr_text.lower().find(term.lower())
                 if idx != -1:
                     e_idx = idx + len(term)
-                    scope = analyzer.analyze_clinical_scope(ehr_text, idx, e_idx)
+                    scope = ClinicalScopeAnalyzer.analyze_scope(ehr_text, idx, e_idx)
+                    ClinicalGroundingVerifier.verify_exact_slice(ehr_text, ehr_text[idx:e_idx], idx, e_idx)
                     span_obj = ClinicalEvidenceSpan(
                         source_text=ehr_text[idx:e_idx],
                         start_char=idx,
                         end_char=e_idx,
-                        clinical_section=analyzer.detect_clinical_section(ehr_text, idx),
+                        clinical_section=ClinicalSectionDetector.detect_section(ehr_text, idx),
                         confidence=0.90
                     )
                     spans.append(span_obj)
@@ -439,13 +434,14 @@ class DeclarativePolicyEngine:
                 if thrombus_match:
                     s_idx = thrombus_match.start()
                     e_idx = thrombus_match.end()
-                    sc = analyzer.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                    sc = ClinicalScopeAnalyzer.analyze_scope(ehr_text, s_idx, e_idx)
                     if not sc["is_negated"]:
+                        ClinicalGroundingVerifier.verify_exact_slice(ehr_text, ehr_text[s_idx:e_idx], s_idx, e_idx)
                         span_obj = ClinicalEvidenceSpan(
                             source_text=ehr_text[s_idx:e_idx],
                             start_char=s_idx,
                             end_char=e_idx,
-                            clinical_section=analyzer.detect_clinical_section(ehr_text, s_idx),
+                            clinical_section=ClinicalSectionDetector.detect_section(ehr_text, s_idx),
                             confidence=0.95
                         )
                         spans.append(span_obj)
