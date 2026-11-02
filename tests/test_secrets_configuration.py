@@ -11,6 +11,7 @@ Proves:
 import re
 import secrets
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 from pydantic import ValidationError
@@ -101,3 +102,27 @@ def test_dockerignore_excludes_git_and_sensitive_directories():
     assert any("carepolicyguard-heldout" in line for line in lines), ".dockerignore must exclude carepolicyguard-heldout"
     assert any(".pytest_cache" in line for line in lines), ".dockerignore must exclude .pytest_cache"
     assert any("*.db" in line or "carepolicyguard.db" in line for line in lines), ".dockerignore must exclude databases"
+
+
+def test_database_url_default_is_local_non_credential():
+    """
+    Verifies structurally that the default DATABASE_URL contains zero embedded credentials
+    (username and password must be None), uses a local file-based scheme (sqlite),
+    and targets no remote network host.
+    Does not print or hardcode any connection string value.
+    """
+    ephemeral_test_secret = secrets.token_urlsafe(32)
+    cfg = Settings(_env_file=None, SECRET_KEY=ephemeral_test_secret)
+
+    parsed = urlsplit(cfg.DATABASE_URL)
+    # 1. Must be local file-based database scheme
+    assert parsed.scheme == "sqlite"
+
+    # 2. Must contain no username or password credentials
+    assert parsed.username is None
+    assert parsed.password is None
+
+    # 3. Must not target a remote host or network socket
+    assert parsed.hostname is None or parsed.hostname == ""
+    assert parsed.port is None
+

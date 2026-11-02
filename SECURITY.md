@@ -77,7 +77,15 @@ CarePolicyGuard complies with the complete CMS-0057-F prior-authorization burden
 
 ---
 
-## 6. Coordinated Vulnerability Disclosure
+## 6. Cryptographic Secret Management & Key Rotation
+
+- **Zero Hardcoded Secrets**: CarePolicyGuard requires operators to inject an authentic cryptographic secret (`SECRET_KEY`) at runtime. There are no fallback default credentials in application code or Docker Compose manifests.
+- **Fail-Fast Enforcement**: Application startup and container initialization strictly validate that `SECRET_KEY` is non-empty and does not match any known placeholder string.
+- **Mandatory User Action (Key Rotation Notice)**: The historical documentation default `SECRET_KEY` is permanently blocklisted. Any historical deployment that previously utilized that default key must be immediately rotated by generating a new cryptographically secure secret (`python -c "import secrets; print(secrets.token_urlsafe(48))"`).
+
+---
+
+## 7. Coordinated Vulnerability Disclosure
 
 To report a suspected security vulnerability or compliance concern, please submit a detailed report to the clinical engineering team:
 - Email: `security@carepolicyguard.med`

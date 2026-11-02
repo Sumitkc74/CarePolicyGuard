@@ -422,6 +422,10 @@ pip install -r requirements.txt
 CarePolicyGuard enforces strict fail-fast validation on mandatory security secrets:
 - **`SECRET_KEY`**: Cryptographic secret for signing stateless JWT tokens and computing SHA-256 chain-of-custody audit hashes. **There is no default fallback** in application startup or container orchestration. If missing or set to an insecure placeholder, startup aborts immediately.
 - **`POSTGRES_PASSWORD`**: Database authentication password for PostgreSQL in Docker Compose deployments. **There is no default fallback**. Compose validation aborts immediately if unset.
+- **`DATABASE_URL` (Default Audit Finding)**: The application config provides an out-of-the-box fallback to a local file-based SQLite database for zero-config local development and testing. Structurally, this default is non-credential: it contains zero embedded credentials (no username, no password), binds to no network ports, and contacts no remote host. For containerized or multi-user enterprise deployments, operators must override this with an authenticated PostgreSQL connection string.
+
+#### User Action: Mandatory Secret Rotation Notice
+The historical documentation default `SECRET_KEY` is now strictly blocklisted and rejected by application validation at startup. Any prior deployment that ever ran with that default key must immediately rotate its `SECRET_KEY` by generating a new cryptographically secure secret. Note: code-level enforcement rejects the insecure default, but deployed environments must perform their own key rotation.
 
 Generate cryptographically secure values without hardcoding usable secrets:
 ```bash
@@ -445,7 +449,7 @@ cp .env.example .env
 # Populate SECRET_KEY in .env
 ```
 
-### 3. Run Comprehensive Test Suite (196+ Tests & Coverage)
+### 3. Run Comprehensive Test Suite (201+ Tests & Coverage)
 ```bash
 # Run unit, integration, cross-mode agreement, property/fuzz, and security tests
 pytest tests/ -v --cov=app --cov-report=term

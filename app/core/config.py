@@ -26,7 +26,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
-    # Persistence
+    # Persistence: Local non-credential file-based SQLite default for zero-config local development and testing.
+    # Structural audit: Scheme is file-based (sqlite), contains zero credentials (no username or password),
+    # points to a local relative path, and executes strictly on local disk with no remote network reachability.
+    # Enterprise or containerized deployments must override this with an authenticated PostgreSQL connection string.
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./carepolicyguard.db")
 
     # Clinical Multi-Agent & Abstention Calibration
