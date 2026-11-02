@@ -1,0 +1,243 @@
+{
+  "timestamp": "2026-11-02T00:34:20.624498+00:00",
+  "model_id": "qwen2.5:14b",
+  "total_vignettes": 10,
+  "runs": [
+    {
+      "vignette_id": "BENCH-01",
+      "policy_id": "NCD-20.4",
+      "decision": "APPROVED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "Severe global hypokinesis with Left Ventricular Ejection Fraction (LVEF) 28%",
+        "Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms",
+        "Post-CABG timeline is 14 months (well past 90 days). No acute cardiogenic shock. Life expectancy > 1 year",
+        "Severe ischemic cardiomyopathy with LVEF 28% and NYHA Class II functional symptoms despite optimal GDMT for 6 months"
+      ],
+      "grounded_spans": [
+        "Severe global hypokinesis with Left Ventricular Ejection Fraction (LVEF) 28%",
+        "Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms",
+        "Post-CABG timeline is 14 months (well past 90 days). No acute cardiogenic shock. Life expectancy > 1 year",
+        "Severe ischemic cardiomyopathy with LVEF 28% and NYHA Class II functional symptoms despite optimal GDMT for 6 months"
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-677\",\"object\":\"chat.completion\",\"created\":1793578363,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Severe global hypokinesis with Left Ventricular Ejection Fraction (LVEF) 28%\\\", \\\"Patient continues to experience dyspnea on mild exertion and fatigue, NYHA Class II symptoms\\\", \\\"Post-CABG timeline is 14 months (well past 90 days). No acute cardiogenic shock. Life expectancy \\u003e 1 year\\\", \\\"Severe ischemic cardiomyopathy with LVEF 28% and NYHA Class II functional symptoms despite optimal GDMT for 6 months\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient meets criteria for severe LV systolic dysfunction, NYHA Class II symptoms, and has received GDMT for over 90 days. CABG was performed 14 months ago, well past the 90-day threshold. No evidence of cardiogenic shock or terminal illness.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1003,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":204,\"total_tokens\":1207}}\n",
+      "latency_ms": 245602.47
+    },
+    {
+      "vignette_id": "BENCH-02",
+      "policy_id": "NCD-20.4",
+      "decision": "DENIED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "LVEF 30%",
+        "NYHA Class II dyspnea",
+        "Started Carvedilol 6.25 mg BID and Entresto 24/26 mg BID 3 weeks ago (total GDMT duration 21 days)",
+        "Note: Patient has only completed 3 weeks of medical therapy. Guideline recommendations require at least 90 days of optimal medical therapy before device evaluation"
+      ],
+      "grounded_spans": [
+        "LVEF 30%",
+        "NYHA Class II dyspnea",
+        "Started Carvedilol 6.25 mg BID and Entresto 24/26 mg BID 3 weeks ago (total GDMT duration 21 days)",
+        "Note: Patient has only completed 3 weeks of medical therapy. Guideline recommendations require at least 90 days of optimal medical therapy before device evaluation"
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-92\",\"object\":\"chat.completion\",\"created\":1793578494,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"LVEF 30%\\\", \\\"NYHA Class II dyspnea\\\", \\\"Started Carvedilol 6.25 mg BID and Entresto 24/26 mg BID 3 weeks ago (total GDMT duration 21 days)\\\", \\\"Note: Patient has only completed 3 weeks of medical therapy. Guideline recommendations require at least 90 days of optimal medical therapy before device evaluation\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient does not meet the 90-day guideline-directed medical therapy requirement.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":815,\"prompt_tokens_details\":{\"cached_tokens\":406},\"completion_tokens\":142,\"total_tokens\":957}}\n",
+      "latency_ms": 130445.88
+    },
+    {
+      "vignette_id": "BENCH-03",
+      "policy_id": "NCD-20.4",
+      "decision": "DENIED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "62-year-old male currently admitted to CCU in active cardiogenic shock requiring intra-aortic balloon pump (IABP) and norepinephrine drip.",
+        "ICD is contraindicated during acute recovery phase (<40 days post-MI, <90 days post-PCI) and active cardiogenic shock."
+      ],
+      "grounded_spans": [
+        "62-year-old male currently admitted to CCU in active cardiogenic shock requiring intra-aortic balloon pump (IABP) and norepinephrine drip.",
+        "ICD is contraindicated during acute recovery phase (<40 days post-MI, <90 days post-PCI) and active cardiogenic shock."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-368\",\"object\":\"chat.completion\",\"created\":1793578609,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"62-year-old male currently admitted to CCU in active cardiogenic shock requiring intra-aortic balloon pump (IABP) and norepinephrine drip.\\\", \\\"ICD is contraindicated during acute recovery phase (\\u003c40 days post-MI, \\u003c90 days post-PCI) and active cardiogenic shock.\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient is in active cardiogenic shock and less than 40 days post-PCI, meeting exclusion criteria per NCD-20.4.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":795,\"prompt_tokens_details\":{\"cached_tokens\":406},\"completion_tokens\":136,\"total_tokens\":931}}\n",
+      "latency_ms": 115257.36
+    },
+    {
+      "vignette_id": "BENCH-04",
+      "policy_id": "LCD-L33829",
+      "decision": "APPROVED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "Face-to-face clinical evaluation conducted on 01/15/2026.",
+        "Prescribing physician documented severe chronic snoring, witnessed apneas, and excessive daytime sleepiness with Epworth Sleepiness Scale of 16/24.",
+        "Diagnostic overnight sleep study completed on 02/02/2026.",
+        "Apnea-Hypopnea Index (AHI): 34.2 events/hr."
+      ],
+      "grounded_spans": [
+        "Face-to-face clinical evaluation conducted on 01/15/2026.",
+        "Prescribing physician documented severe chronic snoring, witnessed apneas, and excessive daytime sleepiness with Epworth Sleepiness Scale of 16/24.",
+        "Diagnostic overnight sleep study completed on 02/02/2026.",
+        "Apnea-Hypopnea Index (AHI): 34.2 events/hr."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion\",\"created\":1793578754,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Face-to-face clinical evaluation conducted on 01/15/2026.\\\", \\\"Prescribing physician documented severe chronic snoring, witnessed apneas, and excessive daytime sleepiness with Epworth Sleepiness Scale of 16/24.\\\", \\\"Diagnostic overnight sleep study completed on 02/02/2026.\\\", \\\"Apnea-Hypopnea Index (AHI): 34.2 events/hr.\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient meets criteria for CPAP therapy with documented face-to-face evaluation and AHI of 34.2 events/hr.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":671,\"prompt_tokens_details\":{\"cached_tokens\":46},\"completion_tokens\":155,\"total_tokens\":826}}\n",
+      "latency_ms": 144965.92
+    },
+    {
+      "vignette_id": "BENCH-05",
+      "policy_id": "LCD-L33829",
+      "decision": "DENIED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "Polysomnography shows AHI: 7.2 events/hr.",
+        "Denies excessive daytime sleepiness, denies insomnia.",
+        "No hypertension, no stroke, no coronary artery disease."
+      ],
+      "grounded_spans": [
+        "Polysomnography shows AHI: 7.2 events/hr.",
+        "Denies excessive daytime sleepiness, denies insomnia.",
+        "No hypertension, no stroke, no coronary artery disease."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-482\",\"object\":\"chat.completion\",\"created\":1793578852,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Polysomnography shows AHI: 7.2 events/hr.\\\", \\\"Denies excessive daytime sleepiness, denies insomnia.\\\", \\\"No hypertension, no stroke, no coronary artery disease.\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient's AHI is 7.2, which does not meet the threshold of 15 events/hr or the criteria for AHI 5-14 due to lack of documented comorbid symptoms.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":557,\"prompt_tokens_details\":{\"cached_tokens\":207},\"completion_tokens\":120,\"total_tokens\":677}}\n",
+      "latency_ms": 98455.67
+    },
+    {
+      "vignette_id": "BENCH-06",
+      "policy_id": "NCD-20.4",
+      "decision": "DEFERRED_TO_HUMAN",
+      "confidence": 0.75,
+      "quoted_spans": [
+        "Patient with ischemic cardiomyopathy. Recent echo reveals LVEF 24%",
+        "Patient has been on stable optimal GDMT including metoprolol succinate and valsartan for 8 months.",
+        "Classified as NYHA Class III with dyspnea on walking 50 feet."
+      ],
+      "grounded_spans": [
+        "Patient with ischemic cardiomyopathy. Recent echo reveals LVEF 24%",
+        "Patient has been on stable optimal GDMT including metoprolol succinate and valsartan for 8 months.",
+        "Classified as NYHA Class III with dyspnea on walking 50 feet."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-502\",\"object\":\"chat.completion\",\"created\":1793579000,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DEFERRED_TO_HUMAN\\\",\\n  \\\"confidence\\\": 0.75,\\n  \\\"quoted_evidence_spans\\\": [\\\"Patient with ischemic cardiomyopathy. Recent echo reveals LVEF 24%\\\", \\\"Patient has been on stable optimal GDMT including metoprolol succinate and valsartan for 8 months.\\\", \\\"Classified as NYHA Class III with dyspnea on walking 50 feet.\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient meets criteria for LVEF and NYHA classification but lacks specific timeline post-MI or revascularization procedure.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":754,\"prompt_tokens_details\":{\"cached_tokens\":406},\"completion_tokens\":129,\"total_tokens\":883}}\n",
+      "latency_ms": 147356.66
+    },
+    {
+      "vignette_id": "BENCH-07",
+      "policy_id": "NCD-20.33",
+      "decision": "APPROVED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "Aortic Valve Area (AVA): 0.68 cm2 (Criterion <= 1.0 cm2 MET)",
+        "Mean Transvalvular Gradient: 48 mmHg (Criterion >= 40 mmHg MET)",
+        "Peak Aortic Jet Velocity: 4.5 m/s (Criterion >= 4.0 m/s MET)",
+        "Multi-disciplinary Heart Team consultation conducted with interventional cardiologist and cardiac surgeon"
+      ],
+      "grounded_spans": [
+        "Aortic Valve Area (AVA): 0.68 cm2 (Criterion <= 1.0 cm2 MET)",
+        "Mean Transvalvular Gradient: 48 mmHg (Criterion >= 40 mmHg MET)",
+        "Peak Aortic Jet Velocity: 4.5 m/s (Criterion >= 4.0 m/s MET)",
+        "Multi-disciplinary Heart Team consultation conducted with interventional cardiologist and cardiac surgeon"
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-501\",\"object\":\"chat.completion\",\"created\":1793579165,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Aortic Valve Area (AVA): 0.68 cm2 (Criterion \\u003c= 1.0 cm2 MET)\\\", \\\"Mean Transvalvular Gradient: 48 mmHg (Criterion \\u003e= 40 mmHg MET)\\\", \\\"Peak Aortic Jet Velocity: 4.5 m/s (Criterion \\u003e= 4.0 m/s MET)\\\", \\\"Multi-disciplinary Heart Team consultation conducted with interventional cardiologist and cardiac surgeon\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient meets hemodynamic criteria for severe aortic stenosis and has undergone a formal Heart Team consultation. Surgical risk is high, making TAVR a suitable intervention.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":729,\"prompt_tokens_details\":{\"cached_tokens\":52},\"completion_tokens\":163,\"total_tokens\":892}}\n",
+      "latency_ms": 165133.73
+    },
+    {
+      "vignette_id": "BENCH-08",
+      "policy_id": "NCD-220.13",
+      "decision": "APPROVED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "Patient suffered two major recurrent gastrointestinal hemorrhages secondary to angiodysplasia while on Apixaban (Eliquis) 5mg BID, requiring 4 units PRBC transfusion and endoscopic clipping.",
+        "Independent non-interventional physician consultation concurs: Long-term oral anticoagulation is contraindicated due to recurring severe bleed risk.",
+        "Transesophageal Echocardiogram (TEE) on 02/10/2026 confirms absence of left atrial thrombus with suitable ostial dimensions for Watchman FLX closure device."
+      ],
+      "grounded_spans": [
+        "Patient suffered two major recurrent gastrointestinal hemorrhages secondary to angiodysplasia while on Apixaban (Eliquis) 5mg BID, requiring 4 units PRBC transfusion and endoscopic clipping.",
+        "Independent non-interventional physician consultation concurs: Long-term oral anticoagulation is contraindicated due to recurring severe bleed risk.",
+        "Transesophageal Echocardiogram (TEE) on 02/10/2026 confirms absence of left atrial thrombus with suitable ostial dimensions for Watchman FLX closure device."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-61\",\"object\":\"chat.completion\",\"created\":1793579351,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Patient suffered two major recurrent gastrointestinal hemorrhages secondary to angiodysplasia while on Apixaban (Eliquis) 5mg BID, requiring 4 units PRBC transfusion and endoscopic clipping.\\\", \\\"Independent non-interventional physician consultation concurs: Long-term oral anticoagulation is contraindicated due to recurring severe bleed risk.\\\", \\\"Transesophageal Echocardiogram (TEE) on 02/10/2026 confirms absence of left atrial thrombus with suitable ostial dimensions for Watchman FLX closure device.\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient meets criteria for high thromboembolic risk and contraindication to long-term oral anticoagulation, with appropriate pre-procedural imaging confirming suitability for LAAC.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":816,\"prompt_tokens_details\":{\"cached_tokens\":50},\"completion_tokens\":196,\"total_tokens\":1012}}\n",
+      "latency_ms": 186533.29
+    },
+    {
+      "vignette_id": "BENCH-09",
+      "policy_id": "NCD-20.4",
+      "decision": "DENIED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "Patient admitted with acute anterior STEMI on 2026-02-02 (13 days elapsed).",
+        "Post-infarction echocardiogram reveals severe LV dysfunction with LVEF 26%, NYHA Class III.",
+        "Note: Patient is currently 13 days post-acute MI. CMS NCD 20.4 Section B.1 mandates waiting a minimum of 40 days post-myocardial infarction before elective device placement."
+      ],
+      "grounded_spans": [
+        "Patient admitted with acute anterior STEMI on 2026-02-02 (13 days elapsed).",
+        "Post-infarction echocardiogram reveals severe LV dysfunction with LVEF 26%, NYHA Class III.",
+        "Note: Patient is currently 13 days post-acute MI. CMS NCD 20.4 Section B.1 mandates waiting a minimum of 40 days post-myocardial infarction before elective device placement."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-746\",\"object\":\"chat.completion\",\"created\":1793579491,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"DENIED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Patient admitted with acute anterior STEMI on 2026-02-02 (13 days elapsed).\\\", \\\"Post-infarction echocardiogram reveals severe LV dysfunction with LVEF 26%, NYHA Class III.\\\", \\\"Note: Patient is currently 13 days post-acute MI. CMS NCD 20.4 Section B.1 mandates waiting a minimum of 40 days post-myocardial infarction before elective device placement.\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient's timeline is 13 days post-acute MI, which does not meet the 40-day waiting period requirement for primary prevention ICD implantation as per CMS NCD 20.4.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":797,\"prompt_tokens_details\":{\"cached_tokens\":409},\"completion_tokens\":181,\"total_tokens\":978}}\n",
+      "latency_ms": 139912.78
+    },
+    {
+      "vignette_id": "BENCH-10",
+      "policy_id": "NCD-20.29",
+      "decision": "APPROVED",
+      "confidence": 0.95,
+      "quoted_spans": [
+        "Wound depth extends to deep fascia with probe-to-bone contact and localized osteomyelitis (Wagner Grade III classification)",
+        "Patient has completed 35 days of documented comprehensive standard wound therapy, including surgical debridement, pressure offloading orthotics, culture-directed oral antibiotics, and moist dressing changes with no measurable reduction in wound surface area.",
+        "Arterial duplex demonstrates patent tibial vessels with adequate distal perfusion to support wound healing."
+      ],
+      "grounded_spans": [
+        "Wound depth extends to deep fascia with probe-to-bone contact and localized osteomyelitis (Wagner Grade III classification)",
+        "Patient has completed 35 days of documented comprehensive standard wound therapy, including surgical debridement, pressure offloading orthotics, culture-directed oral antibiotics, and moist dressing changes with no measurable reduction in wound surface area.",
+        "Arterial duplex demonstrates patent tibial vessels with adequate distal perfusion to support wound healing."
+      ],
+      "is_fully_grounded": true,
+      "faithfulness_ratio": 1.0,
+      "endpoint_used": "http://localhost:11434/v1/chat/completions",
+      "model_name": "qwen2.5:14b",
+      "temperature": 0.0,
+      "raw_response": "{\"id\":\"chatcmpl-225\",\"object\":\"chat.completion\",\"created\":1793579660,\"model\":\"qwen2.5:14b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"decision\\\": \\\"APPROVED\\\",\\n  \\\"confidence\\\": 0.95,\\n  \\\"quoted_evidence_spans\\\": [\\\"Wound depth extends to deep fascia with probe-to-bone contact and localized osteomyelitis (Wagner Grade III classification)\\\", \\\"Patient has completed 35 days of documented comprehensive standard wound therapy, including surgical debridement, pressure offloading orthotics, culture-directed oral antibiotics, and moist dressing changes with no measurable reduction in wound surface area.\\\", \\\"Arterial duplex demonstrates patent tibial vessels with adequate distal perfusion to support wound healing.\\\"],\\n  \\\"clinical_rationale\\\": \\\"Patient meets all criteria for hyperbaric oxygen therapy as per CMS NCD 20.29 with documented Wagner Grade III ulcer, failure of standard wound care, and adequate vascular perfusion.\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":746,\"prompt_tokens_details\":{\"cached_tokens\":52},\"completion_tokens\":173,\"total_tokens\":919}}\n",
+      "latency_ms": 168987.45
+    }
+  ]
+}

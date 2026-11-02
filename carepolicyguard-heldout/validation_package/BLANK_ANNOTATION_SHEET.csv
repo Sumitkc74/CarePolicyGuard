@@ -1,0 +1,5 @@
+case_id,policy_id,decision,per_criterion_assessments,clinical_rationale,supporting_evidence_spans,annotator_id,annotation_timestamp
+CASE-XXX-01,POLICY-ID-HERE,[APPROVED|DENIED|DEFERRED_TO_HUMAN],CRIT-01:MET; CRIT-02:MET,Enter concise clinical rationale here,"""exact verbatim span 1""; ""exact verbatim span 2""",ANNOTATOR-B,YYYY-MM-DDTHH:MM:SSZ
+CASE-XXX-02,POLICY-ID-HERE,[APPROVED|DENIED|DEFERRED_TO_HUMAN],CRIT-01:NOT_MET; CRIT-02:INSUFFICIENT_EVIDENCE,Enter concise clinical rationale here,"""exact verbatim span 1""",ANNOTATOR-B,YYYY-MM-DDTHH:MM:SSZ
+CASE-XXX-03,POLICY-ID-HERE,[APPROVED|DENIED|DEFERRED_TO_HUMAN],CRIT-01:INSUFFICIENT_EVIDENCE; CRIT-02:MET,Enter concise clinical rationale here,None documented,ANNOTATOR-B,YYYY-MM-DDTHH:MM:SSZ
+

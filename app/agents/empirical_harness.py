@@ -310,7 +310,7 @@ class EmpiricalResearchHarness:
             try:
                 data = json.dumps(payload).encode("utf-8")
                 req = urllib.request.Request(target_url, data=data, headers=headers, method="POST")
-                with urllib.request.urlopen(req, timeout=240.0) as resp:
+                with urllib.request.urlopen(req, timeout=300.0) as resp:
                     raw_response_text = resp.read().decode("utf-8")
                     resp_obj = json.loads(raw_response_text)
                     content = resp_obj["choices"][0]["message"]["content"]
@@ -397,10 +397,18 @@ class EmpiricalResearchHarness:
             try:
                 out_dir = Path(__file__).resolve().parent.parent / "data" / "benchmarks"
                 out_dir.mkdir(parents=True, exist_ok=True)
-                out_file = out_dir / "baseline_llm_raw_runs.json"
+                model_tag = (self._target_llm_model or "").lower().replace(":", "_")
+                if "14b" in model_tag:
+                    out_file = out_dir / "baseline_llm_raw_runs_14b.json"
+                elif "7b" in model_tag:
+                    out_file = out_dir / "baseline_llm_raw_runs_7b.json"
+                else:
+                    out_file = out_dir / "baseline_llm_raw_runs.json"
+
                 with open(out_file, "w", encoding="utf-8") as f:
                     json.dump({
                         "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "model_id": self._target_llm_model,
                         "total_vignettes": len(vignettes),
                         "runs": raw_run_records
                     }, f, indent=2)

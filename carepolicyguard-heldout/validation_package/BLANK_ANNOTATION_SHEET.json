@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "dataset_name": "HELD_OUT_VALIDATION_SET_TEMPLATE",
+    "annotation_route": "Route B (Independently dual-annotated, non-clinician validated)",
+    "annotator_id": "ANNOTATOR_ID_PLACEHOLDER",
+    "submission_timestamp": "YYYY-MM-DDTHH:MM:SSZ",
+    "instructions_reference": "INSTRUCTIONS.md"
+  },
+  "annotations": [
+    {
+      "case_id": "CASE-XXX-01",
+      "policy_id": "POLICY-ID-PLACEHOLDER",
+      "decision": "APPROVED",
+      "criteria_assessments": [
+        {
+          "criterion_code": "CRIT-01",
+          "status": "MET",
+          "supporting_quote": "exact verbatim text quote from note",
+          "rationale": "Clinical rationale explaining criterion fulfillment"
+        },
+        {
+          "criterion_code": "CRIT-02",
+          "status": "MET",
+          "supporting_quote": "exact verbatim text quote from note",
+          "rationale": "Clinical rationale explaining criterion fulfillment"
+        }
+      ],
+      "clinical_rationale": "Case determination rationale summarizing policy satisfaction."
+    },
+    {
+      "case_id": "CASE-XXX-02",
+      "policy_id": "POLICY-ID-PLACEHOLDER",
+      "decision": "DEFERRED_TO_HUMAN",
+      "criteria_assessments": [
+        {
+          "criterion_code": "CRIT-01",
+          "status": "INSUFFICIENT_EVIDENCE",
+          "supporting_quote": "None documented",
+          "rationale": "Vital diagnostic measurement is absent from the clinical progress note."
+        }
+      ],
+      "clinical_rationale": "Case must defer to human clinical auditor due to missing mandatory diagnostic metrics."
+    }
+  ]
+}
+

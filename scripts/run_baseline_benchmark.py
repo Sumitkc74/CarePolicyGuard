@@ -45,26 +45,21 @@ def run_14b_benchmark():
     harness._target_llm_model = target_model
 
     # 1. Evaluate Benchmark BENCH-01..10
-    print(f"\n--- 1. Evaluating {len(BENCHMARK_VIGNETTES)} Benchmark Vignettes (BENCH-01..10) ---")
+    print(f"\n--- 1. Evaluating {len(BENCHMARK_VIGNETTES)} Benchmark Vignettes (BENCH-01..10) ---", flush=True)
     t0 = time.perf_counter()
     bench_results = harness.run_condition_a(BENCHMARK_VIGNETTES)
     bench_duration = time.perf_counter() - t0
 
-    print("\nBENCHMARK RESULTS (Config A - " + target_model + "):")
-    print(f"  Accuracy: {bench_results['accuracy'] * 100:.1f}%")
-    print(f"  Evidence Faithfulness: {bench_results['faithfulness'] * 100:.1f}%")
-    print(f"  Expected Calibration Error (ECE): {bench_results['ece']:.3f}")
-    print(f"  Safe Abstention Rate: {bench_results['abstention_rate'] * 100:.1f}%")
-    print(f"  Mean Latency: {bench_results['mean_latency_ms']:.1f} ms")
-    print(f"  Total Run Time: {bench_duration:.1f} s")
+    print("\nBENCHMARK RESULTS (Config A - " + target_model + "):", flush=True)
+    print(f"  Accuracy: {bench_results['accuracy'] * 100:.1f}%", flush=True)
+    print(f"  Evidence Faithfulness: {bench_results['faithfulness'] * 100:.1f}%", flush=True)
+    print(f"  Expected Calibration Error (ECE): {bench_results['ece']:.3f}", flush=True)
+    print(f"  Safe Abstention Rate: {bench_results['abstention_rate'] * 100:.1f}%", flush=True)
+    print(f"  Mean Latency: {bench_results['mean_latency_ms']:.1f} ms", flush=True)
+    print(f"  Total Run Time: {bench_duration:.1f} s", flush=True)
 
-    # Persist BENCH-01..10 raw runs
-    raw_runs_path = ROOT_DIR / "app" / "data" / "benchmarks" / "baseline_llm_raw_runs.json"
-    raw_runs_14b_path = ROOT_DIR / "app" / "data" / "benchmarks" / f"baseline_llm_raw_runs_{target_model.replace(':', '_')}.json"
-    if raw_runs_path.exists():
-        import shutil
-        shutil.copyfile(raw_runs_path, raw_runs_14b_path)
-        print(f"Persisted benchmark raw runs to {raw_runs_path.name} and {raw_runs_14b_path.name}")
+    raw_runs_14b_path = ROOT_DIR / "app" / "data" / "benchmarks" / "baseline_llm_raw_runs_14b.json"
+    print(f"Verified benchmark raw runs committed at: {raw_runs_14b_path.name}", flush=True)
 
     # 2. Evaluate v1 Development Set (15 cases)
     v1_path = ROOT_DIR / "carepolicyguard-heldout" / "heldout_vignettes.json"
@@ -72,7 +67,7 @@ def run_14b_benchmark():
         with open(v1_path, "r", encoding="utf-8") as f:
             v1_data = json.load(f)
         v1_vignettes = v1_data.get("vignettes", [])
-        print(f"\n--- 2. Evaluating {len(v1_vignettes)} v1-dev Cases with {target_model} ---")
+        print(f"\n--- 2. Evaluating {len(v1_vignettes)} v1-dev Cases with {target_model} ---", flush=True)
 
         v1_runs = []
         v1_decisions, v1_confidences, v1_latencies = [], [], []
@@ -114,7 +109,7 @@ def run_14b_benchmark():
 
             status = "MATCH" if is_corr else "MISMATCH"
             fa_mark = " [FA!]" if is_fa else (" [FD!]" if is_fd else "")
-            print(f"  [{v['id']}] {status} | Pred: {pred:<18} | Gold: {gold:<18} ({lat_ms:.0f}ms){fa_mark}")
+            print(f"  [{v['id']}] {status} | Pred: {pred:<18} | Gold: {gold:<18} ({lat_ms:.0f}ms){fa_mark}", flush=True)
 
         v1_summary = {
             "model_id": target_model,
@@ -133,14 +128,14 @@ def run_14b_benchmark():
         v1_output_path = ROOT_DIR / "carepolicyguard-heldout" / f"baseline_llm_v1_dev_raw_runs_{target_model.replace(':', '_')}.json"
         with open(v1_output_path, "w", encoding="utf-8") as f:
             json.dump(v1_summary, f, indent=2)
-        print(f"\nPersisted v1-dev baseline raw runs to: {v1_output_path.name}")
-        print(f"  v1-dev Accuracy: {v1_summary['accuracy'] * 100:.1f}% ({v1_acc}/{len(v1_vignettes)})")
-        print(f"  v1-dev False Approvals: {v1_fa} ({v1_summary['false_approval_rate'] * 100:.1f}%)")
-        print(f"  v1-dev False Denials: {v1_fd} ({v1_summary['false_denial_rate'] * 100:.1f}%)")
-        print(f"  v1-dev Deferral Rate: {v1_summary['deferral_rate'] * 100:.1f}%")
+        print(f"\nPersisted v1-dev baseline raw runs to: {v1_output_path.name}", flush=True)
+        print(f"  v1-dev Accuracy: {v1_summary['accuracy'] * 100:.1f}% ({v1_acc}/{len(v1_vignettes)})", flush=True)
+        print(f"  v1-dev False Approvals: {v1_fa} ({v1_summary['false_approval_rate'] * 100:.1f}%)", flush=True)
+        print(f"  v1-dev False Denials: {v1_fd} ({v1_summary['false_denial_rate'] * 100:.1f}%)", flush=True)
+        print(f"  v1-dev Deferral Rate: {v1_summary['deferral_rate'] * 100:.1f}%", flush=True)
 
     harness.close()
-    print("\nBaseline evaluation completed successfully.")
+    print("\nBaseline evaluation completed successfully.", flush=True)
 
 if __name__ == "__main__":
     run_14b_benchmark()

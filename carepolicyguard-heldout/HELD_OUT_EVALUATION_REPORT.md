@@ -6,17 +6,17 @@
 > Held-out evaluation is strictly reserved for the sealed v2 dataset pending clinician sign-off.
 
 **Dataset**: CarePolicyGuard Held-Out Vignette Set v1 (Development Diagnostic Set)  
-**Execution Timestamp**: 2026-11-01T23:24:52.128019+00:00  
+**Execution Timestamp**: 2026-11-02T01:02:29.788502+00:00  
 **Total Vignettes**: 15 (Gold: {'APPROVED': 7, 'DEFERRED_TO_HUMAN': 4, 'DENIED': 4, 'total': 15})  
 **Status**: UNSEALED DEVELOPMENT SET  
 
 ## 1. Summary Performance by Execution Mode
 
-| Execution Mode | Accuracy | Correct / Total | False Approvals | False Approval Rate | Abstentions | Mean Latency |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `deterministic` | **100.0%** | 15 / 15 | **0** | **0.0%** | 4 (26.7%) | 27.15 ms |
-| `state_machine` | **100.0%** | 15 / 15 | **0** | **0.0%** | 4 (26.7%) | 62.13 ms |
-| `declarative` | **100.0%** | 15 / 15 | **0** | **0.0%** | 4 (26.7%) | 24.38 ms |
+| Execution Mode | Diagnostic Accuracy ($n=15$) | False Approvals (FA) | False Denials (FD) | Deferral Rate (Abstentions) | Mean Latency |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `deterministic` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 26.08 ms |
+| `state_machine` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 56.36 ms |
+| `declarative` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 24.52 ms |
 
 ## 2. Granular Vignette Results Across Modes
 
