@@ -154,11 +154,20 @@ def execute_smoke_test() -> int:
             print(f"[-] Synthetic adjudication failed with status {adj_status}: {adj_data}")
             return 1
 
+        decision = adj_data.get("adjudication_decision")
+        confidence = adj_data.get("calibrated_aggregate_confidence")
+        assessments = adj_data.get("criterion_assessments", [])
+        audit_hash = adj_data.get("audit_hash", "N/A")
+
         print("[+] Synthetic adjudication PASSED:")
         print(f"    - Policy ID: {adj_data.get('policy_id')}")
-        print(f"    - Determination: {adj_data.get('determination')}")
-        print(f"    - Verified Spans: {len(adj_data.get('evidence_spans', []))}")
-        print(f"    - Audit Hash: {adj_data.get('audit_trail', {}).get('audit_hash', 'N/A')[:16]}...")
+        print(f"    - Decision: {decision}")
+        print(f"    - Calibrated Confidence: {confidence}")
+        print(f"    - Criteria Evaluated: {len(assessments)}")
+        print(f"    - Audit Hash: {audit_hash[:16]}...")
+
+        assert decision == "APPROVED", f"Expected adjudication_decision APPROVED, got: {decision}"
+        assert len(assessments) >= 3, f"Expected at least 3 criterion assessments, got {len(assessments)}"
 
         print("\n" + "=" * 80)
         print("ALL CONTAINER SMOKE TESTS PASSED CLEANLY")
