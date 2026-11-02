@@ -81,3 +81,23 @@ docker rm -f cpg-smoke
   4. `CRIT-ICD-04` (Post-CABG Waiting Period > 3 Months): Documented `14 months` (420 days) -> `MET`
 - **Expected Result**: `APPROVED` determination, 4 verified evidence spans, confidence score >= 0.85, and SHA-256 tamper-evident seal.
 
+---
+
+## 5. Live Verification Run Record (GitHub Actions CI)
+
+The container packaging, metadata isolation, healthcheck, and synthetic adjudication pipeline was executed live on a container host in GitHub Actions:
+
+- **CI Workflow**: CarePolicyGuard Enterprise CI/CD
+- **Run ID**: `41405129149`
+- **Commit**: `a7efd5e`
+- **Run URL**: [GitHub Actions Run 41405129149](https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/41405129149)
+- **Host Platform**: `ubuntu-latest` with Docker Engine and Buildx
+- **Overall Status**: `completed success`
+
+### Step-by-Step Verification Results
+1. **Docker Multi-Stage Build**: `completed success` (Built `carepolicyguard:latest` with non-root UID 1001 and `/app/data`).
+2. **Metadata Isolation Assertion**: `completed success` (`docker run --rm carepolicyguard:latest sh -c "test ! -d /app/.git"` returned `PASS: .git directory successfully excluded from container image`).
+3. **Microservice Healthcheck**: `completed success` (`curl -f http://localhost:8000/health` returned HTTP 200 `healthy`).
+4. **Synthetic Clinical Adjudication**: `completed success` (`POST /api/v1/adjudicate` returned HTTP 200 with determination `APPROVED`, 4 verified evidence spans, and cryptographic audit seal).
+5. **Container Lifecycle Cleanup**: `completed success` (Container stopped and removed without residual runtime state).
+
