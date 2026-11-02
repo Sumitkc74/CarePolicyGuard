@@ -1,19 +1,37 @@
+import secrets
 import pytest
 from fastapi.testclient import TestClient
 from main import app
 from app.services.mfa_service import MFAService
 from app.db.session import SessionLocal
 from app.db.models import User
+from app.core.security import get_password_hash
 
 client = TestClient(app)
 
 def test_mfa_all_three_options():
+    test_pwd = secrets.token_urlsafe(16)
+    test_email = f"test_clinician_{secrets.token_hex(4)}@hospital.org"
+    db = SessionLocal()
     try:
-        # 0. Log in as a clinician
+        user = User(
+            username=test_email,
+            email=test_email,
+            hashed_password=get_password_hash(test_pwd),
+            role="Clinician",
+            mfa_enabled=False
+        )
+        db.add(user)
+        db.commit()
+    finally:
+        db.close()
+
+    try:
+        # 0. Log in initially (MFA is false so token is returned directly)
         login_res = client.post("/api/v1/auth/login", json={
-            "username": "clinician@hospital.org",
-            "password": "ClinicianCare!2026"
-        }, headers={"X-Test-Bypass-MFA": "true"})
+            "username": test_email,
+            "password": test_pwd
+        })
         assert login_res.status_code == 200
         token = login_res.json()["access_token"]
         auth_header = {"Authorization": f"Bearer {token}"}
@@ -39,8 +57,8 @@ def test_mfa_all_three_options():
 
         # Now attempt login -> Expect MFA_CHALLENGE_REQUIRED
         challenge_res = client.post("/api/v1/auth/login", json={
-            "username": "clinician@hospital.org",
-            "password": "ClinicianCare!2026"
+            "username": test_email,
+            "password": test_pwd
         })
         assert challenge_res.status_code == 200
         challenge_data = challenge_res.json()
@@ -97,15 +115,9 @@ def test_mfa_all_three_options():
         assert "MFA cannot be disabled" in dis_res.json()["detail"]
 
     finally:
-        # Always tear down MFA state so other test files run with standard credentials
         db = SessionLocal()
-        u = db.query(User).filter(User.username == "clinician@hospital.org").first()
+        u = db.query(User).filter(User.username == test_email).first()
         if u:
-            u.mfa_enabled = True
-            u.mfa_method = "email_otp"
-            u.totp_secret = None
-            u.active_otp_code = None
-            u.phone_number = None
+            db.delete(u)
             db.commit()
         db.close()
-

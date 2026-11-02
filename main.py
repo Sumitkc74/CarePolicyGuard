@@ -61,6 +61,8 @@ async def lifespan(app: FastAPI):
         print("[+] Database schema verified and Medicare policies pre-seeded successfully.")
     except Exception as e:
         print(f"[-] Database seeding warning: {e}")
+        if settings.SEED_DEMO_USERS:
+            raise e
     finally:
         db.close()
 

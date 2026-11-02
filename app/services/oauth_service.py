@@ -144,8 +144,7 @@ class OAuthService:
         provider: str,
         oauth_profile: Dict[str, Any],
         db,
-        request,
-        bypass_mfa: bool = False
+        request
     ) -> Dict[str, Any]:
         """
         Finds existing user by oauth sub or email, or auto-provisions a new verified Clinician account.
@@ -187,7 +186,7 @@ class OAuthService:
             db.refresh(user)
 
         # 3. Check MFA policy enforcement
-        if user.mfa_enabled and not bypass_mfa:
+        if user.mfa_enabled:
             from app.services.mfa_service import MFAService
             challenge_token = create_access_token(
                 data={"sub": user.username, "uid": user.id, "type": "mfa_challenge"},

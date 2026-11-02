@@ -162,11 +162,8 @@ def rate_limit(action: str, max_requests: int = 5, window_seconds: int = 60):
     Extracts client IP or composite identifier and raises HTTP 429 if limit is exceeded.
     """
     def dependency(request: Request):
-        # Support automated test bypass headers
-        if (
-            request.headers.get("X-Test-Bypass-Rate-Limit") == "true"
-            or request.headers.get("X-Test-Bypass-MFA") == "true"
-        ):
+        # Support automated test rate limit bypass headers
+        if request.headers.get("X-Test-Bypass-Rate-Limit") == "true":
             return True
 
         client_ip = request.client.host if request.client else "127.0.0.1"

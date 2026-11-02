@@ -1,18 +1,44 @@
 from sqlalchemy.orm import Session
-from app.core.config import settings
+from app.core.config import settings, INSECURE_SECRET_PLACEHOLDERS
 from app.core.security import get_password_hash, UserRole
 from app.db.models import User, MedicarePolicy, PolicyCriterion
 
-def seed_database(db: Session):
+
+def seed_demo_users(db: Session):
     """
-    Seeds initial users and CMS Medicare National and Local Coverage Determinations (NCDs and LCDs).
+    Seeds initial demo evaluation users.
+    STRICT SECURITY REQUIREMENT:
+    This function ONLY executes when SEED_DEMO_USERS is explicitly enabled in environment.
+    All demo account passwords must come from environment variables with no default fallback.
     """
-    # 1. Seed Users
-    default_users = [
+    if not settings.SEED_DEMO_USERS:
+        return
+
+    demo_passwords = {
+        "admin": settings.DEMO_ADMIN_PASSWORD,
+        "auditor": settings.DEMO_AUDITOR_PASSWORD,
+        "clinician": settings.DEMO_CLINICIAN_PASSWORD,
+        "doctor": settings.DEMO_DOCTOR_PASSWORD,
+    }
+
+    missing_roles = [
+        role for role, pwd in demo_passwords.items()
+        if not pwd or pwd.strip() in INSECURE_SECRET_PLACEHOLDERS
+    ]
+
+    if missing_roles:
+        raise ValueError(
+            f"SEED_DEMO_USERS is enabled, but passwords for roles {missing_roles} "
+            f"are missing or set to insecure defaults. Demo passwords must be supplied via "
+            f"environment variables (DEMO_ADMIN_PASSWORD, DEMO_AUDITOR_PASSWORD, DEMO_CLINICIAN_PASSWORD, "
+            f"DEMO_DOCTOR_PASSWORD) with no default fallbacks."
+        )
+
+    demo_users = [
         {
             "username": "admin@carepolicyguard.med",
             "email": "admin@carepolicyguard.med",
-            "password": settings.DEFAULT_ADMIN_PASS,
+            "password": settings.DEMO_ADMIN_PASSWORD,
             "role": UserRole.ADMIN.value,
             "mfa_enabled": True,
             "mfa_method": "email_otp"
@@ -20,7 +46,7 @@ def seed_database(db: Session):
         {
             "username": "auditor@medicare.cms.gov",
             "email": "auditor@medicare.cms.gov",
-            "password": settings.DEFAULT_AUDITOR_PASS,
+            "password": settings.DEMO_AUDITOR_PASSWORD,
             "role": UserRole.AUDITOR.value,
             "mfa_enabled": True,
             "mfa_method": "email_otp"
@@ -28,7 +54,7 @@ def seed_database(db: Session):
         {
             "username": "clinician@hospital.org",
             "email": "clinician@hospital.org",
-            "password": settings.DEFAULT_CLINICIAN_PASS,
+            "password": settings.DEMO_CLINICIAN_PASSWORD,
             "role": UserRole.CLINICIAN.value,
             "npi_number": "1043256787",
             "medical_license": "C194820",
@@ -44,7 +70,7 @@ def seed_database(db: Session):
         {
             "username": "doctor@hospital.org",
             "email": "doctor@hospital.org",
-            "password": "password123",
+            "password": settings.DEMO_DOCTOR_PASSWORD,
             "role": UserRole.CLINICIAN.value,
             "npi_number": "1043256787",
             "medical_license": "C12345",
@@ -61,7 +87,7 @@ def seed_database(db: Session):
         }
     ]
 
-    for u_data in default_users:
+    for u_data in demo_users:
         existing = db.query(User).filter(User.username == u_data["username"]).first()
         if not existing:
             user = User(
@@ -83,25 +109,14 @@ def seed_database(db: Session):
             )
             db.add(user)
         else:
-            if u_data.get("npi_number") and not existing.npi_number:
-                existing.npi_number = u_data.get("npi_number")
-                existing.medical_license = u_data.get("medical_license")
-                existing.license_state = u_data.get("license_state")
-                existing.credential_title = u_data.get("credential_title")
-                existing.specialty = u_data.get("specialty")
-                existing.organization = u_data.get("organization")
-                existing.is_verified_medical_pro = u_data.get("is_verified_medical_pro", False)
-                existing.verification_method = u_data.get("verification_method")
-            if "mfa_enabled" in u_data:
-                existing.mfa_enabled = u_data["mfa_enabled"]
-                existing.mfa_method = u_data["mfa_method"]
-                existing.mfa_enabled_methods = u_data.get("mfa_enabled_methods", "email_otp")
-                if u_data.get("totp_secret"):
-                    existing.totp_secret = u_data["totp_secret"]
-
+            existing.hashed_password = get_password_hash(u_data["password"])
     db.commit()
 
-    # 2. Seed Medicare Policies & Criteria
+
+def seed_policies(db: Session):
+    """
+    Seeds CMS Medicare National and Local Coverage Determinations (NCDs and LCDs).
+    """
     from app.services.declarative_engine import DeclarativePolicyEngine
     declarative_policies = DeclarativePolicyEngine.get_all_policies()
 
@@ -162,3 +177,13 @@ def seed_database(db: Session):
                 db.delete(crit)
 
         db.commit()
+
+
+def seed_database(db: Session):
+    """
+    Seeds CMS Medicare National and Local Coverage Determinations (NCDs and LCDs).
+    Only seeds demo evaluation users if SEED_DEMO_USERS is explicitly enabled in environment.
+    """
+    seed_policies(db)
+    if settings.SEED_DEMO_USERS:
+        seed_demo_users(db)

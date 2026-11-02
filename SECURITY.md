@@ -83,6 +83,17 @@ CarePolicyGuard complies with the complete CMS-0057-F prior-authorization burden
 - **Fail-Fast Enforcement**: Application startup and container initialization strictly validate that `SECRET_KEY` is non-empty and does not match any known placeholder string.
 - **Mandatory User Action (Key Rotation Notice)**: The historical documentation default `SECRET_KEY` is permanently blocklisted. Any historical deployment that previously utilized that default key must be immediately rotated by generating a new cryptographically secure secret (`python -c "import secrets; print(secrets.token_urlsafe(48))"`).
 
+### Mandatory Operator Action: Rotation or Deletion of Seeded Demo Accounts
+
+Any deployment that ever ran with seeded demo accounts (specifically accounts configured for the admin, clinician, doctor, or auditor roles) must delete those accounts or rotate their passwords immediately. The historical demo passwords for these roles were published in this repository and must be treated as compromised.
+
+Application code cannot verify whether an existing deployment has completed this rotation or deletion — this is strictly an operator and administrative action, not an automated system guarantee.
+
+In the hardened codebase:
+1. Hardcoded demo passwords have been completely purged from application configuration and source code.
+2. Demo account seeding is disabled by default (`SEED_DEMO_USERS=false`).
+3. When seeding is explicitly enabled for development environments, passwords must be supplied exclusively via environment variables (`DEMO_ADMIN_PASSWORD`, `DEMO_CLINICIAN_PASSWORD`, `DEMO_AUDITOR_PASSWORD`, `DEMO_DOCTOR_PASSWORD`) with no default fallback. Startup will fail immediately if any required environment variable is missing or empty.
+
 ---
 
 ## 7. Coordinated Vulnerability Disclosure

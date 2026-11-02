@@ -161,9 +161,7 @@ def login(
         )
 
     # Check if Multi-Factor Authentication is enforced for this account (Mandatory Policy)
-    bypass_mfa_in_test = request.headers.get("X-Test-Bypass-MFA") == "true"
-    
-    if user.mfa_enabled and not bypass_mfa_in_test:
+    if user.mfa_enabled:
         from app.services.mfa_service import MFAService
         
         # If client directly supplied the second-factor code with login request:

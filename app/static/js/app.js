@@ -43,13 +43,7 @@ let lastAdjudicationResult = null;
 let cachedPoliciesList = [];
 let currentCoveragePacket = null;
 
-// Demo credentials
-// Demo credentials
-const DEMO_CREDENTIALS = {
-    clinician: { username: "clinician@hospital.org", password: "ClinicianCare!2026", role: "Clinician" },
-    auditor: { username: "auditor@medicare.cms.gov", password: "AuditorSecure!2026", role: "Auditor" },
-    admin: { username: "admin@carepolicyguard.med", password: "AdminGuard!2026", role: "Admin" }
-};
+// Demo credentials removed for security hardening
 
 const POLICY_SPECIALTY_MAP = {
     "NCD-20.4": "Cardiology",
@@ -220,13 +214,6 @@ function switchLoginMode(mode) {
     }
 }
 
-function autofillLogin(email, password) {
-    const uInput = document.getElementById("login-username-input");
-    const pInput = document.getElementById("login-password-input");
-    if (uInput) uInput.value = email;
-    if (pInput) pInput.value = password;
-    showToast(`Autofilled credentials for ${email}. Click "Sign In & Authenticate" to verify.`);
-}
 
 // Client-Side CMS Luhn Checksum for NPI (Prefix 80840)
 function validateNpiLuhnClient(npi) {
@@ -539,7 +526,6 @@ async function handleGoogleOAuthCredential(credential) {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
-                "X-Test-Bypass-MFA": "true"
             },
             body: JSON.stringify({ credential })
         });
@@ -660,6 +646,7 @@ function signOutToLoginGate() {
 
 const DEFAULT_CLINICIAN_PROFILE = {
     full_name: "Dr. Sarah Jenkins, MD, FACC",
+    display_name: "Dr. Sarah Jenkins",
     npi: "1043256787",
     specialty: "Cardiology / Electrophysiology",
     facility: "MetroHealth Heart & Vascular Institute"
@@ -690,6 +677,22 @@ function getClinicianProfile() {
     return { ...DEFAULT_CLINICIAN_PROFILE };
 }
 
+function getActiveDisplayName() {
+    const userKey = currentUser || currentRole || "user";
+    const custom = localStorage.getItem(`carepolicyguard_display_name_${userKey}`);
+    if (custom) return custom;
+
+    if (currentRole === "Clinician") {
+        const prof = getClinicianProfile();
+        return prof.display_name || "Dr. Sarah Jenkins";
+    } else if (currentRole === "Admin") {
+        return "System Admin";
+    } else if (currentRole === "Auditor") {
+        return "Compliance Auditor";
+    }
+    return currentUser || "Profile";
+}
+
 function switchProfileModalTab(tabName) {
     const btnCreds = document.getElementById("btn-tab-profile-creds");
     const btnSec = document.getElementById("btn-tab-profile-security");
@@ -718,36 +721,42 @@ function renderClinicianProfile() {
     const profile = getClinicianProfile();
     resetAllIndividualEdits();
 
+    const dispDisplayName = document.getElementById("disp-profile-display-name");
     const dispName = document.getElementById("disp-profile-name");
     const dispNpi = document.getElementById("disp-profile-npi");
     const dispSpec = document.getElementById("disp-profile-specialty");
     const dispFac = document.getElementById("disp-profile-facility");
 
+    if (dispDisplayName) dispDisplayName.textContent = profile.display_name || "Dr. Sarah Jenkins";
     if (dispName) dispName.textContent = profile.full_name;
     if (dispNpi) dispNpi.textContent = profile.npi;
     if (dispSpec) dispSpec.textContent = profile.specialty;
     if (dispFac) dispFac.textContent = profile.facility;
 
-    // Top navigation button displays "Profile"
+    // Header badge
+    const activeName = getActiveDisplayName();
     const nameLabel = document.getElementById("user-name-label");
     if (nameLabel) {
-        nameLabel.textContent = "Profile";
+        nameLabel.textContent = activeName;
     }
 
-    // Sync Step 4 physician signature input
+    const secDisp = document.getElementById("sec-disp-display-name");
+    if (secDisp) secDisp.textContent = activeName;
+
+    // Sync Step 4 physician signature input with IMMUTABLE LEGAL name
     const docSigInput = document.getElementById("doc-physician-signature");
     if (docSigInput && (!docSigInput.value || docSigInput.value.includes("Jenkins") || docSigInput.value.includes("Vance"))) {
         docSigInput.value = profile.full_name;
     }
 
-    // Sync Addendum modal signer fields
+    // Sync Addendum modal signer fields with IMMUTABLE LEGAL name and NPI
     const addendumName = document.getElementById("addendum-physician-name");
     const addendumNpi = document.getElementById("addendum-physician-npi");
     if (addendumName) addendumName.value = profile.full_name;
     if (addendumNpi) addendumNpi.value = profile.npi;
 }
 
-const INDIVIDUAL_PROFILE_FIELDS = ['name', 'npi', 'specialty', 'facility', 'pin'];
+const INDIVIDUAL_PROFILE_FIELDS = ['display-name', 'pin'];
 
 function resetAllIndividualEdits() {
     INDIVIDUAL_PROFILE_FIELDS.forEach(f => {
@@ -767,28 +776,10 @@ function openIndividualEdit(fieldName) {
     if (viewRow) viewRow.classList.add("hidden");
     if (editRow) editRow.classList.remove("hidden");
 
-    if (fieldName === "name") {
-        const inp = document.getElementById("inp-profile-name");
+    if (fieldName === "display-name") {
+        const inp = document.getElementById("inp-profile-display-name");
         if (inp) {
-            inp.value = profile.full_name || "";
-            inp.focus();
-        }
-    } else if (fieldName === "npi") {
-        const inp = document.getElementById("inp-profile-npi");
-        if (inp) {
-            inp.value = profile.npi || "";
-            inp.focus();
-        }
-    } else if (fieldName === "specialty") {
-        const inp = document.getElementById("inp-profile-specialty");
-        if (inp) {
-            inp.value = profile.specialty || "";
-            inp.focus();
-        }
-    } else if (fieldName === "facility") {
-        const inp = document.getElementById("inp-profile-facility");
-        if (inp) {
-            inp.value = profile.facility || "";
+            inp.value = profile.display_name || "Dr. Sarah Jenkins";
             inp.focus();
         }
     } else if (fieldName === "pin") {
@@ -815,68 +806,26 @@ function cancelClinicianProfileEdit() {
 function saveIndividualEdit(fieldName) {
     const profile = getClinicianProfile();
 
-    if (fieldName === "name") {
-        const inp = document.getElementById("inp-profile-name");
+    if (fieldName === "display-name") {
+        const inp = document.getElementById("inp-profile-display-name");
         const val = inp ? inp.value.trim() : "";
         if (!val) {
-            showToast("Physician name cannot be empty. Please enter a legal name.", true);
+            showToast("Preferred display name cannot be empty.", true);
             if (inp) inp.focus();
             return;
         }
-        if (val.length < 3) {
-            showToast("Physician name is too short (at least 3 characters required).", true);
+        if (val.length < 2 || val.length > 50) {
+            showToast("Display name must be between 2 and 50 characters.", true);
             if (inp) inp.focus();
             return;
         }
-        profile.full_name = val;
+        profile.display_name = val;
         localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
+        const userKey = currentUser || currentRole || "user";
+        localStorage.setItem(`carepolicyguard_display_name_${userKey}`, val);
         renderClinicianProfile();
-        cancelIndividualEdit("name");
-        showToast("Treating physician legal name updated.");
-    } else if (fieldName === "npi") {
-        const inp = document.getElementById("inp-profile-npi");
-        const val = inp ? inp.value.trim() : "";
-        if (!val) {
-            showToast("NPI cannot be empty. Please enter a 10-digit CMS NPI.", true);
-            if (inp) inp.focus();
-            return;
-        }
-        if (!/^\d{10}$/.test(val)) {
-            showToast("Invalid NPI format: CMS NPI must be exactly 10 numeric digits.", true);
-            if (inp) inp.focus();
-            return;
-        }
-        profile.npi = val;
-        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
-        renderClinicianProfile();
-        cancelIndividualEdit("npi");
-        showToast("10-Digit CMS NPI updated.");
-    } else if (fieldName === "specialty") {
-        const inp = document.getElementById("inp-profile-specialty");
-        const val = inp ? inp.value.trim() : "";
-        if (!val) {
-            showToast("Clinical specialty cannot be empty. Please enter a specialty.", true);
-            if (inp) inp.focus();
-            return;
-        }
-        profile.specialty = val;
-        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
-        renderClinicianProfile();
-        cancelIndividualEdit("specialty");
-        showToast("Clinical specialty updated.");
-    } else if (fieldName === "facility") {
-        const inp = document.getElementById("inp-profile-facility");
-        const val = inp ? inp.value.trim() : "";
-        if (!val) {
-            showToast("Healthcare facility cannot be empty. Please enter a facility or practice name.", true);
-            if (inp) inp.focus();
-            return;
-        }
-        profile.facility = val;
-        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
-        renderClinicianProfile();
-        cancelIndividualEdit("facility");
-        showToast("Healthcare facility affiliation updated.");
+        cancelIndividualEdit("display-name");
+        showToast("Preferred display name updated. (Statutory CMS packets will continue using your verified legal name).");
     } else if (fieldName === "pin") {
         const inp = document.getElementById("inp-profile-pin");
         const val = inp ? inp.value.trim() : "";
@@ -894,7 +843,59 @@ function saveIndividualEdit(fieldName) {
         renderClinicianProfile();
         cancelIndividualEdit("pin");
         showToast("Clinician signing PIN updated successfully.");
+    } else {
+        showToast("Legal physician credentials are verified and locked to prevent statutory impersonation.", true);
     }
+}
+
+// SECURITY & AUDITOR / ADMIN DISPLAY NAME EDITING
+function openSecDisplayNameEdit() {
+    const box = document.getElementById("sec-edit-display-name-box");
+    const inp = document.getElementById("inp-sec-display-name");
+    if (box) box.classList.remove("hidden");
+    if (inp) {
+        inp.value = getActiveDisplayName();
+        inp.focus();
+    }
+}
+
+function cancelSecDisplayNameEdit() {
+    const box = document.getElementById("sec-edit-display-name-box");
+    if (box) box.classList.add("hidden");
+}
+
+function saveSecDisplayNameEdit() {
+    const inp = document.getElementById("inp-sec-display-name");
+    const val = inp ? inp.value.trim() : "";
+    if (!val) {
+        showToast("Preferred display name cannot be empty.", true);
+        if (inp) inp.focus();
+        return;
+    }
+    if (val.length < 2 || val.length > 50) {
+        showToast("Display name must be between 2 and 50 characters.", true);
+        if (inp) inp.focus();
+        return;
+    }
+
+    const userKey = currentUser || currentRole || "user";
+    localStorage.setItem(`carepolicyguard_display_name_${userKey}`, val);
+
+    if (currentRole === "Clinician") {
+        const profile = getClinicianProfile();
+        profile.display_name = val;
+        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
+        renderClinicianProfile();
+    }
+
+    const secDisp = document.getElementById("sec-disp-display-name");
+    if (secDisp) secDisp.textContent = val;
+
+    const nameLabel = document.getElementById("user-name-label");
+    if (nameLabel) nameLabel.textContent = val;
+
+    cancelSecDisplayNameEdit();
+    showToast("Preferred display name updated successfully.");
 }
 
 function togglePinInputVisibility(inputId) {
@@ -910,17 +911,20 @@ function togglePinInputVisibility(inputId) {
 function updateUserBadge() {
     const roleLabel = document.getElementById("user-role-label");
     const nameLabel = document.getElementById("user-name-label");
-    const profile = getClinicianProfile();
+    const activeName = getActiveDisplayName();
 
     if (roleLabel) roleLabel.textContent = currentRole;
     if (nameLabel) {
-        nameLabel.textContent = "Profile";
+        nameLabel.textContent = activeName;
     }
 
     const modalUser = document.getElementById("modal-profile-user");
     const modalRole = document.getElementById("modal-profile-role");
     if (modalUser) modalUser.textContent = currentUser;
     if (modalRole) modalRole.textContent = currentRole;
+
+    const secDisp = document.getElementById("sec-disp-display-name");
+    if (secDisp) secDisp.textContent = activeName;
 
     const auditorNotice = document.getElementById("auditor-mode-notice");
     if (auditorNotice) {
@@ -1088,8 +1092,6 @@ function updateMfaChallengeCardUI(data) {
     const subtitle = document.getElementById("mfa-challenge-subtitle");
     const destText = document.getElementById("mfa-destination-text");
     const codeInput = document.getElementById("mfa-code-input");
-    const devHintBox = document.getElementById("mfa-dev-hint-box");
-    const autofillBtn = document.getElementById("btn-autofill-mfa-code");
 
     const method = data.mfa_method || window._selectedMfaMethod;
 
@@ -1102,19 +1104,6 @@ function updateMfaChallengeCardUI(data) {
     } else if (method === "sms_otp") {
         if (subtitle) subtitle.textContent = "SMS Security Code";
         if (destText) destText.textContent = `A 6-digit verification code was sent via SMS to ${data.destination_masked || "your mobile device"}.`;
-    }
-
-    if (data.dev_preview_code && devHintBox && autofillBtn) {
-        devHintBox.classList.remove("hidden");
-        autofillBtn.textContent = `Autofill Security Code: ${data.dev_preview_code}`;
-        autofillBtn.onclick = () => {
-            if (codeInput) {
-                codeInput.value = data.dev_preview_code;
-                codeInput.focus();
-            }
-        };
-    } else if (devHintBox) {
-        devHintBox.classList.add("hidden");
     }
 
     if (codeInput) {
@@ -1436,14 +1425,11 @@ async function enableEmailOtpMfa() {
             const data = await res.json();
             const hint = document.getElementById("email-otp-target-hint");
             let msg = `Verification code dispatched to ${data.channel_destination || "your email"}.`;
-            if (data.dev_preview_code) {
-                msg += ` (Evaluation Code: ${data.dev_preview_code})`;
-            }
             if (hint) hint.textContent = msg;
             if (box) box.classList.remove("hidden");
             const input = document.getElementById("email-verify-code-input");
             if (input) {
-                input.value = data.dev_preview_code || "";
+                input.value = "";
                 input.focus();
             }
             showToast("Verification code sent to your registered clinical email.");
@@ -1525,13 +1511,10 @@ async function requestSmsOtpCode() {
             const data = await res.json();
             const hint = document.getElementById("sms-otp-target-hint");
             let msg = `Verification code sent to ${data.channel_destination}.`;
-            if (data.dev_preview_code) {
-                msg += ` (Evaluation Code: ${data.dev_preview_code})`;
-            }
             if (hint) hint.textContent = msg;
             const verifyInput = document.getElementById("sms-verify-code-input");
             if (verifyInput) {
-                verifyInput.value = data.dev_preview_code || "";
+                verifyInput.value = "";
                 verifyInput.focus();
             }
             showToast("SMS verification code sent.");
@@ -4158,16 +4141,12 @@ function populatePacketDocument() {
         docSdm.textContent = p.shared_decision_making_attestation || "Documented clinical consultation conducted pursuant to CMS Medicare Coverage Determination.";
     }
 
-    // Physician Signature Input (Populate with detected doctor name if present)
+    // Physician Signature Input (Immutable: strictly bound to authenticated practitioner)
     const sigInput = document.getElementById("doc-physician-signature");
     if (sigInput) {
-        const ehrText = document.getElementById("ehr-input")?.value || "";
-        const auth = checkNoteAuthenticity(ehrText);
-        if (auth.has_doctor_name && auth.doctor_name) {
-            sigInput.value = auth.doctor_name;
-        } else if (p.signed_by) {
-            sigInput.value = p.signed_by;
-        }
+        const prof = getClinicianProfile();
+        sigInput.value = prof.full_name || "Dr. Sarah Jenkins, MD, FACC";
+        sigInput.readOnly = true;
     }
 
     // Signature Date
@@ -4416,8 +4395,8 @@ function verifyAndExecuteSubmission() {
 async function executePacketSubmission() {
     if (!currentCoveragePacket) return;
 
-    const sigInput = document.getElementById("doc-physician-signature");
-    const signerBase = (sigInput && sigInput.value.trim()) || "Dr. Sarah Jenkins, MD, FACC";
+    const prof = getClinicianProfile();
+    const signerBase = prof.full_name || "Dr. Sarah Jenkins, MD, FACC";
     const signerName = `${signerBase} (PIN-Verified Attestation)`;
     const notesInput = document.getElementById("doc-clinical-summary");
     const clinicianNotes = notesInput ? notesInput.value.trim() : (currentCoveragePacket.clinical_summary || "");
@@ -5264,8 +5243,8 @@ async function submitClinicalAddendum() {
             body: JSON.stringify({
                 criterion_code: currentTargetCriterionCode,
                 addendum_text: addendumText,
-                clinician_name: physicianElem ? physicianElem.value : "Attending Physician",
-                clinician_npi: npiElem ? npiElem.value : "1043256787"
+                clinician_name: getClinicianProfile().full_name || "Dr. Sarah Jenkins, MD, FACC",
+                clinician_npi: getClinicianProfile().npi || "1043256787"
             })
         });
 

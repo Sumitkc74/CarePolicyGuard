@@ -26,7 +26,7 @@ By replacing monolithic, hallucination-prone Large Language Models with a **veri
 9. [Architectural Positioning Relative to Prior Authorization Paradigms](#architectural-positioning-relative-to-prior-authorization-paradigms)
 10. [Directory Structure](#directory-structure)
 11. [Quickstart & Installation](#quickstart--installation)
-12. [Demo User Credentials](#demo-user-credentials)
+12. [Demo Evaluation Accounts & Security Notice](#demo-evaluation-accounts--security-notice)
 13. [Academic & Regulatory References](#academic--regulatory-references)
 
 ---
@@ -509,13 +509,18 @@ Open your browser to:
 
 ---
 
-## Demo User Credentials
+## Demo Evaluation Accounts & Security Notice
 
-| Role | Username / Email | Password | Access Scope & Permissions |
-| :--- | :--- | :--- | :--- |
-| **Clinician** (Physician) | `clinician@hospital.org` | `ClinicianCare!2026` | Patient note intake, multi-agent adjudication, appeal generation, FHIR bundle export. |
-| **Auditor** (CMS Reviewer) | `auditor@medicare.cms.gov` | `AuditorSecure!2026` | Forensic audit ledger inspection, character offset quotes, SHA-256 seal verification (Read-Only). |
-| **Admin** (System Administrator) | `admin@carepolicyguard.med` | `AdminGuard!2026` | Technical metadata audit view (clinical text redacted under HIPAA), CMS policy sync, DB maintenance. |
+### Mandatory Operator Action: Rotation or Deletion of Seeded Accounts
+
+Any deployment that ever ran with seeded demo accounts (specifically accounts for the admin, clinician, doctor, or auditor roles) must delete those accounts or rotate their passwords immediately. The historical demo passwords for these roles were published in the repository and must be treated as compromised.
+
+Application code cannot verify whether an existing deployment has completed this rotation or deletion — this is an operator action, not an automated system guarantee.
+
+In accordance with production security standards:
+- Hardcoded demo credentials and UI autofill chips have been removed from the platform.
+- Demo user seeding is disabled by default (`SEED_DEMO_USERS=false`).
+- For local development environments where demo seeding is enabled, passwords must be supplied exclusively through environment variables (`DEMO_ADMIN_PASSWORD`, `DEMO_CLINICIAN_PASSWORD`, `DEMO_AUDITOR_PASSWORD`, `DEMO_DOCTOR_PASSWORD`) with no fallback defaults. Startup fails immediately if any required environment variable is omitted.
 
 ---
 

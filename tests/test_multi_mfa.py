@@ -1,33 +1,39 @@
+import secrets
 import pytest
 from fastapi.testclient import TestClient
 from main import app
 from app.services.mfa_service import MFAService
 from app.db.session import SessionLocal
 from app.db.models import User
+from app.core.security import get_password_hash
 
 client = TestClient(app)
 
 def test_multiple_mfa_methods_and_login_selection():
-    # 0. Ensure doctor@hospital.org has both email_otp and totp_app
+    test_pwd = secrets.token_urlsafe(16)
+    test_email = f"test_multi_doc_{secrets.token_hex(4)}@hospital.org"
     db = SessionLocal()
     try:
-        user = db.query(User).filter(User.username == "doctor@hospital.org").first()
-        if user:
-            user.mfa_enabled = True
-            user.mfa_method = "email_otp"
-            user.mfa_enabled_methods = "email_otp,totp_app"
-            user.totp_secret = "JBSWY3DPEHPK3PXP"
-            user.active_otp_code = None
-            user.otp_expires_at = None
-            db.commit()
+        user = User(
+            username=test_email,
+            email=test_email,
+            hashed_password=get_password_hash(test_pwd),
+            role="Clinician",
+            mfa_enabled=True,
+            mfa_method="email_otp",
+            mfa_enabled_methods="email_otp,totp_app",
+            totp_secret="JBSWY3DPEHPK3PXP"
+        )
+        db.add(user)
+        db.commit()
     finally:
         db.close()
 
     try:
-        # 1. Login with doctor@hospital.org who has multiple MFA methods (Email OTP + TOTP App)
+        # 1. Login with test clinician who has multiple MFA methods (Email OTP + TOTP App)
         login_res = client.post("/api/v1/auth/login", json={
-            "username": "doctor@hospital.org",
-            "password": "password123"
+            "username": test_email,
+            "password": test_pwd
         })
         assert login_res.status_code == 200
         challenge = login_res.json()
@@ -93,16 +99,9 @@ def test_multiple_mfa_methods_and_login_selection():
         assert "at least one active MFA factor" in rm_last.json()["detail"]
 
     finally:
-        # Restore doctor clean state
         db = SessionLocal()
-        u = db.query(User).filter(User.username == "doctor@hospital.org").first()
+        u = db.query(User).filter(User.username == test_email).first()
         if u:
-            u.mfa_enabled = True
-            u.mfa_method = "email_otp"
-            u.mfa_enabled_methods = "email_otp,totp_app"
-            u.totp_secret = "JBSWY3DPEHPK3PXP"
-            u.active_otp_code = None
-            u.otp_expires_at = None
+            db.delete(u)
             db.commit()
         db.close()
-

@@ -47,29 +47,18 @@ def test_google_sso_auto_provision_and_mfa():
     finally:
         db.close()
 
-def test_google_sso_auto_provision_and_direct_bypass():
-    # Test Google sign-in with bypass header
+def test_google_sso_ignores_bypass_header_and_requires_mfa():
+    # Test Google sign-in with bypass header: verify bypass is NOT permitted and MFA challenge is required
     google_res = client.post(
         "/api/v1/auth/oauth/google",
         json={"credential": "mock_google_dr.bypass@hospital.org"},
         headers={"X-Test-Bypass-MFA": "true"}
     )
     assert google_res.status_code == 200
-    token_data = google_res.json()
-    assert "access_token" in token_data
-    assert token_data["role"] == "Clinician"
-    assert token_data["username"] == "dr.bypass@hospital.org"
-    assert token_data["oauth_provider"] == "google"
-
-    # Verify user record in database
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.email == "dr.bypass@hospital.org").first()
-        assert user is not None
-        assert user.oauth_provider == "google"
-        assert user.is_verified_medical_pro is True
-    finally:
-        db.close()
+    data = google_res.json()
+    assert data["status"] == "MFA_CHALLENGE_REQUIRED"
+    assert "access_token" not in data
+    assert "mfa_session_token" in data
 
 def test_oauth_invalid_token_returns_401():
     res = client.post("/api/v1/auth/oauth/google", json={
@@ -77,4 +66,3 @@ def test_oauth_invalid_token_returns_401():
     })
     assert res.status_code == 401
     assert "Google authentication failed" in res.json()["detail"]
-

@@ -318,6 +318,31 @@ def test_role_based_audit_ledger_privacy_and_access_control():
     from app.core.security import create_access_token
     from datetime import timedelta
 
+    from app.db.session import SessionLocal
+    from app.db.models import User
+    from app.core.security import get_password_hash
+    import secrets
+
+    db_sess = SessionLocal()
+    if not db_sess.query(User).filter(User.username == "admin@carepolicyguard.med").first():
+        db_sess.add(User(
+            username="admin@carepolicyguard.med",
+            email="admin@carepolicyguard.med",
+            hashed_password=get_password_hash(secrets.token_urlsafe(16)),
+            role="Admin",
+            mfa_enabled=True,
+        ))
+    if not db_sess.query(User).filter(User.username == "auditor@medicare.cms.gov").first():
+        db_sess.add(User(
+            username="auditor@medicare.cms.gov",
+            email="auditor@medicare.cms.gov",
+            hashed_password=get_password_hash(secrets.token_urlsafe(16)),
+            role="Auditor",
+            mfa_enabled=True,
+        ))
+    db_sess.commit()
+    db_sess.close()
+
     client = TestClient(app)
 
     # First, run an adjudication so at least one audit record exists

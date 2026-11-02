@@ -46,12 +46,10 @@ def register_oauth_routes(api_router: APIRouter):
                 detail=f"Google authentication failed: {str(e)}"
             )
 
-        bypass_mfa = request.headers.get("X-Test-Bypass-MFA") == "true"
         result = OAuthService.authenticate_or_provision_oauth_user(
             provider="google",
             oauth_profile=profile,
             db=db,
-            request=request,
-            bypass_mfa=bypass_mfa
+            request=request
         )
         return result

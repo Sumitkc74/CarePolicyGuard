@@ -60,13 +60,12 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
 
-    # Default Demo Credentials
-    DEFAULT_ADMIN_USER: str = "admin@carepolicyguard.med"
-    DEFAULT_ADMIN_PASS: str = "AdminGuard!2026"
-    DEFAULT_AUDITOR_USER: str = "auditor@medicare.cms.gov"
-    DEFAULT_AUDITOR_PASS: str = "AuditorSecure!2026"
-    DEFAULT_CLINICIAN_USER: str = "clinician@hospital.org"
-    DEFAULT_CLINICIAN_PASS: str = "ClinicianCare!2026"
+    # Demo User Seeding (Strictly dev-only; passwords must come from environment with no default fallbacks)
+    SEED_DEMO_USERS: bool = os.getenv("SEED_DEMO_USERS", "false").lower() in ("true", "1", "yes")
+    DEMO_ADMIN_PASSWORD: str = os.getenv("DEMO_ADMIN_PASSWORD", "")
+    DEMO_AUDITOR_PASSWORD: str = os.getenv("DEMO_AUDITOR_PASSWORD", "")
+    DEMO_CLINICIAN_PASSWORD: str = os.getenv("DEMO_CLINICIAN_PASSWORD", "")
+    DEMO_DOCTOR_PASSWORD: str = os.getenv("DEMO_DOCTOR_PASSWORD", "")
 
     @field_validator("SECRET_KEY", mode="before")
     @classmethod

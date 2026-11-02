@@ -12,32 +12,74 @@ def test_health_check():
     assert data["status"] == "healthy"
     assert data["service"] == settings.PROJECT_NAME
 
+import secrets
+from datetime import timedelta
+from app.db.session import SessionLocal
+from app.db.models import User
+from app.core.security import get_password_hash, create_access_token
+
 def test_auth_login_valid_credentials():
-    # 1. Without bypass header, expects MFA challenge required
+    test_pwd = secrets.token_urlsafe(16)
+    test_email = f"test_auditor_{secrets.token_hex(4)}@medicare.cms.gov"
+    db = SessionLocal()
+    try:
+        user = User(
+            username=test_email,
+            email=test_email,
+            hashed_password=get_password_hash(test_pwd),
+            role="Auditor",
+            mfa_enabled=True,
+            mfa_method="email_otp"
+        )
+        db.add(user)
+        db.commit()
+    finally:
+        db.close()
+
+    # 1. Login with valid credentials triggers MFA challenge
     challenge_resp = client.post("/api/v1/auth/login", json={
-        "username": "auditor@medicare.cms.gov",
-        "password": settings.DEFAULT_AUDITOR_PASS
+        "username": test_email,
+        "password": test_pwd
     })
     assert challenge_resp.status_code == 200
     c_data = challenge_resp.json()
     assert c_data["status"] == "MFA_CHALLENGE_REQUIRED"
     assert "mfa_session_token" in c_data
+    session_token = c_data["mfa_session_token"]
+    otp_code = c_data["dev_preview_code"]
 
-    # 2. With test bypass header, issues access token directly
-    response = client.post("/api/v1/auth/login", json={
-        "username": "auditor@medicare.cms.gov",
-        "password": settings.DEFAULT_AUDITOR_PASS
-    }, headers={"X-Test-Bypass-MFA": "true"})
-    assert response.status_code == 200
-    data = response.json()
+    # 2. Complete real MFA challenge verification to obtain JWT access token
+    verify_resp = client.post("/api/v1/auth/mfa/verify-login", json={
+        "mfa_session_token": session_token,
+        "verification_code": otp_code
+    })
+    assert verify_resp.status_code == 200
+    data = verify_resp.json()
     assert "access_token" in data
     assert data["role"] == "Auditor"
     assert data["token_type"] == "bearer"
 
 def test_auth_login_invalid_credentials():
+    test_pwd = secrets.token_urlsafe(16)
+    test_email = f"test_auditor_inv_{secrets.token_hex(4)}@medicare.cms.gov"
+    db = SessionLocal()
+    try:
+        user = User(
+            username=test_email,
+            email=test_email,
+            hashed_password=get_password_hash(test_pwd),
+            role="Auditor",
+            mfa_enabled=True,
+            mfa_method="email_otp"
+        )
+        db.add(user)
+        db.commit()
+    finally:
+        db.close()
+
     response = client.post("/api/v1/auth/login", json={
-        "username": "auditor@medicare.cms.gov",
-        "password": "WrongPassword123"
+        "username": test_email,
+        "password": "WrongPassword_" + secrets.token_hex(4)
     })
     assert response.status_code == 401
 
@@ -58,12 +100,8 @@ def test_get_presets():
     assert len(data["presets"]) >= 4
 
 def test_adjudicate_endpoint_qualifying_scenario():
-    # Login to get token
-    login_res = client.post("/api/v1/auth/login", json={
-        "username": "auditor@medicare.cms.gov",
-        "password": settings.DEFAULT_AUDITOR_PASS
-    }, headers={"X-Test-Bypass-MFA": "true"})
-    token = login_res.json()["access_token"]
+    # Construct in-memory test token directly without relying on default credentials or bypasses
+    token = create_access_token({"sub": "test_auditor_adj@medicare.cms.gov", "role": "Auditor"}, timedelta(minutes=15))
 
     ehr_text = """
     PROGRESS NOTE - CARDIOLOGY
