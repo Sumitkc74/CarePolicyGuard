@@ -65,76 +65,11 @@ class CriteriaEvaluationAgent:
     @classmethod
     def analyze_clinical_scope(cls, text: str, span_start: int, span_end: int) -> Dict[str, Any]:
         """
-        Clinical NegEx & ConText Scope Analyzer.
-        Inspects preceding and following text windows around a clinical evidence span:
-        1. Negation triggers (pre- and post-negation)
-        2. Experiencer triggers (Family history vs patient)
+        Clinical NegEx & ConText Scope Analyzer delegating to unified ClinicalScopeAnalyzer.
+        Shared core across Deterministic, State Machine, and Declarative modes.
         """
-        preceding_window = text[max(0, span_start - 60):span_start].lower()
-        following_window = text[span_end:min(len(text), span_end + 35)].lower()
-
-        pre_negations = [
-            r"\b(?:no|not|denies|denied|denying|without|negative for|ruled out|free of|absence of|never)\b",
-            r"\b(?:no evidence of|no history of|no signs of|fails to demonstrate|unremarkable for)\b"
-        ]
-        post_negations = [
-            r"\b(?:is ruled out|was ruled out|is absent|unlikely)\b"
-        ]
-        experiencer_triggers = [
-            r"\b(?:mother|father|sister|brother|maternal|paternal|family history|fhx|relative|parent)\b"
-        ]
-        conjunctions = [r"\b(?:but|however|nevertheless|although|except|yet)\b"]
-
-        # Clinical NegEx/ConText rule: Negation does not cross sentence/clause boundaries
-        # Delimiters: newline, semicolon, or period followed by whitespace
-        sentence_boundaries = [m.end() for m in re.finditer(r'(?:\.\s+|\n+|;\s*)', preceding_window)]
-        last_boundary = max(sentence_boundaries) if sentence_boundaries else 0
-        in_sentence_preceding = preceding_window[last_boundary:]
-
-        last_conjunction = -1
-        for conj in conjunctions:
-            for m in re.finditer(conj, in_sentence_preceding):
-                if m.start() > last_conjunction:
-                    last_conjunction = m.start()
-
-        active_preceding = in_sentence_preceding[last_conjunction + 1:] if last_conjunction != -1 else in_sentence_preceding
-
-        # Post-negation also stops at the first subsequent sentence boundary
-        following_boundary_match = re.search(r'(?:\.\s+|\n+|;)', following_window)
-        active_following = following_window[:following_boundary_match.start()] if following_boundary_match else following_window
-
-        is_negated = False
-        negation_trigger = None
-        for pat in pre_negations:
-            m = re.search(pat, active_preceding)
-            if m:
-                is_negated = True
-                negation_trigger = m.group(0)
-                break
-
-        if not is_negated:
-            for pat in post_negations:
-                m = re.search(pat, active_following)
-                if m:
-                    is_negated = True
-                    negation_trigger = m.group(0)
-                    break
-
-        is_family_history = False
-        experiencer = "PATIENT"
-        for pat in experiencer_triggers:
-            m = re.search(pat, active_preceding)
-            if m:
-                is_family_history = True
-                experiencer = "FAMILY_MEMBER"
-                break
-
-        return {
-            "is_negated": is_negated,
-            "negation_trigger": negation_trigger,
-            "is_family_history": is_family_history,
-            "experiencer": experiencer
-        }
+        from app.core.clinical_core import ClinicalScopeAnalyzer
+        return ClinicalScopeAnalyzer.analyze_scope(text, span_start, span_end)
 
 
     def evaluate_criterion(
@@ -370,31 +305,40 @@ class CriteriaEvaluationAgent:
                 rationale = "No acute MI (<40 days) or recent revascularization (<90 days) disqualifying the patient."
                 raw_confidence = 0.88
 
-        elif is_excl and ("shock" in desc.lower() or "terminal" in desc.lower() or "survival" in desc.lower() or "exclusion" in code.lower()):
-            # Disqualifying Exclusion Check (Active Cardiogenic Shock, Metastatic Cancer / Terminal Illness < 1 Year)
-            pos_pattern = r'(?i)\b(?:active cardiogenic shock|in cardiogenic shock|refractory cardiogenic shock|cardiogenic shock|metastatic\s+(?:[a-z]+\s+)?(?:cancer|malignancy|disease)|end-stage malignancy|terminal illness|terminal non-cardiac illness|hospice(?:-directed)?|life expectancy\s*(?:<|less than)\s*1\s*year)\b'
+        elif is_excl:
+            # Generalized Disqualifying Exclusion Check across CMS NCD/LCD Policies
+            raw_terms = criterion.get("entity_names") or criterion.get("keywords") or []
+            terms = [t for t in raw_terms if t and len(t) > 2]
+            if not terms:
+                terms = ["active cardiogenic shock", "cardiogenic shock", "metastatic cancer", "terminal illness", "hospice", "life expectancy < 1 year"]
+
             active_exclusion_found = False
-            for m in re.finditer(pos_pattern, ehr_text):
-                s_idx = m.start()
-                e_idx = m.end()
-                scope = self.analyze_clinical_scope(ehr_text, s_idx, e_idx)
-                if not scope["is_negated"]:
-                    span = ClinicalEvidenceSpan(
-                        source_text=ehr_text[s_idx:e_idx],
-                        start_char=s_idx,
-                        end_char=e_idx,
-                        clinical_section=self.detect_clinical_section(ehr_text, s_idx),
-                        confidence=0.96
-                    )
-                    spans.append(span)
-                    status = DeterminationStatus.MET
-                    rationale = f"Disqualifying exclusion criterion detected: {span.source_text}."
-                    raw_confidence = 0.96
-                    active_exclusion_found = True
+            for term in terms:
+                pat = r'(?i)\b' + re.escape(term) + r'\b'
+                for m in re.finditer(pat, ehr_text):
+                    s_idx = m.start()
+                    e_idx = m.end()
+                    scope = self.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                    if not scope["is_negated"]:
+                        span = ClinicalEvidenceSpan(
+                            source_text=ehr_text[s_idx:e_idx],
+                            start_char=s_idx,
+                            end_char=e_idx,
+                            clinical_section=self.detect_clinical_section(ehr_text, s_idx),
+                            confidence=0.96
+                        )
+                        spans.append(span)
+                        status = DeterminationStatus.MET
+                        rationale = f"Disqualifying statutory exclusion detected: '{span.source_text}'."
+                        raw_confidence = 0.96
+                        active_exclusion_found = True
+                        break
+                if active_exclusion_found:
                     break
 
             if not active_exclusion_found:
-                neg_match = re.search(r'(?i)\b(no|without|denies|negative for|absence of)\s+(?:active\s+|acute\s+)?(cardiogenic shock|terminal illness|terminal non-cardiac illness|end-stage malignancy|hospice)\b', ehr_text)
+                neg_pat = r'(?i)\b(?:no|without|denies|negative for|absence of)\b[^\.\n]{0,30}\b(?:' + '|'.join(re.escape(t) for t in terms) + r')\b'
+                neg_match = re.search(neg_pat, ehr_text)
                 if neg_match:
                     span = ClinicalEvidenceSpan(
                         source_text=ehr_text[neg_match.start():neg_match.end()],
@@ -405,11 +349,11 @@ class CriteriaEvaluationAgent:
                     )
                     spans.append(span)
                     status = DeterminationStatus.NOT_MET
-                    rationale = f"Documented absence of disqualifying exclusion: {span.source_text}."
+                    rationale = f"Documented absence of disqualifying exclusion: '{span.source_text}'."
                     raw_confidence = 0.95
                 else:
                     status = DeterminationStatus.NOT_MET
-                    rationale = "No documented disqualifying cardiogenic shock or non-cardiac disease limiting 1-year survival."
+                    rationale = f"No documented disqualifying exclusion ({name or code})."
                     raw_confidence = 0.93
 
         # =========================================================================
@@ -685,7 +629,7 @@ class CriteriaEvaluationAgent:
                 rationale = "Non-valvular atrial fibrillation with high CHA2DS2-VASc stroke risk is not documented."
                 raw_confidence = 0.60
 
-        elif "crit-laac-02" in code.lower() or "has-bled" in name.lower() or "contraindication" in name.lower():
+        elif "crit-laac-02" in code.lower() or "has-bled" in name.lower() or ("contraindication" in name.lower() and "anticoagul" in desc.lower()):
             contra_match = re.search(r"(?i)\b(?:has-bled(?:\s+score)?\s*(?:is|calculated at|:)?\s*([3-9]|\d{2})|contraindication to (?:long-term )?oral anticoagulation|oral anticoagulation is contraindicated|prior intracranial hemorrhage|intracranial hemorrhage|major recurrent (?:gastrointestinal )?hemorrhage)\b", ehr_text)
             if contra_match:
                 span = ClinicalEvidenceSpan(
@@ -820,6 +764,52 @@ class CriteriaEvaluationAgent:
             decl_crit = DeclarativePolicyEngine.compile_from_dict(criterion)
             decl_assessment = DeclarativePolicyEngine.evaluate(decl_crit, ehr_text)
             return decl_assessment
+
+        # =========================================================================
+        # 5C. CLINICAL STABILITY (NCD 240.2)
+        # =========================================================================
+        elif "crit-o2-02" in code.lower() or "clinical stability" in name.lower():
+            stab_m = re.search(r'(?i)\b(clinically stable|clinical stability|stable outpatient state|stable state|chronic stable state|outpatient stability|stable baseline|chronic stability)\b', ehr_text)
+            if stab_m:
+                s_idx = stab_m.start()
+                e_idx = stab_m.end()
+                scope = self.analyze_clinical_scope(ehr_text, s_idx, e_idx)
+                span = ClinicalEvidenceSpan(
+                    source_text=ehr_text[s_idx:e_idx],
+                    start_char=s_idx,
+                    end_char=e_idx,
+                    clinical_section=self.detect_clinical_section(ehr_text, s_idx),
+                    confidence=0.95
+                )
+                spans.append(span)
+                if not scope["is_negated"]:
+                    status = DeterminationStatus.MET
+                    rationale = f"Documented chronic clinical stability verified: '{span.source_text}'."
+                    raw_confidence = 0.94
+                else:
+                    status = DeterminationStatus.NOT_MET
+                    rationale = f"Patient is explicitly not clinically stable ('{span.source_text}')."
+                    raw_confidence = 0.93
+            else:
+                unstable_m = re.search(r'(?i)\b(acute exacerbation|acute respiratory failure|inpatient status|acute decompensation|unstable respiratory)\b', ehr_text)
+                if unstable_m:
+                    s_idx = unstable_m.start()
+                    e_idx = unstable_m.end()
+                    span = ClinicalEvidenceSpan(
+                        source_text=ehr_text[s_idx:e_idx],
+                        start_char=s_idx,
+                        end_char=e_idx,
+                        clinical_section=self.detect_clinical_section(ehr_text, s_idx),
+                        confidence=0.94
+                    )
+                    spans.append(span)
+                    status = DeterminationStatus.NOT_MET
+                    rationale = f"Patient exhibits acute clinical instability: '{span.source_text}'."
+                    raw_confidence = 0.92
+                else:
+                    status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                    rationale = "Clinical stability not documented at time of testing; deferral required."
+                    raw_confidence = 0.62
 
         # =========================================================================
         # 6. GENERAL KEYWORD FALLBACK

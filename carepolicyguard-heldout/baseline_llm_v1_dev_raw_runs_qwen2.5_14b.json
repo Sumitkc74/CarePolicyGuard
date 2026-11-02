@@ -1,6 +1,9 @@
 {
   "model_id": "qwen2.5:14b",
   "timestamp": "2026-11-02T00:59:18Z",
+  "evaluation_mode": "SUMMARY_ONLY",
+  "raw_envelopes_retained": false,
+  "notes": "Diagnostic run on v1 development set. Raw JSON response envelopes were not retained; summary metrics and per-case predictions are recorded.",
   "total_cases": 15,
   "accuracy": 0.8667,
   "false_approvals": 0,

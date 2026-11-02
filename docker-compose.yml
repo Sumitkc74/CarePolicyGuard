@@ -4,15 +4,15 @@ services:
     container_name: carepolicyguard-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: carepolicyguard
-      POSTGRES_USER: careguard
-      POSTGRES_PASSWORD: careguard_secure_pass
+      POSTGRES_DB: ${POSTGRES_DB:-carepolicyguard}
+      POSTGRES_USER: ${POSTGRES_USER:-careguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-careguard_secure_pass}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U careguard -d carepolicyguard"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-careguard} -d $${POSTGRES_DB:-carepolicyguard}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,12 +28,12 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "${PORT:-8000}:8000"
     environment:
-      - SECRET_KEY=carepolicyguard-deterministic-clinical-secret-key-3849104812
-      - ABSTENTION_THRESHOLD=0.85
-      - ENABLE_PHI_MASKING=true
-      - DATABASE_URL=postgresql://careguard:careguard_secure_pass@db:5432/carepolicyguard
+      - SECRET_KEY=${SECRET_KEY:-carepolicyguard-deterministic-clinical-secret-key-3849104812}
+      - ABSTENTION_THRESHOLD=${ABSTENTION_THRESHOLD:-0.85}
+      - ENABLE_PHI_MASKING=${ENABLE_PHI_MASKING:-true}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://careguard:careguard_secure_pass@db:5432/carepolicyguard}
     volumes:
       - cpg-data:/app/data
     healthcheck:
@@ -48,4 +48,3 @@ volumes:
     driver: local
   pgdata:
     driver: local
-

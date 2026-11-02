@@ -4,7 +4,7 @@
   "jurisdiction": "National Coverage Determination (NCD)",
   "effective_date": "2019-06-21",
   "category": "Cardiology / Interventional Cardiology",
-  "description": "CMS coverage for TAVR in patients with severe symptomatic native aortic stenosis. Requires documented AVA <= 1.0 cm2 or mean gradient >= 40 mmHg, NYHA functional Class >= II, and formal multidisciplinary Heart Team consultation.",
+  "description": "CMS coverage for TAVR in patients with severe symptomatic native aortic stenosis. Requires documented AVA <= 1.0 cm2 or mean gradient >= 40 mmHg, NYHA functional Class >= II, formal multidisciplinary Heart Team consultation, and absence of procedural futility or prohibitive surgical/anatomical contraindications.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
     {
@@ -33,6 +33,30 @@
       "negation_sensitive": true,
       "required_temporal_window": "Prior to procedure",
       "min_score": 0.80
+    },
+    {
+      "criterion_code": "CRIT-TAVR-EXCL-01",
+      "name": "Procedural Futility Exclusion",
+      "description": "TAVR is excluded when intervention is futile due to active infective endocarditis, metastatic malignancy, hospice care, or severe non-cardiac comorbidity with life expectancy < 1 year.",
+      "clinical_intent": "Exclude non-beneficial device placement under futile clinical conditions",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": ["infective endocarditis", "active endocarditis", "endocarditis", "terminal illness", "metastatic cancer", "hospice", "life expectancy < 1 year", "life expectancy less than 1 year", "procedural futility"],
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current pre-procedure evaluation",
+      "min_score": 0.90
+    },
+    {
+      "criterion_code": "CRIT-TAVR-EXCL-02",
+      "name": "Prohibitive Surgical or Anatomical Contraindication Exclusion",
+      "description": "TAVR is excluded when the patient has prohibitive anatomical barriers or prohibitive procedural contraindications (e.g. prohibitive aortic root anatomy, active uncontrolled sepsis/bacteremia, or severe uncorrectable bleeding diathesis).",
+      "clinical_intent": "Exclude patients with prohibitive anatomical or procedural contraindications",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": ["prohibitive aortic root", "prohibitive anatomy", "anatomical contraindication", "prohibitive surgical contraindication", "active bacteremia"],
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current pre-procedure evaluation",
+      "min_score": 0.85
     }
   ],
   "statutory_waiting_periods": []

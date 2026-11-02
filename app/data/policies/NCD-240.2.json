@@ -4,7 +4,7 @@
   "jurisdiction": "National Coverage Determination (CMS)",
   "effective_date": "2021-09-27",
   "category": "Pulmonology",
-  "description": "CMS coverage for long-term home oxygen therapy in chronic respiratory disease. Requires documented arterial blood gas PaO2 <= 55 mmHg or SaO2/SpO2 <= 88% at rest on room air.",
+  "description": "CMS coverage for long-term home oxygen therapy in chronic respiratory disease. Requires documented arterial blood gas PaO2 <= 55 mmHg or SaO2/SpO2 <= 88% at rest on room air, clinical stability at time of testing, and absence of acute reversible etiology.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
     {
@@ -21,8 +21,31 @@
       "negation_sensitive": true,
       "required_temporal_window": "Within 30 days of order",
       "min_score": 0.85
+    },
+    {
+      "criterion_code": "CRIT-O2-02",
+      "name": "Clinical Stability at Evaluation",
+      "description": "Documented evidence that qualifying oximetry or arterial blood gas testing was performed in a chronic, clinically stable state and not during an acute illness or hospital exacerbation.",
+      "clinical_intent": "Enforce CMS requirement for chronic clinical stability prior to long-term home oxygen authorization",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": ["clinically stable", "clinical stability", "stable outpatient state", "stable state", "chronic stable state", "outpatient stability", "stable baseline", "chronic stability"],
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "At time of qualifying test",
+      "min_score": 0.80
+    },
+    {
+      "criterion_code": "CRIT-O2-EXCL-01",
+      "name": "Acute Reversible Etiology Exclusion",
+      "description": "Exclusion: Patient has an active, acute reversible etiology of hypoxemia (e.g. acute untreated pneumonia, acute bronchospasm, or transient pulmonary edema) amenable to treatment.",
+      "clinical_intent": "Exclude transient hypoxemia from long-term home oxygen coverage",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": ["acute pneumonia", "untreated pneumonia", "acute bronchospasm", "transient pulmonary edema", "acute pulmonary edema", "reversible etiology", "reversible hypoxemia"],
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical presentation",
+      "min_score": 0.85
     }
   ],
   "statutory_waiting_periods": []
 }
-

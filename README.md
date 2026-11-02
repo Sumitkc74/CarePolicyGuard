@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
-[![Tests Passing](https://img.shields.io/badge/Tests-110%2F110%20Passing-brightgreen.svg)](tests/)
+[![Tests Passing](https://img.shields.io/badge/Tests-192%2F192%20Passing-brightgreen.svg)](tests/)
 [![HIPAA Compliance](https://img.shields.io/badge/HIPAA-Safe%20Harbor%20%26%20Minimum%20Necessary-success.svg)](#security-privacy--hipaa-minimum-necessary)
 [![Audit Grounding](https://img.shields.io/badge/Evidence%20Faithfulness-100%25%20Character--Anchored-informational.svg)](#4-agent-pipeline-specification)
 
@@ -417,9 +417,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run Comprehensive Test Suite (109 Tests)
+### 2. Run Comprehensive Test Suite (192 Tests & Coverage)
 ```bash
-pytest tests/ -v
+# Run unit, integration, cross-mode agreement, property/fuzz, and security tests
+pytest tests/ -v --cov=app --cov-report=term
+
+# Run specific property and fuzz tests
+pytest tests/test_parsers_property_fuzz.py -v
+
+# Run cross-mode agreement validation
+pytest tests/test_cross_mode_agreement.py -v
 ```
 
 ### 3. Start the Server
@@ -427,6 +434,27 @@ pytest tests/ -v
 python main.py
 # Or with uvicorn:
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+### 4. Containerized Deployment & Smoke Testing
+```bash
+# Build multi-stage hardened container image (non-root HIPAA user UID 1001)
+docker build -t carepolicyguard:latest .
+
+# Run with docker-compose (PostgreSQL + API service)
+docker compose up -d
+
+# Verify microservice health check
+curl -f http://localhost:8000/health
+
+# Smoke-test API endpoint with synthetic clinical adjudication
+curl -X POST http://localhost:8000/api/v1/adjudicate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "patient_id": "PT-SMOKE-01",
+    "policy_id": "NCD-20.4",
+    "ehr_narrative": "67yo male with ischemic cardiomyopathy s/p CABG 14 months ago. NYHA Class II symptoms on GDMT for 6 months. TTE confirms LVEF 28%."
+  }'
 ```
 
 Open your browser to:

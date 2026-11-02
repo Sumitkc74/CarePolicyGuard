@@ -13,6 +13,7 @@ from app.api.pdf_routes import register_pdf_routes
 from app.api.batch_routes import register_batch_route
 import logging
 import io
+import re
 
 logger = logging.getLogger(__name__)
 import uuid
@@ -107,7 +108,7 @@ def validate_and_sanitize_upload(filename: str, content: bytes) -> str:
 
     if len(content) > MAX_FILE_SIZE:
         raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
             detail=f"Uploaded document exceeds the maximum 15 MB limit ({len(content) / (1024 * 1024):.1f} MB provided)."
         )
 
@@ -458,6 +459,36 @@ async def adjudicate_record(
 
     Computes cryptographic SHA-256 chain-of-custody seal and logs audit trail.
     """
+    # 1. Empty / whitespace validation (400 Bad Request)
+    if not request.ehr_narrative or not request.ehr_narrative.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Clinical EHR narrative cannot be empty."
+        )
+
+    # 2. Oversized payload validation (> 500 KB -> 413 Payload Too Large)
+    if len(request.ehr_narrative.encode("utf-8")) > 500 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            detail="EHR narrative exceeds maximum allowed payload limit (500 KB)."
+        )
+
+    # 3. Malformed or Unknown Policy ID validation
+    if request.policy_id and request.policy_id.upper() != "AUTO":
+        clean_pol = request.policy_id.strip()
+        if re.search(r'[^a-zA-Z0-9_\-\.]', clean_pol):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Malformed policy ID '{clean_pol}': contains invalid characters."
+            )
+        from app.agents.policy_retriever import PolicyRetrievalAgent
+        from app.services.declarative_engine import DeclarativePolicyEngine
+        retriever = PolicyRetrievalAgent(db=db)
+        if not retriever.retrieve_policy(clean_pol) and not DeclarativePolicyEngine.load_policy(clean_pol):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Policy '{clean_pol}' not found."
+            )
     pipeline = MultiAgentVerificationPipeline(db=db)
     custom_tau = request.options.get("tau") if request.options else None
 
@@ -1441,3 +1472,15 @@ register_cds_hooks_routes(api_router)
 register_metrics_routes(api_router)
 register_dtr_routes(api_router)
 register_pas_routes(api_router)
+
+
+@api_router.get("/health", summary="API Health Check Endpoint")
+def api_v1_health():
+    """Returns microservice health and operational configuration."""
+    return {
+        "status": "healthy",
+        "service": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "tau_threshold": settings.ABSTENTION_THRESHOLD,
+        "phi_masking": settings.ENABLE_PHI_MASKING
+    }

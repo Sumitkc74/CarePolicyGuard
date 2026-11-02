@@ -159,7 +159,7 @@ class MultiPolicyScanResponse(BaseModel):
 class AdjudicationRequest(BaseModel):
     patient_id: str = Field(default="PT-10829", description="Patient or record identifier")
     policy_id: Optional[str] = Field(default="AUTO", description="Selected Medicare LCD or NCD policy ID (e.g., NCD-20.4), or 'AUTO' for hybrid retrieval auto-discovery")
-    ehr_narrative: str = Field(..., min_length=20, description="Raw clinical EHR documentation / progress note")
+    ehr_narrative: str = Field(default="", description="Raw clinical EHR documentation / progress note")
     cpt_codes: Optional[List[str]] = Field(default=None, description="Optional procedure codes to validate")
     icd10_codes: Optional[List[str]] = Field(default=None, description="Optional diagnosis codes to validate")
     execution_mode: Optional[str] = Field(

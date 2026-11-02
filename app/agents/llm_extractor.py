@@ -37,35 +37,21 @@ class ExtractorTools:
     """
     @staticmethod
     def calculate_temporal_delta(event_date_str: str, reference_date_str: str) -> Optional[int]:
-        """Calculates exact elapsed calendar days between two ISO dates in Python."""
-        try:
-            d_event = datetime.strptime(event_date_str.strip(), "%Y-%m-%d")
-            d_ref = datetime.strptime(reference_date_str.strip(), "%Y-%m-%d")
-            return abs((d_ref - d_event).days)
-        except Exception:
-            return None
+        """Calculates exact elapsed calendar days delegating to unified ClinicalTemporalParser."""
+        from app.core.clinical_core import ClinicalTemporalParser
+        return ClinicalTemporalParser.calculate_calendar_delta(event_date_str, reference_date_str)
 
     @staticmethod
     def evaluate_numeric_cutoff(value: float, operator: str, threshold: float) -> bool:
-        """Deterministic numerical comparison."""
-        if operator in ("<=", "le"):
-            return value <= threshold
-        elif operator in ("<", "lt"):
-            return value < threshold
-        elif operator in (">=", "ge"):
-            return value >= threshold
-        elif operator in (">", "gt"):
-            return value > threshold
-        elif operator in ("==", "eq"):
-            return abs(value - threshold) < 1e-5
-        return False
+        """Deterministic numerical comparison delegating to unified ClinicalNumericParser."""
+        from app.core.clinical_core import ClinicalNumericParser
+        return ClinicalNumericParser.evaluate_cutoff(value, operator, threshold)
 
     @staticmethod
     def verify_exact_character_slice(raw_text: str, quote: str, start: int, end: int) -> bool:
-        """Verifies exact character-level grounding in raw text."""
-        if start < 0 or end > len(raw_text) or start >= end:
-            return False
-        return raw_text[start:end] == quote
+        """Verifies exact character-level grounding delegating to unified ClinicalGroundingVerifier."""
+        from app.core.clinical_core import ClinicalGroundingVerifier
+        return ClinicalGroundingVerifier.verify_exact_slice(raw_text, quote, start, end)
 
 
 class StructuredExtractorAgent:

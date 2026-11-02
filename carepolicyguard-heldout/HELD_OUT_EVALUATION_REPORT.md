@@ -3,10 +3,10 @@
 > [!IMPORTANT]
 > **Development-Set Status**: This set (v1) is an unsealed development dataset used for regression testing and failure diagnosis.
 > Diagnostic numbers reported here are internal benchmarks and must not be cited as held-out generalization claims.
-> Held-out evaluation is strictly reserved for the sealed v2 dataset pending clinician sign-off.
+> Held-out evaluation is strictly reserved for the sealed v2 dataset pending independent validation (Route A or Route B).
 
 **Dataset**: CarePolicyGuard Held-Out Vignette Set v1 (Development Diagnostic Set)  
-**Execution Timestamp**: 2026-11-02T01:02:29.788502+00:00  
+**Execution Timestamp**: 2026-11-02T02:04:47.503237+00:00  
 **Total Vignettes**: 15 (Gold: {'APPROVED': 7, 'DEFERRED_TO_HUMAN': 4, 'DENIED': 4, 'total': 15})  
 **Status**: UNSEALED DEVELOPMENT SET  
 
@@ -14,9 +14,9 @@
 
 | Execution Mode | Diagnostic Accuracy ($n=15$) | False Approvals (FA) | False Denials (FD) | Deferral Rate (Abstentions) | Mean Latency |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `deterministic` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 26.08 ms |
-| `state_machine` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 56.36 ms |
-| `declarative` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 24.52 ms |
+| `deterministic` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 27.65 ms |
+| `state_machine` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 64.02 ms |
+| `declarative` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 24.63 ms |
 
 ## 2. Granular Vignette Results Across Modes
 

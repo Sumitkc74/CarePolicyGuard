@@ -23,14 +23,14 @@ class PolicyCacheManager:
 
         # Patterns that strictly forbid caching to prevent HIPAA PHI leaks
         self._phi_forbidden_patterns = [
-            r"(?i)\bpatient\b",
-            r"(?i)\bpt-\b",
-            r"(?i)\bmrn\b",
-            r"(?i)\bssn\b",
-            r"(?i)\bdob\b",
-            r"(?i)\behr\b",
-            r"(?i)\bnarrative\b",
-            r"(?i)\bclinical_note\b"
+            r"(?i)(?:\b|_)patient(?:\b|_)",
+            r"(?i)(?:\b|_)pt[-_]",
+            r"(?i)(?:\b|_)mrn(?:\b|_)",
+            r"(?i)(?:\b|_)ssn(?:\b|_)",
+            r"(?i)(?:\b|_)dob(?:\b|_)",
+            r"(?i)(?:\b|_)ehr(?:\b|_)",
+            r"(?i)(?:\b|_)narrative(?:\b|_)",
+            r"(?i)(?:\b|_)clinical_note(?:\b|_)"
         ]
 
     def _assert_cache_key_safe(self, key: str) -> None:

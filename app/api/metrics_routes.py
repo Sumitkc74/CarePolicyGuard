@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Any
+from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
@@ -15,7 +15,7 @@ def get_prometheus_metrics(db: Session = Depends(get_db)):
     total_adjudications = db.query(AdjudicationLog).count()
     approved = db.query(AdjudicationLog).filter(AdjudicationLog.decision == "APPROVED").count()
     denied = db.query(AdjudicationLog).filter(AdjudicationLog.decision == "DENIED").count()
-    abstained = db.query(AdjudicationLog).filter(AdjudicationLog.abstention_status.in_(["ABSTAINED", "FLAGGED_FOR_HUMAN_REVIEW"])).count()
+    abstained = db.query(AdjudicationLog).filter(AdjudicationLog.abstention_status == True).count()
 
     # Latency statistics
     logs = db.query(AdjudicationLog.execution_time_ms).filter(AdjudicationLog.execution_time_ms.isnot(None)).all()
@@ -76,6 +76,7 @@ def get_prometheus_metrics(db: Session = Depends(get_db)):
 
     return Response(content="\n".join(lines) + "\n", media_type="text/plain; version=0.0.4; charset=utf-8")
 
+
 def get_metrics_json(db: Session = Depends(get_db)) -> Dict[str, Any]:
     """
     Returns real-time clinical, operational, and system cache telemetry in structured JSON format.
@@ -83,7 +84,7 @@ def get_metrics_json(db: Session = Depends(get_db)) -> Dict[str, Any]:
     total_adjudications = db.query(AdjudicationLog).count()
     approved = db.query(AdjudicationLog).filter(AdjudicationLog.decision == "APPROVED").count()
     denied = db.query(AdjudicationLog).filter(AdjudicationLog.decision == "DENIED").count()
-    abstained = db.query(AdjudicationLog).filter(AdjudicationLog.abstention_status.in_(["ABSTAINED", "FLAGGED_FOR_HUMAN_REVIEW"])).count()
+    abstained = db.query(AdjudicationLog).filter(AdjudicationLog.abstention_status == True).count()
 
     logs = db.query(AdjudicationLog.execution_time_ms).filter(AdjudicationLog.execution_time_ms.isnot(None)).all()
     avg_latency_ms = (sum(l[0] for l in logs) / len(logs)) if logs else 45.0
@@ -110,6 +111,63 @@ def get_metrics_json(db: Session = Depends(get_db)) -> Dict[str, Any]:
         }
     }
 
+
+def get_operator_metrics(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """
+    Operator-facing metrics endpoint:
+    Aggregates latency distribution, deferral burden rate, and decision breakdown.
+    Contains zero patient identifiers or Protected Health Information (PHI).
+    """
+    total_adjudications = db.query(AdjudicationLog).count()
+    approved = db.query(AdjudicationLog).filter(AdjudicationLog.decision == "APPROVED").count()
+    denied = db.query(AdjudicationLog).filter(AdjudicationLog.decision == "DENIED").count()
+    deferred = db.query(AdjudicationLog).filter(AdjudicationLog.decision == "DEFERRED_TO_HUMAN").count()
+
+    # Latency numbers
+    raw_latencies = [
+        row[0] for row in db.query(AdjudicationLog.execution_time_ms)
+        .filter(AdjudicationLog.execution_time_ms.isnot(None))
+        .all()
+    ]
+
+    if raw_latencies:
+        mean_latency = round(sum(raw_latencies) / len(raw_latencies), 2)
+        min_latency = round(min(raw_latencies), 2)
+        max_latency = round(max(raw_latencies), 2)
+    else:
+        mean_latency = 0.0
+        min_latency = 0.0
+        max_latency = 0.0
+
+    deferral_rate = round(deferred / total_adjudications, 4) if total_adjudications > 0 else 0.0
+    approval_rate = round(approved / total_adjudications, 4) if total_adjudications > 0 else 0.0
+    denial_rate = round(denied / total_adjudications, 4) if total_adjudications > 0 else 0.0
+
+    return {
+        "operator_telemetry": {
+            "total_evaluations": total_adjudications,
+            "decisions": {
+                "approved_count": approved,
+                "denied_count": denied,
+                "deferred_to_human_count": deferred,
+            },
+            "rates": {
+                "approval_rate": approval_rate,
+                "denial_rate": denial_rate,
+                "deferral_rate": deferral_rate,
+            },
+            "latency_ms": {
+                "mean": mean_latency,
+                "min": min_latency,
+                "max": max_latency,
+            },
+            "cache_efficiency": policy_cache.get_metrics(),
+            "phi_safe": True
+        }
+    }
+
+
 def register_metrics_routes(api_router: APIRouter):
     api_router.add_api_route("/metrics", get_prometheus_metrics, methods=["GET"], summary="OpenTelemetry / Prometheus Metrics Endpoint")
     api_router.add_api_route("/metrics/json", get_metrics_json, methods=["GET"], summary="Operational Metrics JSON API")
+    api_router.add_api_route("/metrics/operator", get_operator_metrics, methods=["GET"], summary="Operator Telemetry API (Zero PHI)")

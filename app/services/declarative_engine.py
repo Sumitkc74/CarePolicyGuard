@@ -15,6 +15,21 @@ class DeclarativePolicyEngine:
     """
 
     _POLICY_CACHE: Dict[str, DeclarativePolicy] = {}
+    _POLICY_CACHE_MTIME: Dict[str, float] = {}
+
+    @classmethod
+    def invalidate_policy(cls, policy_id: str) -> bool:
+        """Explicitly invalidates cache for a given policy ID."""
+        clean_id = policy_id.strip()
+        removed = cls._POLICY_CACHE.pop(clean_id, None) is not None
+        cls._POLICY_CACHE_MTIME.pop(clean_id, None)
+        return removed
+
+    @classmethod
+    def clear_cache(cls) -> None:
+        """Clears all cached declarative policies."""
+        cls._POLICY_CACHE.clear()
+        cls._POLICY_CACHE_MTIME.clear()
 
     @classmethod
     def get_policies_dir(cls) -> Path:
@@ -23,20 +38,25 @@ class DeclarativePolicyEngine:
 
     @classmethod
     def load_policy(cls, policy_id: str) -> Optional[DeclarativePolicy]:
-        """Loads a DeclarativePolicy from declarative JSON specification."""
+        """Loads a DeclarativePolicy with automatic timestamp invalidation."""
         clean_id = policy_id.strip()
-        if clean_id in cls._POLICY_CACHE:
-            return cls._POLICY_CACHE[clean_id]
-
         file_path = cls.get_policies_dir() / f"{clean_id}.json"
         if not file_path.exists():
+            cls.invalidate_policy(clean_id)
             return None
 
         try:
+            current_mtime = file_path.stat().st_mtime
+            if clean_id in cls._POLICY_CACHE:
+                cached_mtime = cls._POLICY_CACHE_MTIME.get(clean_id, 0.0)
+                if current_mtime <= cached_mtime:
+                    return cls._POLICY_CACHE[clean_id]
+
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             policy = DeclarativePolicy(**data)
             cls._POLICY_CACHE[clean_id] = policy
+            cls._POLICY_CACHE_MTIME[clean_id] = current_mtime
             return policy
         except Exception:
             return None
