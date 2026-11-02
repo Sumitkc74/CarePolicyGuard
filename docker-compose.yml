@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-carepolicyguard}
       POSTGRES_USER: ${POSTGRES_USER:-careguard}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-careguard_secure_pass}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD environment variable must be set for database authentication}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -30,10 +30,10 @@ services:
     ports:
       - "${PORT:-8000}:8000"
     environment:
-      - SECRET_KEY=${SECRET_KEY:-carepolicyguard-deterministic-clinical-secret-key-3849104812}
+      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY environment variable must be set for cryptographic token signing and API security}
       - ABSTENTION_THRESHOLD=${ABSTENTION_THRESHOLD:-0.85}
       - ENABLE_PHI_MASKING=${ENABLE_PHI_MASKING:-true}
-      - DATABASE_URL=${DATABASE_URL:-postgresql://careguard:careguard_secure_pass@db:5432/carepolicyguard}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${POSTGRES_USER:-careguard}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD environment variable must be set for database connection}@db:5432/${POSTGRES_DB:-carepolicyguard}}
     volumes:
       - cpg-data:/app/data
     healthcheck:

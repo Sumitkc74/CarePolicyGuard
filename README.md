@@ -417,7 +417,35 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run Comprehensive Test Suite (192 Tests & Coverage)
+### 2. Configure Required Environment Variables
+
+CarePolicyGuard enforces strict fail-fast validation on mandatory security secrets:
+- **`SECRET_KEY`**: Cryptographic secret for signing stateless JWT tokens and computing SHA-256 chain-of-custody audit hashes. **There is no default fallback** in application startup or container orchestration. If missing or set to an insecure placeholder, startup aborts immediately.
+- **`POSTGRES_PASSWORD`**: Database authentication password for PostgreSQL in Docker Compose deployments. **There is no default fallback**. Compose validation aborts immediately if unset.
+
+Generate cryptographically secure values without hardcoding usable secrets:
+```bash
+# Generate a secure 48-character secret key
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+Configure your environment before starting:
+```bash
+# Set in your local shell session:
+# On Linux/macOS:
+export SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(48))")
+export POSTGRES_PASSWORD=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
+
+# On Windows PowerShell:
+$env:SECRET_KEY = python -c "import secrets; print(secrets.token_urlsafe(48))"
+$env:POSTGRES_PASSWORD = python -c "import secrets; print(secrets.token_urlsafe(32))"
+
+# Or configure via .env (never commit your .env to version control):
+cp .env.example .env
+# Populate SECRET_KEY in .env
+```
+
+### 3. Run Comprehensive Test Suite (196+ Tests & Coverage)
 ```bash
 # Run unit, integration, cross-mode agreement, property/fuzz, and security tests
 pytest tests/ -v --cov=app --cov-report=term
@@ -429,19 +457,19 @@ pytest tests/test_parsers_property_fuzz.py -v
 pytest tests/test_cross_mode_agreement.py -v
 ```
 
-### 3. Start the Server
+### 4. Start the Server
 ```bash
 python main.py
 # Or with uvicorn:
 uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-### 4. Containerized Deployment & Smoke Testing
+### 5. Containerized Deployment & Smoke Testing
 ```bash
 # Build multi-stage hardened container image (non-root HIPAA user UID 1001)
 docker build -t carepolicyguard:latest .
 
-# Run with docker-compose (PostgreSQL + API service)
+# Run with docker-compose (enforces required SECRET_KEY and POSTGRES_PASSWORD)
 docker compose up -d
 
 # Verify microservice health check

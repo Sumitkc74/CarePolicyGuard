@@ -1,13 +1,41 @@
+# Version control metadata and CI workflows
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Environment files and secrets
+.env
+.env.*
+
+# Python bytecode and tool caches
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Test suite and coverage artifacts
+tests/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local databases and runtime state
+*.db
 *.sqlite
 *.sqlite3
 carepolicyguard.db
-.env
-.pytest_cache/
-.coverage
-htmlcov/
-.DS_Store
-*.log
+data/*.db
+data/*.sqlite*
 
+# Held-out benchmark datasets and validation protocols
+carepolicyguard-heldout/
+
+# Orchestration files not needed inside the container
+docker-compose*.yml
+
+# Logs and transient OS files
+*.log
+.DS_Store
+Thumbs.db

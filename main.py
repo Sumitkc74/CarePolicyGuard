@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from app.core.config import settings
+from app.core.config import INSECURE_SECRET_PLACEHOLDERS, settings
 from app.core.logging_config import configure_structured_logging
 from app.db.session import engine, SessionLocal, Base, get_db
 from app.db.seed import seed_database
@@ -16,6 +16,15 @@ from app.api.routes import api_router
 async def lifespan(app: FastAPI):
     # Configure HIPAA-compliant structured JSON logging
     configure_structured_logging()
+
+    # Fail-fast startup validation for required cryptographic secret
+    if not settings.SECRET_KEY or settings.SECRET_KEY in INSECURE_SECRET_PLACEHOLDERS:
+        raise RuntimeError(
+            "FATAL: SECRET_KEY environment variable is missing, empty, or using an insecure default. "
+            "A cryptographic secret is required to start CarePolicyGuard. "
+            "Generate one using: python -c 'import secrets; print(secrets.token_urlsafe(48))'"
+        )
+
     # 1. Startup: Create DB schema & seed CMS policies and demo credentials
     print(f"[*] Initializing {settings.PROJECT_NAME} v{settings.VERSION}...")
     Base.metadata.create_all(bind=engine)
