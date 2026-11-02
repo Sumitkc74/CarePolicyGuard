@@ -75,12 +75,26 @@ jobs:
           tags: carepolicyguard:latest
           load: true
 
-      - name: Execute Container Self-Health Test
+      - name: Execute Container Self-Health, .git Exclusion, and Synthetic Adjudication Smoke Test
         run: |
+          # 1. Assert .git repository metadata was excluded from container image
+          docker run --rm carepolicyguard:latest sh -c "test ! -d /app/.git" && echo "PASS: .git directory successfully excluded from container image"
+
+          # 2. Launch container with ephemeral test credentials
           docker run -d --name cpg-test-container -p 8000:8000 \
             -e SECRET_KEY="ci-healthcheck-secret-key-3918401928" \
             -e DATABASE_URL="sqlite:///./data/ci.db" \
+            -e ABSTENTION_THRESHOLD=0.85 \
             carepolicyguard:latest
           sleep 5
-          docker inspect --format='{{json .State.Health.Status}}' cpg-test-container || curl -f http://localhost:8000/health
+
+          # 3. Microservice health endpoint verification
+          curl -f http://localhost:8000/health
+
+          # 4. Synthetic clinical adjudication smoke test (zero patient data)
+          curl -f -X POST http://localhost:8000/api/v1/adjudicate \
+            -H "Content-Type: application/json" \
+            -d '{"patient_id":"PT-SMOKE-01","policy_id":"NCD-20.4","ehr_narrative":"67yo male with ischemic cardiomyopathy s/p CABG 14 months ago. NYHA Class II symptoms on GDMT for 6 months. TTE confirms LVEF 28%."}'
+
+          # 5. Stop and clean up container
           docker stop cpg-test-container

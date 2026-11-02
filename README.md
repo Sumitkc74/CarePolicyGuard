@@ -469,9 +469,22 @@ uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 ### 5. Containerized Deployment & Smoke Testing
+
+For detailed verification protocol and CI/CD workflow details, see [docs/DOCKER_SMOKE_TEST.md](file:///e:/Class/GitHub/CarePolicyGuard/docs/DOCKER_SMOKE_TEST.md).
+
+#### Turnkey Smoke Test (Automated)
+On any host with a running Docker daemon:
+```bash
+python scripts/docker_smoke_test.py
+```
+
+#### Manual Container Deployment
 ```bash
 # Build multi-stage hardened container image (non-root HIPAA user UID 1001)
 docker build -t carepolicyguard:latest .
+
+# Confirm .git was excluded from the container image
+docker run --rm carepolicyguard:latest sh -c "test ! -d /app/.git"
 
 # Run with docker-compose (enforces required SECRET_KEY and POSTGRES_PASSWORD)
 docker compose up -d
