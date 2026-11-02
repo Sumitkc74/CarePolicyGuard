@@ -178,3 +178,4 @@ def test_grounding_verifier_agreement():
     # Tampered offset
     assert ClinicalGroundingVerifier.verify_exact_slice(note, quote, start + 1, end) is False
     assert ExtractorTools.verify_exact_character_slice(note, quote, start + 1, end) is False
+

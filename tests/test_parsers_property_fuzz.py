@@ -196,3 +196,4 @@ def test_negation_scope_parentheses_and_multiline_blocks():
     end_dys = start_dys + len("Chronic dyspnea")
     res_dys = ClinicalScopeAnalyzer.analyze_scope(text_multiline, start_dys, end_dys)
     assert res_dys["is_negated"] is False
+

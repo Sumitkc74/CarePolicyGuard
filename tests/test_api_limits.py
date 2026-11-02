@@ -131,3 +131,4 @@ def test_operator_metrics_endpoint_zero_phi():
     body_str = resp.text.lower()
     for sensitive in ["patient_name", "mrn", "ssn", "date_of_birth", "ehr_narrative"]:
         assert sensitive not in body_str
+

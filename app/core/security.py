@@ -1,14 +1,17 @@
 import hashlib
 import hmac
+import json
 import os
 import re
-import json
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, Optional, Union
+from typing import Any
+
 import jwt
 from fastapi import HTTPException, status
+
 from app.core.config import settings
+
 
 class UserRole(str, Enum):
     AUDITOR = "Auditor"
@@ -38,15 +41,15 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         expected_hash = bytes.fromhex(parts[3])
         calculated = hashlib.pbkdf2_hmac("sha256", plain_password.encode("utf-8"), salt, iterations)
         return hmac.compare_digest(expected_hash, calculated)
-    except Exception:
+    except (ValueError, TypeError):
         return False
 
-def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
     """
     Generates a signed JWT access token.
     """
     to_encode = data.copy()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if expires_delta:
         expire = now + expires_delta
     else:
@@ -55,7 +58,7 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-def decode_access_token(token: str) -> Dict[str, Any]:
+def decode_access_token(token: str) -> dict[str, Any]:
     """
     Decodes and validates a JWT token.
     """
@@ -82,7 +85,7 @@ def compute_audit_hash(
     calibrated_confidence: float,
     criterion_assessments: list,
     evidence_spans: list,
-    timestamp: Union[str, datetime]
+    timestamp: str | datetime
 ) -> str:
     """
     Computes an immutable, deterministic SHA-256 cryptographic chain-of-custody hash.
@@ -164,7 +167,7 @@ def sanitize_phi(text: str) -> str:
     return sanitized
 
 
-def verify_clinical_document_authenticity(text: str) -> Dict[str, Any]:
+def verify_clinical_document_authenticity(text: str) -> dict[str, Any]:
     """
     Verifies that a submitted clinical document is authentic by validating:
     1. Provider / Physician Name and Credentials (e.g., Dr. Name, MD, DO, NP, PA-C)
@@ -371,7 +374,7 @@ def is_institutional_clinical_email(email: str) -> tuple[bool, str]:
     return True, ""
 
 
-def verify_medical_professional_credentials(data: Dict[str, Any]) -> Dict[str, Any]:
+def verify_medical_professional_credentials(data: dict[str, Any]) -> dict[str, Any]:
     """
     Comprehensive verification to ensure an individual registering to create
     prior-authorization cases is a verified medical professional:
@@ -410,7 +413,7 @@ def verify_medical_professional_credentials(data: Dict[str, Any]) -> Dict[str, A
         elif len(npi) != 10 or not npi.isdigit():
             reasons.append(f"NPI '{npi}' must be exactly 10 numeric digits.")
         elif npi[0] not in ("1", "2"):
-            reasons.append(f"Individual clinical NPI must begin with '1' or '2' (Type 1 Individual Provider).")
+            reasons.append("Individual clinical NPI must begin with '1' or '2' (Type 1 Individual Provider).")
         else:
             reasons.append(f"NPI '{npi}' failed CMS Luhn checksum validation (check digit mismatch).")
 

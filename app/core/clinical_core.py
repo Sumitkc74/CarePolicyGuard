@@ -1,12 +1,13 @@
 import re
 from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
+from typing import Any, ClassVar
+
 from app.schemas.contracts import (
-    DeterminationStatus,
     ClinicalEvidenceSpan,
-    CriterionAssessment
+    CriterionAssessment,
+    DeterminationStatus,
 )
-from app.schemas.declarative_policy import DeclarativeCriterion, CriterionType
+
 
 class ClinicalScopeAnalyzer:
     """
@@ -18,22 +19,22 @@ class ClinicalScopeAnalyzer:
     3. Experiencer distinction (Patient vs Family History).
     """
 
-    PRE_NEGATIONS = [
+    PRE_NEGATIONS: ClassVar[list[str]] = [
         r"\b(?:no|not|denies|denied|denying|without|negative for|ruled out|free of|absence of|never)\b",
         r"\b(?:no evidence of|no history of|no signs of|fails to demonstrate|unremarkable for)\b"
     ]
-    POST_NEGATIONS = [
+    POST_NEGATIONS: ClassVar[list[str]] = [
         r"\b(?:is ruled out|was ruled out|is absent|unlikely)\b"
     ]
-    EXPERIENCER_TRIGGERS = [
+    EXPERIENCER_TRIGGERS: ClassVar[list[str]] = [
         r"\b(?:mother|father|sister|brother|maternal|paternal|family history|fhx|relative|parent)\b"
     ]
-    CONJUNCTIONS = [
+    CONJUNCTIONS: ClassVar[list[str]] = [
         r"\b(?:but|however|nevertheless|although|except|yet)\b"
     ]
 
     @classmethod
-    def analyze_scope(cls, text: str, span_start: int, span_end: int) -> Dict[str, Any]:
+    def analyze_scope(cls, text: str, span_start: int, span_end: int) -> dict[str, Any]:
         preceding_window = text[max(0, span_start - 60):span_start].lower()
         following_window = text[span_end:min(len(text), span_end + 35)].lower()
 
@@ -45,8 +46,7 @@ class ClinicalScopeAnalyzer:
         last_conjunction = -1
         for conj in cls.CONJUNCTIONS:
             for m in re.finditer(conj, in_sentence_preceding):
-                if m.start() > last_conjunction:
-                    last_conjunction = m.start()
+                last_conjunction = max(last_conjunction, m.start())
 
         active_preceding = in_sentence_preceding[last_conjunction + 1:] if last_conjunction != -1 else in_sentence_preceding
 
@@ -91,7 +91,7 @@ class ClinicalSectionDetector:
     """
     Unified section boundary detector for EHR narratives.
     """
-    HEADERS = [
+    HEADERS: ClassVar[list[tuple[str, list[str]]]] = [
         ("History of Present Illness", [r"(?i)\bhistory of present illness\b", r"(?i)\bhpi\b"]),
         ("Past Medical History", [r"(?i)\bpast medical history\b", r"(?i)\bpmh\b"]),
         ("Medications", [r"(?i)\bmedications\b", r"(?i)\bcurrent meds\b", r"(?i)\bgdmt\b"]),
@@ -152,12 +152,12 @@ class ClinicalTemporalParser:
     Shared across Extractor, State Machine, and Declarative Engine.
     """
     @staticmethod
-    def calculate_calendar_delta(event_date_str: str, reference_date_str: str) -> Optional[int]:
+    def calculate_calendar_delta(event_date_str: str, reference_date_str: str) -> int | None:
         try:
             d_event = datetime.strptime(event_date_str.strip(), "%Y-%m-%d")
             d_ref = datetime.strptime(reference_date_str.strip(), "%Y-%m-%d")
             return abs((d_ref - d_event).days)
-        except Exception:
+        except (ValueError, TypeError, AttributeError):
             return None
 
     @staticmethod
@@ -194,15 +194,13 @@ class ClinicalCoreEvaluator:
     @classmethod
     def evaluate(
         cls,
-        criterion: Dict[str, Any],
+        criterion: dict[str, Any],
         ehr_text: str
     ) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-UNKNOWN")
         name = criterion.get("name", "")
         desc = criterion.get("description", "")
         is_excl = bool(criterion.get("is_exclusion", False))
-        temporal_req = criterion.get("required_temporal_window", "Not specified")
-        min_score = float(criterion.get("min_score", 0.85))
 
         code_low = code.lower()
         name_low = name.lower()
@@ -281,7 +279,7 @@ class ClinicalCoreEvaluator:
     # -------------------------------------------------------------------------
 
     @classmethod
-    def _evaluate_lvef(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_lvef(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-ICD-01")
         name = criterion.get("name", "Severe LV Systolic Dysfunction")
         desc = criterion.get("description", "")
@@ -354,7 +352,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_nyha(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_nyha(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-ICD-02")
         name = criterion.get("name", "Heart Failure Functional Classification")
         desc = criterion.get("description", "")
@@ -409,7 +407,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_gdmt(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_gdmt(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-ICD-03")
         name = criterion.get("name", "Guideline-Directed Medical Therapy Duration (>=90 Days)")
         desc = criterion.get("description", "")
@@ -544,7 +542,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_revasc_timeline(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_revasc_timeline(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-ICD-04")
         name = criterion.get("name", "Cardiomyopathy Etiology & Revascularization Timeline")
         desc = criterion.get("description", "")
@@ -617,7 +615,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_futility_exclusion(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_futility_exclusion(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-EXCL-FUTILITY")
         name = criterion.get("name", "Cardiogenic Shock / Futility / Terminal Illness Exclusion")
         desc = criterion.get("description", "")
@@ -688,7 +686,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_oxygen_hypoxemia(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_oxygen_hypoxemia(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-O2-01")
         name = criterion.get("name", "Resting Hypoxemia (PaO2 <= 55 mmHg or SpO2 <= 88%)")
         desc = criterion.get("description", "")
@@ -773,7 +771,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_clinical_stability(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_clinical_stability(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-O2-02")
         name = criterion.get("name", "Clinical Stability at Evaluation")
         desc = criterion.get("description", "")
@@ -863,7 +861,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_reversible_etiology_exclusion(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_reversible_etiology_exclusion(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-O2-EXCL-01")
         name = criterion.get("name", "Acute Reversible Etiology Exclusion")
         desc = criterion.get("description", "")
@@ -933,7 +931,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_tavr_hemodynamics(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_tavr_hemodynamics(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-TAVR-01")
         name = criterion.get("name", "Severe Aortic Stenosis Hemodynamic Threshold")
         desc = criterion.get("description", "")
@@ -1058,7 +1056,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_heart_team(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_heart_team(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-TAVR-02")
         name = criterion.get("name", "Heart Team Consultation")
         desc = criterion.get("description", "")
@@ -1102,7 +1100,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_tavr_prohibitive_exclusion(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_tavr_prohibitive_exclusion(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-TAVR-EXCL-02")
         name = criterion.get("name", "Prohibitive Surgical or Anatomical Contraindication Exclusion")
         desc = criterion.get("description", "")
@@ -1148,7 +1146,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_carotid(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_carotid(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-CAS-01")
         name = criterion.get("name", "Carotid Stenosis Criterion")
         desc = criterion.get("description", "")
@@ -1313,7 +1311,7 @@ class ClinicalCoreEvaluator:
         return cls._evaluate_generic_declarative(criterion, ehr_text)
 
     @classmethod
-    def _evaluate_sleep_apnea(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_sleep_apnea(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-OSA-01")
         name = criterion.get("name", "Sleep Apnea Criterion")
         desc = criterion.get("description", "")
@@ -1441,7 +1439,7 @@ class ClinicalCoreEvaluator:
         )
 
     @classmethod
-    def _evaluate_hbot(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_hbot(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-HBOT-01")
         name = criterion.get("name", "HBOT DFU Criterion")
         desc = criterion.get("description", "")
@@ -1567,7 +1565,7 @@ class ClinicalCoreEvaluator:
         return cls._evaluate_generic_declarative(criterion, ehr_text)
 
     @classmethod
-    def _evaluate_laac(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_laac(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-LAAC-01")
         name = criterion.get("name", "LAAC Criterion")
         desc = criterion.get("description", "")
@@ -1706,7 +1704,7 @@ class ClinicalCoreEvaluator:
         return cls._evaluate_generic_declarative(criterion, ehr_text)
 
     @classmethod
-    def _evaluate_tka(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_tka(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-TKA-01")
         name = criterion.get("name", "TKA Criterion")
         desc = criterion.get("description", "")
@@ -1889,7 +1887,7 @@ class ClinicalCoreEvaluator:
         return cls._evaluate_generic_declarative(criterion, ehr_text)
 
     @classmethod
-    def _evaluate_generic_declarative(cls, criterion: Dict[str, Any], ehr_text: str) -> CriterionAssessment:
+    def _evaluate_generic_declarative(cls, criterion: dict[str, Any], ehr_text: str) -> CriterionAssessment:
         code = criterion.get("criterion_code", "CRIT-UNKNOWN")
         name = criterion.get("name", "")
         desc = criterion.get("description", "")

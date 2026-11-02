@@ -1,11 +1,11 @@
-import time
 import re
-from typing import Any, Dict, Optional, Tuple, List
+import time
 from threading import Lock
+from typing import Any
+
 
 class CacheSecurityException(Exception):
     """Raised when an attempt is made to cache sensitive Protected Health Information (PHI)."""
-    pass
 
 class PolicyCacheManager:
     """
@@ -17,7 +17,7 @@ class PolicyCacheManager:
         self._lock = Lock()
         self._default_ttl = default_ttl_seconds
         # Storage format: key -> (value, expiry_timestamp_float)
-        self._store: Dict[str, Tuple[Any, float]] = {}
+        self._store: dict[str, tuple[Any, float]] = {}
         self._hits: int = 0
         self._misses: int = 0
 
@@ -44,7 +44,7 @@ class PolicyCacheManager:
                     f"Security violation: Caching forbidden for sensitive or PHI-related key pattern: '{key}'"
                 )
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """
         Retrieves a value from cache if present and not expired.
         Increments hit or miss counter.
@@ -64,7 +64,7 @@ class PolicyCacheManager:
             self._misses += 1
             return None
 
-    def set(self, key: str, value: Any, ttl_seconds: Optional[int] = None) -> None:
+    def set(self, key: str, value: Any, ttl_seconds: int | None = None) -> None:
         """
         Stores a value with an associated TTL.
         """
@@ -86,7 +86,7 @@ class PolicyCacheManager:
         Invalidates all keys starting with the given prefix. Returns count of deleted keys.
         """
         with self._lock:
-            to_remove = [k for k in self._store.keys() if k.startswith(prefix)]
+            to_remove = [k for k in list(self._store) if k.startswith(prefix)]
             for k in to_remove:
                 del self._store[k]
             return len(to_remove)
@@ -100,7 +100,7 @@ class PolicyCacheManager:
             self._hits = 0
             self._misses = 0
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """
         Returns telemetry metrics for monitoring cache efficiency.
         """

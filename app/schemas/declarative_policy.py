@@ -1,6 +1,8 @@
-from typing import List, Optional, Dict, Any
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict, model_validator
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
 
 class CriterionType(str, Enum):
     NUMERIC_THRESHOLD = "NUMERIC_THRESHOLD"
@@ -22,19 +24,19 @@ class DeclarativeCriterion(BaseModel):
     description: str = Field(..., description="Official statutory criterion narrative")
     clinical_intent: str = Field(default="Statutory Medicare coverage requirement", description="Clinical justification")
     criterion_type: CriterionType = Field(default=CriterionType.NUMERIC_THRESHOLD, description="Operational evaluation paradigm")
-    entity_names: List[str] = Field(default_factory=list, description="Clinical synonyms, abbreviations, and trade names")
-    operator: Optional[str] = Field(default=None, description="Relational operator: <=, >=, <, >, ==, in")
-    threshold: Optional[float] = Field(default=None, description="Numeric cutoff e.g. 35.0 for LVEF or 15.0 for AHI")
-    target_unit: Optional[str] = Field(default=None, description="Expected unit e.g. %, events/hr, mm Hg")
-    ordinal_allowed: Optional[List[str]] = Field(default=None, description="Qualifying ordinal classes e.g. ['II', 'III', 'IV']")
-    min_duration_days: Optional[int] = Field(default=None, description="Minimum duration required e.g. 90 days for GDMT")
+    entity_names: list[str] = Field(default_factory=list, description="Clinical synonyms, abbreviations, and trade names")
+    operator: str | None = Field(default=None, description="Relational operator: <=, >=, <, >, ==, in")
+    threshold: float | None = Field(default=None, description="Numeric cutoff e.g. 35.0 for LVEF or 15.0 for AHI")
+    target_unit: str | None = Field(default=None, description="Expected unit e.g. %, events/hr, mm Hg")
+    ordinal_allowed: list[str] | None = Field(default=None, description="Qualifying ordinal classes e.g. ['II', 'III', 'IV']")
+    min_duration_days: int | None = Field(default=None, description="Minimum duration required e.g. 90 days for GDMT")
     is_exclusion: bool = Field(default=False, description="True if meeting this condition disqualifies coverage")
     negation_sensitive: bool = Field(default=True, description="Enforces ConText/NegEx clinical scope analysis")
-    required_temporal_window: Optional[str] = Field(default="Within past 12 months", description="Statutory window")
-    icd10_preconditions: List[str] = Field(default_factory=list, description="Diagnostic ICD-10 code patterns")
-    cpt_preconditions: List[str] = Field(default_factory=list, description="Procedure CPT code patterns")
+    required_temporal_window: str | None = Field(default="Within past 12 months", description="Statutory window")
+    icd10_preconditions: list[str] = Field(default_factory=list, description="Diagnostic ICD-10 code patterns")
+    cpt_preconditions: list[str] = Field(default_factory=list, description="Procedure CPT code patterns")
     min_score: float = Field(default=0.85, description="Evidence sufficiency weight")
-    keywords: List[str] = Field(default_factory=list, description="Legacy keywords list alias for backward compatibility")
+    keywords: list[str] = Field(default_factory=list, description="Legacy keywords list alias for backward compatibility")
 
     @model_validator(mode="after")
     def sync_keywords_alias(self):
@@ -56,6 +58,6 @@ class DeclarativePolicy(BaseModel):
     effective_date: str = Field(default="2024-01-01", description="Statutory effective date")
     category: str = Field(default="General Medicine", description="Clinical domain")
     description: str = Field(..., description="Summary of policy coverage")
-    criteria: List[DeclarativeCriterion] = Field(default_factory=list, description="Declarative criteria set")
-    statutory_waiting_periods: List[Dict[str, Any]] = Field(default_factory=list, description="Longitudinal timeline rules")
+    criteria: list[DeclarativeCriterion] = Field(default_factory=list, description="Declarative criteria set")
+    statutory_waiting_periods: list[dict[str, Any]] = Field(default_factory=list, description="Longitudinal timeline rules")
 

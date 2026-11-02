@@ -5,11 +5,11 @@ Splunk, Datadog, Elasticsearch, CloudWatch, and Grafana Loki.
 Strictly redacts PHI and sensitive fields.
 """
 
+import json
 import logging
 import sys
-import json
-from datetime import datetime, timezone
-from typing import Any, Dict
+from datetime import UTC, datetime
+from typing import Any
 
 
 class SafeJsonFormatter(logging.Formatter):
@@ -19,8 +19,8 @@ class SafeJsonFormatter(logging.Formatter):
     """
 
     def format(self, record: logging.LogRecord) -> str:
-        log_payload: Dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+        log_payload: dict[str, Any] = {
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -64,3 +64,4 @@ def configure_structured_logging(level: int = logging.INFO) -> None:
     json_handler = logging.StreamHandler(sys.stdout)
     json_handler.setFormatter(SafeJsonFormatter())
     root_logger.addHandler(json_handler)
+

@@ -105,3 +105,4 @@ def test_pipeline_zero_phi_leakage_in_rationales_and_audit():
     assert "456-78-9012" not in db_str
 
     db.close()
+

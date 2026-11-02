@@ -106,3 +106,4 @@ def test_policy_cache_manager_ttl_and_phi_guard():
 
     with pytest.raises(CacheSecurityException):
         manager.get("mrn_98765_record")
+

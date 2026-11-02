@@ -1,9 +1,10 @@
 import time
 from abc import ABC, abstractmethod
-from typing import Dict, List, Tuple, Optional
 from collections import defaultdict
 from threading import Lock
-from fastapi import Request, HTTPException, status
+
+from fastapi import HTTPException, Request, status
+
 
 class BaseRateLimiter(ABC):
     """Abstract base rate limiter supporting pluggable distributed backends."""
@@ -15,7 +16,7 @@ class BaseRateLimiter(ABC):
         action: str,
         max_requests: int,
         window_seconds: int
-    ) -> Tuple[bool, int]:
+    ) -> tuple[bool, int]:
         pass
 
     @abstractmethod
@@ -37,7 +38,7 @@ class SlidingWindowRateLimiter(BaseRateLimiter):
     def __init__(self):
         self._lock = Lock()
         # Key format: (action, identifier) -> list of timestamp floats
-        self._history: Dict[Tuple[str, str], List[float]] = defaultdict(list)
+        self._history: dict[tuple[str, str], list[float]] = defaultdict(list)
 
     def is_rate_limited(
         self,
@@ -45,7 +46,7 @@ class SlidingWindowRateLimiter(BaseRateLimiter):
         action: str,
         max_requests: int,
         window_seconds: int
-    ) -> Tuple[bool, int]:
+    ) -> tuple[bool, int]:
         """
         Returns (is_limited, retry_after_seconds).
         Cleans expired timestamps outside the sliding window.
@@ -103,7 +104,7 @@ class RedisSlidingWindowRateLimiter(BaseRateLimiter):
         action: str,
         max_requests: int,
         window_seconds: int
-    ) -> Tuple[bool, int]:
+    ) -> tuple[bool, int]:
         if not self._redis:
             return self._fallback.is_rate_limited(key, action, max_requests, window_seconds)
 
@@ -129,7 +130,7 @@ class RedisSlidingWindowRateLimiter(BaseRateLimiter):
             pipe.expire(redis_key, window_seconds)
             pipe.execute()
             return False, 0
-        except Exception:
+        except Exception:  # noqa: BLE001
             # Fallback to local in-memory on redis connection glitch
             return self._fallback.is_rate_limited(key, action, max_requests, window_seconds)
 
@@ -137,7 +138,7 @@ class RedisSlidingWindowRateLimiter(BaseRateLimiter):
         if self._redis:
             try:
                 self._redis.delete(f"ratelimit:{action}:{key}")
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
         self._fallback.reset_key(key, action)
 
@@ -147,7 +148,7 @@ class RedisSlidingWindowRateLimiter(BaseRateLimiter):
                 keys = self._redis.keys("ratelimit:*")
                 if keys:
                     self._redis.delete(*keys)
-            except Exception:
+            except Exception:  # noqa: BLE001, S110
                 pass
         self._fallback.reset_all()
 

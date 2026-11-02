@@ -1,7 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Dict, Any, Union
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
 
 class DeterminationStatus(str, Enum):
     MET = "MET"
@@ -25,17 +27,17 @@ class ClinicalEvidenceSpan(BaseModel):
 class CriterionAssessment(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    criterion_id: Union[int, str] = Field(..., description="Unique criterion identifier")
+    criterion_id: int | str = Field(..., description="Unique criterion identifier")
     criterion_code: str = Field(..., description="Short code, e.g. CRIT-ICD-01")
     name: str = Field(default="", description="Criterion display name")
     description: str = Field(..., description="Full text description of policy criterion")
     is_exclusion: bool = Field(default=False, description="True if meeting this criterion excludes coverage")
     required_temporal_window: str = Field(default="Not specified", description="Required temporal preconditions")
     status: DeterminationStatus = Field(..., description="Evaluation status (MET, NOT_MET, INSUFFICIENT_EVIDENCE)")
-    verified_spans: List[ClinicalEvidenceSpan] = Field(default_factory=list, description="Verified character-anchored clinical citations")
+    verified_spans: list[ClinicalEvidenceSpan] = Field(default_factory=list, description="Verified character-anchored clinical citations")
     clinical_rationale: str = Field(..., description="Reasoning mapping clinical facts to policy requirement")
     raw_confidence: float = Field(..., ge=0.0, le=1.0, description="Uncalibrated model confidence score")
-    temporal_window_met: Optional[bool] = Field(default=None, description="Whether temporal prerequisite was satisfied")
+    temporal_window_met: bool | None = Field(default=None, description="Whether temporal prerequisite was satisfied")
 
 class VerificationAuditResult(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -65,10 +67,10 @@ class BillingValidationResult(BaseModel):
     is_billing_compliant: bool
     is_cpt_covered: bool
     is_icd10_covered: bool
-    detected_cpt_codes: List[CodingMatch] = Field(default_factory=list)
-    detected_icd10_codes: List[CodingMatch] = Field(default_factory=list)
-    carc_codes: List[Dict[str, str]] = Field(default_factory=list)
-    rarc_codes: List[Dict[str, str]] = Field(default_factory=list)
+    detected_cpt_codes: list[CodingMatch] = Field(default_factory=list)
+    detected_icd10_codes: list[CodingMatch] = Field(default_factory=list)
+    carc_codes: list[dict[str, str]] = Field(default_factory=list)
+    rarc_codes: list[dict[str, str]] = Field(default_factory=list)
     billing_advisory: str
 
 class TimelineMilestone(BaseModel):
@@ -90,7 +92,7 @@ class TimelineAnalysisResult(BaseModel):
 
     policy_id: str
     all_waiting_periods_satisfied: bool
-    milestones: List[TimelineMilestone] = Field(default_factory=list)
+    milestones: list[TimelineMilestone] = Field(default_factory=list)
     overall_timeline_advisory: str
 
 class FinalAdjudication(BaseModel):
@@ -105,21 +107,21 @@ class FinalAdjudication(BaseModel):
     raw_aggregate_confidence: float = Field(..., ge=0.0, le=1.0, description="Average uncalibrated extraction confidence")
     calibrated_aggregate_confidence: float = Field(..., ge=0.0, le=1.0, description="Aggregate calibrated confidence after adversarial audit")
     abstention_threshold: float = Field(default=0.85, description="Confidence threshold tau below which system must abstain")
-    abstention_reason: Optional[str] = Field(default=None, description="Detailed trigger rationale if abstention was activated")
-    criterion_assessments: List[CriterionAssessment] = Field(default_factory=list, description="Criterion-by-criterion evaluation breakdown")
-    verification_audits: List[VerificationAuditResult] = Field(default_factory=list, description="Adversarial verification results per criterion")
+    abstention_reason: str | None = Field(default=None, description="Detailed trigger rationale if abstention was activated")
+    criterion_assessments: list[CriterionAssessment] = Field(default_factory=list, description="Criterion-by-criterion evaluation breakdown")
+    verification_audits: list[VerificationAuditResult] = Field(default_factory=list, description="Adversarial verification results per criterion")
     audit_hash: str = Field(..., description="Cryptographic SHA-256 chain-of-custody seal over adjudication bundle")
-    required_clinician_action_notes: Optional[str] = Field(default=None, description="Actionable checklist items for clinical auditor")
+    required_clinician_action_notes: str | None = Field(default=None, description="Actionable checklist items for clinical auditor")
     execution_time_ms: float = Field(default=0.0, description="Total pipeline latency in milliseconds")
     sanitized_ehr_text: str = Field(..., description="PHI-sanitized patient EHR note used in evaluation")
     timestamp: datetime = Field(..., description="Adjudication execution timestamp")
-    billing_validation: Optional[BillingValidationResult] = None
-    timeline_analysis: Optional[TimelineAnalysisResult] = None
-    carc_codes: List[Dict[str, str]] = Field(default_factory=list)
-    rarc_codes: List[Dict[str, str]] = Field(default_factory=list)
+    billing_validation: BillingValidationResult | None = None
+    timeline_analysis: TimelineAnalysisResult | None = None
+    carc_codes: list[dict[str, str]] = Field(default_factory=list)
+    rarc_codes: list[dict[str, str]] = Field(default_factory=list)
     execution_mode: str = Field(default="deterministic", description="Adjudication engine utilized: deterministic or state_machine")
-    state_transitions: Optional[List[Dict[str, Any]]] = Field(default=None, description="State machine audit transitions if executed under state_machine mode")
-    retrieval_insights: Optional[Dict[str, Any]] = Field(default=None, description="Hybrid retrieval candidate ranking if policy was auto-discovered")
+    state_transitions: list[dict[str, Any]] | None = Field(default=None, description="State machine audit transitions if executed under state_machine mode")
+    retrieval_insights: dict[str, Any] | None = Field(default=None, description="Hybrid retrieval candidate ranking if policy was auto-discovered")
 
 # Request / Response DTOs
 class PolicyMatchSummary(BaseModel):
@@ -141,7 +143,7 @@ class PolicyMatchSummary(BaseModel):
 class MultiPolicyScanRequest(BaseModel):
     patient_id: str = Field(default="PT-10829", description="Patient or record identifier")
     ehr_narrative: str = Field(..., min_length=20, description="Raw clinical EHR documentation / progress note")
-    options: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Pipeline configuration overrides (e.g. tau, debug)")
+    options: dict[str, Any] | None = Field(default_factory=dict, description="Pipeline configuration overrides (e.g. tau, debug)")
 
 class MultiPolicyScanResponse(BaseModel):
     patient_id_masked: str
@@ -149,29 +151,29 @@ class MultiPolicyScanResponse(BaseModel):
     approved_count: int
     denied_count: int
     deferred_count: int
-    best_match_policy_id: Optional[str] = None
-    best_match_title: Optional[str] = None
-    all_matches: List[PolicyMatchSummary]
-    multi_morbidity_insights: List[str] = Field(default_factory=list)
+    best_match_policy_id: str | None = None
+    best_match_title: str | None = None
+    all_matches: list[PolicyMatchSummary]
+    multi_morbidity_insights: list[str] = Field(default_factory=list)
     execution_time_ms: float
     timestamp: datetime
 
 class AdjudicationRequest(BaseModel):
     patient_id: str = Field(default="PT-10829", description="Patient or record identifier")
-    policy_id: Optional[str] = Field(default="AUTO", description="Selected Medicare LCD or NCD policy ID (e.g., NCD-20.4), or 'AUTO' for hybrid retrieval auto-discovery")
+    policy_id: str | None = Field(default="AUTO", description="Selected Medicare LCD or NCD policy ID (e.g., NCD-20.4), or 'AUTO' for hybrid retrieval auto-discovery")
     ehr_narrative: str = Field(default="", description="Raw clinical EHR documentation / progress note")
-    cpt_codes: Optional[List[str]] = Field(default=None, description="Optional procedure codes to validate")
-    icd10_codes: Optional[List[str]] = Field(default=None, description="Optional diagnosis codes to validate")
-    execution_mode: Optional[str] = Field(
+    cpt_codes: list[str] | None = Field(default=None, description="Optional procedure codes to validate")
+    icd10_codes: list[str] | None = Field(default=None, description="Optional diagnosis codes to validate")
+    execution_mode: str | None = Field(
         default="deterministic",
         description="Adjudication engine: 'deterministic' (production rule pipeline), 'declarative' (production declarative schema engine), or 'state_machine' [EXPERIMENTAL] (multi-pass extractor with explicit state transitions). Note: state_machine mode is labeled EXPERIMENTAL due to lower precision and safety vulnerability on unconstrained clinical phrasing."
     )
-    options: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Pipeline configuration overrides (e.g. tau, debug)")
+    options: dict[str, Any] | None = Field(default_factory=dict, description="Pipeline configuration overrides (e.g. tau, debug)")
 
 class LoginRequest(BaseModel):
     username: str
     password: str
-    mfa_code: Optional[str] = None
+    mfa_code: str | None = None
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -186,13 +188,13 @@ class UserCreate(BaseModel):
     password: str
     role: str = "Clinician"
     # Medical Professional Verification Fields
-    full_name: Optional[str] = None
-    npi_number: Optional[str] = None
-    credential_title: Optional[str] = None  # MD, DO, NP, PA-C, MBBS, CRNA, PharmD
-    medical_license: Optional[str] = None
-    license_state: Optional[str] = None
-    specialty: Optional[str] = None
-    organization: Optional[str] = None
+    full_name: str | None = None
+    npi_number: str | None = None
+    credential_title: str | None = None  # MD, DO, NP, PA-C, MBBS, CRNA, PharmD
+    medical_license: str | None = None
+    license_state: str | None = None
+    specialty: str | None = None
+    organization: str | None = None
 
 class MedicalVerificationRequest(BaseModel):
     npi_number: str
@@ -200,7 +202,7 @@ class MedicalVerificationRequest(BaseModel):
     credential_title: str
     medical_license: str
     license_state: str
-    organization: Optional[str] = None
+    organization: str | None = None
 
 class MedicalVerificationResponse(BaseModel):
     is_verified: bool
@@ -210,7 +212,7 @@ class MedicalVerificationResponse(BaseModel):
     state_license_valid: bool
     organization_valid: bool
     message: str
-    reasons: List[str] = []
+    reasons: list[str] = []
 
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -220,10 +222,10 @@ class UserOut(BaseModel):
     email: str
     role: str
     is_active: bool
-    npi_number: Optional[str] = None
-    credential_title: Optional[str] = None
-    license_state: Optional[str] = None
-    organization: Optional[str] = None
+    npi_number: str | None = None
+    credential_title: str | None = None
+    license_state: str | None = None
+    organization: str | None = None
     is_verified_medical_pro: bool = False
     created_at: datetime
 
@@ -250,7 +252,7 @@ class PolicyOut(BaseModel):
     effective_date: str
     description: str
     category: str
-    criteria: List[CriterionOut]
+    criteria: list[CriterionOut]
 
 class AuditLogOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -261,20 +263,20 @@ class AuditLogOut(BaseModel):
     policy_id: str
     decision: str
     abstention_status: bool
-    abstention_reason: Optional[str]
+    abstention_reason: str | None
     calibrated_confidence: float
     raw_confidence: float
     criterion_evaluations_json: str
     evidence_spans_json: str
     adversarial_audits_json: str
-    required_clinician_action_notes: Optional[str]
+    required_clinician_action_notes: str | None
     audit_hash: str
     sanitized_ehr_preview: str
     execution_time_ms: float
-    submission_status: Optional[str] = "PENDING_REVIEW"
-    signed_by: Optional[str] = None
-    signed_at: Optional[datetime] = None
-    payer_transaction_id: Optional[str] = None
+    submission_status: str | None = "PENDING_REVIEW"
+    signed_by: str | None = None
+    signed_at: datetime | None = None
+    payer_transaction_id: str | None = None
     created_at: datetime
 
 class BenchmarkConfigMetrics(BaseModel):
@@ -307,8 +309,8 @@ class BenchmarkResponse(BaseModel):
     dataset_size: int
     total_evaluations: int
     abstention_threshold: float
-    configs: List[BenchmarkConfigMetrics]
-    vignette_results: List[VignetteEvaluationResult] = Field(default_factory=list)
+    configs: list[BenchmarkConfigMetrics]
+    vignette_results: list[VignetteEvaluationResult] = Field(default_factory=list)
     comparative_analysis: str
 
 # Document Prior Authorization & Insurance Submission Models
@@ -329,27 +331,27 @@ class CMSCoveragePacket(BaseModel):
     policy_title: str
     jurisdiction: str
     date_of_service: str
-    icd10_codes: List[str]
-    cpt_hcpcs_codes: List[str]
+    icd10_codes: list[str]
+    cpt_hcpcs_codes: list[str]
     clinical_summary: str
-    criteria_sections: List[FilledCriterionSection]
+    criteria_sections: list[FilledCriterionSection]
     adjudication_decision: str
     abstention_status: bool
     calibrated_confidence: float
     audit_hash: str
     submission_status: str  # PENDING_CLINICIAN_REVIEW, SUBMITTED_TO_PAYER
-    signed_by: Optional[str] = None
-    signed_at: Optional[str] = None
-    payer_transaction_id: Optional[str] = None
-    clinician_action_notes: Optional[str] = None
-    authorization_validity_period: Optional[str] = "180 calendar days from date of determination"
-    shared_decision_making_attestation: Optional[str] = None
+    signed_by: str | None = None
+    signed_at: str | None = None
+    payer_transaction_id: str | None = None
+    clinician_action_notes: str | None = None
+    authorization_validity_period: str | None = "180 calendar days from date of determination"
+    shared_decision_making_attestation: str | None = None
 
 class SubmitPacketRequest(BaseModel):
     case_id: str
     signed_by: str
-    clinician_notes: Optional[str] = None
-    payer_name: Optional[str] = "CMS Medicare MAC Gateway"
+    clinician_notes: str | None = None
+    payer_name: str | None = "CMS Medicare MAC Gateway"
 
 class SubmissionReceipt(BaseModel):
     case_id: str
@@ -364,10 +366,10 @@ class SubmissionReceipt(BaseModel):
 
 class PeerToPeerAppealRequest(BaseModel):
     case_id: str
-    physician_name: Optional[str] = None
-    physician_npi: Optional[str] = None
-    physician_specialty: Optional[str] = None
-    reconsideration_notes: Optional[str] = None
+    physician_name: str | None = None
+    physician_npi: str | None = None
+    physician_specialty: str | None = None
+    reconsideration_notes: str | None = None
 
 class PeerToPeerAppealLetter(BaseModel):
     appeal_id: str
@@ -381,15 +383,15 @@ class PeerToPeerAppealLetter(BaseModel):
     appeal_date: str
     denial_rationale: str
     statutory_legal_basis: str
-    clinical_guideline_citations: List[str]
-    peer_to_peer_talking_points: List[str]
+    clinical_guideline_citations: list[str]
+    peer_to_peer_talking_points: list[str]
     full_letter_text: str
     audit_hash: str
 
 class EHRPushRequest(BaseModel):
     case_id: str
-    ehr_system: Optional[str] = "Epic Systems FHIR R4 / Da Vinci PAS"
-    encounter_id: Optional[str] = None
+    ehr_system: str | None = "Epic Systems FHIR R4 / Da Vinci PAS"
+    encounter_id: str | None = None
 
 class EHRPushReceipt(BaseModel):
     status: str
@@ -403,16 +405,16 @@ class EHRPushReceipt(BaseModel):
     message: str
 
 class ClinicalAddendumRequest(BaseModel):
-    criterion_code: Optional[str] = Field(default=None, description="Criterion code being addressed, e.g. CRIT-ICD-04")
+    criterion_code: str | None = Field(default=None, description="Criterion code being addressed, e.g. CRIT-ICD-04")
     addendum_text: str = Field(..., min_length=10, description="Clinician's attested addendum narrative")
-    clinician_name: Optional[str] = Field(default="Attending Physician", description="Name of signing clinician")
-    clinician_npi: Optional[str] = Field(default="1043256787", description="10-digit NPI of signing clinician")
+    clinician_name: str | None = Field(default="Attending Physician", description="Name of signing clinician")
+    clinician_npi: str | None = Field(default="1043256787", description="10-digit NPI of signing clinician")
 
 class ClinicalAddendumResponse(BaseModel):
     case_id: str
     status: str
     addendum_id: str
-    criterion_addressed: Optional[str]
+    criterion_addressed: str | None
     appended_at: str
     signed_by: str
     signed_npi: str
@@ -427,8 +429,8 @@ class AuditTrailEvent(BaseModel):
     event_id: str
     timestamp: str
     event_type: str  # ADJUDICATION, AMENDMENT, AUTHENTICATION, SUBMISSION, EHR_PUSH, ERASURE
-    case_id: Optional[str]
-    patient_id_masked: Optional[str]
+    case_id: str | None
+    patient_id_masked: str | None
     actor: str
     actor_role: str
     action_details: str
@@ -437,22 +439,22 @@ class AuditTrailEvent(BaseModel):
 class AuditTrailResponse(BaseModel):
     total_events: int
     system_mode: str
-    events: List[AuditTrailEvent]
+    events: list[AuditTrailEvent]
 
 class BatchAdjudicationItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    patient_id: Optional[str] = Field(default=None, description="Patient identifier (will be masked under HIPAA Safe Harbor)")
+    patient_id: str | None = Field(default=None, description="Patient identifier (will be masked under HIPAA Safe Harbor)")
     policy_id: str = Field(..., description="Target policy ID, e.g. NCD-20.4 or LCD-L33829")
     clinical_narrative: str = Field(..., min_length=15, description="De-identified or raw clinical progress note")
-    requested_procedure_code: Optional[str] = Field(default=None, description="CPT/HCPCS code, e.g. 33249")
-    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Custom metadata or roster tags")
+    requested_procedure_code: str | None = Field(default=None, description="CPT/HCPCS code, e.g. 33249")
+    metadata: dict[str, Any] | None = Field(default_factory=dict, description="Custom metadata or roster tags")
 
 class BatchAdjudicationRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    batch_name: Optional[str] = Field(default="Clinical Roster Batch", description="Label for this multi-patient cohort")
-    items: List[BatchAdjudicationItem] = Field(..., min_length=1, max_length=50, description="List of patient notes to adjudicate")
-    webhook_url: Optional[str] = Field(default=None, description="Optional outbound HTTPS webhook URL for notification upon batch completion")
-    webhook_secret: Optional[str] = Field(default=None, description="Shared secret for signing webhook payload with HMAC-SHA256")
+    batch_name: str | None = Field(default="Clinical Roster Batch", description="Label for this multi-patient cohort")
+    items: list[BatchAdjudicationItem] = Field(..., min_length=1, max_length=50, description="List of patient notes to adjudicate")
+    webhook_url: str | None = Field(default=None, description="Optional outbound HTTPS webhook URL for notification upon batch completion")
+    webhook_secret: str | None = Field(default=None, description="Shared secret for signing webhook payload with HMAC-SHA256")
 
 class BatchAdjudicationItemResult(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -475,7 +477,7 @@ class BatchAdjudicationResponse(BaseModel):
     deferred_count: int
     processing_time_ms: float
     timestamp: str
-    webhook_delivered: Optional[bool] = Field(default=None, description="Whether the outbound completion webhook was successfully dispatched")
-    results: List[BatchAdjudicationItemResult]
+    webhook_delivered: bool | None = Field(default=None, description="Whether the outbound completion webhook was successfully dispatched")
+    results: list[BatchAdjudicationItemResult]
 
 

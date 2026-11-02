@@ -1,10 +1,12 @@
 import time
-from typing import Any, Dict, Optional, Tuple, Callable
 from collections import defaultdict
+from collections.abc import Callable
 from threading import Lock
+from typing import Any
+
 
 class IdempotencyRecord:
-    def __init__(self, payload: Any, status_code: int = 200, headers: Optional[Dict[str, str]] = None, ttl_seconds: int = 86400):
+    def __init__(self, payload: Any, status_code: int = 200, headers: dict[str, str] | None = None, ttl_seconds: int = 86400):
         self.payload = payload
         self.status_code = status_code
         self.headers = headers or {}
@@ -25,14 +27,13 @@ class IdempotencyEngine:
     def __init__(self, default_ttl_seconds: int = 86400):
         self._master_lock = Lock()
         self._default_ttl = default_ttl_seconds
-        self._completed_records: Dict[str, IdempotencyRecord] = {}
-        self._in_flight_locks: Dict[str, Lock] = defaultdict(Lock)
+        self._completed_records: dict[str, IdempotencyRecord] = {}
+        self._in_flight_locks: dict[str, Lock] = defaultdict(Lock)
 
-    def get_existing(self, idempotency_key: str) -> Optional[Tuple[Any, int, Dict[str, str]]]:
+    def get_existing(self, idempotency_key: str) -> tuple[Any, int, dict[str, str]] | None:
         """
         Returns (payload, status_code, headers) if an unexpired record exists for this key.
         """
-        now = time.time()
         with self._master_lock:
             rec = self._completed_records.get(idempotency_key)
             if rec:
@@ -47,8 +48,8 @@ class IdempotencyEngine:
         idempotency_key: str,
         payload: Any,
         status_code: int = 200,
-        headers: Optional[Dict[str, str]] = None,
-        ttl_seconds: Optional[int] = None
+        headers: dict[str, str] | None = None,
+        ttl_seconds: int | None = None
     ) -> None:
         """
         Persists a completed response for replay.
@@ -65,9 +66,9 @@ class IdempotencyEngine:
     def execute_idempotent(
         self,
         idempotency_key: str,
-        action: Callable[[], Tuple[Any, int, Optional[Dict[str, str]]]],
-        ttl_seconds: Optional[int] = None
-    ) -> Tuple[Any, int, Dict[str, str], bool]:
+        action: Callable[[], tuple[Any, int, dict[str, str] | None]],
+        ttl_seconds: int | None = None
+    ) -> tuple[Any, int, dict[str, str], bool]:
         """
         Executes an action with full race-condition and replay protection:
         1. If already completed, returns (payload, status_code, headers, is_replay=True).
