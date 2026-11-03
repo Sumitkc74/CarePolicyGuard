@@ -86,8 +86,12 @@ def run_heldout_evaluation():
                 "is_correct": is_correct,
                 "is_false_approval": is_false_approval,
                 "is_false_denial": is_false_denial,
+                "score_type": getattr(res, "score_type", "sufficiency_score"),
+                "sufficiency_score": getattr(res, "sufficiency_score", None),
+                "sufficiency_formula": getattr(res, "sufficiency_formula", "criteria_sufficiency_weighted_sum / total_applicable_criteria"),
                 "raw_confidence": res.raw_aggregate_confidence,
                 "calibrated_confidence": res.calibrated_aggregate_confidence,
+                "calibrated_confidence_explanation": getattr(res, "calibrated_confidence_explanation", None),
                 "clinical_rationale": rationale_summary,
                 "latency_ms": round(lat_ms, 2)
             }
@@ -163,7 +167,7 @@ def generate_markdown_report(run_data: Dict[str, Any], output_path: Path):
         f"> [!IMPORTANT]",
         f"> **Development-Set Status**: This set (v1) is an unsealed development dataset used for regression testing and failure diagnosis.",
         f"> Diagnostic numbers reported here are internal benchmarks and must not be cited as held-out generalization claims.",
-        f"> Held-out evaluation is strictly reserved for the sealed v2 dataset pending clinician sign-off.",
+        f"> Held-out evaluation is reserved for the sealed v2 set pending independent validation (Route A: external clinician review, or Route B: blind dual annotation with kappa at or above 0.85 and adjudication).",
         f"",
         f"**Dataset**: {meta['set_name']} (Development Diagnostic Set)  ",
         f"**Execution Timestamp**: {meta['evaluation_timestamp']}  ",

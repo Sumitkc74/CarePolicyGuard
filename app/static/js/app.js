@@ -2679,18 +2679,58 @@ function animateStep(stepName, statusText, className) {
     }
 }
 
+window.handleClinicalSignOff = async function() {
+    const caseId = (window._LAST_ADJUDICATION_DATA && window._LAST_ADJUDICATION_DATA.case_id);
+    if (!caseId) return;
+    try {
+        const res = await fetch(`/api/v1/determination/${caseId}/sign-off`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                signed_by: "Dr. Attending Physician, MD",
+                clinician_credentials: "MD, Board Certified",
+                attestation_notes: "Clinical review completed; determination verified and released."
+            })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (window._LAST_ADJUDICATION_DATA) {
+                window._LAST_ADJUDICATION_DATA.determination_stage = "FINAL";
+                window._LAST_ADJUDICATION_DATA.human_sign_off_status = "SIGNED_OFF";
+                window._LAST_ADJUDICATION_DATA.is_releasable = true;
+                window._LAST_ADJUDICATION_DATA.signed_off_by = data.signed_off_by;
+                window._LAST_ADJUDICATION_DATA.signed_off_at = data.signed_off_at;
+                renderAdjudicationResults(window._LAST_ADJUDICATION_DATA);
+            }
+        }
+    } catch (e) {
+        console.error("Clinical sign-off failed", e);
+    }
+};
+
 // =============================================================================
 // RENDERING ADJUDICATION & SYNCHRONIZED EVIDENCE
 // =============================================================================
 function renderAdjudicationResults(data) {
+    window._LAST_ADJUDICATION_DATA = data;
     const stepperLat = document.getElementById("stepper-latency");
     if (stepperLat) stepperLat.textContent = `Pipeline Latency: ${data.execution_time_ms} ms`;
 
     // Task 1: Update Scope & Clinical Sign-off Gate UI Elements
+    const isFinal = (data.determination_stage === "FINAL" || data.human_sign_off_status === "SIGNED_OFF");
+    const stageBadge = document.getElementById("determination-stage-badge");
+    if (stageBadge) {
+        stageBadge.textContent = isFinal ? "FINAL (RELEASED)" : "PROVISIONAL (ADVISORY - NOT RELEASABLE)";
+        stageBadge.style.color = isFinal ? "#10b981" : "#f59e0b";
+    }
+    const signoffBtn = document.getElementById("btn-clinical-signoff");
+    if (signoffBtn) {
+        signoffBtn.style.display = isFinal ? "none" : "inline-block";
+    }
     const signoffBadge = document.getElementById("human-signoff-badge");
     if (signoffBadge) {
         signoffBadge.textContent = data.human_sign_off_status || "PENDING CLINICAL SIGN-OFF";
-        signoffBadge.style.color = (data.human_sign_off_status === "SIGNED_OFF") ? "#10b981" : "#38bdf8";
+        signoffBadge.style.color = isFinal ? "#10b981" : "#38bdf8";
     }
     const disclaimerText = document.getElementById("plain-language-disclaimer-text");
     if (disclaimerText && data.plain_language_disclaimer) {

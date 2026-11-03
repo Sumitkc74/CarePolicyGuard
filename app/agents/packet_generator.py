@@ -89,7 +89,7 @@ class CoveragePacketGenerator:
         summary = (
             f"Pre-authorization review for {adjudication.policy_title} ({adjudication.policy_id}). "
             f"Adjudication outcome: {adjudication.adjudication_decision.value} "
-            f"with {adjudication.calibrated_aggregate_confidence * 100:.1f}% calibrated evidence confidence. "
+            f"with {adjudication.sufficiency_score * 100:.1f}% heuristic sufficiency score. "
         )
         if adjudication.abstention_status:
             summary += f"Gate Abstention active: {adjudication.abstention_reason}."
@@ -145,8 +145,17 @@ class CoveragePacketGenerator:
             adjudication_decision=adjudication.adjudication_decision.value,
             abstention_status=adjudication.abstention_status,
             calibrated_confidence=adjudication.calibrated_aggregate_confidence,
+            calibrated_confidence_explanation=adjudication.calibrated_confidence_explanation,
+            score_type=adjudication.score_type,
+            sufficiency_score=adjudication.sufficiency_score,
+            sufficiency_formula=adjudication.sufficiency_formula,
+            determination_stage=adjudication.determination_stage,
+            is_releasable=adjudication.is_releasable,
+            human_sign_off_status=adjudication.human_sign_off_status,
             audit_hash=adjudication.audit_hash,
             submission_status="PENDING_CLINICIAN_REVIEW",
+            signed_by=adjudication.signed_off_by,
+            signed_at=adjudication.signed_off_at,
             clinician_action_notes=adjudication.required_clinician_action_notes,
             authorization_validity_period=validity_period,
             shared_decision_making_attestation=sdm_attestation

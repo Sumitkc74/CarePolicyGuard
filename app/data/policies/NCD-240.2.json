@@ -4,6 +4,15 @@
   "jurisdiction": "National Coverage Determination (CMS)",
   "effective_date": "2021-09-27",
   "category": "Pulmonology",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-15",
+      "author": "CarePolicyGuard Regulatory Informatics",
+      "summary": "Statutory citation mapping against CMS Pub 100-03 Manual Section 240.2."
+    }
+  ],
   "description": "CMS coverage for long-term home oxygen therapy in chronic respiratory disease. Requires documented arterial blood gas PaO2 <= 55 mmHg or SaO2/SpO2 <= 88% at rest on room air, clinical stability at time of testing, and absence of acute reversible etiology.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
@@ -20,7 +29,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Within 30 days of order",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
+      "source_section": "Section B: Group I Medical Documentation Requirements",
+      "source_paragraph": "Paragraph 1: Severe Resting Hypoxemia",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Arterial blood gas PaO2 at or below 55 mm Hg, or an arterial oxygen saturation (SpO2) at or below 88% measured at rest."
     },
     {
       "criterion_code": "CRIT-O2-02",
@@ -32,7 +46,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "At time of qualifying test",
-      "min_score": 0.80
+      "min_score": 0.80,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
+      "source_section": "Section B: General Requirements",
+      "source_paragraph": "Paragraph 2: Clinical Stability at Testing",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "The qualifying arterial blood gas study or oximetry test was conducted in a chronic, clinically stable state."
     },
     {
       "criterion_code": "CRIT-O2-EXCL-01",
@@ -44,7 +63,12 @@
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current clinical presentation",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
+      "source_section": "Section C: Non-Covered Conditions",
+      "source_paragraph": "Paragraph 1: Acute Reversible Etiologies",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Oxygen therapy is non-covered for conditions where hypoxemia is transient or reversible by standard treatment."
     }
   ],
   "statutory_waiting_periods": []

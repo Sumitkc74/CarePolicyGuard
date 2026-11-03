@@ -101,7 +101,7 @@ def compute_audit_hash(
         "patient_id_masked": patient_id_masked,
         "policy_id": policy_id,
         "decision": decision,
-        "calibrated_confidence": round(float(calibrated_confidence), 4),
+        "calibrated_confidence": round(float(calibrated_confidence), 4) if calibrated_confidence is not None else None,
         "criteria": sorted([
             {
                 "code": str(c.get("criterion_code", c.get("criterion_id", ""))),

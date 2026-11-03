@@ -60,7 +60,8 @@ class VerificationAuditResult(BaseModel):
     semantic_audit_notes: str | None = Field(default=None, description="Detailed semantic breakdown (subject, timing, modality, negation, range)")
     discordance_details: str | None = Field(default=None, description="Specific details of conflicting clinical values or dates")
     audit_notes: str = Field(..., description="Detailed adversarial verification audit findings")
-    calibrated_confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence recalibrated after adversarial penalization")
+    calibrated_confidence: float | None = Field(default=None, ge=0.0, le=1.0, description="Confidence recalibrated after adversarial penalization (null if uncalibrated)")
+    sufficiency_score: float = Field(default=0.0, ge=0.0, le=1.0, description="Heuristic sufficiency score for this criterion")
 
 class CodingMatch(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -115,7 +116,8 @@ class FinalAdjudication(BaseModel):
     adjudication_decision: AdjudicationDecision = Field(..., description="Final decision: APPROVED, DENIED, or DEFERRED_TO_HUMAN")
     abstention_status: bool = Field(..., description="True if autonomous decision was withheld and deferred to human review")
     raw_aggregate_confidence: float = Field(..., ge=0.0, le=1.0, description="Average uncalibrated extraction confidence")
-    calibrated_aggregate_confidence: float = Field(..., ge=0.0, le=1.0, description="Aggregate calibrated confidence / sufficiency score after adversarial audit")
+    calibrated_aggregate_confidence: float | None = Field(default=None, ge=0.0, le=1.0, description="Empirical post-hoc calibrated confidence (only populated when fitted on held-out validation data; null otherwise)")
+    calibrated_confidence_explanation: str | None = Field(default="No empirical calibration model fitted on held-out validation data; reporting heuristic sufficiency score", description="Explanation of calibration provenance or why calibrated_aggregate_confidence is null")
     abstention_threshold: float = Field(default=0.85, description="Operating sufficiency threshold tau below which system abstains")
     abstention_reason: str | None = Field(default=None, description="Detailed trigger rationale if abstention was activated")
     criterion_assessments: list[CriterionAssessment] = Field(default_factory=list, description="Criterion-by-criterion evaluation breakdown")
@@ -134,6 +136,14 @@ class FinalAdjudication(BaseModel):
     retrieval_insights: dict[str, Any] | None = Field(default=None, description="Hybrid retrieval candidate ranking if policy was auto-discovered")
 
     # Honest Scope & Sign-off Gate Architecture (Task 1 & Task 6)
+    determination_stage: str = Field(
+        default="PROVISIONAL",
+        description="Determination release lifecycle stage: 'PROVISIONAL' (system output, non-releasable pre-check) or 'FINAL' (released only after recorded human sign-off)"
+    )
+    is_releasable: bool = Field(
+        default=False,
+        description="True only if human sign-off has occurred; provisional determinations cannot be released or exported as final"
+    )
     determination_scope: str = Field(
         default="Checked: curated CMS statutory criteria. Not checked: plan-specific rules, member eligibility, network status. Requires human clinical review and sign-off before official transmission.",
         description="Explicit scope of checked CMS criteria vs unchecked plan/eligibility rules"
@@ -178,6 +188,7 @@ class FinalAdjudication(BaseModel):
     agent_disagreements: list[dict[str, Any]] = Field(default_factory=list, description="Recorded agent disagreements resolved by deterministic veto")
     action_required_questions: list[str] = Field(default_factory=list, description="Targeted clinical questions formulated by MissingEvidenceAgent for human reviewer")
     human_override: dict[str, Any] | None = Field(default=None, description="Recorded human override preserving original system determination")
+    original_system_output_json: str | None = Field(default=None, description="Byte-identical JSON serialization of original system determination prior to human override")
 
 # Request / Response DTOs
 class PolicyMatchSummary(BaseModel):
@@ -187,7 +198,10 @@ class PolicyMatchSummary(BaseModel):
     policy_title: str
     category: str
     decision: AdjudicationDecision
-    calibrated_confidence: float
+    calibrated_confidence: float | None = None
+    score_type: str = "sufficiency_score"
+    sufficiency_score: float = 0.0
+    sufficiency_formula: str = "criteria_sufficiency_weighted_sum / total_applicable_criteria"
     relevance_score: float = 0.0
     total_criteria: int
     met_criteria: int
@@ -320,7 +334,8 @@ class AuditLogOut(BaseModel):
     decision: str
     abstention_status: bool
     abstention_reason: str | None
-    calibrated_confidence: float
+    calibrated_confidence: float | None = None
+    sufficiency_score: float | None = None
     raw_confidence: float
     criterion_evaluations_json: str
     evidence_spans_json: str
@@ -393,7 +408,14 @@ class CMSCoveragePacket(BaseModel):
     criteria_sections: list[FilledCriterionSection]
     adjudication_decision: str
     abstention_status: bool
-    calibrated_confidence: float
+    calibrated_confidence: float | None = None
+    calibrated_confidence_explanation: str | None = "No empirical calibration model fitted on held-out validation data; reporting heuristic sufficiency score"
+    score_type: str = "sufficiency_score"
+    sufficiency_score: float = 0.0
+    sufficiency_formula: str = "criteria_sufficiency_weighted_sum / total_applicable_criteria"
+    determination_stage: str = Field(default="PROVISIONAL", description="Determination release lifecycle stage: 'PROVISIONAL' or 'FINAL'")
+    is_releasable: bool = Field(default=False, description="True only after recorded human sign-off")
+    human_sign_off_status: str = Field(default="PENDING_CLINICAL_SIGN_OFF", description="Sign-off status")
     audit_hash: str
     submission_status: str  # PENDING_CLINICIAN_REVIEW, SUBMITTED_TO_PAYER
     signed_by: str | None = None
@@ -402,6 +424,21 @@ class CMSCoveragePacket(BaseModel):
     clinician_action_notes: str | None = None
     authorization_validity_period: str | None = "180 calendar days from date of determination"
     shared_decision_making_attestation: str | None = None
+
+class SignOffRequest(BaseModel):
+    signed_by: str = Field(..., description="Licensed clinician name or ID")
+    clinician_npi: str | None = Field(default=None, description="Clinician NPI")
+    clinician_credentials: str | None = Field(default=None, description="Clinician title e.g. MD, DO, FACC")
+    attestation_notes: str | None = Field(default=None, description="Clinical attestation or sign-off notes")
+
+class SignOffResponse(BaseModel):
+    case_id: str
+    determination_stage: str = "FINAL"
+    human_sign_off_status: str = "SIGNED_OFF"
+    is_releasable: bool = True
+    signed_off_by: str
+    signed_off_at: str
+    message: str
 
 class SubmitPacketRequest(BaseModel):
     case_id: str
@@ -476,7 +513,8 @@ class ClinicalAddendumResponse(BaseModel):
     signed_npi: str
     prior_decision: str
     updated_decision: str
-    updated_confidence: float
+    updated_confidence: float | None = None
+    updated_sufficiency_score: float | None = None
     audit_hash: str
     updated_adjudication: FinalAdjudication
     message: str
@@ -522,7 +560,9 @@ class BatchAdjudicationItemResult(BaseModel):
     patient_id_masked: str
     policy_id: str
     decision: AdjudicationDecision
-    calibrated_confidence: float
+    score_type: str = "sufficiency_score"
+    sufficiency_score: float | None = None
+    calibrated_confidence: float | None = None
     raw_confidence: float
     abstention_status: bool
     adjudication: FinalAdjudication

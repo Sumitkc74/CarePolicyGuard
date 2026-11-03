@@ -126,3 +126,50 @@ def test_database_url_default_is_local_non_credential():
     assert parsed.hostname is None or parsed.hostname == ""
     assert parsed.port is None
 
+
+def test_env_example_matches_live_config_and_demo_seeding():
+    """
+    Task 5 Consistency Test:
+    Proves:
+    1. Every variable named in .env.example is an active field in Settings.
+    2. Every demo-seeding variable that Settings reads appears in .env.example.
+    3. All demo password and secret keys are empty in .env.example (zero stored secrets).
+    4. The comment names SEED_DEMO_USERS and explicitly notes development-only scope.
+    """
+    env_example_path = Path(__file__).resolve().parent.parent / ".env.example"
+    assert env_example_path.exists(), ".env.example not found"
+
+    content = env_example_path.read_text(encoding="utf-8")
+    var_lines = [
+        line.strip() for line in content.splitlines()
+        if line.strip() and not line.strip().startswith("#") and "=" in line
+    ]
+
+    example_vars = {line.split("=")[0].strip(): line.split("=", 1)[1].strip() for line in var_lines}
+    settings_fields = set(Settings.model_fields.keys())
+
+    # 1. Every variable in .env.example is recognized by Settings
+    for var in example_vars:
+        assert var in settings_fields, f"Variable '{var}' in .env.example is not read by Settings"
+
+    # 2. Every demo-seeding variable in Settings appears in .env.example
+    expected_demo_vars = {
+        "SEED_DEMO_USERS",
+        "DEMO_ADMIN_PASSWORD",
+        "DEMO_AUDITOR_PASSWORD",
+        "DEMO_CLINICIAN_PASSWORD",
+        "DEMO_DOCTOR_PASSWORD"
+    }
+    for demo_var in expected_demo_vars:
+        assert demo_var in example_vars, f"Demo seeding variable '{demo_var}' is missing from .env.example"
+
+    # 3. All password/secret values in .env.example are empty strings
+    for sec_key in ["SECRET_KEY", "DEMO_ADMIN_PASSWORD", "DEMO_AUDITOR_PASSWORD", "DEMO_CLINICIAN_PASSWORD", "DEMO_DOCTOR_PASSWORD", "SMTP_PASSWORD", "GOOGLE_CLIENT_SECRET"]:
+        if sec_key in example_vars:
+            assert example_vars[sec_key] == "", f"Security violation: {sec_key} in .env.example must be empty"
+
+    # 4. Comment specifies SEED_DEMO_USERS and development-only
+    assert "SEED_DEMO_USERS" in content
+    assert "development" in content.lower() or "dev-only" in content.lower()
+
+

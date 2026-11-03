@@ -4,6 +4,15 @@
   "jurisdiction": "Local Coverage Determination (LCD)",
   "effective_date": "2024-01-01",
   "category": "Orthopedic Surgery",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-15",
+      "author": "CarePolicyGuard Regulatory Informatics",
+      "summary": "Benchmark archetype policy definition; contractor-specific statutory mapping pending."
+    }
+  ],
   "description": "Coverage policy for elective total knee arthroplasty in adult patients with end-stage osteoarthritis. Requires documented range of motion flexion <= 90 degrees, failure of conservative therapy >= 180 days, and absence of active joint sepsis.",
   "scope_note": "Benchmark reference policy demonstrating zero-code declarative policy ingestion; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
@@ -20,7 +29,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Within past 3 months",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
+      "source_traceability_status": "UNVERIFIED",
+      "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session."
     },
     {
       "criterion_code": "CRIT-TKA-02",
@@ -34,7 +48,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": ">= 180 days",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
+      "source_section": "Conservative Management Prerequisites",
+      "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
+      "source_traceability_status": "UNVERIFIED",
+      "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session."
     },
     {
       "criterion_code": "CRIT-TKA-EXCL-01",
@@ -46,9 +65,13 @@
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current presentation",
-      "min_score": 0.90
+      "min_score": 0.90,
+      "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
+      "source_section": "Contraindications",
+      "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
+      "source_traceability_status": "UNVERIFIED",
+      "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session."
     }
   ],
   "statutory_waiting_periods": []
 }
-

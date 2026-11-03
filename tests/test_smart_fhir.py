@@ -40,7 +40,8 @@ def test_smart_on_fhir_endpoints():
     assert adj_res.status_code == 200
     adj_data = adj_res.json()
     assert adj_data["adjudication_decision"] == "APPROVED"
-    assert adj_data["calibrated_aggregate_confidence"] >= 0.85
+    assert adj_data["sufficiency_score"] >= 0.85
+    assert adj_data["calibrated_aggregate_confidence"] is None
 
 def test_live_public_hapi_fhir_server_capability():
     """

@@ -98,3 +98,138 @@ def test_resubmission_lifecycle_transitions_and_rejection():
     with pytest.raises(InvalidWorkflowTransitionError, match="Illegal internal workflow transition"):
         ResubmissionLifecycleManager.transition(fresh_case, InternalWorkflowState.SIGNED_OFF)
 
+
+from fastapi.testclient import TestClient
+from main import app
+
+client = TestClient(app)
+
+
+def test_provisional_determination_cannot_be_retrieved_as_final_or_pushed_to_ehr():
+    """
+    Task 1 Gate Enforcement:
+    Proves that a fresh automated determination is strictly PROVISIONAL and NOT releasable:
+    - GET /api/v1/determination/{case_id}/final raises HTTP 412 Precondition Failed.
+    - POST /api/v1/packet/{case_id}/ehr-push raises HTTP 412 Precondition Failed.
+    - GET /api/v1/packet/{case_id}/pdf?require_final=true raises HTTP 412 Precondition Failed.
+    """
+    ehr = (
+        "CARDIOLOGY PROGRESS NOTE\n"
+        "Patient with ischemic cardiomyopathy. LVEF 26% on echo. NYHA Class II.\n"
+        "On GDMT for 6 months. Prior MI 2 years ago. No acute shock."
+    )
+    res = client.post("/api/v1/adjudicate", json={
+        "patient_id": "PT-GATE-PROV-01",
+        "policy_id": "NCD-20.4",
+        "ehr_narrative": ehr
+    })
+    assert res.status_code == 200
+    case_id = res.json()["case_id"]
+
+    # 1. Inspect provisional determination via standard endpoint
+    det_res = client.get(f"/api/v1/determination/{case_id}")
+    assert det_res.status_code == 200
+    det_data = det_res.json()
+    assert det_data["determination_stage"] == "PROVISIONAL"
+    assert det_data["is_releasable"] is False
+
+    # 2. Final-only retrieval endpoint must reject provisional determination
+    final_res = client.get(f"/api/v1/determination/{case_id}/final")
+    assert final_res.status_code == 412
+    assert "PROVISIONAL" in final_res.json()["detail"]
+
+    # 3. Direct EHR push must reject provisional determination
+    push_res = client.post(f"/api/v1/packet/{case_id}/ehr-push", json={
+        "case_id": case_id,
+        "ehr_system": "Epic Systems Hyperdrive"
+    })
+    assert push_res.status_code == 412
+    assert "PROVISIONAL" in push_res.json()["detail"]
+
+    # 4. Final-required PDF export must reject provisional determination
+    pdf_res = client.get(f"/api/v1/packet/{case_id}/pdf?require_final=true")
+    assert pdf_res.status_code == 412
+
+
+def test_signed_off_determination_can_be_retrieved_as_final_and_released():
+    """
+    Task 1 Gate Enforcement:
+    Proves that recording a clinical sign-off transitions determination to FINAL (is_releasable=True),
+    enabling retrieval from /final, PDF export with require_final=true, and EHR push.
+    """
+    ehr = (
+        "CARDIOLOGY PROGRESS NOTE\n"
+        "Patient with ischemic cardiomyopathy. LVEF 25% on echo. NYHA Class II.\n"
+        "On GDMT for 6 months. Prior MI 2 years ago. No acute shock."
+    )
+    res = client.post("/api/v1/adjudicate", json={
+        "patient_id": "PT-GATE-FINAL-01",
+        "policy_id": "NCD-20.4",
+        "ehr_narrative": ehr
+    })
+    assert res.status_code == 200
+    case_id = res.json()["case_id"]
+
+    # Record clinical sign-off
+    signoff_res = client.post(f"/api/v1/determination/{case_id}/sign-off", json={
+        "signed_by": "Dr. Sarah Jenkins, MD, FACC",
+        "clinician_npi": "1487293810",
+        "clinician_credentials": "MD, FACC",
+        "attestation_notes": "Clinical findings verified against source documentation under CMS-0057-F."
+    })
+    assert signoff_res.status_code == 200
+    signoff_data = signoff_res.json()
+    assert signoff_data["determination_stage"] == "FINAL"
+    assert signoff_data["is_releasable"] is True
+    assert signoff_data["signed_off_by"] == "Dr. Sarah Jenkins, MD, FACC"
+
+    # Final retrieval endpoint now succeeds
+    final_res = client.get(f"/api/v1/determination/{case_id}/final")
+    assert final_res.status_code == 200
+    final_data = final_res.json()
+    assert final_data["determination_stage"] == "FINAL"
+    assert final_data["is_releasable"] is True
+
+    # Direct EHR push now succeeds
+    push_res = client.post(f"/api/v1/packet/{case_id}/ehr-push", json={
+        "case_id": case_id,
+        "ehr_system": "Epic Systems Hyperdrive"
+    })
+    assert push_res.status_code == 200
+    assert push_res.json()["status"] == "SUCCESS_TRANSMITTED"
+
+
+def test_override_preserves_original_system_output_byte_identical():
+    """
+    Task 1 & Task 6:
+    Proves that HumanOverrideService records the human decision without mutating
+    or rewriting the system's original output. The serialized original output is
+    preserved byte-identical.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    ehr = (
+        "Patient with ischemic cardiomyopathy. LVEF 25% on TTE.\n"
+        "GDMT maintained for 6 months. NYHA Class II. Remote MI 3 years ago."
+    )
+    original_adj = pipeline.adjudicate_sync("PT-OVERRIDE-BYTE-01", "NCD-20.4", ehr, save_record=False)
+    original_json_before = original_adj.model_dump_json()
+
+    overridden = HumanOverrideService.record_override(
+        original_adjudication=original_adj,
+        override_decision=AdjudicationDecision.DENIED,
+        override_reason="Severe non-cardiac comorbidities and palliative care transition.",
+        clinician_id="Dr. Jane Smith, MD",
+        clinician_role="Attending Cardiologist"
+    )
+
+    # Invariant 1: original_adjudication passed in remains unchanged
+    assert original_adj.model_dump_json() == original_json_before
+
+    # Invariant 2: stored original_system_output_json inside the override record matches byte-for-byte
+    assert overridden.original_system_output_json == original_json_before
+
+    # Invariant 3: overridden determination stage remains PROVISIONAL until human sign-off
+    assert overridden.determination_stage == "PROVISIONAL"
+    assert overridden.is_releasable is False
+
+

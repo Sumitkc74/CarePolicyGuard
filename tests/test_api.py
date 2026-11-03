@@ -342,7 +342,17 @@ def test_fhir_bundle_export_and_ehr_push_endpoints():
     assert "Claim" in resource_types
     assert "DocumentReference" in resource_types
 
-    # 3. Direct EHR Push Simulation
+    # 3. Sign off and Direct EHR Push Simulation
+    sign_off_res = client.post(
+        f"/api/v1/determination/{case_id}/sign-off",
+        json={
+            "signed_by": "Dr. Sarah Jenkins, MD",
+            "clinician_npi": "1043256787",
+            "attestation_notes": "Reviewed and approved for EHR transmission"
+        }
+    )
+    assert sign_off_res.status_code == 200
+
     push_res = client.post(
         f"/api/v1/packet/{case_id}/ehr-push",
         json={
@@ -482,7 +492,8 @@ def test_smart_addendum_deficiency_resolution_and_readjudication():
     assert addendum_data["addendum_id"].startswith("ADDENDUM-")
     assert addendum_data["signed_npi"] == "1043256787"
     assert addendum_data["updated_decision"] == "APPROVED"
-    assert addendum_data["updated_confidence"] >= 0.85
+    assert addendum_data["updated_sufficiency_score"] >= 0.85
+    assert addendum_data["updated_confidence"] is None
 
 def test_hipaa_audit_trail_inspection_and_csv_export():
     """Verify inspection and RFC 4180 CSV export of the tamper-evident audit ledger."""

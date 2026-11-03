@@ -40,7 +40,8 @@ def test_batch_adjudication_endpoint():
     # Patient 1: Post-MI >40d, LVEF 28%, >90d GDMT -> APPROVED
     res1 = data["results"][0]
     assert res1["decision"] == "APPROVED"
-    assert res1["calibrated_confidence"] >= 0.85
+    assert res1["sufficiency_score"] >= 0.85
+    assert res1["calibrated_confidence"] is None
     assert not res1["abstention_status"]
 
     # Patient 2: Acute STEMI 12 days ago (<40d exclusion) -> DENIED

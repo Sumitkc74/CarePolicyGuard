@@ -349,7 +349,11 @@ class MultiAgentVerificationPipeline:
             adjudication_decision=decision,
             abstention_status=abstention_status,
             raw_aggregate_confidence=raw_aggregate_conf,
-            calibrated_aggregate_confidence=calibrated_aggregate_conf,
+            calibrated_aggregate_confidence=None,
+            calibrated_confidence_explanation="No empirical calibration model fitted on held-out validation data; reporting heuristic sufficiency score",
+            determination_stage="PROVISIONAL",
+            is_releasable=False,
+            human_sign_off_status="PENDING_CLINICAL_SIGN_OFF",
             abstention_threshold=gate_tau,
             abstention_reason=abstention_reason,
             criterion_assessments=criteria_assessments,
@@ -389,7 +393,8 @@ class MultiAgentVerificationPipeline:
                     decision=decision.value,
                     abstention_status=abstention_status,
                     abstention_reason=abstention_reason,
-                    calibrated_confidence=calibrated_aggregate_conf,
+                    calibrated_confidence=None,
+                    sufficiency_score=calibrated_aggregate_conf,
                     raw_confidence=raw_aggregate_conf,
                     criterion_evaluations_json=json.dumps([c.model_dump() for c in criteria_assessments]),
                     evidence_spans_json=json.dumps(all_spans),
@@ -473,9 +478,9 @@ class MultiAgentVerificationPipeline:
             unmet_crit = total_crit - met_crit
 
             if adjudication.adjudication_decision == AdjudicationDecision.APPROVED:
-                rationale = f"All {total_crit} clinical criteria verified with calibrated confidence {adjudication.calibrated_aggregate_confidence:.1%}."
+                rationale = f"All {total_crit} clinical criteria verified with sufficiency score {adjudication.sufficiency_score:.1%}."
             elif adjudication.adjudication_decision == AdjudicationDecision.DEFERRED_TO_HUMAN:
-                rationale = f"Confidence ({adjudication.calibrated_aggregate_confidence:.1%}) below safety threshold or requires human auditor review."
+                rationale = f"Sufficiency score ({adjudication.sufficiency_score:.1%}) below safety threshold or requires human auditor review."
             else:
                 unmet_names = [
                     c.name or c.criterion_code for c in adjudication.criterion_assessments
@@ -490,6 +495,9 @@ class MultiAgentVerificationPipeline:
                 category=getattr(pol, "category", "Medicare Coverage"),
                 decision=adjudication.adjudication_decision,
                 calibrated_confidence=adjudication.calibrated_aggregate_confidence,
+                score_type=adjudication.score_type,
+                sufficiency_score=adjudication.sufficiency_score,
+                sufficiency_formula=adjudication.sufficiency_formula,
                 relevance_score=relevance_map.get(pol.policy_id, 0.0),
                 total_criteria=total_crit,
                 met_criteria=met_crit,
@@ -506,7 +514,7 @@ class MultiAgentVerificationPipeline:
         all_matches.sort(
             key=lambda m: (
                 1 if m.decision == AdjudicationDecision.APPROVED else (0.5 if m.decision == AdjudicationDecision.DEFERRED_TO_HUMAN else 0),
-                m.calibrated_confidence,
+                m.sufficiency_score,
                 m.relevance_score
             ),
             reverse=True

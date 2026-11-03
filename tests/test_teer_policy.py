@@ -23,7 +23,8 @@ def test_teer_mitraclip_policy_adjudication():
     assert resp.status_code == 200
     data = resp.json()
     assert data["adjudication_decision"] == "APPROVED"
-    assert data["calibrated_aggregate_confidence"] >= 0.85
+    assert data["sufficiency_score"] >= 0.85
+    assert data["calibrated_aggregate_confidence"] is None
     assert not data["abstention_status"]
 
     # 2. Non-qualifying: Mild MR fails criteria

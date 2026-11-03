@@ -50,7 +50,9 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = float(os.getenv("LLM_TEMPERATURE", "0.7"))
     LLM_SAMPLE_PASSES: int = int(os.getenv("LLM_SAMPLE_PASSES", "3"))
 
-    # CORS
+    # CORS & Networking
+    HOST: str = os.getenv("HOST", "0.0.0.0")
+    PORT: int = int(os.getenv("PORT", "8000"))
     BACKEND_CORS_ORIGINS: list[str] = ["*"]
 
     # Live Email Delivery (SMTP)

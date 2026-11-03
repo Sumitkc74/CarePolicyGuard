@@ -198,12 +198,51 @@ class PolicyRetrievalAgent:
             },
             "NCD-240.2": {
                 "cms_manual": "CMS Pub 100-03, Medicare National Coverage Determinations Manual",
-                "chapter_section": "Chapter 1, Part 4, Section 240.2 (Continuous Positive Airway Pressure for Obstructive Sleep Apnea)",
-                "effective_date": "2008-03-13",
+                "chapter_section": "Chapter 1, Part 4, Section 240.2 (Home Use of Oxygen)",
+                "effective_date": "2021-09-27",
                 "statutory_text_excerpt": (
-                    "A. General: The use of CPAP is covered for adults for the treatment of obstructive sleep apnea (OSA) if Apnea-Hypopnea Index (AHI) "
-                    "or Respiratory Disturbance Index (RDI) is >= 15 events per hour, or between 5 and 14 events per hour with documented comorbid hypertension, "
-                    "stroke, excessive daytime sleepiness, or ischemic heart disease."
+                    "A. General: Initial claims for long term oxygen therapy must be based on the results of a clinical test performed "
+                    "by a treating practitioner. Coverage requires arterial blood gas PaO2 <= 55 mmHg or oxygen saturation <= 88% at rest on room air "
+                    "in a chronic, clinically stable state."
+                )
+            },
+            "LCD-L33829": {
+                "cms_manual": "CMS DME MAC LCD L33829",
+                "chapter_section": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+                "effective_date": "2015-10-01",
+                "statutory_text_excerpt": (
+                    "Coverage Indications: An initial positive airway pressure device is covered for beneficiaries with an AHI or RDI >= 15 events per hour, "
+                    "or AHI/RDI between 5 and 14 with documented comorbid symptoms (hypertension, excessive daytime sleepiness, stroke, or ischemic heart disease). "
+                    "Requires prior face-to-face clinical evaluation."
+                )
+            },
+            "LCD-TOTAL-KNEE-01": {
+                "cms_manual": "CMS Regional MAC Local Coverage Determination (Reference Archetype)",
+                "chapter_section": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+                "effective_date": "2024-01-01",
+                "statutory_text_excerpt": (
+                    "UNVERIFIED: Benchmark reference archetype policy. Coverage for elective total knee arthroplasty requires documented limitation of motion "
+                    "(flexion <= 90 degrees), failure of non-surgical conservative therapy for >= 180 days, and absence of active joint sepsis."
+                )
+            },
+            "NCD-20.29": {
+                "cms_manual": "CMS Pub 100-03, Medicare National Coverage Determinations Manual",
+                "chapter_section": "Chapter 1, Part 1, Section 20.29 (Hyperbaric Oxygen Therapy)",
+                "effective_date": "2017-04-03",
+                "statutory_text_excerpt": (
+                    "B. Covered Conditions: Hyperbaric oxygen therapy is covered as adjunctive therapy for diabetic wounds of the lower extremities in patients "
+                    "who have Wagner grade III or higher lesions and have failed at least 30 continuous days of standard wound therapy without measurable healing, "
+                    "with vascular status evaluated."
+                )
+            },
+            "NCD-220.13": {
+                "cms_manual": "CMS Pub 100-03, Medicare National Coverage Determinations Manual",
+                "chapter_section": "Chapter 1, Part 4, Section 220.13 (Percutaneous Left Atrial Appendage Closure)",
+                "effective_date": "2024-01-01",
+                "statutory_text_excerpt": (
+                    "B. Covered Indications: Percutaneous LAAC is covered for patients with non-valvular atrial fibrillation at high risk for stroke "
+                    "(CHADS2 >= 2 or CHA2DS2-VASc >= 3) who have a formal clinical rationale establishing unsuitability for long-term oral anticoagulation, "
+                    "and imaging confirming absence of intracardiac thrombus."
                 )
             }
         }

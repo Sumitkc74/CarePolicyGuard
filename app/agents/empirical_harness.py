@@ -86,7 +86,8 @@ class EmpiricalResearchHarness:
             lat = (time.perf_counter() - t0) * 1000.0
             latencies.append(lat)
             dec = adj.adjudication_decision.value if hasattr(adj.adjudication_decision, "value") else str(adj.adjudication_decision)
-            conf = round(float(adj.calibrated_aggregate_confidence), 3)
+            score_val = adj.sufficiency_score if adj.calibrated_aggregate_confidence is None else adj.calibrated_aggregate_confidence
+            conf = round(float(score_val), 3)
             grounded = all(a.grounding_status for a in adj.verification_audits)
 
             decisions.append(dec)

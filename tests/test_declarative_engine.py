@@ -171,7 +171,8 @@ def test_declarative_policy_live_pipeline_adjudication():
     )
     assert result_det.adjudication_decision == AdjudicationDecision.APPROVED
     assert len(result_det.criterion_assessments) == 3
-    assert result_det.calibrated_aggregate_confidence >= 0.85
+    assert result_det.sufficiency_score >= 0.85
+    assert result_det.calibrated_aggregate_confidence is None
 
     # 2. Test live declarative mode
     result_decl = pipeline.adjudicate_sync(
@@ -183,7 +184,8 @@ def test_declarative_policy_live_pipeline_adjudication():
     )
     assert result_decl.adjudication_decision == AdjudicationDecision.APPROVED
     assert len(result_decl.criterion_assessments) == 3
-    assert result_decl.calibrated_aggregate_confidence >= 0.85
+    assert result_decl.sufficiency_score >= 0.85
+    assert result_decl.calibrated_aggregate_confidence is None
 
     # 3. Test non-qualifying case (flexion 110 degrees > 90) produces DENIED
     non_qualifying_note = """

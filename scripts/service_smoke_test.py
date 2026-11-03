@@ -100,12 +100,14 @@ def run_live_smoke_test() -> int:
 
         decision = adj_data.get("adjudication_decision")
         confidence = adj_data.get("calibrated_aggregate_confidence")
+        sufficiency = adj_data.get("sufficiency_score")
         assessments = adj_data.get("criterion_assessments", [])
         audit_hash = adj_data.get("audit_hash", "N/A")
 
         print("[+] Synthetic adjudication PASSED:")
         print(f"    - Policy ID: {adj_data.get('policy_id')}")
         print(f"    - Decision: {decision}")
+        print(f"    - Sufficiency Score: {sufficiency}")
         print(f"    - Calibrated Confidence: {confidence}")
         print(f"    - Criteria Evaluated: {len(assessments)}")
         print(f"    - Audit Hash: {audit_hash[:16]}...")

@@ -67,6 +67,8 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                 patient_id_masked=adj.patient_id_masked,
                 policy_id=adj.policy_id,
                 decision=adj.adjudication_decision,
+                score_type=getattr(adj, "score_type", "sufficiency_score"),
+                sufficiency_score=getattr(adj, "sufficiency_score", None),
                 calibrated_confidence=adj.calibrated_aggregate_confidence,
                 raw_confidence=adj.raw_aggregate_confidence,
                 abstention_status=adj.abstention_status,

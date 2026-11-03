@@ -116,6 +116,7 @@ class HumanOverrideService:
             "is_overridden": True,
             "override_decision": override_decision.value,
             "original_system_decision": original_adjudication.adjudication_decision.value,
+            "original_system_output_json": original_adjudication.model_dump_json(),
             "override_reason": override_reason.strip(),
             "clinician_id": clinician_id,
             "clinician_role": clinician_role,
@@ -125,10 +126,13 @@ class HumanOverrideService:
         }
 
         # Update copy with override container while keeping original fields intact
+        adj_dict["original_system_output_json"] = original_adjudication.model_dump_json()
         adj_dict["human_override"] = override_payload
         adj_dict["human_sign_off_status"] = "OVERRIDDEN"
         adj_dict["signed_off_by"] = clinician_id
         adj_dict["signed_off_at"] = timestamp_str
+        adj_dict["determination_stage"] = "PROVISIONAL"
+        adj_dict["is_releasable"] = False
 
         # Re-compute cryptographic audit seal certifying the override event
         new_audit_hash = compute_audit_hash(
@@ -144,6 +148,47 @@ class HumanOverrideService:
 
         updated = FinalAdjudication(**adj_dict)
         return updated
+
+
+class HumanSignOffService:
+    """
+    Mandatory Human Sign-Off Gate Service (Task 1).
+    Enforces that a determination cannot transition from PROVISIONAL to FINAL
+    or become releasable without an explicit, recorded human clinician sign-off.
+    """
+
+    @classmethod
+    def sign_off(
+        cls,
+        adjudication: FinalAdjudication,
+        signed_by: str,
+        clinician_npi: Optional[str] = None,
+        clinician_credentials: Optional[str] = None,
+        notes: Optional[str] = None
+    ) -> FinalAdjudication:
+        if not signed_by or not signed_by.strip():
+            raise ValueError("Clinical sign-off requires an identified reviewer / clinician name or ID.")
+
+        timestamp_str = datetime.now(timezone.utc).isoformat()
+        adj_dict = adjudication.model_dump()
+        adj_dict["determination_stage"] = "FINAL"
+        adj_dict["is_releasable"] = True
+        adj_dict["human_sign_off_status"] = "SIGNED_OFF"
+        adj_dict["signed_off_by"] = signed_by.strip()
+        adj_dict["signed_off_at"] = timestamp_str
+
+        attestation = f"[Clinician Sign-Off Gate Passed]: Reviewed and approved by {signed_by.strip()}"
+        if clinician_credentials:
+            attestation += f", {clinician_credentials.strip()}"
+        if clinician_npi:
+            attestation += f" (NPI: {clinician_npi.strip()})"
+        if notes:
+            attestation += f". Notes: {notes.strip()}"
+
+        existing_notes = adj_dict.get("required_clinician_action_notes") or ""
+        adj_dict["required_clinician_action_notes"] = (existing_notes + "\n" + attestation).strip()
+
+        return FinalAdjudication(**adj_dict)
 
 
 class ResubmissionLifecycleManager:

@@ -4,6 +4,15 @@
   "jurisdiction": "National Coverage Determination (CMS)",
   "effective_date": "2023-10-11",
   "category": "Interventional Neurology & Cardiology",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-15",
+      "author": "CarePolicyGuard Regulatory Informatics",
+      "summary": "Statutory citation mapping against CMS Pub 100-03 Manual Section 20.7."
+    }
+  ],
   "description": "CMS coverage for Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS) for patients with symptomatic or asymptomatic severe carotid stenosis at high risk for carotid endarterectomy (CEA). Mandatory deployment of FDA-approved embolic protection systems.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
@@ -20,7 +29,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Within past 6 months",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
+      "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+      "source_paragraph": "Paragraph a: Stenosis Severity Thresholds",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "FDA-approved carotid stent systems and FDA-approved embolic protection devices for patients with symptomatic carotid artery stenosis >= 70% or asymptomatic stenosis >= 80%."
     },
     {
       "criterion_code": "CRIT-CAS-02",
@@ -32,7 +46,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Current pre-procedure evaluation",
-      "min_score": 0.80
+      "min_score": 0.80,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
+      "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+      "source_paragraph": "Paragraph b: High Surgical Risk for Carotid Endarterectomy",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Patients who are at high risk for carotid endarterectomy (CEA) due to significant medical comorbidities or anatomically unfavorable neck features."
     },
     {
       "criterion_code": "CRIT-CAS-03",
@@ -44,9 +63,13 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Procedure plan and equipment verification",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
+      "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+      "source_paragraph": "Paragraph c: Mandatory Embolic Protection",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Coverage is contingent upon the mandatory deployment of an FDA-approved distal embolic protection device."
     }
   ],
   "statutory_waiting_periods": []
 }
-

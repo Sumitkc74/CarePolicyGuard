@@ -75,3 +75,29 @@ def test_scope_and_signoff_in_docs_and_ui():
     assert "PENDING CLINICAL SIGN-OFF" in index_html
     assert "Tamper-evident chain-of-custody seals" in index_html
 
+
+def test_heldout_evaluation_wording_uses_route_a_and_b_not_clinician_sign_off():
+    """
+    Task 4 Consistency Test:
+    Proves that no held-out evaluation report or evaluation runner script presents
+    clinician sign-off as a requirement or pending gate for held-out evaluation.
+    Must cite Route A (external clinician review) or Route B (blind dual annotation).
+    """
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+
+    # 1. Check HELD_OUT_EVALUATION_REPORT.md
+    report_path = root / "carepolicyguard-heldout" / "HELD_OUT_EVALUATION_REPORT.md"
+    if report_path.exists():
+        report_text = report_path.read_text(encoding="utf-8")
+        assert "pending clinician sign-off" not in report_text, "Found forbidden 'pending clinician sign-off' in heldout report"
+        assert "Route A" in report_text and "Route B" in report_text, "Heldout report must cite Route A and Route B"
+
+    # 2. Check evaluate_heldout.py
+    eval_script_path = root / "carepolicyguard-heldout" / "evaluate_heldout.py"
+    if eval_script_path.exists():
+        eval_script_text = eval_script_path.read_text(encoding="utf-8")
+        assert "pending clinician sign-off" not in eval_script_text, "Found forbidden 'pending clinician sign-off' in evaluate_heldout.py"
+        assert "Route A" in eval_script_text and "Route B" in eval_script_text, "evaluate_heldout.py must cite Route A and Route B"
+
+

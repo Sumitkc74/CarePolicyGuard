@@ -4,6 +4,15 @@
   "jurisdiction": "Local Coverage Determination (LCD)",
   "effective_date": "2015-10-01",
   "category": "Pulmonology / Durable Medical Equipment",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-15",
+      "author": "CarePolicyGuard Regulatory Informatics",
+      "summary": "Statutory citation mapping against DME MAC LCD L33829."
+    }
+  ],
   "description": "Medicare local coverage determination for CPAP/APAP therapy in adult obstructive sleep apnea (OSA). Requires documented diagnostic polysomnography with AHI >= 15 events/hr or AHI 5-14 with documented comorbid hypertension, stroke, or excessive daytime sleepiness, and face-to-face clinical evaluation prior to sleep study.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
@@ -20,7 +29,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Diagnostic sleep study",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
+      "source_section": "Coverage Indications, Limitations, and/or Medical Necessity - Initial Coverage",
+      "source_paragraph": "Paragraph 1: AHI or RDI >= 15 events/hr, or AHI/RDI >= 5 and <= 14 with documented comorbid hypertension, stroke, or daytime sleepiness",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "An initial positive airway pressure device is covered for beneficiaries with an AHI or RDI >= 15 events per hour, or an AHI or RDI >= 5 and <= 14 events per hour with documented symptoms of excessive daytime sleepiness, impaired cognition, mood disorders, or insomnia, or documented hypertension, ischemic heart disease, or history of stroke."
     },
     {
       "criterion_code": "CRIT-CPAP-02",
@@ -32,7 +46,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Prior to diagnostic sleep study",
-      "min_score": 0.80
+      "min_score": 0.80,
+      "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
+      "source_section": "General Requirements",
+      "source_paragraph": "Paragraph A: Face-to-Face Clinical Evaluation",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Prior to the sleep test, the beneficiary must have a face-to-face clinical evaluation by the treating physician or practitioner to assess the patient for obstructive sleep apnea."
     }
   ],
   "statutory_waiting_periods": []

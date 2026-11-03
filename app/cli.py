@@ -59,7 +59,9 @@ def handle_adjudicate(args):
         print(f"Patient (Masked):      {result.patient_id_masked} (HIPAA Safe Harbor)")
         print(f"Governing Policy:      {result.policy_id} - {result.policy_title}")
         print(f"Final Determination:   {result.adjudication_decision.value}")
-        print(f"Calibrated Confidence: {result.calibrated_aggregate_confidence * 100:.1f}%")
+        cal_str = f"{result.calibrated_aggregate_confidence * 100:.1f}%" if result.calibrated_aggregate_confidence is not None else "None (Uncalibrated; using Sufficiency Score)"
+        print(f"Sufficiency Score:     {result.sufficiency_score * 100:.1f}%")
+        print(f"Calibrated Confidence: {cal_str}")
         print(f"Safety Gate (tau):     {result.abstention_threshold:.2f} (Abstained: {result.abstention_status})")
         print(f"Execution Latency:     {result.execution_time_ms} ms")
         print(f"SHA-256 Audit Seal:    {result.audit_hash}")
@@ -114,7 +116,8 @@ def handle_export_audit(args):
             f.write("Event ID,Timestamp (UTC),Case ID,Patient Masked,Policy ID,Decision,Calibrated Confidence,Audit Hash (SHA-256)\n")
             for l in logs:
                 ts = l.created_at.isoformat() if l.created_at else "N/A"
-                f.write(f'"AUD-{l.id:05d}","{ts}","{l.case_id}","{l.patient_id_masked}","{l.policy_id}","{l.decision}",{l.calibrated_confidence:.4f},"{l.audit_hash}"\n')
+                cal_s = f"{l.calibrated_confidence:.4f}" if l.calibrated_confidence is not None else "null"
+                f.write(f'"AUD-{l.id:05d}","{ts}","{l.case_id}","{l.patient_id_masked}","{l.policy_id}","{l.decision}",{cal_s},"{l.audit_hash}"\n')
         print(f"[+] Successfully exported {len(logs)} audit records to '{output_path}'.")
     finally:
         db.close()

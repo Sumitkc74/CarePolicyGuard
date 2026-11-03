@@ -55,6 +55,8 @@ from app.schemas.contracts import (
     CMSCoveragePacket,
     SubmitPacketRequest,
     SubmissionReceipt,
+    SignOffRequest,
+    SignOffResponse,
     PeerToPeerAppealRequest,
     PeerToPeerAppealLetter,
     EHRPushRequest,
@@ -556,6 +558,7 @@ def sanitize_audit_log_for_user(log: AdjudicationLog, current_user: Optional[Use
         "abstention_status": log.abstention_status,
         "abstention_reason": log.abstention_reason,
         "calibrated_confidence": log.calibrated_confidence,
+        "sufficiency_score": getattr(log, "sufficiency_score", None),
         "raw_confidence": log.raw_confidence,
         "criterion_evaluations_json": log.criterion_evaluations_json,
         "evidence_spans_json": log.evidence_spans_json,
@@ -1084,6 +1087,124 @@ def get_coverage_packet(case_id: str, db: Session = Depends(get_db)):
     _EPHEMERAL_PACKETS[case_id] = packet
     return packet
 
+@api_router.post("/determination/{case_id}/sign-off", response_model=SignOffResponse, summary="Record Human Clinician Sign-Off on Determination")
+def sign_off_clinical_determination(
+    case_id: str,
+    request: SignOffRequest,
+    current_user: Optional[User] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Mandatory Human Sign-Off Gate (Task 1):
+    Records licensed clinician sign-off on a provisional determination,
+    transitioning its release lifecycle stage from 'PROVISIONAL' to 'FINAL'.
+    Only after sign-off can the determination be released, exported as final,
+    or transmitted to external payers / EHR systems.
+    """
+    now = datetime.now(timezone.utc)
+    signed_name = request.signed_by or (current_user.username if current_user else "Attending Clinician")
+
+    adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
+    if adj:
+        from app.services.deferral_queue import HumanSignOffService
+        signed_adj = HumanSignOffService.sign_off(
+            adjudication=adj,
+            signed_by=signed_name,
+            clinician_npi=request.clinician_npi,
+            clinician_credentials=request.clinician_credentials,
+            notes=request.attestation_notes
+        )
+        _EPHEMERAL_ADJUDICATIONS[case_id] = signed_adj
+
+    if case_id in _EPHEMERAL_PACKETS:
+        packet = _EPHEMERAL_PACKETS[case_id]
+        packet.determination_stage = "FINAL"
+        packet.is_releasable = True
+        packet.human_sign_off_status = "SIGNED_OFF"
+        packet.signed_by = signed_name
+        packet.signed_at = now.isoformat()
+        if request.attestation_notes:
+            packet.clinician_action_notes = ((packet.clinician_action_notes or "") + f"\n[Sign-Off Attestation]: {request.attestation_notes}").strip()
+
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if log:
+        log.signed_by = signed_name
+        log.signed_at = now
+        log.submission_status = "SIGNED_OFF"
+        if request.attestation_notes:
+            log.required_clinician_action_notes = ((log.required_clinician_action_notes or "") + f"\n[Sign-Off Attestation]: {request.attestation_notes}").strip()
+        db.commit()
+
+    if not adj and case_id not in _EPHEMERAL_PACKETS and not log:
+        raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
+
+    return SignOffResponse(
+        case_id=case_id,
+        determination_stage="FINAL",
+        human_sign_off_status="SIGNED_OFF",
+        is_releasable=True,
+        signed_off_by=signed_name,
+        signed_off_at=now.isoformat(),
+        message="Determination successfully signed off. Lifecycle stage is now FINAL (releasable)."
+    )
+
+@api_router.get("/determination/{case_id}", response_model=FinalAdjudication, summary="Retrieve Determination")
+def get_determination_record(case_id: str, db: Session = Depends(get_db)):
+    """
+    Retrieves the clinical determination for case_id.
+    Exposes determination_stage ('PROVISIONAL' vs 'FINAL') and is_releasable.
+    """
+    adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
+    if adj:
+        return adj
+
+    packet = _EPHEMERAL_PACKETS.get(case_id)
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if not packet and not log:
+        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
+
+    dummy_packet = get_coverage_packet(case_id, db=db)
+    stage = "FINAL" if (log and log.signed_by) or (dummy_packet and dummy_packet.determination_stage == "FINAL") else "PROVISIONAL"
+    releasable = stage == "FINAL"
+    signoff_status = "SIGNED_OFF" if releasable else "PENDING_CLINICAL_SIGN_OFF"
+
+    return FinalAdjudication(
+        case_id=case_id,
+        patient_id_masked=dummy_packet.patient_id_masked,
+        policy_id=dummy_packet.policy_id,
+        policy_title=dummy_packet.policy_title,
+        adjudication_decision=dummy_packet.adjudication_decision,
+        abstention_status=dummy_packet.abstention_status,
+        raw_aggregate_confidence=dummy_packet.sufficiency_score,
+        calibrated_aggregate_confidence=dummy_packet.calibrated_confidence,
+        score_type=dummy_packet.score_type,
+        sufficiency_score=dummy_packet.sufficiency_score,
+        sufficiency_formula=dummy_packet.sufficiency_formula,
+        determination_stage=stage,
+        is_releasable=releasable,
+        human_sign_off_status=signoff_status,
+        signed_off_by=dummy_packet.signed_by,
+        signed_off_at=dummy_packet.signed_at,
+        audit_hash=dummy_packet.audit_hash,
+        sanitized_ehr_text="",
+        timestamp=datetime.now(timezone.utc)
+    )
+
+@api_router.get("/determination/{case_id}/final", response_model=FinalAdjudication, summary="Retrieve Final Released Determination")
+def get_final_determination(case_id: str, db: Session = Depends(get_db)):
+    """
+    Enforces the Human Sign-Off Gate:
+    Retrieves the determination ONLY if it has been signed off and reached 'FINAL' stage.
+    Blocks retrieval of provisional determinations with HTTP 412 Precondition Failed.
+    """
+    adj = get_determination_record(case_id, db=db)
+    if adj.determination_stage != "FINAL" or not adj.is_releasable:
+        raise HTTPException(
+            status_code=status.HTTP_412_PRECONDITION_FAILED,
+            detail="Determination is PROVISIONAL and cannot be retrieved or released as final without recorded human sign-off."
+        )
+    return adj
+
 @api_router.post("/packet/submit", response_model=SubmissionReceipt, summary="Sign & Submit Reviewed Policy Packet to Insurance")
 def submit_coverage_to_insurance(
     request: SubmitPacketRequest,
@@ -1097,6 +1218,12 @@ def submit_coverage_to_insurance(
     """
     now = datetime.now(timezone.utc)
     transaction_id = f"CMS-EDI-837-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+
+    if not request.signed_by or not request.signed_by.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Clinician sign-off signature is required to release and submit determination."
+        )
 
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == request.case_id).first()
     if log:
@@ -1113,12 +1240,33 @@ def submit_coverage_to_insurance(
     elif request.case_id in _EPHEMERAL_PACKETS:
         packet = _EPHEMERAL_PACKETS[request.case_id]
         packet.submission_status = "SUBMITTED_TO_PAYER"
+        packet.determination_stage = "FINAL"
+        packet.is_releasable = True
+        packet.human_sign_off_status = "SIGNED_OFF"
         packet.signed_by = request.signed_by
         packet.signed_at = now.isoformat()
         packet.payer_transaction_id = transaction_id
         audit_hash = packet.audit_hash
     else:
         raise HTTPException(status_code=404, detail=f"Case '{request.case_id}' not found.")
+
+    if request.case_id in _EPHEMERAL_PACKETS:
+        p = _EPHEMERAL_PACKETS[request.case_id]
+        p.determination_stage = "FINAL"
+        p.is_releasable = True
+        p.human_sign_off_status = "SIGNED_OFF"
+        p.signed_by = request.signed_by
+        p.signed_at = now.isoformat()
+
+    if request.case_id in _EPHEMERAL_ADJUDICATIONS:
+        adj = _EPHEMERAL_ADJUDICATIONS[request.case_id]
+        from app.services.deferral_queue import HumanSignOffService
+        signed_adj = HumanSignOffService.sign_off(
+            adjudication=adj,
+            signed_by=request.signed_by,
+            notes=request.clinician_notes
+        )
+        _EPHEMERAL_ADJUDICATIONS[request.case_id] = signed_adj
 
     return SubmissionReceipt(
         case_id=request.case_id,
@@ -1148,6 +1296,7 @@ def generate_appeal_letter(
 @api_router.get("/packet/{case_id}/fhir", summary="Export Standard HL7 FHIR R4 Da Vinci PAS Bundle")
 def export_fhir_bundle(
     case_id: str,
+    require_final: bool = False,
     db: Session = Depends(get_db)
 ):
     """
@@ -1155,6 +1304,11 @@ def export_fhir_bundle(
     the Da Vinci Prior Authorization Support (PAS) specification.
     """
     packet = get_coverage_packet(case_id, db=db)
+    if require_final and getattr(packet, "determination_stage", "PROVISIONAL") != "FINAL" and not getattr(packet, "is_releasable", False):
+        raise HTTPException(
+            status_code=status.HTTP_412_PRECONDITION_FAILED,
+            detail="Determination is PROVISIONAL and cannot be exported as final without recorded human sign-off."
+        )
     return FHIRExportService.generate_fhir_bundle(packet)
 
 @api_router.post("/packet/{case_id}/ehr-push", response_model=EHRPushReceipt, summary="Direct Interoperability Push to Hospital EHR")
@@ -1168,6 +1322,11 @@ def push_packet_to_ehr(
     into the hospital EHR (Epic / Cerner) as an official FHIR DocumentReference.
     """
     packet = get_coverage_packet(case_id, db=db)
+    if getattr(packet, "determination_stage", "PROVISIONAL") != "FINAL" and not getattr(packet, "is_releasable", False) and getattr(packet, "human_sign_off_status", "") != "SIGNED_OFF":
+        raise HTTPException(
+            status_code=status.HTTP_412_PRECONDITION_FAILED,
+            detail="Determination is PROVISIONAL and cannot be released or pushed to hospital EHR without recorded human clinical sign-off."
+        )
     return FHIRExportService.push_to_ehr(packet, request)
 
 @api_router.post("/packet/{case_id}/addendum", response_model=ClinicalAddendumResponse, summary="Append Signed Clinical Addendum & Re-Adjudicate")
@@ -1243,6 +1402,7 @@ async def append_clinical_addendum(
         log.abstention_status = updated_adj.abstention_status
         log.abstention_reason = updated_adj.abstention_reason
         log.calibrated_confidence = updated_adj.calibrated_aggregate_confidence
+        log.sufficiency_score = updated_adj.sufficiency_score
         log.audit_hash = updated_adj.audit_hash
         log.required_clinician_action_notes = (
             (log.required_clinician_action_notes or "") +
@@ -1261,9 +1421,10 @@ async def append_clinical_addendum(
         prior_decision=prior_decision,
         updated_decision=updated_adj.adjudication_decision.value,
         updated_confidence=updated_adj.calibrated_aggregate_confidence,
+        updated_sufficiency_score=updated_adj.sufficiency_score,
         audit_hash=updated_adj.audit_hash,
         updated_adjudication=updated_adj,
-        message=f"Addendum {addendum_id} successfully appended. Case re-evaluated: decision updated to {updated_adj.adjudication_decision.value} ({updated_adj.calibrated_aggregate_confidence:.1%} confidence)."
+        message=f"Addendum {addendum_id} successfully appended. Case re-evaluated: decision updated to {updated_adj.adjudication_decision.value} ({updated_adj.sufficiency_score:.1%} sufficiency score)."
     )
 
 @api_router.get("/audit/trail", response_model=AuditTrailResponse, summary="Inspect HIPAA & RAC Audit Trail")
@@ -1290,7 +1451,7 @@ def get_audit_trail(db: Session = Depends(get_db)):
             actor_role=role,
             action_details=(
                 f"Policy: {l.policy_id} | Outcome: {l.decision} | "
-                f"Confidence: {l.calibrated_confidence:.1%} | Status: {l.submission_status}"
+                f"Confidence: {f'{l.calibrated_confidence:.1%}' if l.calibrated_confidence is not None else 'Uncalibrated'} | Status: {l.submission_status}"
             ),
             audit_hash=l.audit_hash
         ))
@@ -1329,7 +1490,7 @@ def export_audit_trail_fhir_bundle(db: Session = Depends(get_db)):
             "action": "E",
             "recorded": l.created_at.isoformat() if l.created_at else datetime.now(timezone.utc).isoformat(),
             "outcome": "0" if l.decision == "APPROVED" else "4",
-            "outcomeDesc": f"Adjudication Decision: {l.decision} (Confidence: {l.calibrated_confidence:.1%})",
+            "outcomeDesc": f"Adjudication Decision: {l.decision} (Confidence: {f'{l.calibrated_confidence:.1%}' if l.calibrated_confidence is not None else 'Uncalibrated'})",
             "agent": [
                 {
                     "type": {
@@ -1429,7 +1590,8 @@ def export_audit_trail_csv(db: Session = Depends(get_db)):
         actor = l.signed_by or "CarePolicyGuard Multi-Agent Engine"
         role = "Clinician" if l.signed_by else "Autonomous Engine"
         ts = l.created_at.isoformat() if l.created_at else datetime.now(timezone.utc).isoformat()
-        details = f"Policy {l.policy_id} - Outcome {l.decision} (Confidence {l.calibrated_confidence:.1%}) - Status {l.submission_status}"
+        conf_label = f"{l.calibrated_confidence:.1%}" if l.calibrated_confidence is not None else "Uncalibrated"
+        details = f"Policy {l.policy_id} - Outcome {l.decision} (Confidence {conf_label}) - Status {l.submission_status}"
         details_escaped = details.replace('"', '""')
         output.write(f'"AUD-EVT-{l.id:05d}","{ts}","{action_type}","{l.case_id}","{l.patient_id_masked}","{actor}","{role}","{details_escaped}","{l.audit_hash}"\n')
 

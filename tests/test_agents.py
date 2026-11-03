@@ -147,7 +147,8 @@ async def test_end_to_end_pipeline_approval(sample_ehr):
     )
     assert result.adjudication_decision == AdjudicationDecision.APPROVED
     assert result.abstention_status is False
-    assert result.calibrated_aggregate_confidence >= 0.85
+    assert result.sufficiency_score >= 0.85
+    assert result.calibrated_aggregate_confidence is None
     assert len(result.audit_hash) == 64
 
 def test_criteria_evaluator_lvef_hfpef_distinction():

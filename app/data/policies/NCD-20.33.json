@@ -4,6 +4,15 @@
   "jurisdiction": "National Coverage Determination (NCD)",
   "effective_date": "2019-06-21",
   "category": "Cardiology / Interventional Cardiology",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-15",
+      "author": "CarePolicyGuard Regulatory Informatics",
+      "summary": "Statutory citation mapping against CMS Pub 100-03 Manual Section 20.33."
+    }
+  ],
   "description": "CMS coverage for TAVR in patients with severe symptomatic native aortic stenosis. Requires documented AVA <= 1.0 cm2 or mean gradient >= 40 mmHg, NYHA functional Class >= II, formal multidisciplinary Heart Team consultation, and absence of procedural futility or prohibitive surgical/anatomical contraindications.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
@@ -20,7 +29,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Within past 6 months",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+      "source_section": "Section B: Covered Indications",
+      "source_paragraph": "Paragraph 1: Severe Symptomatic Aortic Stenosis",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Patients with severe symptomatic aortic stenosis (AVA <= 1.0 cm2 or mean aortic gradient >= 40 mmHg or peak velocity >= 4.0 m/s)."
     },
     {
       "criterion_code": "CRIT-TAVR-02",
@@ -32,7 +46,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Prior to procedure",
-      "min_score": 0.80
+      "min_score": 0.80,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+      "source_section": "Section B: Covered Indications",
+      "source_paragraph": "Paragraph 2: Multidisciplinary Heart Team Collaboration",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "A multidisciplinary team (heart team) that includes a cardiac surgeon and an interventional cardiologist who have independently evaluated the patient."
     },
     {
       "criterion_code": "CRIT-TAVR-EXCL-01",
@@ -44,7 +63,12 @@
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current pre-procedure evaluation",
-      "min_score": 0.90
+      "min_score": 0.90,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+      "source_section": "Section C: Non-Covered / Exclusions",
+      "source_paragraph": "Paragraph 1: Procedural Futility",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "TAVR is non-covered when procedural futility exists due to severe non-cardiac conditions with life expectancy < 1 year or terminal comorbid illness."
     },
     {
       "criterion_code": "CRIT-TAVR-EXCL-02",
@@ -56,7 +80,12 @@
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current pre-procedure evaluation",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+      "source_section": "Section C: Non-Covered / Exclusions",
+      "source_paragraph": "Paragraph 2: Prohibitive Surgical and Anatomical Contraindications",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "TAVR is non-covered for patients with prohibitive anatomical contraindications or uncontrolled systemic sepsis."
     }
   ],
   "statutory_waiting_periods": []

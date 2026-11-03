@@ -87,6 +87,28 @@ class CalibrationHarness:
         p = 1.0 / (1.0 + math.exp(-scaled_logit))
         return round(p, 4)
 
+    def calibrate_determination(self, adjudication: Any) -> Any:
+        """
+        Applies empirical calibration from validation-fitted harness to a FinalAdjudication.
+        Sets calibrated_aggregate_confidence to the empirical calibrated probability
+        and explains the calibration method and temperature parameter.
+        """
+        if not self.is_fitted:
+            raise RuntimeError("Cannot calibrate determination: harness is not fitted on validation data.")
+
+        from app.schemas.contracts import FinalAdjudication
+        score_to_calibrate = getattr(adjudication, "sufficiency_score", None)
+        if score_to_calibrate is None:
+            score_to_calibrate = getattr(adjudication, "raw_aggregate_confidence", 0.85)
+
+        calibrated_prob = self.predict_probability(score_to_calibrate)
+        adj_dict = adjudication.model_dump()
+        adj_dict["calibrated_aggregate_confidence"] = calibrated_prob
+        adj_dict["calibrated_confidence_explanation"] = (
+            f"Empirically calibrated via Temperature Scaling (T={self.temperature:.3f}) fitted on validation partition."
+        )
+        return FinalAdjudication(**adj_dict)
+
     def evaluate(
         self,
         test_dataset: List[Dict[str, Any]],

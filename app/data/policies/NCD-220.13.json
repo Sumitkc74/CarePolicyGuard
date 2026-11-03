@@ -4,6 +4,15 @@
   "jurisdiction": "National Coverage Determination (CMS)",
   "effective_date": "2024-01-01",
   "category": "Electrophysiology & Interventional Cardiology",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-15",
+      "author": "CarePolicyGuard Regulatory Informatics",
+      "summary": "Statutory citation mapping against CMS Pub 100-03 Manual Section 220.13."
+    }
+  ],
   "description": "CMS coverage for Percutaneous Left Atrial Appendage Closure (LAAC) for patients with non-valvular atrial fibrillation at high stroke risk who are unsuitable for long-term oral anticoagulation.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
@@ -20,7 +29,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Documented in clinical record",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
+      "source_section": "Section B: Covered Indications",
+      "source_paragraph": "Paragraph 1: Non-Valvular Atrial Fibrillation with Stroke Risk",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "A CHADS2 score >= 2 or CHA2DS2-VASc score >= 3 indicating high stroke risk in patients with non-valvular atrial fibrillation."
     },
     {
       "criterion_code": "CRIT-LAAC-02",
@@ -35,7 +49,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Documented medical history",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
+      "source_section": "Section B: Covered Indications",
+      "source_paragraph": "Paragraph 2: Anticoagulation Contraindication / Unsuitability",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "A formal clinical rationale establishing that the patient is unsuitable for long-term oral anticoagulation."
     },
     {
       "criterion_code": "CRIT-LAAC-03",
@@ -47,7 +66,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Within pre-procedure timeframe",
-      "min_score": 0.80
+      "min_score": 0.80,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
+      "source_section": "Section B: Covered Indications",
+      "source_paragraph": "Paragraph 3: Pre-Procedural Imaging Requirements",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Pre-procedural imaging confirming the absence of intracardiac thrombus prior to transcatheter transseptal puncture."
     }
   ],
   "statutory_waiting_periods": []

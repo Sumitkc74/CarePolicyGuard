@@ -111,3 +111,59 @@ def test_selective_risk_threshold_derivation():
     assert derived["target_false_approval_rate"] == 0.0
     assert "uncalibrated_operating_tradeoff_note" in derived
 
+
+def test_uncalibrated_determination_emits_null_calibrated_confidence():
+    """
+    Task 3: Proves that in normal uncalibrated runtime, the pipeline outputs
+    a documented sufficiency score and strictly sets calibrated_aggregate_confidence to None,
+    ensuring no heuristic value wears a calibrated name.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    ehr = (
+        "CARDIOLOGY NOTE: Patient with ischemic cardiomyopathy.\n"
+        "Echocardiogram confirms LVEF 24%. NYHA Class II dyspnea.\n"
+        "Maintained on GDMT (carvedilol and lisinopril) for 6 months.\n"
+        "Myocardial infarction occurred 2 years ago. No acute cardiogenic shock."
+    )
+    result = pipeline.adjudicate_sync("PT-TEST-CAL-HONEST", "NCD-20.4", ehr, save_record=False)
+
+    assert result.score_type == "sufficiency_score"
+    assert result.sufficiency_score is not None
+    assert result.sufficiency_score > 0.0
+    # Strictly null when uncalibrated
+    assert result.calibrated_aggregate_confidence is None
+    assert "No empirical calibration model fitted" in result.calibrated_confidence_explanation
+
+
+def test_genuinely_calibrated_value_reported_when_produced_via_harness():
+    """
+    Task 3: Proves that an empirical calibrated confidence value is ONLY populated
+    when produced through the calibration harness on validation data.
+    """
+    pipeline = MultiAgentVerificationPipeline()
+    ehr = (
+        "CARDIOLOGY NOTE: Patient with ischemic cardiomyopathy.\n"
+        "Echocardiogram confirms LVEF 24%. NYHA Class II dyspnea.\n"
+        "Maintained on GDMT (carvedilol and lisinopril) for 6 months.\n"
+        "Myocardial infarction occurred 2 years ago. No acute cardiogenic shock."
+    )
+    uncalibrated = pipeline.adjudicate_sync("PT-TEST-CAL-EMP", "NCD-20.4", ehr, save_record=False)
+    assert uncalibrated.calibrated_aggregate_confidence is None
+
+    # Fit calibration harness on validation data
+    harness = CalibrationHarness(method="temperature")
+    val_data = [
+        {"case_id": "VAL-01", "raw_score": 0.95, "is_correct": 1},
+        {"case_id": "VAL-02", "raw_score": 0.88, "is_correct": 1},
+        {"case_id": "VAL-03", "raw_score": 0.65, "is_correct": 0},
+        {"case_id": "VAL-04", "raw_score": 0.78, "is_correct": 1},
+    ]
+    harness.fit(val_data)
+
+    calibrated = harness.calibrate_determination(uncalibrated)
+    assert calibrated.calibrated_aggregate_confidence is not None
+    assert isinstance(calibrated.calibrated_aggregate_confidence, float)
+    assert 0.0 <= calibrated.calibrated_aggregate_confidence <= 1.0
+    assert "Empirically calibrated via Temperature Scaling" in calibrated.calibrated_confidence_explanation
+
+

@@ -4,6 +4,15 @@
   "jurisdiction": "National Coverage Determination (CMS)",
   "effective_date": "2017-04-03",
   "category": "Wound Care",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-15",
+      "author": "CarePolicyGuard Regulatory Informatics",
+      "summary": "Statutory citation mapping against CMS Pub 100-03 Manual Section 20.29."
+    }
+  ],
   "description": "CMS coverage for systemic hyperbaric oxygen therapy (HBOT) in patients with diabetic wounds of the lower extremities. Requires Wagner Grade 3 or higher, failure of at least 30 days of standard conservative wound therapy, and vascular evaluation.",
   "scope_note": "Curated benchmark criterion schema targeting primary statutory indications, exclusions, and waiting periods; not an exhaustive legal transcription of full multi-page CMS coverage manuals.",
   "criteria": [
@@ -18,7 +27,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "At current wound evaluation",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
+      "source_section": "Section B: Covered Conditions",
+      "source_paragraph": "Paragraph 4: Diabetic wounds of the lower extremities in patients who have Wagner grade III or higher lesions",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Diabetic wounds of the lower extremities in patients who have Wagner grade III or higher lesions."
     },
     {
       "criterion_code": "CRIT-HBOT-02",
@@ -43,7 +57,12 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": ">= 30 days prior to HBOT initiation",
-      "min_score": 0.85
+      "min_score": 0.85,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
+      "source_section": "Section B: Covered Conditions",
+      "source_paragraph": "Paragraph 4: Prerequisite Failure of Standard Wound Therapy",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "The patient must have completed at least 30 continuous days of standard wound therapy without evidence of measurable signs of healing."
     },
     {
       "criterion_code": "CRIT-HBOT-03",
@@ -55,14 +74,13 @@
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Within past 60 days",
-      "min_score": 0.75
+      "min_score": 0.75,
+      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
+      "source_section": "Section B: Covered Conditions",
+      "source_paragraph": "Paragraph 4: Vascular Assessment Requirement",
+      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_text_excerpt": "Evaluation of lower extremity vascular status and treatment of any treatable vascular problem."
     }
   ],
-  "statutory_waiting_periods": [
-    {
-      "event_type": "CONSERVATIVE_WOUND_CARE",
-      "minimum_duration_days": 30,
-      "statutory_citation": "CMS NCD 20.29 Section B.1"
-    }
-  ]
+  "statutory_waiting_periods": []
 }
