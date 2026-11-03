@@ -85,7 +85,14 @@ def test_mfa_all_three_options():
         assert setup_email.status_code == 200
         email_data = setup_email.json()
         assert email_data["mfa_method"] == "email_otp"
-        email_code = email_data["dev_preview_code"]
+        assert "dev_preview_code" not in email_data
+
+        db_check = SessionLocal()
+        try:
+            u_check = db_check.query(User).filter(User.email == test_email).first()
+            email_code = u_check.active_otp_code
+        finally:
+            db_check.close()
 
         enable_email = client.post("/api/v1/auth/mfa/enable", json={
             "mfa_method": "email_otp",
@@ -100,7 +107,14 @@ def test_mfa_all_three_options():
         assert setup_sms.status_code == 200
         sms_data = setup_sms.json()
         assert sms_data["mfa_method"] == "sms_otp"
-        sms_code = sms_data["dev_preview_code"]
+        assert "dev_preview_code" not in sms_data
+
+        db_check = SessionLocal()
+        try:
+            u_check = db_check.query(User).filter(User.email == test_email).first()
+            sms_code = u_check.active_otp_code
+        finally:
+            db_check.close()
 
         enable_sms = client.post("/api/v1/auth/mfa/enable", json={
             "mfa_method": "sms_otp",

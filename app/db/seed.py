@@ -82,12 +82,14 @@ def seed_demo_users(db: Session):
             "verification_method": "NPPES_API_VERIFIED",
             "mfa_enabled": True,
             "mfa_method": "email_otp",
-            "mfa_enabled_methods": "email_otp,totp_app",
-            "totp_secret": "JBSWY3DPEHPK3PXP"
+            "mfa_enabled_methods": "email_otp,totp_app"
         }
     ]
 
+    from app.services.mfa_service import MFAService
+
     for u_data in demo_users:
+        totp_sec = MFAService.generate_totp_secret() if "totp_app" in u_data.get("mfa_enabled_methods", "") else None
         existing = db.query(User).filter(User.username == u_data["username"]).first()
         if not existing:
             user = User(
@@ -105,11 +107,16 @@ def seed_demo_users(db: Session):
                 verification_method=u_data.get("verification_method"),
                 mfa_enabled=u_data.get("mfa_enabled", False),
                 mfa_method=u_data.get("mfa_method"),
+                mfa_enabled_methods=u_data.get("mfa_enabled_methods"),
+                totp_secret=totp_sec,
                 is_active=True
             )
             db.add(user)
         else:
             existing.hashed_password = get_password_hash(u_data["password"])
+            if totp_sec:
+                existing.totp_secret = totp_sec
+                existing.mfa_enabled_methods = u_data.get("mfa_enabled_methods")
     db.commit()
 
 

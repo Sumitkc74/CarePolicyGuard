@@ -146,8 +146,7 @@ class MFAService:
             "full_email": email,
             "sent_live_smtp": sent_successfully,
             "smtp_error": smtp_error,
-            "message": f"6-digit authentication code sent to {masked_email}. Valid for 10 minutes.",
-            "dev_preview_code": code
+            "message": f"6-digit authentication code sent to {masked_email}. Valid for 10 minutes."
         }
 
     @classmethod
@@ -157,6 +156,5 @@ class MFAService:
             "status": "SENT",
             "channel": "SMS",
             "destination": masked_phone,
-            "message": f"6-digit authentication code sent via SMS to {masked_phone}. Valid for 10 minutes.",
-            "dev_preview_code": code
+            "message": f"6-digit authentication code sent via SMS to {masked_phone}. Valid for 10 minutes."
         }

@@ -23,12 +23,22 @@ def test_google_sso_auto_provision_and_mfa():
     assert data["status"] == "MFA_CHALLENGE_REQUIRED"
     assert data["oauth_provider"] == "google"
     assert "mfa_session_token" in data
-    assert "dev_preview_code" in data
+    assert "dev_preview_code" not in data
+
+    # Retrieve dispatched OTP code delivered to user via real channel / database
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.email == "dr.smith@pacificheart.org").first()
+        assert user is not None
+        otp_code = user.active_otp_code
+        assert otp_code is not None
+    finally:
+        db.close()
 
     # 2. Complete MFA verification
     verify_res = client.post("/api/v1/auth/mfa/verify-login", json={
         "mfa_session_token": data["mfa_session_token"],
-        "verification_code": data["dev_preview_code"]
+        "verification_code": otp_code
     })
     assert verify_res.status_code == 200
     token_data = verify_res.json()

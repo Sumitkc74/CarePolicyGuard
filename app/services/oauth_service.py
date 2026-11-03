@@ -196,7 +196,6 @@ class OAuthService:
             enabled_methods = user.get_enabled_mfa_methods()
             primary = user.mfa_method if user.mfa_method in enabled_methods else enabled_methods[0]
 
-            dev_code = None
             dest_masked = None
 
             if primary == "email_otp":
@@ -205,7 +204,6 @@ class OAuthService:
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_email_otp(user.email, code)
-                dev_code = dispatch["dev_preview_code"]
                 dest_masked = dispatch["destination"]
             elif primary == "sms_otp" and user.phone_number:
                 code, expires_at = MFAService.generate_numeric_otp(6)
@@ -213,7 +211,6 @@ class OAuthService:
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_sms_otp(user.phone_number, code)
-                dev_code = dispatch["dev_preview_code"]
                 dest_masked = dispatch["destination"]
             elif primary == "totp_app":
                 dest_masked = "Google / Microsoft Authenticator App"
@@ -224,7 +221,6 @@ class OAuthService:
                 "mfa_method": primary,
                 "available_methods": enabled_methods,
                 "destination_masked": dest_masked,
-                "dev_preview_code": dev_code,
                 "message": f"Sign-in verified via {provider.capitalize()}. Enter your {primary} verification code to complete authentication.",
                 "oauth_provider": provider
             }

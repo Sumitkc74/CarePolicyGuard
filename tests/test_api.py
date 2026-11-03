@@ -45,8 +45,14 @@ def test_auth_login_valid_credentials():
     c_data = challenge_resp.json()
     assert c_data["status"] == "MFA_CHALLENGE_REQUIRED"
     assert "mfa_session_token" in c_data
+    assert "dev_preview_code" not in c_data
     session_token = c_data["mfa_session_token"]
-    otp_code = c_data["dev_preview_code"]
+
+    # Read the delivered OTP code from the user's active verification state
+    u_record = db.query(User).filter(User.email == test_email).first()
+    assert u_record is not None
+    otp_code = u_record.active_otp_code
+    assert otp_code is not None
 
     # 2. Complete real MFA challenge verification to obtain JWT access token
     verify_resp = client.post("/api/v1/auth/mfa/verify-login", json={

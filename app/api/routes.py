@@ -185,7 +185,6 @@ def login(
                 expires_delta=timedelta(minutes=10)
             )
             
-            dev_code = None
             dest_masked = None
             
             if user.mfa_method == "email_otp":
@@ -194,7 +193,6 @@ def login(
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_email_otp(user.email, code)
-                dev_code = dispatch["dev_preview_code"]
                 dest_masked = dispatch["destination"]
                 
             elif user.mfa_method == "sms_otp" and user.phone_number:
@@ -203,7 +201,6 @@ def login(
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_sms_otp(user.phone_number, code)
-                dev_code = dispatch["dev_preview_code"]
                 dest_masked = dispatch["destination"]
                 
             elif user.mfa_method == "totp_app":
@@ -220,8 +217,7 @@ def login(
                     "mfa_method": primary,
                     "available_methods": enabled_methods,
                     "destination_masked": dest_masked,
-                    "message": f"Enter the 6-digit verification code from your {primary}.",
-                    "dev_preview_code": dev_code
+                    "message": f"Enter the 6-digit verification code from your {primary}."
                 }
             )
 

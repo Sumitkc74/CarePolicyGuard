@@ -46,8 +46,7 @@ def test_concurrent_adjudication_stress():
 
     def run_single_adjudication(worker_id):
         headers = {
-            "Idempotency-Key": f"stress-worker-key-{worker_id}",
-            "X-Test-Bypass-Rate-Limit": "true"
+            "Idempotency-Key": f"stress-worker-key-{worker_id}"
         }
         start = time.perf_counter()
         resp = client.post("/api/v1/adjudicate", json=payload, headers=headers)
@@ -114,8 +113,7 @@ def test_batch_adjudication_with_webhook():
     with patch.object(WebhookService, "dispatch_webhook", return_value=True) as mock_dispatch:
         resp = client.post(
             "/api/v1/adjudicate/batch",
-            json=batch_req,
-            headers={"X-Test-Bypass-Rate-Limit": "true"}
+            json=batch_req
         )
         assert resp.status_code == 200
         data = resp.json()

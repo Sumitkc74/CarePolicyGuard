@@ -18,7 +18,6 @@ class MFASetupResponse(BaseModel):
     otpauth_uri: Optional[str] = None
     channel_destination: Optional[str] = None
     message: str
-    dev_preview_code: Optional[str] = None
 
 class MFAEnableRequest(BaseModel):
     mfa_method: str = Field(..., description="Method to enable: 'totp_app', 'email_otp', or 'sms_otp'")
@@ -31,7 +30,6 @@ class MFAChallengeResponse(BaseModel):
     mfa_method: str
     destination_masked: Optional[str] = None
     message: str
-    dev_preview_code: Optional[str] = None
 
 class MFAVerifyRequest(BaseModel):
     mfa_session_token: str = Field(..., description="Ephemeral token issued by login challenge")
@@ -90,8 +88,7 @@ def register_mfa_routes(api_router: APIRouter):
             return MFASetupResponse(
                 mfa_method="email_otp",
                 channel_destination=dispatch["destination"],
-                message=dispatch["message"],
-                dev_preview_code=dispatch.get("dev_preview_code")
+                message=dispatch["message"]
             )
 
         elif method == "sms_otp":
@@ -112,8 +109,7 @@ def register_mfa_routes(api_router: APIRouter):
             return MFASetupResponse(
                 mfa_method="sms_otp",
                 channel_destination=dispatch["destination"],
-                message=dispatch["message"],
-                dev_preview_code=dispatch.get("dev_preview_code")
+                message=dispatch["message"]
             )
 
         else:
@@ -220,7 +216,6 @@ def register_mfa_routes(api_router: APIRouter):
                 detail=f"MFA method '{req.requested_method}' is not configured for this account. Configured methods: {', '.join(enabled)}"
             )
 
-        dev_code = None
         dest_masked = None
         message = ""
 
@@ -230,7 +225,6 @@ def register_mfa_routes(api_router: APIRouter):
             user.otp_expires_at = expires_at
             db.commit()
             dispatch = MFAService.send_email_otp(user.email, code)
-            dev_code = dispatch["dev_preview_code"]
             dest_masked = dispatch["destination"]
             message = f"Security code dispatched to {dest_masked}."
 
@@ -242,7 +236,6 @@ def register_mfa_routes(api_router: APIRouter):
             user.otp_expires_at = expires_at
             db.commit()
             dispatch = MFAService.send_sms_otp(user.phone_number, code)
-            dev_code = dispatch["dev_preview_code"]
             dest_masked = dispatch["destination"]
             message = f"SMS security code dispatched to {dest_masked}."
 
@@ -254,8 +247,7 @@ def register_mfa_routes(api_router: APIRouter):
             "status": "CHALLENGE_METHOD_SWITCHED",
             "mfa_method": req.requested_method,
             "destination_masked": dest_masked,
-            "message": message,
-            "dev_preview_code": dev_code
+            "message": message
         }
 
     @api_router.post("/auth/mfa/remove-method", summary="Remove a Configured MFA Method")

@@ -26,13 +26,14 @@ def test_rate_limiter_throttling_and_bypass():
     assert "Rate limit exceeded" in throttled_res.json()["detail"]
     assert "Retry-After" in throttled_res.headers
 
-    # With bypass header, request should succeed past rate limiter
+    # Bypass header must NOT bypass rate limiter; client must still be throttled with HTTP 429
     bypass_res = client.post(
         "/api/v1/auth/login",
         json={"username": "clinician@hospital.org", "password": "WrongPassword123"},
         headers={"X-Test-Bypass-Rate-Limit": "true"}
     )
-    assert bypass_res.status_code == 401
+    assert bypass_res.status_code == 429
+    assert "Rate limit exceeded" in bypass_res.json()["detail"]
 
     # Reset limiter for subsequent tests
     limiter.reset_all()

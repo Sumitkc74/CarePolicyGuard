@@ -12,6 +12,7 @@ client = TestClient(app)
 def test_multiple_mfa_methods_and_login_selection():
     test_pwd = secrets.token_urlsafe(16)
     test_email = f"test_multi_doc_{secrets.token_hex(4)}@hospital.org"
+    in_memory_totp_secret = MFAService.generate_totp_secret()
     db = SessionLocal()
     try:
         user = User(
@@ -22,7 +23,7 @@ def test_multiple_mfa_methods_and_login_selection():
             mfa_enabled=True,
             mfa_method="email_otp",
             mfa_enabled_methods="email_otp,totp_app",
-            totp_secret="JBSWY3DPEHPK3PXP"
+            totp_secret=in_memory_totp_secret
         )
         db.add(user)
         db.commit()
@@ -54,7 +55,7 @@ def test_multiple_mfa_methods_and_login_selection():
         assert switch_data["mfa_method"] == "totp_app"
 
         # 3. Verify login using Authenticator App RFC 6238 TOTP code
-        totp_code = MFAService.generate_totp_code("JBSWY3DPEHPK3PXP")
+        totp_code = MFAService.generate_totp_code(in_memory_totp_secret)
         verify_res = client.post("/api/v1/auth/mfa/verify-login", json={
             "mfa_session_token": session_token,
             "verification_code": totp_code,
@@ -74,7 +75,14 @@ def test_multiple_mfa_methods_and_login_selection():
         # 5. Add a 3rd factor: SMS OTP
         sms_setup = client.post("/api/v1/auth/mfa/setup?method=sms_otp&phone=%2B15555559876", headers=headers)
         assert sms_setup.status_code == 200
-        sms_code = sms_setup.json()["dev_preview_code"]
+        assert "dev_preview_code" not in sms_setup.json()
+
+        db_check = SessionLocal()
+        try:
+            u_check = db_check.query(User).filter(User.email == test_email).first()
+            sms_code = u_check.active_otp_code
+        finally:
+            db_check.close()
 
         enable_sms = client.post("/api/v1/auth/mfa/enable", headers=headers, json={
             "mfa_method": "sms_otp",

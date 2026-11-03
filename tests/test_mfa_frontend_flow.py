@@ -38,13 +38,20 @@ def test_mfa_end_to_end_flow():
         assert data["status"] == "MFA_CHALLENGE_REQUIRED"
         assert data["mfa_method"] == "email_otp"
         assert "mfa_session_token" in data
-        assert "dev_preview_code" in data
-        assert len(data["dev_preview_code"]) == 6
+        assert "dev_preview_code" not in data
+
+        db_check = SessionLocal()
+        try:
+            u_check = db_check.query(User).filter(User.email == test_email).first()
+            otp_code = u_check.active_otp_code
+            assert otp_code is not None
+        finally:
+            db_check.close()
 
         # 2. Test MFA verification completes login and returns JWT
         verify_resp = client.post("/api/v1/auth/mfa/verify-login", json={
             "mfa_session_token": data["mfa_session_token"],
-            "verification_code": data["dev_preview_code"]
+            "verification_code": otp_code
         })
         assert verify_resp.status_code == 200
         token_data = verify_resp.json()
