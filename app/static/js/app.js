@@ -2686,6 +2686,17 @@ function renderAdjudicationResults(data) {
     const stepperLat = document.getElementById("stepper-latency");
     if (stepperLat) stepperLat.textContent = `Pipeline Latency: ${data.execution_time_ms} ms`;
 
+    // Task 1: Update Scope & Clinical Sign-off Gate UI Elements
+    const signoffBadge = document.getElementById("human-signoff-badge");
+    if (signoffBadge) {
+        signoffBadge.textContent = data.human_sign_off_status || "PENDING CLINICAL SIGN-OFF";
+        signoffBadge.style.color = (data.human_sign_off_status === "SIGNED_OFF") ? "#10b981" : "#38bdf8";
+    }
+    const disclaimerText = document.getElementById("plain-language-disclaimer-text");
+    if (disclaimerText && data.plain_language_disclaimer) {
+        disclaimerText.innerHTML = `<strong>What was checked:</strong> Curated statutory CMS criteria. <strong>What was not checked:</strong> Plan-specific rules, member eligibility, network authorization.<br><strong>Requirement:</strong> A licensed clinical professional must review and sign off before this determination leaves the system.`;
+    }
+
     // 1. Big Verdict Card & Ribbon Updates
     const verdictCard = document.getElementById("big-verdict-card");
     const verdictBubble = document.getElementById("verdict-bubble");

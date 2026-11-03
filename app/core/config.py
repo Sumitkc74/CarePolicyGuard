@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./carepolicyguard.db")
 
     # Clinical Multi-Agent & Abstention Calibration
+    # Operating Choice Documentation (Task 2):
+    # ABSTENTION_THRESHOLD = 0.85 is an uncalibrated heuristic operating choice, not a measured Bayesian probability.
+    # Tradeoff Analysis: A threshold of 0.85 prioritizes zero false approvals (preventing improper authorizations
+    # of invasive or expensive procedures) at the acceptable expense of routing borderline cases to human clinical review.
+    # The CalibrationHarness provides selective-risk derivation on validation data for future empirical tuning.
     ABSTENTION_THRESHOLD: float = float(os.getenv("ABSTENTION_THRESHOLD", "0.85"))
     ENABLE_PHI_MASKING: bool = True
 

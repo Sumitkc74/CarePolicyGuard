@@ -444,6 +444,17 @@
                         <h2>Coverage Determination</h2>
                     </div>
 
+                    <!-- PLAIN-LANGUAGE SCOPE & SIGN-OFF GATE BANNER (Task 1) -->
+                    <div class="determination-scope-banner" id="determination-scope-banner" style="margin: 12px 0 16px 0; padding: 12px 16px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px;">
+                        <div style="font-size: 0.85rem; color: #f8fafc; font-weight: 600; margin-bottom: 4px;">
+                            <span>Scope &amp; Sign-Off Gate Notice</span> &bull; <span id="human-signoff-badge" style="color: #38bdf8;">PENDING CLINICAL SIGN-OFF</span>
+                        </div>
+                        <p style="font-size: 0.78rem; color: #94a3b8; margin: 0; line-height: 1.4;" id="plain-language-disclaimer-text">
+                            <strong>What was checked:</strong> Curated statutory CMS criteria. <strong>What was not checked:</strong> Plan-specific rules, member eligibility, network authorization.
+                            <strong>Requirement:</strong> A licensed clinical professional must review and sign off before this determination leaves the system.
+                        </p>
+                    </div>
+
                     <!-- BIG FRIENDLY DECISION BANNER -->
                     <div id="big-verdict-card" class="big-verdict-card verdict-pending">
                         <div class="verdict-icon-bubble" id="verdict-bubble">
@@ -872,7 +883,7 @@
                 <div class="card-header">
                     <div>
                         <h3>Immutable Adjudication Audit Ledger</h3>
-                        <p class="card-subtitle">Cryptographically verified chain-of-custody logs with SHA-256 seals</p>
+                        <p class="card-subtitle">Tamper-evident chain-of-custody seals certifying record integrity, immutability, and deterministic reproducibility (does not certify medical correctness)</p>
                     </div>
                     <div class="header-action-group">
                         <button class="btn-secondary" onclick="exportAuditTrailCsv()" title="Download official RFC 4180 CSV audit trail for Medicare RAC/MAC auditor inspection">

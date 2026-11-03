@@ -1,0 +1,91 @@
+[
+  {
+    "case_id": "ADV-01",
+    "name": "Hypothetical Modality Framing",
+    "policy_id": "NCD-20.4",
+    "framing": "hypothetical",
+    "clinical_domain": "Cardiology",
+    "narrative": "CARDIOLOGY CONSULTATION\nPatient evaluated for palpitations.\nASSESSMENT & PLAN: Consider implantable cardioverter defibrillator (ICD) if sustained ventricular tachycardia develops in the future. Echocardiogram shows LVEF 42%. Currently stable on low dose carvedilol.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "REJECTED_OR_DEFERRED",
+    "rationale": "Evidence for ICD is phrased hypothetically ('consider... if... develops') and LVEF is 42% (fails <=35%)."
+  },
+  {
+    "case_id": "ADV-02",
+    "name": "Negated Clinical Condition",
+    "policy_id": "NCD-20.4",
+    "framing": "negation",
+    "clinical_domain": "Cardiology",
+    "narrative": "ANNUAL WELLNESS EXAM\nCARDIAC EVALUATION:\nPatient denies heart failure symptoms. No evidence of left ventricular ejection fraction reduction. LVEF is 55% on recent screening study. Negative for ischemic cardiomyopathy. No GDMT indicated.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "REJECTED_OR_DEFERRED",
+    "rationale": "Key conditions are explicitly negated ('denies', 'no evidence of', 'negative for') and LVEF is normal."
+  },
+  {
+    "case_id": "ADV-03",
+    "name": "Future-Planned Timeline Precondition",
+    "policy_id": "NCD-20.4",
+    "framing": "future_planned",
+    "clinical_domain": "Cardiology",
+    "narrative": "ELECTROPHYSIOLOGY CLINIC\nPatient with newly diagnosed non-ischemic cardiomyopathy. Echo confirms LVEF 30%.\nPLAN: Patient is scheduled for elective CRT-D implantation next month. GDMT initiated 12 days ago with lisinopril 5mg and carvedilol 6.25mg.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "REJECTED_OR_DEFERRED",
+    "rationale": "Procedure is future-planned and GDMT duration (12 days) fails mandatory 90-day statutory trial."
+  },
+  {
+    "case_id": "ADV-04",
+    "name": "Wrong Subject / Family History Attribution",
+    "policy_id": "NCD-20.33",
+    "framing": "family_history",
+    "clinical_domain": "Valvular Surgery",
+    "narrative": "PRE-OPERATIVE CLINIC\nCHIEF COMPLAINT: Evaluation for cardiac clearance.\nFAMILY HISTORY: Notable for severe symptomatic aortic stenosis in father requiring urgent surgical valve replacement. Mother had severe mitral regurgitation requiring MitraClip.\nPATIENT STATUS: Patient reports excellent exercise tolerance, walking 3 miles daily without dyspnea. Echocardiogram confirms normal mitral valve and normal aortic valve area.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "REJECTED_OR_DEFERRED",
+    "rationale": "Valvular indications exist solely in family history; patient has normal valves and no clinical symptoms."
+  },
+  {
+    "case_id": "ADV-05",
+    "name": "Contradictory Hemodynamic Measurements Across Sections",
+    "policy_id": "NCD-20.4",
+    "framing": "internal_contradiction",
+    "clinical_domain": "Cardiology",
+    "narrative": "INPATIENT CARDIOLOGY SUMMARY\nHISTORY OF PRESENT ILLNESS:\nInitial point-of-care ultrasound on admission 10/02/2026 documented severe systolic dysfunction with LVEF 22%.\nDIAGNOSTIC STUDIES:\nFormal comprehensive transthoracic echocardiogram performed on 10/14/2026 shows completely normal global systolic function with LVEF 56%.\nPLAN: Reconcile discordant echo findings prior to any invasive intervention.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "DEFERRED_TO_HUMAN",
+    "rationale": "Sharp clinical contradiction between LVEF 22% and LVEF 56% requires clinician reconciliation."
+  },
+  {
+    "case_id": "ADV-06",
+    "name": "Numeric Value Out of Range",
+    "policy_id": "NCD-20.4",
+    "framing": "value_out_of_range",
+    "clinical_domain": "Cardiology",
+    "narrative": "CARDIOLOGY PROGRESS NOTE\nCLINICAL SUMMARY:\nPatient with coronary artery disease and NYHA Class II symptoms on stable GDMT for 1 year.\nEchocardiogram: Left ventricular ejection fraction measured at LVEF 46%.\nImpression: Mild systolic dysfunction; does not meet device threshold.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "REJECTED_OR_DEFERRED",
+    "rationale": "LVEF 46% fails statutory cutoff of <= 35%."
+  },
+  {
+    "case_id": "ADV-07",
+    "name": "Negated Comorbidities for Mild-Moderate Range",
+    "policy_id": "NCD-240.2",
+    "framing": "negated_comorbidity",
+    "clinical_domain": "Pulmonology",
+    "narrative": "SLEEP MEDICINE CONSULTATION\nDIAGNOSTIC POLYSOMNOGRAPHY:\nOvernight sleep study demonstrates mild-to-moderate obstructive sleep apnea with AHI 9.4 events/hr.\nREVIEW OF SYSTEMS:\nPatient denies daytime sleepiness. Blood pressure normal without medications, no hypertension. No history of stroke or ischemic heart disease.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "REJECTED_OR_DEFERRED",
+    "rationale": "AHI is 9.4 (band 5-14 requires documented comorbidity); all qualifying comorbidities are explicitly negated."
+  },
+  {
+    "case_id": "ADV-08",
+    "name": "Conditional Speculative Framing",
+    "policy_id": "NCD-20.7",
+    "framing": "conditional_speculation",
+    "clinical_domain": "Vascular Surgery",
+    "narrative": "VASCULAR SURGERY CLINIC\nASSESSMENT: Patient with asymptomatic carotid bruit.\nPLAN: If patient should develop neurological symptoms or TIA, consider carotid artery stenting (CAS). Carotid duplex ultrasound reveals mild carotid stenosis of 35% on the left and 40% on the right.",
+    "expected_decision_not": "APPROVED",
+    "expected_adversarial_outcome": "REJECTED_OR_DEFERRED",
+    "rationale": "CAS is mentioned conditionally ('if patient should develop...'), and stenosis 35-40% fails statutory asymptomatic threshold of >= 70%."
+  }
+]
+

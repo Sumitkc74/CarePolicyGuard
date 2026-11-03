@@ -108,6 +108,18 @@ class CalibratedAbstentionGate:
             abstention_triggers.append(f"Adversarial audit detected clinical contradiction or discordance in: {codes}.")
             action_items.append(f"Clinician reconciliation required for conflicting measurements in [{codes}].")
 
+        # Check for Semantic Support Failures (wrong subject, timing, modality, negation, range)
+        semantic_failures = [
+            (crit, audit) for crit, audit in zip(criteria_assessments, audit_results)
+            if not getattr(audit, "semantic_support_passed", True) and not crit.is_exclusion
+        ]
+        if semantic_failures and not has_proven_unmet:
+            codes = ", ".join([c.criterion_code for c, a in semantic_failures])
+            abstention_triggers.append(
+                f"Adversarial audit failed semantic support (wrong subject, future-planned timing, hypothetical modality, or out of range) in: [{codes}]."
+            )
+            action_items.append(f"Verify clinical validity for semantically unverified claims in [{codes}].")
+
         # Check Weakest-Link Safety Floor (no mandatory inclusion criterion may fall below tau_floor)
         sub_floor_mandatory = [
             (crit, audit) for crit, audit in zip(criteria_assessments, audit_results)

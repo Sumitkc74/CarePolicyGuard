@@ -37,6 +37,11 @@ class DeclarativeCriterion(BaseModel):
     cpt_preconditions: list[str] = Field(default_factory=list, description="Procedure CPT code patterns")
     min_score: float = Field(default=0.85, description="Evidence sufficiency weight")
     keywords: list[str] = Field(default_factory=list, description="Legacy keywords list alias for backward compatibility")
+    cms_document: str = Field(default="CMS National Coverage Determination (NCD)", description="Governing CMS manual or document")
+    source_section: str | None = Field(default=None, description="CMS policy section (e.g., Section B.1)")
+    source_paragraph: str | None = Field(default=None, description="Specific CMS paragraph or clause")
+    source_traceability_status: str = Field(default="VERIFIED_SOURCE", description="VERIFIED_SOURCE or UNVERIFIED_SOURCE")
+    source_text_excerpt: str | None = Field(default=None, description="Verbatim citation excerpt from CMS policy text")
 
     @model_validator(mode="after")
     def sync_keywords_alias(self):
@@ -58,6 +63,8 @@ class DeclarativePolicy(BaseModel):
     effective_date: str = Field(default="2024-01-01", description="Statutory effective date")
     category: str = Field(default="General Medicine", description="Clinical domain")
     description: str = Field(..., description="Summary of policy coverage")
+    policy_version: str = Field(default="2024.1", description="Policy schema version")
+    change_log: list[dict[str, Any]] = Field(default_factory=list, description="Policy change history and CMS revisions")
     criteria: list[DeclarativeCriterion] = Field(default_factory=list, description="Declarative criteria set")
     statutory_waiting_periods: list[dict[str, Any]] = Field(default_factory=list, description="Longitudinal timeline rules")
 

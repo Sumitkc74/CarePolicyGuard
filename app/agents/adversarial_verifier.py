@@ -198,19 +198,24 @@ class AdversarialVerificationAgent:
         hallucination_flag: bool,
         offset_drift_detected: bool,
         unverified_omission_flag: bool,
-        discordance_flag: bool = False
+        discordance_flag: bool = False,
+        semantic_support_passed: bool = True
     ) -> float:
         """
         Recalibrates confidence using adversarial penalization:
         - Hallucination: massive penalization (factor 0.20)
+        - Semantic Support Failure: severe penalization (factor 0.30)
         - Unverified Omission: severe penalization (factor 0.45)
         - Offset Drift: moderate penalization (factor 0.65)
-        - Perfect Grounding: retain or slight boost
+        - Discordance / Contradiction: penalization (factor 0.50)
+        - Perfect Grounding & Semantic Support: retain
         """
         score = raw_confidence
 
         if hallucination_flag:
             score *= 0.20
+        elif not semantic_support_passed:
+            score *= 0.30
         elif offset_drift_detected:
             score *= 0.65
         elif not grounding_status:
@@ -231,12 +236,28 @@ class AdversarialVerificationAgent:
         ehr_text: str
     ) -> VerificationAuditResult:
         """
-        Runs comprehensive adversarial verification across spans, offsets, and omissions.
+        Runs comprehensive adversarial verification across spans, offsets, semantic support, and omissions.
         """
+        from app.services.semantic_verifier import SemanticSupportChecker
+
         all_grounded, hallucination_flag, offset_drift, span_notes = self.verify_spans_programmatic(
             assessment.verified_spans,
             ehr_text
         )
+
+        # Semantic Support Audit (Subject, Timing, Modality, Negation, Value Range)
+        semantic_passed, semantic_notes = SemanticSupportChecker.audit_assessment_semantics(
+            assessment,
+            ehr_text,
+            criterion_def
+        )
+
+        # If semantic support failed, disqualify invalid spans from counting as evidence
+        if not semantic_passed:
+            valid_spans = [s for s in assessment.verified_spans if getattr(s, "semantic_support_passed", True)]
+            if not valid_spans and assessment.status == DeterminationStatus.MET and not assessment.is_exclusion:
+                assessment.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                assessment.clinical_rationale += " [DISQUALIFIED BY ADVERSARIAL AUDIT: Cited evidence failed semantic support check.]"
 
         omission_flag, omission_note = self.audit_negative_omissions(
             assessment,
@@ -252,16 +273,19 @@ class AdversarialVerificationAgent:
             hallucination_flag,
             offset_drift,
             omission_flag,
-            discordance_flag=discordance_flag
+            discordance_flag=discordance_flag,
+            semantic_support_passed=semantic_passed
         )
 
         audit_summary_parts = span_notes.copy()
+        if not semantic_passed and semantic_notes:
+            audit_summary_parts.extend(semantic_notes)
         if omission_flag:
             audit_summary_parts.append(omission_note)
         if discordance_flag and discordance_note:
             audit_summary_parts.append(discordance_note)
 
-        audit_notes = " | ".join(audit_summary_parts) if audit_summary_parts else "Adversarial verification passed: evidence fully grounded."
+        audit_notes = " | ".join(audit_summary_parts) if audit_summary_parts else "Adversarial verification passed: evidence fully grounded and semantically supported."
 
         return VerificationAuditResult(
             criterion_code=assessment.criterion_code,
@@ -271,6 +295,9 @@ class AdversarialVerificationAgent:
             offset_drift_detected=offset_drift,
             discordance_flag=discordance_flag,
             healed_offset_drift=False,
+            semantic_support_passed=semantic_passed,
+            semantic_audit_notes=" | ".join(semantic_notes) if semantic_notes else None,
+            discordance_details=discordance_note,
             audit_notes=audit_notes,
             calibrated_confidence=calibrated_conf
         )

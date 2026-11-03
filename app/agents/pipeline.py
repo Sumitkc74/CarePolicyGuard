@@ -18,6 +18,8 @@ from app.agents.policy_retriever import PolicyRetrievalAgent
 from app.agents.criteria_evaluator import CriteriaEvaluationAgent
 from app.agents.adversarial_verifier import AdversarialVerificationAgent
 from app.agents.abstention_gate import CalibratedAbstentionGate
+from app.agents.critic_agent import CriticAgent
+from app.agents.missing_evidence_agent import MissingEvidenceAgent
 from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.agents.state_machine import ClinicalAdjudicationStateMachine
 from app.db.models import AdjudicationLog, MedicarePolicy
@@ -41,6 +43,8 @@ class MultiAgentVerificationPipeline:
         self.hybrid_retriever = HybridPolicyRetriever(db=db)
         self.evaluator_agent = CriteriaEvaluationAgent()
         self.verifier_agent = AdversarialVerificationAgent()
+        self.critic_agent = CriticAgent()
+        self.missing_evidence_agent = MissingEvidenceAgent()
         self.abstention_gate = CalibratedAbstentionGate(tau=settings.ABSTENTION_THRESHOLD)
         self.state_machine = ClinicalAdjudicationStateMachine(db=db, tau=settings.ABSTENTION_THRESHOLD)
 
@@ -256,6 +260,69 @@ class MultiAgentVerificationPipeline:
         carc_codes = billing_res.carc_codes
         rarc_codes = billing_res.rarc_codes
 
+        # 5d. Multi-Agent Critic Cross-Examination & Falsification (Task 4)
+        critic_findings = self.critic_agent.critique_approval(
+            provisional_decision=decision,
+            criteria_assessments=criteria_assessments,
+            ehr_text=sanitized_ehr,
+            policy_id=policy_id
+        )
+        agent_disagreements: List[Dict[str, Any]] = []
+        if critic_findings.get("falsification_detected"):
+            if decision == AdjudicationDecision.APPROVED:
+                if critic_findings.get("critic_action") == "VETO_TO_DENIED":
+                    decision = AdjudicationDecision.DENIED
+                    abstention_status = False
+                    abstention_reason = " | ".join(critic_findings["objections"])
+                    agent_disagreements.append({
+                        "agent": "CriticAgent",
+                        "provisional_proposal": "APPROVED",
+                        "critic_verdict": "VETO_TO_DENIED",
+                        "disagreement_rationale": "Critic detected disqualifying exclusion counter-evidence.",
+                        "objections": critic_findings["objections"]
+                    })
+                else:
+                    decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+                    abstention_status = True
+                    critic_objs = " | ".join(critic_findings["objections"])
+                    abstention_reason = f"{abstention_reason} | {critic_objs}" if abstention_reason else critic_objs
+                    agent_disagreements.append({
+                        "agent": "CriticAgent",
+                        "provisional_proposal": "APPROVED",
+                        "critic_verdict": "VETO_TO_DEFERRED",
+                        "disagreement_rationale": "Critic detected contradiction or semantic support failure.",
+                        "objections": critic_findings["objections"]
+                    })
+
+        # 5e. Deterministic Veto Safety Invariant:
+        # Agents propose; the deterministic engine disposes. No agent may approve on its own.
+        has_unmet_inclusion = any(not a.is_exclusion and a.status != DeterminationStatus.MET for a in criteria_assessments)
+        has_met_exclusion = any(a.is_exclusion and a.status == DeterminationStatus.MET for a in criteria_assessments)
+        if decision == AdjudicationDecision.APPROVED and (has_unmet_inclusion or has_met_exclusion):
+            decision = AdjudicationDecision.DENIED
+            abstention_reason = "Deterministic Veto: Disallowed autonomous approval with unmet inclusion or verified exclusion."
+            agent_disagreements.append({
+                "agent": "DeterministicRuleVeto",
+                "provisional_proposal": "APPROVED",
+                "critic_verdict": "DETERMINISTIC_VETO_TO_DENIED",
+                "disagreement_rationale": "Deterministic engine exercised statutory veto over proposed approval."
+            })
+
+        # 5f. Missing Evidence Agent (Task 4)
+        action_required_questions: List[str] = []
+        if decision == AdjudicationDecision.DEFERRED_TO_HUMAN:
+            action_required_questions = self.missing_evidence_agent.formulate_questions(
+                criteria_assessments=criteria_assessments,
+                policy_title=policy_title
+            )
+
+        # 5g. Sufficiency Reporting (Task 2)
+        criteria_total_count = len(criteria_assessments)
+        criteria_met_count = sum(1 for c in criteria_assessments if c.status == DeterminationStatus.MET and not c.is_exclusion)
+        missing_criteria = [c.criterion_code for c in criteria_assessments if c.status == DeterminationStatus.NOT_MET and not c.is_exclusion]
+        insufficient_criteria = [c.criterion_code for c in criteria_assessments if c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE and not c.is_exclusion]
+        deferral_reason = abstention_reason if decision == AdjudicationDecision.DEFERRED_TO_HUMAN else None
+
         # 6. Cryptographic Chain-of-Custody Seal (SHA-256)
         all_spans = []
         for ca in criteria_assessments:
@@ -298,7 +365,18 @@ class MultiAgentVerificationPipeline:
             rarc_codes=rarc_codes,
             execution_mode=execution_mode,
             state_transitions=state_transitions,
-            retrieval_insights=retrieval_insights
+            retrieval_insights=retrieval_insights,
+            score_type="sufficiency_score",
+            sufficiency_score=calibrated_aggregate_conf,
+            sufficiency_formula="criteria_sufficiency_weighted_sum / total_applicable_criteria",
+            criteria_met_count=criteria_met_count,
+            criteria_total_count=criteria_total_count,
+            missing_criteria=missing_criteria,
+            insufficient_criteria=insufficient_criteria,
+            deferral_reason=deferral_reason,
+            critic_findings=critic_findings,
+            agent_disagreements=agent_disagreements,
+            action_required_questions=action_required_questions
         )
 
         # 7. Persistence (Zero-Retention Medical Privacy Safe Harbor)

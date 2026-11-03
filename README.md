@@ -40,6 +40,13 @@ In modern healthcare prior authorization and utilization review:
 
 CarePolicyGuard bridges this gap through **deterministic mathematical extraction**, **adversarial slice verification**, and **cryptographic chain-of-custody seals**.
 
+> [!IMPORTANT]
+> **Operational Scope & Human Sign-Off Gate Notice**:
+> * **Coverage Pre-Check Scope**: System evaluations check documented clinical records against curated statutory CMS criteria. They do **not** check plan-specific benefit structures, supplemental payer policies, or real-time patient eligibility.
+> * **Mandatory Clinical Sign-Off**: System recommendations do not constitute official payer determinations. An authorized licensed clinician must independently review and sign off before any determination leaves the system.
+> * **Audit Trail Meaning**: The cryptographic SHA-256 seal proves that the record was not altered after creation and that a run is deterministically reproducible — it certifies post-creation immutability and provenance, **not** that a clinical decision was medically correct.
+> * **Sufficiency Scores vs Probability**: System numeric scores reflect documented criteria sufficiency weights, not calibrated probabilities. True probability calibration requires unseen held-out validation data via the `CalibrationHarness`.
+
 ---
 
 ## Data & Benchmark Provenance

@@ -23,6 +23,13 @@ class ClinicalEvidenceSpan(BaseModel):
     end_char: int = Field(..., description="Exact 0-indexed end character offset in original note")
     clinical_section: str = Field(default="Clinical Note", description="EHR section where evidence was found")
     confidence: float = Field(default=1.0, ge=0.0, le=1.0, description="Confidence in this span")
+    semantic_support_passed: bool = Field(default=True, description="True if semantic validation (subject, timing, modality, negation, range) passes")
+    subject_valid: bool = Field(default=True, description="True if experiencer is the patient, not family history or other party")
+    timing_valid: bool = Field(default=True, description="True if event is actual/current, not future planned or resolved historical")
+    modality_valid: bool = Field(default=True, description="True if modality is confirmed, not hypothetical or conditional")
+    negation_valid: bool = Field(default=True, description="True if unnegated in active clinical clause")
+    value_in_range: bool = Field(default=True, description="True if numeric measurement falls within statutory threshold")
+    semantic_invalidation_reasons: list[str] = Field(default_factory=list, description="Specific semantic failure reasons if disqualified")
 
 class CriterionAssessment(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -49,6 +56,9 @@ class VerificationAuditResult(BaseModel):
     offset_drift_detected: bool = Field(..., description="True if text exists but start/end offsets drift from slice")
     discordance_flag: bool = Field(default=False, description="True if conflicting diagnostic measurements or internal contradictions exist across sections")
     healed_offset_drift: bool = Field(default=False, description="True if offset drift was autonomously healed by feedback loop")
+    semantic_support_passed: bool = Field(default=True, description="True if all supporting evidence spans pass semantic integrity checks")
+    semantic_audit_notes: str | None = Field(default=None, description="Detailed semantic breakdown (subject, timing, modality, negation, range)")
+    discordance_details: str | None = Field(default=None, description="Specific details of conflicting clinical values or dates")
     audit_notes: str = Field(..., description="Detailed adversarial verification audit findings")
     calibrated_confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence recalibrated after adversarial penalization")
 
@@ -105,8 +115,8 @@ class FinalAdjudication(BaseModel):
     adjudication_decision: AdjudicationDecision = Field(..., description="Final decision: APPROVED, DENIED, or DEFERRED_TO_HUMAN")
     abstention_status: bool = Field(..., description="True if autonomous decision was withheld and deferred to human review")
     raw_aggregate_confidence: float = Field(..., ge=0.0, le=1.0, description="Average uncalibrated extraction confidence")
-    calibrated_aggregate_confidence: float = Field(..., ge=0.0, le=1.0, description="Aggregate calibrated confidence after adversarial audit")
-    abstention_threshold: float = Field(default=0.85, description="Confidence threshold tau below which system must abstain")
+    calibrated_aggregate_confidence: float = Field(..., ge=0.0, le=1.0, description="Aggregate calibrated confidence / sufficiency score after adversarial audit")
+    abstention_threshold: float = Field(default=0.85, description="Operating sufficiency threshold tau below which system abstains")
     abstention_reason: str | None = Field(default=None, description="Detailed trigger rationale if abstention was activated")
     criterion_assessments: list[CriterionAssessment] = Field(default_factory=list, description="Criterion-by-criterion evaluation breakdown")
     verification_audits: list[VerificationAuditResult] = Field(default_factory=list, description="Adversarial verification results per criterion")
@@ -122,6 +132,52 @@ class FinalAdjudication(BaseModel):
     execution_mode: str = Field(default="deterministic", description="Adjudication engine utilized: deterministic or state_machine")
     state_transitions: list[dict[str, Any]] | None = Field(default=None, description="State machine audit transitions if executed under state_machine mode")
     retrieval_insights: dict[str, Any] | None = Field(default=None, description="Hybrid retrieval candidate ranking if policy was auto-discovered")
+
+    # Honest Scope & Sign-off Gate Architecture (Task 1 & Task 6)
+    determination_scope: str = Field(
+        default="Checked: curated CMS statutory criteria. Not checked: plan-specific rules, member eligibility, network status. Requires human clinical review and sign-off before official transmission.",
+        description="Explicit scope of checked CMS criteria vs unchecked plan/eligibility rules"
+    )
+    human_sign_off_status: str = Field(
+        default="PENDING_CLINICAL_SIGN_OFF",
+        description="Human sign-off status: PENDING_CLINICAL_SIGN_OFF, SIGNED_OFF, or OVERRIDDEN"
+    )
+    signed_off_by: str | None = Field(default=None, description="Name or identifier of licensed clinician who reviewed and signed off")
+    signed_off_at: str | None = Field(default=None, description="Timestamp of clinical sign-off")
+    audit_hash_type: str = Field(
+        default="tamper_evident_integrity_seal",
+        description="Tamper-evident record hash certifying post-creation integrity and reproducibility, not medical correctness"
+    )
+    plain_language_disclaimer: str = Field(
+        default=(
+            "Notice: This coverage determination pre-check is based solely on curated CMS coverage criteria. "
+            "Plan-specific coverage rules and real-time patient eligibility were not evaluated. "
+            "This output requires review and sign-off by a licensed clinical professional before any authorization or claim submission."
+        ),
+        description="Mandatory plain-language clinical disclaimer"
+    )
+
+    # Heuristic Sufficiency Reporting (Task 2)
+    score_type: str = Field(
+        default="sufficiency_score",
+        description="Explicit classification of confidence score: sufficiency_score (heuristic criteria weight) rather than calibrated probability"
+    )
+    sufficiency_score: float = Field(default=0.0, ge=0.0, le=1.0, description="Heuristic sufficiency score based on verified criteria")
+    sufficiency_formula: str = Field(
+        default="criteria_sufficiency_weighted_sum / total_applicable_criteria",
+        description="Documented formula for sufficiency score computation"
+    )
+    criteria_met_count: int = Field(default=0, description="Count of criteria meeting statutory requirements")
+    criteria_total_count: int = Field(default=0, description="Total criteria evaluated")
+    missing_criteria: list[str] = Field(default_factory=list, description="Codes of missing criteria required for coverage")
+    insufficient_criteria: list[str] = Field(default_factory=list, description="Codes of criteria with insufficient documentation")
+    deferral_reason: str | None = Field(default=None, description="Clinical reason for deferral if deferred to human")
+
+    # Multi-Agent Coordination & Disagreement Tracking (Task 4)
+    critic_findings: dict[str, Any] | None = Field(default=None, description="Critic agent counter-evidence and falsification audit findings")
+    agent_disagreements: list[dict[str, Any]] = Field(default_factory=list, description="Recorded agent disagreements resolved by deterministic veto")
+    action_required_questions: list[str] = Field(default_factory=list, description="Targeted clinical questions formulated by MissingEvidenceAgent for human reviewer")
+    human_override: dict[str, Any] | None = Field(default=None, description="Recorded human override preserving original system determination")
 
 # Request / Response DTOs
 class PolicyMatchSummary(BaseModel):
@@ -435,6 +491,10 @@ class AuditTrailEvent(BaseModel):
     actor_role: str
     action_details: str
     audit_hash: str
+    audit_seal_certifies: str = Field(
+        default="tamper_evident_integrity_and_reproducibility",
+        description="Certifies post-creation record immutability and deterministic reproducibility, not clinical correctness"
+    )
 
 class AuditTrailResponse(BaseModel):
     total_events: int
