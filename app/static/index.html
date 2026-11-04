@@ -379,6 +379,7 @@
                     <!-- HIDDEN SYSTEM INPUTS TO PREVENT VISUAL CLUTTER -->
                     <textarea id="ehr-input" style="display: none;"></textarea>
                     <input type="hidden" id="patient-id-input" value="PT-CARD-8821">
+                    <input type="hidden" id="patient-name-input" value="Eleanor Vance">
                     <input type="hidden" id="policy-select" value="NCD-20.4">
                     <input type="hidden" id="tau-input" value="0.85">
 
@@ -653,10 +654,14 @@
 
                         <!-- SECTION A: PATIENT & DOCTOR -->
                         <div class="packet-section">
-                            <div class="section-title-bar">SECTION A: PATIENT & COVERAGE INFORMATION</div>
+                            <div class="section-title-bar">SECTION A: PATIENT &amp; COVERAGE INFORMATION</div>
                             <div class="packet-fields-grid">
                                 <div class="packet-field">
-                                    <label>Patient ID:</label>
+                                    <label>Patient Legal Name:</label>
+                                    <span id="doc-patient-name" class="field-val-bold">--</span>
+                                </div>
+                                <div class="packet-field">
+                                    <label>Patient ID / MRN:</label>
                                     <span id="doc-patient-id" class="field-val-mono">--</span>
                                 </div>
                                 <div class="packet-field">
@@ -2462,6 +2467,14 @@
             <div class="modal-body pin-modal-body">
                 <!-- SUMMARY STRIP -->
                 <div class="pin-summary-strip">
+                    <div class="pin-summary-row">
+                        <span>Patient Legal Name:</span>
+                        <strong id="pin-modal-patient" style="color:#F8FAFC;">--</strong>
+                    </div>
+                    <div class="pin-summary-row">
+                        <span>Patient ID / MRN:</span>
+                        <strong class="mono" id="pin-modal-patient-id" style="color:#38BDF8;">--</strong>
+                    </div>
                     <div class="pin-summary-row">
                         <span>Case Number:</span>
                         <strong class="mono" id="pin-modal-case-id" style="color:#38BDF8;">--</strong>

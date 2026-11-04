@@ -244,3 +244,35 @@ def test_signing_clinician_gains_retrieval_rights(setup_access_control_users_and
     assert final_res.json()["determination_stage"] == "FINAL"
     assert final_res.json()["is_releasable"] is True
 
+
+def test_clinician_signing_view_displays_authentic_patient_identity(setup_access_control_users_and_cases):
+    """
+    Verifies that under HIPAA TPO (45 CFR § 164.506) and CMS 42 CFR § 424.500:
+    1. Licensed Clinicians reviewing prior authorization packets are presented with
+       authentic patient identity (patient_name and unmasked patient_id) to prevent
+       wrong-patient signing errors.
+    2. Compliance Auditors inspecting cases receive de-identified Safe Harbor masking
+       ('[REDACTED (Auditor Mode)]' and 'PT-***').
+    """
+    case_id = setup_access_control_users_and_cases["case_id"]
+    headers_owner = {"Authorization": f"Bearer {setup_access_control_users_and_cases['token_owner']}"}
+    headers_auditor = {"Authorization": f"Bearer {setup_access_control_users_and_cases['token_auditor']}"}
+
+    # 1. Clinician / Case Owner Packet Retrieval
+    clinician_res = client.get(f"/api/v1/packet/{case_id}", headers=headers_owner)
+    assert clinician_res.status_code == 200
+    clinician_packet = clinician_res.json()
+
+    assert clinician_packet["patient_name"] is not None
+    assert clinician_packet["patient_name"] != "[REDACTED (Auditor Mode)]"
+    assert clinician_packet["patient_id"] is not None
+
+    # 2. Auditor Packet Retrieval (De-Identified Safe Harbor)
+    auditor_res = client.get(f"/api/v1/packet/{case_id}", headers=headers_auditor)
+    assert auditor_res.status_code == 200
+    auditor_packet = auditor_res.json()
+
+    assert auditor_packet["patient_name"] == "[REDACTED (Auditor Mode)]"
+    assert auditor_packet["patient_id"] == auditor_packet["patient_id_masked"]
+
+

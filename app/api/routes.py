@@ -790,6 +790,7 @@ def get_clinical_presets():
                 "category": "Cardiology",
                 "policy_id": "NCD-20.4",
                 "patient_id": "PT-CARD-8821",
+                "patient_name": "Eleanor Vance",
                 "description": "Severe ischemic cardiomyopathy (LVEF 28%, NYHA II, 6 months GDMT, 14 mos post-CABG)",
                 "expected_decision": "APPROVED",
                 "ehr_text": BENCHMARK_VIGNETTES[0]["ehr"].strip()
@@ -800,6 +801,7 @@ def get_clinical_presets():
                 "category": "Cardiology",
                 "policy_id": "NCD-20.4",
                 "patient_id": "PT-CARD-9014",
+                "patient_name": "Robert Thornton",
                 "description": "LVEF 30% but only 3 weeks of GDMT (< 90-day requirement). Gate defers to human.",
                 "expected_decision": "DEFERRED_TO_HUMAN",
                 "ehr_text": BENCHMARK_VIGNETTES[1]["ehr"].strip()
@@ -810,6 +812,7 @@ def get_clinical_presets():
                 "category": "Cardiology",
                 "policy_id": "NCD-20.4",
                 "patient_id": "PT-ICU-1029",
+                "patient_name": "Harold Hayes",
                 "description": "Patient in acute cardiogenic shock and PCI 4 days ago. Contraindicated under CMS exclusion.",
                 "expected_decision": "DENIED",
                 "ehr_text": BENCHMARK_VIGNETTES[2]["ehr"].strip()
@@ -820,6 +823,7 @@ def get_clinical_presets():
                 "category": "Pulmonology",
                 "policy_id": "LCD-L33829",
                 "patient_id": "PT-RESP-4402",
+                "patient_name": "Arthur Miller",
                 "description": "Severe obstructive sleep apnea (AHI 34.2 events/hr) with documented face-to-face evaluation.",
                 "expected_decision": "APPROVED",
                 "ehr_text": BENCHMARK_VIGNETTES[3]["ehr"].strip()
@@ -830,6 +834,7 @@ def get_clinical_presets():
                 "category": "Pulmonology",
                 "policy_id": "LCD-L33829",
                 "patient_id": "PT-RESP-5510",
+                "patient_name": "Thomas Sterling",
                 "description": "AHI 7.2 events/hr but chart lacks required comorbid condition documentation.",
                 "expected_decision": "DEFERRED_TO_HUMAN",
                 "ehr_text": BENCHMARK_VIGNETTES[4]["ehr"].strip()
@@ -840,6 +845,7 @@ def get_clinical_presets():
                 "category": "Wound Care",
                 "policy_id": "NCD-20.29",
                 "patient_id": "PT-WOUND-3390",
+                "patient_name": "Harold Washington",
                 "description": "Type 2 diabetes with Wagner Grade 3 deep ulceration and failure of 30 days standard wound therapy.",
                 "expected_decision": "APPROVED",
                 "ehr_text": """CLINICAL PROGRESS NOTE - WOUND CARE CLINIC
@@ -1099,10 +1105,10 @@ def get_coverage_packet(
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
     verify_case_record_access(case_id, log, current_user)
 
+    packet = None
     if case_id in _EPHEMERAL_PACKETS:
-        return _EPHEMERAL_PACKETS[case_id]
-
-    if log.full_packet_json:
+        packet = _EPHEMERAL_PACKETS[case_id].model_copy(deep=True)
+    elif log.full_packet_json:
         try:
             packet = CMSCoveragePacket.model_validate_json(log.full_packet_json)
             packet.determination_stage = log.determination_stage or packet.determination_stage
@@ -1111,54 +1117,67 @@ def get_coverage_packet(
             packet.signed_by = log.signed_by or packet.signed_by
             packet.signed_at = log.signed_at.isoformat() if log.signed_at else packet.signed_at
             packet.payer_transaction_id = log.payer_transaction_id or packet.payer_transaction_id
-            _EPHEMERAL_PACKETS[case_id] = packet
-            return packet
+            _EPHEMERAL_PACKETS[case_id] = packet.model_copy(deep=True)
         except Exception:
             pass
 
-    import json
-    criterion_assessments_raw = json.loads(log.criterion_evaluations_json or "[]")
-    from app.schemas.contracts import CriterionAssessment
-    c_assessments = [CriterionAssessment(**c) for c in criterion_assessments_raw]
+    if packet is None:
+        import json
+        criterion_assessments_raw = json.loads(log.criterion_evaluations_json or "[]")
+        from app.schemas.contracts import CriterionAssessment
+        c_assessments = [CriterionAssessment(**c) for c in criterion_assessments_raw]
 
-    policy_obj = db.query(MedicarePolicy).filter(MedicarePolicy.policy_id == log.policy_id).first()
-    policy_title = policy_obj.title if policy_obj else f"Medicare Policy {log.policy_id}"
+        policy_obj = db.query(MedicarePolicy).filter(MedicarePolicy.policy_id == log.policy_id).first()
+        policy_title = policy_obj.title if policy_obj else f"Medicare Policy {log.policy_id}"
 
-    adjudication_dummy = FinalAdjudication(
-        case_id=log.case_id,
-        patient_id_masked=log.patient_id_masked,
-        policy_id=log.policy_id,
-        policy_title=policy_title,
-        adjudication_decision=log.decision,
-        abstention_status=log.abstention_status,
-        raw_aggregate_confidence=log.raw_confidence or 0.0,
-        calibrated_aggregate_confidence=log.calibrated_confidence,
-        abstention_threshold=0.85,
-        abstention_reason=log.abstention_reason,
-        criterion_assessments=c_assessments,
-        verification_audits=[],
-        audit_hash=log.audit_hash or "",
-        required_clinician_action_notes=log.required_clinician_action_notes,
-        execution_time_ms=log.execution_time_ms or 0.0,
-        sanitized_ehr_text="",
-        determination_stage=log.determination_stage or "PROVISIONAL",
-        is_releasable=log.is_releasable if log.is_releasable is not None else False,
-        human_sign_off_status=log.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF",
-        signed_off_by=log.signed_by,
-        signed_off_at=log.signed_at.isoformat() if log.signed_at else None,
-        timestamp=log.created_at
-    )
+        adjudication_dummy = FinalAdjudication(
+            case_id=log.case_id,
+            patient_id_masked=log.patient_id_masked,
+            policy_id=log.policy_id,
+            policy_title=policy_title,
+            adjudication_decision=log.decision,
+            abstention_status=log.abstention_status,
+            raw_aggregate_confidence=log.raw_confidence or 0.0,
+            calibrated_aggregate_confidence=log.calibrated_confidence,
+            abstention_threshold=0.85,
+            abstention_reason=log.abstention_reason,
+            criterion_assessments=c_assessments,
+            verification_audits=[],
+            audit_hash=log.audit_hash or "",
+            required_clinician_action_notes=log.required_clinician_action_notes,
+            execution_time_ms=log.execution_time_ms or 0.0,
+            sanitized_ehr_text="",
+            determination_stage=log.determination_stage or "PROVISIONAL",
+            is_releasable=log.is_releasable if log.is_releasable is not None else False,
+            human_sign_off_status=log.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF",
+            signed_off_by=log.signed_by,
+            signed_off_at=log.signed_at.isoformat() if log.signed_at else None,
+            timestamp=log.created_at
+        )
 
-    packet = CoveragePacketGenerator.generate_packet(adjudication_dummy)
-    packet.submission_status = log.submission_status or "PENDING_CLINICIAN_REVIEW"
-    packet.determination_stage = log.determination_stage or "PROVISIONAL"
-    packet.is_releasable = log.is_releasable if log.is_releasable is not None else False
-    packet.human_sign_off_status = log.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF"
-    packet.signed_by = log.signed_by
-    packet.signed_at = log.signed_at.isoformat() if log.signed_at else None
-    packet.payer_transaction_id = log.payer_transaction_id
-    _EPHEMERAL_PACKETS[case_id] = packet
-    return packet
+        packet = CoveragePacketGenerator.generate_packet(adjudication_dummy)
+        packet.submission_status = log.submission_status or "PENDING_CLINICIAN_REVIEW"
+        packet.determination_stage = log.determination_stage or "PROVISIONAL"
+        packet.is_releasable = log.is_releasable if log.is_releasable is not None else False
+        packet.human_sign_off_status = log.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF"
+        packet.signed_by = log.signed_by
+        packet.signed_at = log.signed_at.isoformat() if log.signed_at else None
+        packet.payer_transaction_id = log.payer_transaction_id
+        _EPHEMERAL_PACKETS[case_id] = packet.model_copy(deep=True)
+
+    # Return deep copy with role-specific PHI view to avoid mutating cached instances
+    res_packet = packet.model_copy(deep=True)
+    from app.core.security import PRESET_PATIENT_NAMES
+    if current_user.role in (UserRole.AUDITOR.value, "Auditor"):
+        res_packet.patient_name = "[REDACTED (Auditor Mode)]"
+        res_packet.patient_id = res_packet.patient_id_masked
+    else:
+        if not res_packet.patient_name:
+            res_packet.patient_name = PRESET_PATIENT_NAMES.get(log.patient_id_masked) or PRESET_PATIENT_NAMES.get(res_packet.patient_id) or "Eleanor Vance"
+        if not res_packet.patient_id or res_packet.patient_id == res_packet.patient_id_masked:
+            res_packet.patient_id = log.patient_id_masked
+
+    return res_packet
 
 @api_router.post("/determination/{case_id}/sign-off", response_model=SignOffResponse, summary="Record Human Clinician Sign-Off on Determination")
 def sign_off_clinical_determination(

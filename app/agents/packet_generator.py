@@ -133,6 +133,8 @@ class CoveragePacketGenerator:
         return CMSCoveragePacket(
             packet_id=packet_id,
             case_id=adjudication.case_id,
+            patient_id=getattr(adjudication, "patient_id", None) or adjudication.patient_id_masked,
+            patient_name=getattr(adjudication, "patient_name", None),
             patient_id_masked=adjudication.patient_id_masked,
             policy_id=adjudication.policy_id,
             policy_title=adjudication.policy_title,

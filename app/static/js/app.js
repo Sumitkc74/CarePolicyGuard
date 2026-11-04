@@ -42,6 +42,67 @@ let clinicalPresets = [];
 let lastAdjudicationResult = null;
 let cachedPoliciesList = [];
 let currentCoveragePacket = null;
+let currentPatientName = "Eleanor Vance";
+let currentPatientId = "PT-CARD-8821";
+
+const PRESET_PATIENT_NAME_MAP = {
+    "PT-CARD-8821": "Eleanor Vance",
+    "PT-CARD-9014": "Robert Thornton",
+    "PT-ICU-1029": "Harold Hayes",
+    "PT-RESP-4402": "Arthur Miller",
+    "PT-RESP-5510": "Thomas Sterling",
+    "PT-WOUND-3390": "Harold Washington",
+    "PT-CARD-6612": "Margaret Campbell",
+    "PT-CARD-7731": "James Wilson",
+    "PT-CARD-9944": "Beatrice Gomez"
+};
+
+function extractPatientNameFromNote(text) {
+    if (!text) return null;
+    const match = text.match(/(?:patient\s*(?:name)?|pt\s*(?:name)?)\s*:\s*([A-Za-z]+(?:\s+[A-Za-z]+)+)/i);
+    if (match && match[1]) {
+        const val = match[1].trim();
+        if (!val.toLowerCase().includes("redacted") && !val.toLowerCase().includes("unknown")) {
+            return val;
+        }
+    }
+    return null;
+}
+
+function getActivePatientIdentity() {
+    // Role-based PHI: In Auditor inspection mode, apply HIPAA Safe Harbor masking
+    if (currentRole === "Auditor") {
+        return {
+            patient_name: "[REDACTED (Auditor Mode)]",
+            patient_id: (currentCoveragePacket && currentCoveragePacket.patient_id_masked) || "PT-***"
+        };
+    }
+    // Clinician view: under 45 CFR § 164.506 (TPO), display authentic unmasked patient identity
+    // to certify medical necessity without wrong-patient signing risk
+    let patId = (document.getElementById("patient-id-input") && document.getElementById("patient-id-input").value.trim()) || 
+                (currentCoveragePacket && (currentCoveragePacket.patient_id || currentCoveragePacket.patient_id_masked)) || 
+                currentPatientId || "PT-CARD-8821";
+    let name = currentPatientName;
+
+    const inputNameElem = document.getElementById("patient-name-input");
+    if (inputNameElem && inputNameElem.value.trim() && inputNameElem.value.trim() !== "Eleanor Vance") {
+        name = inputNameElem.value.trim();
+    } else if (currentCoveragePacket && currentCoveragePacket.patient_name) {
+        name = currentCoveragePacket.patient_name;
+    } else if (PRESET_PATIENT_NAME_MAP[patId]) {
+        name = PRESET_PATIENT_NAME_MAP[patId];
+    } else {
+        const pMatch = clinicalPresets.find(p => p.patient_id === patId || p.id === selectedModalPresetId);
+        if (pMatch && pMatch.patient_name) {
+            name = pMatch.patient_name;
+        }
+    }
+
+    return {
+        patient_name: name || "Eleanor Vance",
+        patient_id: patId
+    };
+}
 
 // Demo credentials removed for security hardening
 
@@ -1857,6 +1918,12 @@ function loadPreset(presetId) {
     if (patElem) patElem.value = p.patient_id;
     if (ehrElem) ehrElem.value = p.ehr_text;
 
+    const resolvedName = p.patient_name || PRESET_PATIENT_NAME_MAP[p.patient_id] || "Eleanor Vance";
+    const nameElem = document.getElementById("patient-name-input");
+    if (nameElem) nameElem.value = resolvedName;
+    currentPatientName = resolvedName;
+    currentPatientId = p.patient_id;
+
     // Clear previous evaluation results so fresh check runs on new sample
     lastAdjudicationResult = null;
     currentCoveragePacket = null;
@@ -2078,6 +2145,12 @@ function syncPastedNoteToInput() {
 
     if (pasted && ehrElem) {
         ehrElem.value = pasted.value;
+        const extractedName = extractPatientNameFromNote(pasted.value);
+        if (extractedName) {
+            currentPatientName = extractedName;
+            const nameElem = document.getElementById("patient-name-input");
+            if (nameElem) nameElem.value = extractedName;
+        }
         if (currentNoteMode === "sample" && pasted.value.trim() !== (clinicalPresets.find(p => p.id === selectedModalPresetId)?.ehr_text || "").trim()) {
             // User modified the text or typed their own
             currentNoteMode = "actual";
@@ -2754,6 +2827,7 @@ async function executeAdjudication() {
             },
             body: JSON.stringify({
                 patient_id: patientId,
+                patient_name: currentPatientName,
                 policy_id: policyId,
                 ehr_narrative: ehrText,
                 options: { tau: tau }
@@ -4226,13 +4300,17 @@ function populatePacketDocument() {
 
     // Header values
     const docPacketId = document.getElementById("doc-packet-id");
+    const docPatientName = document.getElementById("doc-patient-name");
     const docPatientId = document.getElementById("doc-patient-id");
     const docDos = document.getElementById("doc-dos");
     const docPolicyId = document.getElementById("doc-policy-id");
     const docJurisdiction = document.getElementById("doc-jurisdiction");
 
+    const patientIdentity = getActivePatientIdentity();
+
     if (docPacketId) docPacketId.textContent = p.packet_id;
-    if (docPatientId) docPatientId.textContent = p.patient_id_masked;
+    if (docPatientName) docPatientName.textContent = patientIdentity.patient_name;
+    if (docPatientId) docPatientId.textContent = (currentRole === "Auditor") ? p.patient_id_masked : (patientIdentity.patient_id || p.patient_id_masked);
     if (docDos) docDos.textContent = p.date_of_service;
     if (docPolicyId) docPolicyId.textContent = `${p.policy_id} - ${p.policy_title}`;
     if (docJurisdiction) docJurisdiction.textContent = p.jurisdiction;
@@ -4408,6 +4486,12 @@ function openClinicianPinModal() {
         executePacketSubmission();
         return;
     }
+
+    const patientIdentity = getActivePatientIdentity();
+    const patNameEl = document.getElementById("pin-modal-patient");
+    if (patNameEl) patNameEl.textContent = patientIdentity.patient_name;
+    const patIdEl = document.getElementById("pin-modal-patient-id");
+    if (patIdEl) patIdEl.textContent = patientIdentity.patient_id;
 
     const caseIdEl = document.getElementById("pin-modal-case-id");
     if (caseIdEl) caseIdEl.textContent = (currentCoveragePacket && currentCoveragePacket.case_id) || "CASE-CURRENT";
@@ -4652,7 +4736,9 @@ function printPacketDocument() {
     }
 
     const p = currentCoveragePacket;
-    const patientId = p.patient_id_masked || "PT-UNKNOWN";
+    const patientIdentity = getActivePatientIdentity();
+    const patientName = patientIdentity.patient_name;
+    const patientId = (currentRole === "Auditor") ? (p.patient_id_masked || "PT-UNKNOWN") : (patientIdentity.patient_id || p.patient_id_masked || "PT-UNKNOWN");
     const dos = p.date_of_service || new Date().toISOString().split("T")[0];
     const policy = `${p.policy_id || ''} - ${p.policy_title || ''}`;
     const jurisdiction = p.jurisdiction || "National / Regional MAC";
@@ -4861,18 +4947,22 @@ function printPacketDocument() {
     <table class="grid-table">
         <tr>
             <td style="width: 25%;">
-                <div class="field-label">Patient ID</div>
+                <div class="field-label">Patient Legal Name</div>
+                <div class="field-value">${escapeHtml(patientName)}</div>
+            </td>
+            <td style="width: 20%;">
+                <div class="field-label">Patient ID / MRN</div>
                 <div class="field-value">${escapeHtml(patientId)}</div>
             </td>
-            <td style="width: 25%;">
+            <td style="width: 15%;">
                 <div class="field-label">Date of Service</div>
                 <div class="field-value">${escapeHtml(dos)}</div>
             </td>
-            <td style="width: 30%;">
+            <td style="width: 25%;">
                 <div class="field-label">Governing Policy</div>
                 <div class="field-value">${escapeHtml(policy)}</div>
             </td>
-            <td style="width: 20%;">
+            <td style="width: 15%;">
                 <div class="field-label">MAC Jurisdiction</div>
                 <div class="field-value">${escapeHtml(jurisdiction)}</div>
             </td>

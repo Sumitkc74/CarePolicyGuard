@@ -110,6 +110,8 @@ class FinalAdjudication(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     case_id: str = Field(..., description="Unique deterministic case adjudication identifier")
+    patient_id: str | None = Field(default=None, description="Authentic unmasked patient identifier / MRN for licensed clinical signers")
+    patient_name: str | None = Field(default=None, description="Patient legal name for licensed clinician attestation")
     patient_id_masked: str = Field(..., description="Sanitized/masked patient identifier")
     policy_id: str = Field(..., description="Governing Medicare policy ID (e.g., NCD-20.4)")
     policy_title: str = Field(..., description="Full official Medicare policy title")
@@ -230,6 +232,7 @@ class MultiPolicyScanResponse(BaseModel):
 
 class AdjudicationRequest(BaseModel):
     patient_id: str = Field(default="PT-10829", description="Patient or record identifier")
+    patient_name: str | None = Field(default=None, description="Patient legal name for clinical attestation")
     policy_id: str | None = Field(default="AUTO", description="Selected Medicare LCD or NCD policy ID (e.g., NCD-20.4), or 'AUTO' for hybrid retrieval auto-discovery")
     ehr_narrative: str = Field(default="", description="Raw clinical EHR documentation / progress note")
     cpt_codes: list[str] | None = Field(default=None, description="Optional procedure codes to validate")
@@ -404,6 +407,8 @@ class FilledCriterionSection(BaseModel):
 class CMSCoveragePacket(BaseModel):
     packet_id: str
     case_id: str
+    patient_id: str | None = None
+    patient_name: str | None = None
     patient_id_masked: str
     policy_id: str
     policy_title: str
