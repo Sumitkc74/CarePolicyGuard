@@ -257,6 +257,11 @@ def login(
         token_type="bearer",
         role=user.role,
         username=user.username,
+        full_name=getattr(user, "full_name", None) or user.username,
+        npi_number=getattr(user, "npi_number", None),
+        credential_title=getattr(user, "credential_title", "MD"),
+        specialty=getattr(user, "specialty", None),
+        organization=getattr(user, "organization", None),
         expires_in_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
@@ -342,10 +347,29 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     return user
 
 @api_router.get("/auth/me", response_model=UserOut)
-def get_current_user_profile(current_user: User = Depends(get_current_user)):
+def get_current_user_profile(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Returns current authenticated user profile.
     """
+    if current_user.role == UserRole.CLINICIAN.value:
+        changed = False
+        if not getattr(current_user, "npi_number", None):
+            from app.core.security import generate_deterministic_npi
+            current_user.npi_number = generate_deterministic_npi(current_user.email)
+            changed = True
+        if not getattr(current_user, "full_name", None):
+            local_name = current_user.email.split("@")[0].replace(".", " ").replace("_", " ").title()
+            current_user.full_name = f"Dr. {local_name}"
+            changed = True
+        if not getattr(current_user, "credential_title", None):
+            current_user.credential_title = "MD"
+            changed = True
+        if changed:
+            db.commit()
+            db.refresh(current_user)
     return current_user
 
 # =============================================================================

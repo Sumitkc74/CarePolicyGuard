@@ -360,6 +360,11 @@ def register_mfa_routes(api_router: APIRouter):
             "token_type": "bearer",
             "role": user.role,
             "username": user.username,
+            "full_name": getattr(user, "full_name", None) or user.username,
+            "npi_number": getattr(user, "npi_number", None),
+            "credential_title": getattr(user, "credential_title", "MD"),
+            "specialty": getattr(user, "specialty", "Cardiology / Internal Medicine"),
+            "organization": getattr(user, "organization", "CarePolicyGuard Healthcare Network"),
             "expires_in_seconds": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
             "mfa_verified": True
         }

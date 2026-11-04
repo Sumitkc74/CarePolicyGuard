@@ -251,6 +251,11 @@ class TokenResponse(BaseModel):
     role: str
     username: str
     expires_in_seconds: int
+    full_name: str | None = None
+    npi_number: str | None = None
+    credential_title: str | None = None
+    specialty: str | None = None
+    organization: str | None = None
 
 class UserCreate(BaseModel):
     username: str
@@ -292,9 +297,11 @@ class UserOut(BaseModel):
     email: str
     role: str
     is_active: bool
+    full_name: str | None = None
     npi_number: str | None = None
     credential_title: str | None = None
     license_state: str | None = None
+    specialty: str | None = None
     organization: str | None = None
     is_verified_medical_pro: bool = False
     created_at: datetime

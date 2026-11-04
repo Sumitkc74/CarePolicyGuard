@@ -36,6 +36,7 @@ async def lifespan(app: FastAPI):
             res = conn.execute(text("PRAGMA table_info(users)"))
             cols = [r[1] for r in res.fetchall()]
             new_cols = [
+                ("full_name", "VARCHAR(150)"),
                 ("npi_number", "VARCHAR(20)"),
                 ("medical_license", "VARCHAR(50)"),
                 ("license_state", "VARCHAR(10)"),

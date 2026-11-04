@@ -16,6 +16,7 @@ class User(Base):
     email = Column(String(150), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     role = Column(String(50), nullable=False, default="Clinician")  # Auditor, Clinician, Admin
+    full_name = Column(String(150), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
 
     # Medical Professional Credential & Licensure Verification

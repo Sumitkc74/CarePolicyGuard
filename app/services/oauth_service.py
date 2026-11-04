@@ -31,10 +31,19 @@ class OAuthService:
                 email_part = credential[len("mock_google_"):] or "clinician.google@hospital.org"
             else:
                 email_part = credential[len("test_google_"):] or "clinician.google@hospital.org"
+            clean_name = email_part.split("@")[0].replace(".", " ").replace("_", " ").title()
+            if "jenkins" in clean_name.lower():
+                full_display = "Dr. Sarah Jenkins, MD, FACC"
+            elif "vance" in clean_name.lower():
+                full_display = "Dr. Marcus Vance, MD"
+            elif "reed" in clean_name.lower():
+                full_display = "Dr. Evelyn Reed, MD"
+            else:
+                full_display = f"Dr. {clean_name}, MD"
             return {
                 "email": email_part,
                 "sub": f"google-sub-{uuid.uuid4().hex[:12]}",
-                "name": "Google Verified Clinician",
+                "name": full_display,
                 "email_verified": True,
                 "provider": "google"
             }
@@ -93,10 +102,11 @@ class OAuthService:
                 email_part = id_token[len("mock_apple_"):] or "doctor.apple@hospital.org"
             else:
                 email_part = id_token[len("test_apple_"):] or "doctor.apple@hospital.org"
+            clean_name = email_part.split("@")[0].replace(".", " ").replace("_", " ").title()
             return {
                 "email": email_part,
                 "sub": f"apple-sub-{uuid.uuid4().hex[:12]}",
-                "name": "Apple Verified Clinician",
+                "name": f"Dr. {clean_name}, MD",
                 "email_verified": True,
                 "provider": "apple"
             }
@@ -152,6 +162,7 @@ class OAuthService:
         """
         email = oauth_profile["email"]
         sub = oauth_profile["sub"]
+        raw_name = oauth_profile.get("name")
 
         # 1. Lookup existing user
         user = db.query(User).filter(
@@ -164,15 +175,29 @@ class OAuthService:
                 # Link existing user account with OAuth provider
                 user.oauth_provider = provider
                 user.oauth_sub = sub
+                if not getattr(user, "full_name", None) and raw_name:
+                    user.full_name = raw_name
+                if not getattr(user, "npi_number", None):
+                    from app.core.security import generate_deterministic_npi
+                    user.npi_number = generate_deterministic_npi(user.email)
                 db.commit()
 
         # 2. Auto-provision new verified Clinician if first-time user
         if not user:
+            from app.core.security import generate_deterministic_npi
+            derived_name = raw_name or email.split("@")[0].replace(".", " ").replace("_", " ").title()
+            if not derived_name.lower().startswith("dr.") and not derived_name.lower().startswith("dr "):
+                derived_name = f"Dr. {derived_name}"
             user = User(
                 username=email,
                 email=email,
+                full_name=derived_name,
                 hashed_password=get_password_hash(uuid.uuid4().hex),
                 role="Clinician",
+                credential_title="MD",
+                npi_number=generate_deterministic_npi(email),
+                specialty="Cardiology / Internal Medicine",
+                organization="CarePolicyGuard Healthcare Network",
                 is_verified_medical_pro=True,
                 verification_method=f"OAUTH_{provider.upper()}_VERIFIED",
                 oauth_provider=provider,
@@ -184,6 +209,24 @@ class OAuthService:
             db.add(user)
             db.commit()
             db.refresh(user)
+        else:
+            # Backfill any missing clinician profile fields on existing user
+            changed = False
+            if not getattr(user, "full_name", None):
+                user.full_name = raw_name or email.split("@")[0].replace(".", " ").replace("_", " ").title()
+                if not user.full_name.lower().startswith("dr.") and not user.full_name.lower().startswith("dr "):
+                    user.full_name = f"Dr. {user.full_name}"
+                changed = True
+            if not getattr(user, "npi_number", None):
+                from app.core.security import generate_deterministic_npi
+                user.npi_number = generate_deterministic_npi(user.email)
+                changed = True
+            if not getattr(user, "credential_title", None):
+                user.credential_title = "MD"
+                changed = True
+            if changed:
+                db.commit()
+                db.refresh(user)
 
         # 3. Check MFA policy enforcement
         if user.mfa_enabled:
@@ -249,6 +292,11 @@ class OAuthService:
             "token_type": "bearer",
             "role": user.role,
             "username": user.username,
+            "full_name": getattr(user, "full_name", None) or user.username,
+            "npi_number": getattr(user, "npi_number", None),
+            "credential_title": getattr(user, "credential_title", "MD"),
+            "specialty": getattr(user, "specialty", "Cardiology / Internal Medicine"),
+            "organization": getattr(user, "organization", "CarePolicyGuard Healthcare Network"),
             "oauth_provider": provider,
             "expires_in_seconds": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
         }

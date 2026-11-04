@@ -151,8 +151,10 @@ async function checkSessionOrShowGate() {
         currentRole = savedRole || "Clinician";
         currentUser = savedUser || "clinician@hospital.org";
         hideLoginGate();
+        renderClinicianProfile();
         updateUserBadge();
         routeToRoleDefaultTab();
+        await syncUserProfileFromServer();
         await loadPolicies();
         await loadPresets();
         await loadAuditLogs();
@@ -547,11 +549,17 @@ async function handleGoogleOAuthCredential(credential) {
             sessionStorage.setItem("carepolicyguard_token", currentToken);
             sessionStorage.setItem("carepolicyguard_role", currentRole);
             sessionStorage.setItem("carepolicyguard_user", currentUser);
+            if (data.full_name) sessionStorage.setItem("carepolicyguard_full_name", data.full_name);
+            if (data.npi_number) sessionStorage.setItem("carepolicyguard_npi", data.npi_number);
+            if (data.specialty) sessionStorage.setItem("carepolicyguard_specialty", data.specialty);
+            if (data.organization) sessionStorage.setItem("carepolicyguard_facility", data.organization);
 
+            renderClinicianProfile();
             updateUserBadge();
             hideLoginGate();
             showToast(`Welcome! Authenticated via Google (${currentUser})`);
 
+            await syncUserProfileFromServer();
             await loadPolicies();
             await loadPresets();
             await loadAuditLogs();
@@ -596,14 +604,20 @@ async function executeLogin(username, password) {
             sessionStorage.setItem("carepolicyguard_token", currentToken);
             sessionStorage.setItem("carepolicyguard_role", currentRole);
             sessionStorage.setItem("carepolicyguard_user", currentUser);
+            if (data.full_name) sessionStorage.setItem("carepolicyguard_full_name", data.full_name);
+            if (data.npi_number) sessionStorage.setItem("carepolicyguard_npi", data.npi_number);
+            if (data.specialty) sessionStorage.setItem("carepolicyguard_specialty", data.specialty);
+            if (data.organization) sessionStorage.setItem("carepolicyguard_facility", data.organization);
 
             const card = document.querySelector(".login-gate-card");
             if (card) card.classList.remove("mfa-active");
+            renderClinicianProfile();
             updateUserBadge();
             routeToRoleDefaultTab();
             hideLoginGate();
             showToast(`Welcome! Authenticated as ${currentRole} (${currentUser})`);
 
+            await syncUserProfileFromServer();
             await loadPolicies();
             await loadPresets();
             await loadAuditLogs();
@@ -623,6 +637,10 @@ function signOutToLoginGate() {
     sessionStorage.removeItem("carepolicyguard_token");
     sessionStorage.removeItem("carepolicyguard_role");
     sessionStorage.removeItem("carepolicyguard_user");
+    sessionStorage.removeItem("carepolicyguard_full_name");
+    sessionStorage.removeItem("carepolicyguard_npi");
+    sessionStorage.removeItem("carepolicyguard_specialty");
+    sessionStorage.removeItem("carepolicyguard_facility");
     localStorage.removeItem("carepolicyguard_token");
     localStorage.removeItem("carepolicyguard_role");
     localStorage.removeItem("carepolicyguard_user");
@@ -652,29 +670,86 @@ const DEFAULT_CLINICIAN_PROFILE = {
     facility: "MetroHealth Heart & Vascular Institute"
 };
 
-// Immediate purge of legacy Eleanor Vance clinician name from browser cache
-try {
-    const _legacyProfile = localStorage.getItem("carepolicyguard_clinician_profile");
-    if (_legacyProfile && (_legacyProfile.includes("Eleanor Vance") || _legacyProfile.includes("Dr. Eleanor"))) {
-        localStorage.removeItem("carepolicyguard_clinician_profile");
+function computeDeterministicNpiClient(seedStr) {
+    const clean = String(seedStr || "default").trim().toLowerCase();
+    let hash = 2166136261;
+    for (let i = 0; i < clean.length; i++) {
+        hash ^= clean.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
     }
-} catch (e) {}
+    const absHash = Math.abs(hash);
+    const numPart = String(absHash).padStart(8, '0').slice(0, 8);
+    const base = "1" + numPart;
+    for (let cd = 0; cd < 10; cd++) {
+        const candidate = base + cd;
+        const full = "80840" + candidate;
+        let sum = 0;
+        const rev = full.split("").reverse();
+        for (let i = 0; i < rev.length; i++) {
+            let d = parseInt(rev[i], 10);
+            if (i % 2 === 1) {
+                d *= 2;
+                if (d > 9) d -= 9;
+            }
+            sum += d;
+        }
+        if (sum % 10 === 0) return candidate;
+    }
+    return "1043256787";
+}
+
+function deriveClinicianNameFromUser(userKey) {
+    if (!userKey || userKey === "default" || userKey === "--") {
+        return { full_name: "Dr. Clinician, MD", display_name: "Dr. Clinician" };
+    }
+    if (userKey === "s.jenkins@pacificheart.org" || userKey === "doctor@hospital.org") {
+        return { full_name: "Dr. Sarah Jenkins, MD, FACC", display_name: "Dr. Sarah Jenkins" };
+    }
+    if (userKey === "m.vance@hospital.org") {
+        return { full_name: "Dr. Marcus Vance, MD", display_name: "Dr. Marcus Vance" };
+    }
+    if (userKey === "e.reed@woundcare.org") {
+        return { full_name: "Dr. Evelyn Reed, MD", display_name: "Dr. Evelyn Reed" };
+    }
+    const localPart = userKey.includes("@") ? userKey.split("@")[0] : userKey;
+    const cleaned = localPart.replace(/[._\-]+/g, " ").trim();
+    const words = cleaned.split(" ").filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1));
+    const cleanName = words.join(" ") || "Clinician";
+    return {
+        full_name: `Dr. ${cleanName}, MD`,
+        display_name: `Dr. ${cleanName}`
+    };
+}
 
 function getClinicianProfile() {
+    const userKey = currentUser || "default";
     try {
-        const stored = localStorage.getItem("carepolicyguard_clinician_profile");
+        const stored = localStorage.getItem(`carepolicyguard_clinician_profile_${userKey}`);
         if (stored) {
             const parsed = JSON.parse(stored);
-            if (parsed.full_name && (parsed.full_name.includes("Eleanor Vance") || parsed.full_name.includes("Dr. Eleanor"))) {
-                parsed.full_name = "Dr. Sarah Jenkins, MD, FACC";
-                localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(parsed));
-            }
-            return { ...DEFAULT_CLINICIAN_PROFILE, ...parsed };
+            return parsed;
         }
     } catch (e) {
         console.warn("Could not parse stored clinician profile:", e);
     }
-    return { ...DEFAULT_CLINICIAN_PROFILE };
+
+    const sessFullName = sessionStorage.getItem("carepolicyguard_full_name");
+    const sessNpi = sessionStorage.getItem("carepolicyguard_npi");
+    const sessSpec = sessionStorage.getItem("carepolicyguard_specialty");
+    const sessFac = sessionStorage.getItem("carepolicyguard_facility");
+
+    const derived = deriveClinicianNameFromUser(userKey);
+    const fullName = sessFullName || derived.full_name;
+    const displayName = derived.display_name || (fullName.split(",")[0].trim());
+    const npi = sessNpi || computeDeterministicNpiClient(userKey);
+
+    return {
+        full_name: fullName,
+        display_name: displayName,
+        npi: npi,
+        specialty: sessSpec || "Cardiology / Internal Medicine",
+        facility: sessFac || "CarePolicyGuard Healthcare Network"
+    };
 }
 
 function getActiveDisplayName() {
@@ -684,7 +759,7 @@ function getActiveDisplayName() {
 
     if (currentRole === "Clinician") {
         const prof = getClinicianProfile();
-        return prof.display_name || "Dr. Sarah Jenkins";
+        return prof.display_name || deriveClinicianNameFromUser(userKey).display_name;
     } else if (currentRole === "Admin") {
         return "System Admin";
     } else if (currentRole === "Auditor") {
@@ -727,7 +802,7 @@ function renderClinicianProfile() {
     const dispSpec = document.getElementById("disp-profile-specialty");
     const dispFac = document.getElementById("disp-profile-facility");
 
-    if (dispDisplayName) dispDisplayName.textContent = profile.display_name || "Dr. Sarah Jenkins";
+    if (dispDisplayName) dispDisplayName.textContent = profile.display_name || "Dr. Clinician";
     if (dispName) dispName.textContent = profile.full_name;
     if (dispNpi) dispNpi.textContent = profile.npi;
     if (dispSpec) dispSpec.textContent = profile.specialty;
@@ -745,9 +820,15 @@ function renderClinicianProfile() {
 
     // Sync Step 4 physician signature input with IMMUTABLE LEGAL name
     const docSigInput = document.getElementById("doc-physician-signature");
-    if (docSigInput && (!docSigInput.value || docSigInput.value.includes("Jenkins") || docSigInput.value.includes("Vance"))) {
+    if (docSigInput) {
         docSigInput.value = profile.full_name;
     }
+
+    const authDocName = document.getElementById("auth-doc-name-val");
+    if (authDocName) authDocName.textContent = profile.full_name;
+
+    const pinModalSigner = document.getElementById("pin-modal-signer");
+    if (pinModalSigner) pinModalSigner.textContent = profile.full_name;
 
     // Sync Addendum modal signer fields with IMMUTABLE LEGAL name and NPI
     const addendumName = document.getElementById("addendum-physician-name");
@@ -820,8 +901,8 @@ function saveIndividualEdit(fieldName) {
             return;
         }
         profile.display_name = val;
-        localStorage.setItem("carepolicyguard_clinician_profile", JSON.stringify(profile));
         const userKey = currentUser || currentRole || "user";
+        localStorage.setItem(`carepolicyguard_clinician_profile_${userKey}`, JSON.stringify(profile));
         localStorage.setItem(`carepolicyguard_display_name_${userKey}`, val);
         renderClinicianProfile();
         cancelIndividualEdit("display-name");
@@ -1173,14 +1254,20 @@ async function handleMfaChallengeSubmit(event) {
             sessionStorage.setItem("carepolicyguard_token", currentToken);
             sessionStorage.setItem("carepolicyguard_role", currentRole);
             sessionStorage.setItem("carepolicyguard_user", currentUser);
+            if (data.full_name) sessionStorage.setItem("carepolicyguard_full_name", data.full_name);
+            if (data.npi_number) sessionStorage.setItem("carepolicyguard_npi", data.npi_number);
+            if (data.specialty) sessionStorage.setItem("carepolicyguard_specialty", data.specialty);
+            if (data.organization) sessionStorage.setItem("carepolicyguard_facility", data.organization);
 
             const card = document.querySelector(".login-gate-card");
             if (card) card.classList.remove("mfa-active");
+            renderClinicianProfile();
             updateUserBadge();
             routeToRoleDefaultTab();
             hideLoginGate();
             showToast(`Two-factor verification successful. Authenticated as ${currentRole} (${currentUser})`);
 
+            await syncUserProfileFromServer();
             await loadPolicies();
             await loadPresets();
             await loadAuditLogs();
@@ -1204,6 +1291,26 @@ async function handleMfaChallengeSubmit(event) {
 
 function cancelMfaChallenge() {
     hideMfaChallengeScreen();
+}
+
+async function syncUserProfileFromServer() {
+    if (!currentToken) return;
+    try {
+        const res = await fetch("/api/v1/auth/me", {
+            headers: { "Authorization": `Bearer ${currentToken}` }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.full_name) sessionStorage.setItem("carepolicyguard_full_name", data.full_name);
+            if (data.npi_number) sessionStorage.setItem("carepolicyguard_npi", data.npi_number);
+            if (data.specialty) sessionStorage.setItem("carepolicyguard_specialty", data.specialty);
+            if (data.organization) sessionStorage.setItem("carepolicyguard_facility", data.organization);
+            renderClinicianProfile();
+            updateUserBadge();
+        }
+    } catch (e) {
+        console.warn("Could not sync profile from server:", e);
+    }
 }
 
 async function loadAuthModalSecurityDetails() {

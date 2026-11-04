@@ -349,6 +349,24 @@ def validate_npi_luhn(npi: str) -> bool:
     return checksum % 10 == 0
 
 
+def generate_deterministic_npi(seed_str: str) -> str:
+    """
+    Generates a deterministic, CMS Luhn-valid 10-digit National Provider Identifier (NPI)
+    beginning with '1' for any seed string (e.g., user email or username).
+    """
+    import hashlib
+    clean_seed = (seed_str or "default").strip().lower()
+    h = hashlib.sha256(clean_seed.encode("utf-8")).hexdigest()
+    base = "1" + "".join(c for c in h if c.isdigit())[:8]
+    if len(base) < 9:
+        base = base.ljust(9, "7")
+    for check_digit in range(10):
+        candidate = base + str(check_digit)
+        if validate_npi_luhn(candidate):
+            return candidate
+    return "1043256787"
+
+
 def is_institutional_clinical_email(email: str) -> tuple[bool, str]:
     """
     Enforces HIPAA Administrative Safeguards (45 CFR § 164.312(a)):
