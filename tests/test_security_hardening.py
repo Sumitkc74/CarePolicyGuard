@@ -1,8 +1,33 @@
+import secrets
+from datetime import timedelta
 import pytest
 from fastapi.testclient import TestClient
 from main import app
+from app.db.session import SessionLocal
+from app.db.models import User
+from app.core.security import get_password_hash, create_access_token
 
 client = TestClient(app)
+
+def _get_admin_headers() -> dict:
+    db = SessionLocal()
+    admin_username = f"admin_sh_{secrets.token_hex(4)}@carepolicyguard.med"
+    user = User(
+        username=admin_username,
+        email=admin_username,
+        hashed_password=get_password_hash(secrets.token_hex(16)),
+        role="Admin",
+        is_active=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    token = create_access_token(
+        {"sub": admin_username, "role": "Admin", "uid": user.id},
+        expires_delta=timedelta(minutes=30)
+    )
+    db.close()
+    return {"Authorization": f"Bearer {token}"}
 
 def test_owasp_security_headers_present():
     res = client.get("/health")
@@ -89,7 +114,8 @@ def test_fhir_audit_event_bundle_export():
     })
 
     # 2. Query the FHIR AuditEvent bundle
-    res = client.get("/api/v1/audit/trail/fhir-audit-event")
+    headers = _get_admin_headers()
+    res = client.get("/api/v1/audit/trail/fhir-audit-event", headers=headers)
     assert res.status_code == 200
     data = res.json()
     assert data["resourceType"] == "Bundle"

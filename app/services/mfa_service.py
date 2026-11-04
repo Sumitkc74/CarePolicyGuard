@@ -6,14 +6,54 @@ import base64
 import os
 import secrets
 import smtplib
+import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timezone, timedelta
-from typing import Tuple, Optional, Dict, Any
+from typing import Tuple, Optional, Dict, Any, List
+from fastapi import HTTPException, status
 
 from app.core.config import settings
 
+logger = logging.getLogger("app.services.mfa_service")
+
+
+class DevOtpDeliveryChannel:
+    """
+    In-memory / server-side development OTP delivery channel for local engineering/testing
+    when SMTP is unconfigured. Strictly inactive and forbidden in production.
+    """
+    _dev_codes: Dict[str, str] = {}
+
+    @classmethod
+    def is_available(cls) -> bool:
+        env = getattr(settings, "ENVIRONMENT", "development").lower()
+        debug_mode = getattr(settings, "DEBUG", True)
+        if env == "production" or not debug_mode:
+            return False
+        return bool(getattr(settings, "DEV_OTP_DELIVERY_ENABLED", False))
+
+    @classmethod
+    def deliver(cls, destination: str, code: str) -> None:
+        if not cls.is_available():
+            raise RuntimeError("Dev OTP delivery channel is disabled or strictly prohibited in production.")
+        cls._dev_codes[destination] = code
+        # Server-side developer log stream notice (clearly marked as dev code)
+        logger.info(f"[DEV OTP DELIVERY]: Second-factor verification code generated for {destination}. (Local Dev Mode Only)")
+
+    @classmethod
+    def get_latest_code(cls, destination: str) -> Optional[str]:
+        if not cls.is_available():
+            return None
+        return cls._dev_codes.get(destination)
+
+    @classmethod
+    def clear(cls) -> None:
+        cls._dev_codes.clear()
+
+
 class MFAService:
+
     """
     Unified Multi-Factor Authentication Service:
     1. Authenticator App (RFC 6238 TOTP - Google Authenticator, Duo, Apple Passwords).
@@ -84,15 +124,23 @@ class MFAService:
     def send_email_otp(cls, email: str, code: str) -> Dict[str, Any]:
         """
         Sends verification code to the user's email address.
-        If SMTP is configured in .env, sends a real live email.
-        Otherwise, delivers via secure local simulated preview.
+        - If SMTP is configured in settings, sends a real live email.
+        - If SMTP is unconfigured AND DEV_OTP_DELIVERY_ENABLED is active in dev mode,
+          delivers via the server-side dev channel.
+        - If SMTP is unconfigured AND dev channel is inactive, raises HTTP 503 promptly
+          with a clear error, preventing deadlocks or silent un-deliverable OTP generation.
         """
         masked_email = email[:2] + "***@" + email.split("@")[-1] if "@" in email else email
-        delivery_mode = "LIVE_SMTP" if (settings.SMTP_ENABLED and settings.SMTP_USER) else "DEVELOPMENT_PREVIEW"
-        sent_successfully = False
-        smtp_error = None
+        smtp_configured = bool(
+            settings.SMTP_ENABLED and
+            settings.SMTP_HOST and
+            settings.SMTP_USER and
+            settings.SMTP_PASSWORD
+        )
 
-        if settings.SMTP_ENABLED and settings.SMTP_USER and settings.SMTP_PASSWORD:
+        if smtp_configured:
+            sent_successfully = False
+            smtp_error = None
             try:
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = f"CarePolicyGuard Verification Code: {code}"
@@ -138,16 +186,33 @@ class MFAService:
             except Exception as e:
                 smtp_error = str(e)
 
-        return {
-            "status": "SENT",
-            "channel": "EMAIL",
-            "delivery_mode": delivery_mode,
-            "destination": masked_email,
-            "full_email": email,
-            "sent_live_smtp": sent_successfully,
-            "smtp_error": smtp_error,
-            "message": f"6-digit authentication code sent to {masked_email}. Valid for 10 minutes."
-        }
+            return {
+                "status": "SENT" if sent_successfully else "FAILED",
+                "channel": "EMAIL",
+                "delivery_mode": "LIVE_SMTP",
+                "destination": masked_email,
+                "sent_live_smtp": sent_successfully,
+                "smtp_error": smtp_error,
+                "message": f"6-digit authentication code sent via SMTP to {masked_email}. Valid for 10 minutes."
+            }
+
+        # SMTP is not configured: check development-only delivery channel
+        if DevOtpDeliveryChannel.is_available():
+            DevOtpDeliveryChannel.deliver(email, code)
+            return {
+                "status": "SENT",
+                "channel": "EMAIL",
+                "delivery_mode": "DEV_CHANNEL",
+                "destination": masked_email,
+                "sent_live_smtp": False,
+                "message": f"Security verification code dispatched via server-side development channel for {masked_email}."
+            }
+
+        # Neither SMTP nor dev channel is available: fail promptly with HTTP 503
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="MFA email delivery service is not configured. Please contact system administrator or configure TOTP application."
+        )
 
     @classmethod
     def send_sms_otp(cls, phone_number: str, code: str) -> Dict[str, Any]:

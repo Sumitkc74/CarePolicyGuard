@@ -1,10 +1,34 @@
 import pytest
+import secrets
+from datetime import timedelta
 from fastapi.testclient import TestClient
 from main import app
+from app.db.session import SessionLocal
+from app.db.models import User
+from app.core.security import create_access_token, get_password_hash
 
 client = TestClient(app)
 
 def test_pdf_export_endpoints():
+    db = SessionLocal()
+    admin_username = f"admin_pdf_{secrets.token_hex(4)}@carepolicyguard.med"
+    user = User(
+        username=admin_username,
+        email=admin_username,
+        hashed_password=get_password_hash(secrets.token_hex(16)),
+        role="Admin",
+        is_active=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    admin_token = create_access_token(
+        {"sub": admin_username, "role": "Admin", "uid": user.id},
+        expires_delta=timedelta(minutes=30)
+    )
+    db.close()
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
     # 1. Create a prior-auth case
     note = """
     70-year-old female with ischemic cardiomyopathy. Prior MI in 2020.
@@ -25,16 +49,17 @@ def test_pdf_export_endpoints():
     case_id = adj_data["case_id"]
 
     # 2. Test Coverage Packet PDF export
-    pdf_res = client.get(f"/api/v1/packet/{case_id}/pdf")
+    pdf_res = client.get(f"/api/v1/packet/{case_id}/pdf", headers=headers)
     assert pdf_res.status_code == 200
     assert pdf_res.headers["content-type"] == "application/pdf"
     assert pdf_res.content.startswith(b"%PDF-1.4")
     assert len(pdf_res.content) > 500
 
     # 3. Test Appeal Letter PDF export
-    appeal_pdf_res = client.get(f"/api/v1/packet/{case_id}/appeal-letter/pdf")
+    appeal_pdf_res = client.get(f"/api/v1/packet/{case_id}/appeal-letter/pdf", headers=headers)
     assert appeal_pdf_res.status_code == 200
     assert appeal_pdf_res.headers["content-type"] == "application/pdf"
     assert appeal_pdf_res.content.startswith(b"%PDF-1.4")
     assert len(appeal_pdf_res.content) > 500
+
 

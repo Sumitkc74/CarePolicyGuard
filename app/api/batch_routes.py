@@ -51,7 +51,7 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
             # Ephemeral packet cache
             packet = CoveragePacketGenerator.generate_packet(adj)
             ephemeral_packets[adj.case_id] = packet
-            ephemeral_texts[adj.case_id] = item.clinical_narrative
+            ephemeral_texts[adj.case_id] = adj.sanitized_ehr_text
             ephemeral_adjudications[adj.case_id] = adj
 
             dec_val = adj.adjudication_decision.value if hasattr(adj.adjudication_decision, 'value') else str(adj.adjudication_decision)

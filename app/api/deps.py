@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from datetime import datetime, timezone
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -122,4 +122,53 @@ def get_verified_clinician_user(
             detail="Access denied: Clinician account is not verified as a medical professional. Sign-off prohibited."
         )
     return current_user
+
+
+def verify_case_record_access(
+    case_id: str,
+    log: Optional[Any],
+    current_user: User
+) -> Any:
+    """
+    Enforces HIPAA Minimum Necessary and Anti-Enumeration Defense on case records:
+    1. Auditors and Admins retain organization-wide compliance and system inspection rights.
+    2. Clinicians and users can only inspect cases they submitted/own or personally signed off.
+    3. Anti-Enumeration Oracle Defense: If the case does not exist OR exists but the caller
+       is not authorized to view it, returns an IDENTICAL HTTP 404 response to prevent attackers
+       from discovering valid case IDs.
+    """
+    not_found_detail = f"Case adjudication record '{case_id}' not found."
+    if log is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=not_found_detail,
+        )
+
+    # Auditor and Admin have full organizational compliance/audit inspection rights
+    if current_user.role in (UserRole.AUDITOR.value, UserRole.ADMIN.value, "Auditor", "Admin"):
+        return log
+
+    # Case owner check (the user who submitted or created the case)
+    if getattr(log, "user_id", None) is not None and log.user_id == current_user.id:
+        return log
+
+    # Signer check (the verified clinician who signed off the case)
+    signed_by = getattr(log, "signed_by", None)
+    if signed_by:
+        signed_by_lower = signed_by.lower()
+        if (current_user.username and current_user.username.lower() in signed_by_lower) or \
+           (current_user.email and current_user.email.lower() in signed_by_lower):
+            return log
+
+    signer_npi = getattr(log, "signer_npi", None)
+    if signer_npi and getattr(current_user, "npi_number", None):
+        if signer_npi == current_user.npi_number:
+            return log
+
+    # Anti-enumeration oracle defense: do NOT return 403; return 404 with identical message
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=not_found_detail,
+    )
+
 

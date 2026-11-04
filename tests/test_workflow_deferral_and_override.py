@@ -1,4 +1,9 @@
 import pytest
+import secrets
+from datetime import timedelta
+from app.db.session import SessionLocal
+from app.db.models import User
+from app.core.security import create_access_token, get_password_hash
 from app.agents.pipeline import MultiAgentVerificationPipeline
 from app.schemas.contracts import AdjudicationDecision, FinalAdjudication
 from app.services.deferral_queue import (
@@ -126,28 +131,56 @@ def test_provisional_determination_cannot_be_retrieved_as_final_or_pushed_to_ehr
     assert res.status_code == 200
     case_id = res.json()["case_id"]
 
+    import secrets
+    from app.db.session import SessionLocal
+    from app.db.models import User
+    from app.core.security import create_access_token, get_password_hash
+
+    db = SessionLocal()
+    admin_u = f"admin_prov_{secrets.token_hex(4)}"
+    u_admin = User(
+        username=admin_u,
+        email=f"{admin_u}@hospital.org",
+        hashed_password=get_password_hash(secrets.token_hex(16)),
+        role="Admin",
+        is_active=True
+    )
+    db.add(u_admin)
+    db.commit()
+    db.refresh(u_admin)
+    admin_token = create_access_token(
+        {"sub": admin_u, "role": "Admin", "uid": u_admin.id},
+        expires_delta=timedelta(minutes=15)
+    )
+    db.close()
+    auth_headers = {"Authorization": f"Bearer {admin_token}"}
+
     # 1. Inspect provisional determination via standard endpoint
-    det_res = client.get(f"/api/v1/determination/{case_id}")
+    det_res = client.get(f"/api/v1/determination/{case_id}", headers=auth_headers)
     assert det_res.status_code == 200
     det_data = det_res.json()
     assert det_data["determination_stage"] == "PROVISIONAL"
     assert det_data["is_releasable"] is False
 
     # 2. Final-only retrieval endpoint must reject provisional determination
-    final_res = client.get(f"/api/v1/determination/{case_id}/final")
+    final_res = client.get(f"/api/v1/determination/{case_id}/final", headers=auth_headers)
     assert final_res.status_code == 412
     assert "PROVISIONAL" in final_res.json()["detail"]
 
     # 3. Direct EHR push must reject provisional determination
-    push_res = client.post(f"/api/v1/packet/{case_id}/ehr-push", json={
-        "case_id": case_id,
-        "ehr_system": "Epic Systems Hyperdrive"
-    })
+    push_res = client.post(
+        f"/api/v1/packet/{case_id}/ehr-push",
+        headers=auth_headers,
+        json={
+            "case_id": case_id,
+            "ehr_system": "Epic Systems Hyperdrive"
+        }
+    )
     assert push_res.status_code == 412
     assert "PROVISIONAL" in push_res.json()["detail"]
 
     # 4. Final-required PDF export must reject provisional determination
-    pdf_res = client.get(f"/api/v1/packet/{case_id}/pdf?require_final=true")
+    pdf_res = client.get(f"/api/v1/packet/{case_id}/pdf?require_final=true", headers=auth_headers)
     assert pdf_res.status_code == 412
 
 
@@ -257,17 +290,21 @@ def test_signed_off_determination_can_be_retrieved_as_final_and_released():
     assert clinician_user in signoff_data["signed_off_by"]
 
     # Final retrieval endpoint now succeeds
-    final_res = client.get(f"/api/v1/determination/{case_id}/final")
+    final_res = client.get(f"/api/v1/determination/{case_id}/final", headers={"Authorization": f"Bearer {token_clinician}"})
     assert final_res.status_code == 200
     final_data = final_res.json()
     assert final_data["determination_stage"] == "FINAL"
     assert final_data["is_releasable"] is True
 
     # Direct EHR push now succeeds
-    push_res = client.post(f"/api/v1/packet/{case_id}/ehr-push", json={
-        "case_id": case_id,
-        "ehr_system": "Epic Systems Hyperdrive"
-    })
+    push_res = client.post(
+        f"/api/v1/packet/{case_id}/ehr-push",
+        headers={"Authorization": f"Bearer {token_clinician}"},
+        json={
+            "case_id": case_id,
+            "ehr_system": "Epic Systems Hyperdrive"
+        }
+    )
     assert push_res.status_code == 200
     assert push_res.json()["status"] == "SUCCESS_TRANSMITTED"
 
@@ -306,8 +343,27 @@ def test_system_restart_survival_for_determinations_packets_and_deferral_queue()
     DeferralWorkQueue.clear()
     ResubmissionLifecycleManager.clear()
 
+    db_admin = SessionLocal()
+    admin_restart_u = f"admin_restart_{secrets.token_hex(4)}"
+    u_restart_admin = User(
+        username=admin_restart_u,
+        email=f"{admin_restart_u}@hospital.org",
+        hashed_password=get_password_hash(secrets.token_hex(16)),
+        role="Admin",
+        is_active=True
+    )
+    db_admin.add(u_restart_admin)
+    db_admin.commit()
+    db_admin.refresh(u_restart_admin)
+    admin_token = create_access_token(
+        {"sub": admin_restart_u, "role": "Admin", "uid": u_restart_admin.id},
+        expires_delta=timedelta(minutes=15)
+    )
+    db_admin.close()
+    auth_headers = {"Authorization": f"Bearer {admin_token}"}
+
     # 1. Determination must be rehydrated from database
-    reloaded_det = client.get(f"/api/v1/determination/{case_id}")
+    reloaded_det = client.get(f"/api/v1/determination/{case_id}", headers=auth_headers)
     assert reloaded_det.status_code == 200
     det_json = reloaded_det.json()
     assert det_json["case_id"] == case_id
@@ -315,7 +371,7 @@ def test_system_restart_survival_for_determinations_packets_and_deferral_queue()
     assert det_json["is_releasable"] is False
 
     # 2. Coverage packet must be rehydrated from database
-    reloaded_packet = client.get(f"/api/v1/packet/{case_id}")
+    reloaded_packet = client.get(f"/api/v1/packet/{case_id}", headers=auth_headers)
     assert reloaded_packet.status_code == 200
     packet_json = reloaded_packet.json()
     assert packet_json["case_id"] == case_id

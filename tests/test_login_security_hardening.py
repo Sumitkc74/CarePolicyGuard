@@ -228,8 +228,9 @@ def test_challenge_response_has_no_otp_preview_field_and_no_code_in_body(monkeyp
     created_users = [email_unconf, email_conf, sms_user_email, totp_user_email]
 
     try:
-        # Test Case 1: Email OTP (SMTP Unconfigured)
+        # Test Case 1: Email OTP (SMTP Unconfigured with dev delivery enabled)
         monkeypatch.setattr(settings, "SMTP_ENABLED", False)
+        monkeypatch.setattr(settings, "DEV_OTP_DELIVERY_ENABLED", True)
         res1 = client.post("/api/v1/auth/login", json={"username": email_unconf, "password": test_pwd})
         assert res1.status_code == 200
         raw_body1 = res1.text

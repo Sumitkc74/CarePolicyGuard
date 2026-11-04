@@ -134,9 +134,31 @@ def test_zero_retention_mode():
     db.close()
 
 def test_right_to_erasure_audit_delete():
+    import secrets
     from fastapi.testclient import TestClient
     from main import app
+    from app.db.session import SessionLocal
+    from app.db.models import User
     client = TestClient(app)
+
+    db = SessionLocal()
+    admin_uname = f"admin_del_{secrets.token_hex(4)}@carepolicyguard.med"
+    u = User(
+        username=admin_uname,
+        email=admin_uname,
+        hashed_password=get_password_hash(secrets.token_hex(16)),
+        role="Admin",
+        is_active=True
+    )
+    db.add(u)
+    db.commit()
+    db.refresh(u)
+    token = create_access_token(
+        {"sub": admin_uname, "role": "Admin", "uid": u.id},
+        expires_delta=timedelta(minutes=30)
+    )
+    headers = {"Authorization": f"Bearer {token}"}
+    db.close()
 
     # Run regular adjudication (persisted)
     res = client.post(
@@ -152,16 +174,16 @@ def test_right_to_erasure_audit_delete():
     case_id = res.json()["case_id"]
 
     # Ensure it exists
-    get_res = client.get(f"/api/v1/audit-logs/{case_id}")
+    get_res = client.get(f"/api/v1/audit-logs/{case_id}", headers=headers)
     assert get_res.status_code == 200
 
     # Purge record under Right to Erasure
-    del_res = client.delete(f"/api/v1/audit-logs/{case_id}")
+    del_res = client.delete(f"/api/v1/audit-logs/{case_id}", headers=headers)
     assert del_res.status_code == 200
     assert del_res.json()["status"] == "success"
 
     # Verify it is deleted
-    get_after = client.get(f"/api/v1/audit-logs/{case_id}")
+    get_after = client.get(f"/api/v1/audit-logs/{case_id}", headers=headers)
     assert get_after.status_code == 404
 
 def test_verify_clinical_document_authenticity():

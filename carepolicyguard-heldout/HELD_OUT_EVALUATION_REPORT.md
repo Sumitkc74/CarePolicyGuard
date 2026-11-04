@@ -6,7 +6,7 @@
 > Held-out evaluation is reserved for the sealed v2 set pending independent validation (Route A: external clinician review, or Route B: blind dual annotation with kappa at or above 0.85 and adjudication).
 
 **Dataset**: CarePolicyGuard Held-Out Vignette Set v1 (Development Diagnostic Set)  
-**Execution Timestamp**: 2026-11-03T22:15:20.164052+00:00  
+**Execution Timestamp**: 2026-11-04T00:55:59.860432+00:00  
 **Total Vignettes**: 15 (Gold: {'APPROVED': 7, 'DEFERRED_TO_HUMAN': 4, 'DENIED': 4, 'total': 15})  
 **Status**: UNSEALED DEVELOPMENT SET  
 
@@ -14,9 +14,9 @@
 
 | Execution Mode | Diagnostic Accuracy ($n=15$) | False Approvals (FA) | False Denials (FD) | Deferral Rate (Abstentions) | Mean Latency |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `deterministic` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 31.78 ms |
-| `state_machine` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 130.5 ms |
-| `declarative` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 44.97 ms |
+| `deterministic` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 33.45 ms |
+| `state_machine` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 95.93 ms |
+| `declarative` | **100.0% (15/15)** | **0 (0.0%)** | **0 (0.0%)** | 4 (26.7%) | 38.44 ms |
 
 ## 2. Granular Vignette Results Across Modes
 

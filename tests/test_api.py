@@ -18,6 +18,27 @@ from app.db.session import SessionLocal
 from app.db.models import User
 from app.core.security import get_password_hash, create_access_token
 
+def _get_admin_headers() -> dict:
+    db = SessionLocal()
+    admin_username = f"admin_test_{secrets.token_hex(4)}@carepolicyguard.med"
+    user = User(
+        username=admin_username,
+        email=admin_username,
+        hashed_password=get_password_hash(secrets.token_hex(16)),
+        role="Admin",
+        is_active=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    token = create_access_token(
+        {"sub": admin_username, "role": "Admin", "uid": user.id},
+        expires_delta=timedelta(minutes=30)
+    )
+    db.close()
+    return {"Authorization": f"Bearer {token}"}
+
+
 def test_auth_login_valid_credentials():
     test_pwd = secrets.token_urlsafe(16)
     test_email = f"test_auditor_{secrets.token_hex(4)}@medicare.cms.gov"
@@ -174,7 +195,8 @@ def test_upload_note_and_submit_to_insurance():
     case_id = upload_data["adjudication"]["case_id"]
 
     # 2. Retrieve filled coverage packet for clinician review
-    packet_res = client.get(f"/api/v1/packet/{case_id}")
+    admin_hdr = _get_admin_headers()
+    packet_res = client.get(f"/api/v1/packet/{case_id}", headers=admin_hdr)
     assert packet_res.status_code == 200
     packet = packet_res.json()
     assert packet["case_id"] == case_id
@@ -185,6 +207,7 @@ def test_upload_note_and_submit_to_insurance():
     # 3. Clinician signs & transmits packet to insurance
     submit_res = client.post(
         "/api/v1/packet/submit",
+        headers=admin_hdr,
         json={
             "case_id": case_id,
             "signed_by": "Dr. Sarah Jenkins, MD, FCCP",
@@ -298,6 +321,7 @@ def test_generate_peer_to_peer_appeal_letter_endpoint():
     # 2. Request Appeal Letter
     apl_res = client.post(
         f"/api/v1/packet/{case_id}/appeal-letter",
+        headers=_get_admin_headers(),
         json={
             "case_id": case_id,
             "physician_name": "Dr. Sarah Jenkins, MD, FACC",
@@ -329,7 +353,7 @@ def test_fhir_bundle_export_and_ehr_push_endpoints():
     case_id = adj_res.json()["case_id"]
 
     # 2. Export HL7 FHIR Bundle
-    fhir_res = client.get(f"/api/v1/packet/{case_id}/fhir")
+    fhir_res = client.get(f"/api/v1/packet/{case_id}/fhir", headers=_get_admin_headers())
     assert fhir_res.status_code == 200
     bundle = fhir_res.json()
     assert bundle["resourceType"] == "Bundle"
@@ -380,6 +404,7 @@ def test_fhir_bundle_export_and_ehr_push_endpoints():
 
     push_res = client.post(
         f"/api/v1/packet/{case_id}/ehr-push",
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "case_id": case_id,
             "ehr_system": "Epic Systems Hyperdrive / FHIR R4 Endpoint"
@@ -504,6 +529,7 @@ def test_smart_addendum_deficiency_resolution_and_readjudication():
     # 2. Append attested clinician addendum supplying GDMT compliance
     addendum_res = client.post(
         f"/api/v1/packet/{case_id}/addendum",
+        headers=_get_admin_headers(),
         json={
             "criterion_code": "CRIT-ICD-04",
             "addendum_text": "Patient has been compliant on optimal GDMT with Carvedilol 25mg BID and Entresto 49/51mg BID for > 120 days with good tolerance.",
@@ -523,7 +549,8 @@ def test_smart_addendum_deficiency_resolution_and_readjudication():
 def test_hipaa_audit_trail_inspection_and_csv_export():
     """Verify inspection and RFC 4180 CSV export of the tamper-evident audit ledger."""
     # 1. Inspect audit trail JSON
-    trail_res = client.get("/api/v1/audit/trail")
+    admin_hdr = _get_admin_headers()
+    trail_res = client.get("/api/v1/audit/trail", headers=admin_hdr)
     assert trail_res.status_code == 200
     trail_data = trail_res.json()
     assert "total_events" in trail_data
@@ -531,7 +558,7 @@ def test_hipaa_audit_trail_inspection_and_csv_export():
     assert isinstance(trail_data["events"], list)
 
     # 2. Export audit trail CSV
-    export_res = client.get("/api/v1/audit/trail/export")
+    export_res = client.get("/api/v1/audit/trail/export", headers=admin_hdr)
     assert export_res.status_code == 200
     assert "text/csv" in export_res.headers["content-type"]
     assert 'attachment; filename="carepolicyguard_audit_trail.csv"' in export_res.headers["content-disposition"]

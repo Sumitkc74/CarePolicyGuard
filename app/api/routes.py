@@ -69,7 +69,14 @@ from app.schemas.contracts import (
     BatchAdjudicationResponse,
     BatchAdjudicationItemResult
 )
-from app.api.deps import get_current_user, require_role, get_optional_current_user, get_verified_clinician_user
+from app.api.deps import (
+    get_current_user,
+    require_role,
+    get_optional_current_user,
+    get_verified_clinician_user,
+    verify_case_record_access
+)
+from app.services.deferral_queue import DeferralWorkQueue, DeferralQueueItem
 from app.agents.pipeline import MultiAgentVerificationPipeline
 from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.agents.benchmark_engine import BenchmarkRunner, BENCHMARK_VIGNETTES
@@ -423,9 +430,9 @@ async def scan_all_policies(
         custom_tau=custom_tau
     )
 
-    # Ephemeral caching for approved policies
+    # Ephemeral caching for approved policies (PHI minimized: sanitized clinical text only)
     for match in result.all_matches:
-        _EPHEMERAL_EHR_TEXTS[match.adjudication.case_id] = request.ehr_narrative
+        _EPHEMERAL_EHR_TEXTS[match.adjudication.case_id] = match.adjudication.sanitized_ehr_text
         _EPHEMERAL_ADJUDICATIONS[match.adjudication.case_id] = match.adjudication
         if match.decision.value == "APPROVED":
             packet = CoveragePacketGenerator.generate_packet(match.adjudication)
@@ -526,13 +533,13 @@ async def adjudicate_record(
             status_code=200
         )
 
-    # In-memory ephemeral packet caching (ensures instant availability without disk footprint)
+    # In-memory ephemeral packet caching (ensures instant availability without disk footprint; PHI sanitized)
     packet = CoveragePacketGenerator.generate_packet(result)
     _EPHEMERAL_PACKETS[result.case_id] = packet
-    _EPHEMERAL_EHR_TEXTS[result.case_id] = request.ehr_narrative
+    _EPHEMERAL_EHR_TEXTS[result.case_id] = result.sanitized_ehr_text
     _EPHEMERAL_ADJUDICATIONS[result.case_id] = result
 
-    # Persist full packet and narrative to AdjudicationLog in DB
+    # Persist full packet and sanitized narrative to AdjudicationLog in DB
     if save_record and db:
         try:
             log_item = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == result.case_id).first()
@@ -540,8 +547,8 @@ async def adjudicate_record(
                 log_item.full_packet_json = packet.model_dump_json()
                 if not log_item.full_adjudication_json:
                     log_item.full_adjudication_json = result.model_dump_json()
-                if not log_item.full_ehr_text:
-                    log_item.full_ehr_text = request.ehr_narrative
+                if not log_item.full_ehr_text or log_item.full_ehr_text != result.sanitized_ehr_text:
+                    log_item.full_ehr_text = result.sanitized_ehr_text
                 db.commit()
         except Exception as db_e:
             db.rollback()
@@ -623,7 +630,7 @@ def get_audit_logs(
     policy_id: Optional[str] = Query(None, description="Filter by Medicare policy ID"),
     decision: Optional[str] = Query(None, description="Filter by decision"),
     limit: int = Query(50, ge=1, le=200),
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -640,7 +647,7 @@ def get_audit_logs(
         query = query.filter(AdjudicationLog.decision == decision)
 
     # HIPAA Minimum Necessary: Clinicians only see cases they personally handled/signed
-    if current_user and current_user.role == UserRole.CLINICIAN.value:
+    if current_user.role == UserRole.CLINICIAN.value:
         clinician_filters = [AdjudicationLog.user_id == current_user.id]
         if current_user.username:
             clinician_filters.append(AdjudicationLog.signed_by == current_user.username)
@@ -656,7 +663,7 @@ def get_audit_logs(
 @api_router.get("/audit-logs/{case_id}", response_model=AuditLogOut)
 def get_audit_log_by_case(
     case_id: str,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -672,7 +679,7 @@ def get_audit_log_by_case(
         )
 
     # HIPAA Minimum Necessary: Clinicians cannot inspect other clinicians' cases
-    if current_user and current_user.role == UserRole.CLINICIAN.value:
+    if current_user.role == UserRole.CLINICIAN.value:
         handled_by_user = (
             log.user_id == current_user.id or
             (log.signed_by and current_user.username in log.signed_by) or
@@ -688,7 +695,7 @@ def get_audit_log_by_case(
 
 @api_router.delete("/audit-logs/purge/all", summary="Purge All Ephemeral & Unsubmitted Records")
 def purge_all_audit_logs(
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -696,7 +703,7 @@ def purge_all_audit_logs(
     Permanently erases all non-submitted exploratory clinical adjudication records from the database.
     Strictly restricted to IT Administrators. Auditors and Clinicians are prohibited from deleting audit logs.
     """
-    if current_user and current_user.role != UserRole.ADMIN.value:
+    if current_user.role != UserRole.ADMIN.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Access denied: Role '{current_user.role}' is not authorized to purge audit records. Only IT Administrators may perform system maintenance."
@@ -715,18 +722,19 @@ def purge_all_audit_logs(
 @api_router.delete("/audit-logs/{case_id}", summary="Right to Erasure: Purge Single Clinical Record")
 def delete_single_audit_log(
     case_id: str,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Permanently deletes a single clinical record and removes any ephemeral memory traces.
     Auditors are strictly prohibited from deleting records to maintain regulatory audit integrity.
     """
-    if current_user and current_user.role == UserRole.AUDITOR.value:
+    if current_user.role == UserRole.AUDITOR.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: CMS Regulatory Auditors have read-only audit inspection authority and cannot erase audit records."
         )
+
     _EPHEMERAL_PACKETS.pop(case_id, None)
     _EPHEMERAL_EHR_TEXTS.pop(case_id, None)
     _EPHEMERAL_ADJUDICATIONS.pop(case_id, None)
@@ -1040,9 +1048,11 @@ async def upload_clinical_note(
         save_record=not zero_retention
     )
 
-    # Generate Filled Prior Authorization Document Packet for Review
+    # Generate Filled Prior Authorization Document Packet for Review (PHI minimized: stores sanitized text)
     packet = CoveragePacketGenerator.generate_packet(adjudication)
     _EPHEMERAL_PACKETS[adjudication.case_id] = packet
+    _EPHEMERAL_EHR_TEXTS[adjudication.case_id] = adjudication.sanitized_ehr_text
+    _EPHEMERAL_ADJUDICATIONS[adjudication.case_id] = adjudication
 
     return {
         "filename": safe_filename,
@@ -1053,17 +1063,20 @@ async def upload_clinical_note(
     }
 
 @api_router.get("/packet/{case_id}", response_model=CMSCoveragePacket, summary="Get Filled Coverage Packet for Review")
-def get_coverage_packet(case_id: str, db: Session = Depends(get_db)):
+def get_coverage_packet(
+    case_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Retrieves the filled CMS coverage determination packet for pre-submission clinician review.
-    Checks in-memory ephemeral cache first, then persistent database storage.
+    Enforces HIPAA Minimum Necessary access control and Anti-Enumeration Oracle Defense.
     """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
     if case_id in _EPHEMERAL_PACKETS:
         return _EPHEMERAL_PACKETS[case_id]
-
-    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
-    if not log:
-        raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
 
     if log.full_packet_json:
         try:
@@ -1216,20 +1229,23 @@ def sign_off_clinical_determination(
     )
 
 @api_router.get("/determination/{case_id}", response_model=FinalAdjudication, summary="Retrieve Determination")
-def get_determination_record(case_id: str, db: Session = Depends(get_db)):
+def get_determination_record(
+    case_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Retrieves the clinical determination for case_id.
     Exposes determination_stage ('PROVISIONAL' vs 'FINAL') and is_releasable.
+    Enforces access control and anti-enumeration oracle defense.
     Reconstitutes from database on system restart.
     """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
     adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
     if adj:
         return adj
-
-    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
-    if not log:
-        if case_id not in _EPHEMERAL_PACKETS:
-            raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
 
     if log and log.full_adjudication_json:
         try:
@@ -1244,7 +1260,7 @@ def get_determination_record(case_id: str, db: Session = Depends(get_db)):
         except Exception:
             pass
 
-    dummy_packet = get_coverage_packet(case_id, db=db)
+    dummy_packet = get_coverage_packet(case_id, current_user=current_user, db=db)
     stage = log.determination_stage if log and log.determination_stage else (
         "FINAL" if (log and log.signed_by) or (dummy_packet and dummy_packet.determination_stage == "FINAL") else "PROVISIONAL"
     )
@@ -1274,13 +1290,17 @@ def get_determination_record(case_id: str, db: Session = Depends(get_db)):
     )
 
 @api_router.get("/determination/{case_id}/final", response_model=FinalAdjudication, summary="Retrieve Final Released Determination")
-def get_final_determination(case_id: str, db: Session = Depends(get_db)):
+def get_final_determination(
+    case_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Enforces the Human Sign-Off Gate:
     Retrieves the determination ONLY if it has been signed off and reached 'FINAL' stage.
     Blocks retrieval of provisional determinations with HTTP 412 Precondition Failed.
     """
-    adj = get_determination_record(case_id, db=db)
+    adj = get_determination_record(case_id, current_user=current_user, db=db)
     if adj.determination_stage != "FINAL" or not adj.is_releasable:
         raise HTTPException(
             status_code=status.HTTP_412_PRECONDITION_FAILED,
@@ -1291,13 +1311,14 @@ def get_final_determination(case_id: str, db: Session = Depends(get_db)):
 @api_router.post("/packet/submit", response_model=SubmissionReceipt, summary="Sign & Submit Reviewed Policy Packet to Insurance")
 def submit_coverage_to_insurance(
     request: SubmitPacketRequest,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Clinician Sign-Off & Electronic Submission to Medicare Payer:
     Transmits the reviewed, cryptographically sealed coverage document to the payer clearinghouse gateway.
     Handles both persistent and ephemeral zero-retention packets gracefully.
+    Strictly requires authentication and case access validation.
     """
     now = datetime.now(timezone.utc)
     transaction_id = f"CMS-EDI-837-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
@@ -1309,12 +1330,14 @@ def submit_coverage_to_insurance(
         )
 
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == request.case_id).first()
+    verify_case_record_access(request.case_id, log, current_user)
+
     if log:
         log.submission_status = "SUBMITTED_TO_PAYER"
-        log.signed_by = request.signed_by or (current_user.username if current_user else None)
+        log.signed_by = request.signed_by or current_user.username
         log.signed_at = now
         log.payer_transaction_id = transaction_id
-        if current_user and not log.user_id:
+        if not log.user_id:
             log.user_id = current_user.id
         if request.clinician_notes:
             log.required_clinician_action_notes = (log.required_clinician_action_notes or "") + f"\n[Clinician Attestation Note]: {request.clinician_notes}"
@@ -1331,7 +1354,7 @@ def submit_coverage_to_insurance(
         packet.payer_transaction_id = transaction_id
         audit_hash = packet.audit_hash
     else:
-        raise HTTPException(status_code=404, detail=f"Case '{request.case_id}' not found.")
+        raise HTTPException(status_code=404, detail=f"Case adjudication record '{request.case_id}' not found.")
 
     if request.case_id in _EPHEMERAL_PACKETS:
         p = _EPHEMERAL_PACKETS[request.case_id]
@@ -1367,26 +1390,30 @@ def submit_coverage_to_insurance(
 def generate_appeal_letter(
     case_id: str,
     request: Optional[PeerToPeerAppealRequest] = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Generates an expedited Peer-to-Peer Appeal Letter and talking points for physician
     defense before the Medicare Administrative Contractor (MAC) Medical Director.
+    Strictly requires authentication and case access validation.
     """
-    packet = get_coverage_packet(case_id, db=db)
+    packet = get_coverage_packet(case_id, current_user=current_user, db=db)
     return PeerToPeerAppealService.generate_appeal(packet, request)
 
 @api_router.get("/packet/{case_id}/fhir", summary="Export Standard HL7 FHIR R4 Da Vinci PAS Bundle")
 def export_fhir_bundle(
     case_id: str,
     require_final: bool = False,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Exports the prior authorization case as an official HL7 FHIR R4 Bundle compliant with
     the Da Vinci Prior Authorization Support (PAS) specification.
+    Strictly requires authentication and case access validation.
     """
-    packet = get_coverage_packet(case_id, db=db)
+    packet = get_coverage_packet(case_id, current_user=current_user, db=db)
     if require_final and getattr(packet, "determination_stage", "PROVISIONAL") != "FINAL" and not getattr(packet, "is_releasable", False):
         raise HTTPException(
             status_code=status.HTTP_412_PRECONDITION_FAILED,
@@ -1398,13 +1425,15 @@ def export_fhir_bundle(
 def push_packet_to_ehr(
     case_id: str,
     request: Optional[EHRPushRequest] = None,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Pushes the verified, cryptographically signed prior authorization packet directly
     into the hospital EHR (Epic / Cerner) as an official FHIR DocumentReference.
+    Strictly requires authentication, case access validation, and human sign-off.
     """
-    packet = get_coverage_packet(case_id, db=db)
+    packet = get_coverage_packet(case_id, current_user=current_user, db=db)
     if getattr(packet, "determination_stage", "PROVISIONAL") != "FINAL" and not getattr(packet, "is_releasable", False) and getattr(packet, "human_sign_off_status", "") != "SIGNED_OFF":
         raise HTTPException(
             status_code=status.HTTP_412_PRECONDITION_FAILED,
@@ -1416,6 +1445,7 @@ def push_packet_to_ehr(
 async def append_clinical_addendum(
     case_id: str,
     request: ClinicalAddendumRequest,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -1423,23 +1453,26 @@ async def append_clinical_addendum(
     Appends an attested, signed clinical addendum addressing missing or deficient criteria,
     automatically re-runs the multi-agent verification pipeline on the updated chart,
     updates the audit ledger, and returns the updated adjudication decision.
+    Strictly requires authentication and case access validation.
     """
     now = datetime.now(timezone.utc)
     addendum_id = f"ADDENDUM-{uuid.uuid4().hex[:8].upper()}"
 
     # 1. Retrieve original clinical narrative & metadata
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
     original_text = _EPHEMERAL_EHR_TEXTS.get(case_id)
     policy_id = None
     patient_id = "PT-10829"
     prior_decision = "DENIED"
 
-    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
     if log:
         policy_id = log.policy_id
         patient_id = log.patient_id_masked
         prior_decision = log.decision
         if not original_text:
-            original_text = log.sanitized_ehr_preview
+            original_text = log.full_ehr_text or log.sanitized_ehr_preview
     elif case_id in _EPHEMERAL_PACKETS:
         packet = _EPHEMERAL_PACKETS[case_id]
         policy_id = packet.policy_id
@@ -1448,7 +1481,7 @@ async def append_clinical_addendum(
         if not original_text:
             original_text = packet.clinical_summary
     else:
-        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
+        raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
 
     if not original_text:
         original_text = "Clinical progress note."
@@ -1470,11 +1503,12 @@ async def append_clinical_addendum(
         patient_id=patient_id,
         policy_id=policy_id,
         ehr_narrative=updated_narrative,
+        user_id=current_user.id,
         save_record=(log is not None)
     )
 
-    # 4. Update Ephemeral Stores
-    _EPHEMERAL_EHR_TEXTS[updated_adj.case_id] = updated_narrative
+    # 4. Update Ephemeral Stores (PHI minimized: stores sanitized text only)
+    _EPHEMERAL_EHR_TEXTS[updated_adj.case_id] = updated_adj.sanitized_ehr_text
     _EPHEMERAL_ADJUDICATIONS[updated_adj.case_id] = updated_adj
     new_packet = CoveragePacketGenerator.generate_packet(updated_adj, physician_name=request.clinician_name)
     _EPHEMERAL_PACKETS[updated_adj.case_id] = new_packet
@@ -1510,14 +1544,109 @@ async def append_clinical_addendum(
         message=f"Addendum {addendum_id} successfully appended. Case re-evaluated: decision updated to {updated_adj.adjudication_decision.value} ({updated_adj.sufficiency_score:.1%} sufficiency score)."
     )
 
+@api_router.get("/deferral/queue", response_model=List[DeferralQueueItem], summary="List Deferral Work Queue Items")
+def get_deferral_queue(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieves cases in the human deferral work queue.
+    Auditors and Admins inspect the full queue for regulatory oversight.
+    Clinicians inspect only cases they created, submitted, or signed off.
+    """
+    items = DeferralWorkQueue.list_queue(db=db)
+    if current_user.role in (UserRole.AUDITOR.value, UserRole.ADMIN.value, "Auditor", "Admin"):
+        return items
+
+    user_case_ids = {
+        l.case_id for l in db.query(AdjudicationLog.case_id).filter(
+            or_(
+                AdjudicationLog.user_id == current_user.id,
+                AdjudicationLog.signed_by.ilike(f"%{current_user.username}%") if current_user.username else False,
+                AdjudicationLog.signed_by.ilike(f"%{current_user.email}%") if current_user.email else False
+            )
+        ).all()
+    }
+    return [item for item in items if item.case_id in user_case_ids]
+
+@api_router.get("/deferral/queue/{case_id}", response_model=DeferralQueueItem, summary="Get Single Deferral Work Queue Item")
+def get_deferral_queue_item(
+    case_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieves a single case from the deferral work queue.
+    Enforces HIPAA Minimum Necessary access control and Anti-Enumeration Oracle Defense.
+    """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
+    item = DeferralWorkQueue.get_item(case_id, db=db)
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Case adjudication record '{case_id}' not found."
+        )
+    return item
+
+@api_router.delete("/determination/{case_id}", summary="Right to Erasure: Scrub Clinical Content and Retain Tombstone")
+def delete_determination_record(
+    case_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    HIPAA Data Minimization & Right to Erasure (45 CFR § 164.526):
+    Permanently erases all clinical narrative text, quotes, and criteria assessments,
+    while retaining an immutable tombstone record for regulatory audit continuity.
+    """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
+    # Clear in-memory caches
+    _EPHEMERAL_PACKETS.pop(case_id, None)
+    _EPHEMERAL_EHR_TEXTS.pop(case_id, None)
+    _EPHEMERAL_ADJUDICATIONS.pop(case_id, None)
+
+    if log:
+        log.full_ehr_text = "[SCRUBBED - RIGHT TO ERASURE]"
+        log.sanitized_ehr_preview = "[SCRUBBED - RIGHT TO ERASURE]"
+        log.criterion_evaluations_json = "[]"
+        log.evidence_spans_json = "[]"
+        log.required_clinician_action_notes = "[SCRUBBED]"
+        log.full_adjudication_json = None
+        log.full_packet_json = None
+        log.submission_status = "ERASED_TOMBSTONE"
+        db.commit()
+
+    return {
+        "status": "success",
+        "case_id": case_id,
+        "message": f"Determination clinical narrative for case '{case_id}' permanently erased. Tombstone audit record preserved."
+    }
+
 @api_router.get("/audit/trail", response_model=AuditTrailResponse, summary="Inspect HIPAA & RAC Audit Trail")
-def get_audit_trail(db: Session = Depends(get_db)):
+def get_audit_trail(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     HIPAA § 164.312(b) Audit Controls:
     Returns chronological, cryptographically verified audit records tracking clinician interactions,
     automated pipeline adjudications, submissions, and addendums.
+    Scoped by role: Clinicians see cases they personally handled; Auditors and Admins inspect cross-system records.
     """
-    logs = db.query(AdjudicationLog).order_by(AdjudicationLog.created_at.desc()).limit(100).all()
+    query = db.query(AdjudicationLog)
+    if current_user.role == UserRole.CLINICIAN.value:
+        clinician_filters = [AdjudicationLog.user_id == current_user.id]
+        if current_user.username:
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.username}%"))
+        if current_user.email:
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.email}%"))
+        query = query.filter(or_(*clinician_filters))
+
+    logs = query.order_by(AdjudicationLog.created_at.desc()).limit(100).all()
     events: List[AuditTrailEvent] = []
 
     for l in logs:
@@ -1546,13 +1675,26 @@ def get_audit_trail(db: Session = Depends(get_db)):
     )
 
 @api_router.get("/audit/trail/fhir-audit-event", summary="Export HIPAA Audit Trail as FHIR R4 AuditEvent Bundle")
-def export_audit_trail_fhir_bundle(db: Session = Depends(get_db)):
+def export_audit_trail_fhir_bundle(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     HIPAA § 164.312(b) & HL7 FHIR R4 AuditEvent:
     Exports tamper-evident audit logs in standard FHIR R4 Bundle of AuditEvent resources
     for automated ingestion into enterprise SIEMs (Splunk, Datadog, AWS CloudWatch, Epic).
+    Scoped by role: Clinicians see cases they personally handled; Auditors and Admins inspect cross-system records.
     """
-    logs = db.query(AdjudicationLog).order_by(AdjudicationLog.created_at.desc()).limit(100).all()
+    query = db.query(AdjudicationLog)
+    if current_user.role == UserRole.CLINICIAN.value:
+        clinician_filters = [AdjudicationLog.user_id == current_user.id]
+        if current_user.username:
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.username}%"))
+        if current_user.email:
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.email}%"))
+        query = query.filter(or_(*clinician_filters))
+
+    logs = query.order_by(AdjudicationLog.created_at.desc()).limit(100).all()
     entries = []
     for l in logs:
         audit_event = {
@@ -1660,11 +1802,24 @@ def export_audit_trail_fhir_bundle(db: Session = Depends(get_db)):
     }
 
 @api_router.get("/audit/trail/export", summary="Export Compliance Audit Trail (CSV)")
-def export_audit_trail_csv(db: Session = Depends(get_db)):
+def export_audit_trail_csv(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Generates an official RFC 4180 CSV export of the tamper-evident audit ledger for CMS RAC/MAC auditors.
+    Scoped by role: Clinicians see cases they personally handled; Auditors and Admins inspect cross-system records.
     """
-    logs = db.query(AdjudicationLog).order_by(AdjudicationLog.created_at.desc()).all()
+    query = db.query(AdjudicationLog)
+    if current_user.role == UserRole.CLINICIAN.value:
+        clinician_filters = [AdjudicationLog.user_id == current_user.id]
+        if current_user.username:
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.username}%"))
+        if current_user.email:
+            clinician_filters.append(AdjudicationLog.signed_by.ilike(f"%{current_user.email}%"))
+        query = query.filter(or_(*clinician_filters))
+
+    logs = query.order_by(AdjudicationLog.created_at.desc()).all()
     output = io.StringIO()
     output.write("Event ID,Timestamp (UTC),Event Type,Case ID,Patient Masked,Actor,Actor Role,Action Details,Audit Hash (SHA-256)\n")
 
@@ -1699,7 +1854,7 @@ def get_cache_telemetry():
 
 register_batch_route(api_router, _EPHEMERAL_PACKETS, _EPHEMERAL_EHR_TEXTS, _EPHEMERAL_ADJUDICATIONS)
 
-register_pdf_routes(api_router, lambda cid: get_coverage_packet(cid, next(get_db())))
+register_pdf_routes(api_router, lambda cid, user, db: get_coverage_packet(cid, current_user=user, db=db))
 
 register_smart_fhir_routes(api_router)
 

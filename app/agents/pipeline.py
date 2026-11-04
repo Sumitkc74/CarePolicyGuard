@@ -439,7 +439,7 @@ class MultiAgentVerificationPipeline:
                     is_releasable=False,
                     human_sign_off_status="PENDING_CLINICAL_SIGN_OFF",
                     full_adjudication_json=final_result.model_dump_json(),
-                    full_ehr_text=ehr_narrative,
+                    full_ehr_text=sanitized_ehr,
                     original_system_output_json=final_result.model_dump_json(),
                     created_at=timestamp
                 )
