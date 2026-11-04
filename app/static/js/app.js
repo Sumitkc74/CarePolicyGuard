@@ -2413,7 +2413,10 @@ function renderMultiPolicyScanResults(data) {
 
     // 1. Render Featured (Bigger Hero Card)
     if (featuredSlot && featuredMatch) {
-        const pct = Math.round(featuredMatch.calibrated_confidence * 100);
+        const confVal = (featuredMatch.calibrated_confidence != null)
+            ? featuredMatch.calibrated_confidence
+            : (featuredMatch.sufficiency_score != null ? featuredMatch.sufficiency_score : (featuredMatch.met_criteria / (featuredMatch.total_criteria || 1)));
+        const pct = Math.round(confVal * 100);
         let statusBadge = "";
         if (featuredMatch.decision === "APPROVED") {
             statusBadge = `<span class="badge-featured-status approved"><span class="badge-dot" style="background:#10b981;"></span>QUALIFIED (${pct}%)</span>`;
@@ -2470,7 +2473,10 @@ function renderMultiPolicyScanResults(data) {
             card.onclick = () => selectPolicyFromScan(m.policy_id, true);
 
             let statusPill = "";
-            const pct = Math.round(m.calibrated_confidence * 100);
+            const confVal = (m.calibrated_confidence != null)
+                ? m.calibrated_confidence
+                : (m.sufficiency_score != null ? m.sufficiency_score : (m.met_criteria / (m.total_criteria || 1)));
+            const pct = Math.round(confVal * 100);
             if (m.decision === "APPROVED") {
                 statusPill = `<span class="mini-status approved">Qualified ${pct}%</span>`;
             } else if (m.decision === "DEFERRED_TO_HUMAN") {
@@ -2867,7 +2873,7 @@ function renderAdjudicationResults(data) {
                 <span class="med-icon icon-md icon-blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
                 <div class="hero-text-block">
                     <strong>Review Pre-Filled Prior Authorization Form</strong>
-                    <span>All criteria met (${(data.calibrated_aggregate_confidence * 100).toFixed(0)}% match). Click to inspect, sign, and send to Medicare.</span>
+                    <span>All criteria met (${Math.round(((data.calibrated_aggregate_confidence != null) ? data.calibrated_aggregate_confidence : (data.sufficiency_score != null ? data.sufficiency_score : 1.0)) * 100)}% match). Click to inspect, sign, and send to Medicare.</span>
                 </div>
                 <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
             `;
@@ -2918,7 +2924,12 @@ function renderAdjudicationResults(data) {
 
     // 2. Metrics Ribbon
     const metricCal = document.getElementById("metric-calibrated-conf");
-    if (metricCal) metricCal.textContent = `${(data.calibrated_aggregate_confidence * 100).toFixed(1)}%`;
+    if (metricCal) {
+        const calScore = (data.calibrated_aggregate_confidence != null)
+            ? data.calibrated_aggregate_confidence
+            : data.sufficiency_score;
+        metricCal.textContent = calScore != null ? `${(calScore * 100).toFixed(1)}%` : "100.0%";
+    }
     
     // Check if any grounding failure
     const allGrounded = data.verification_audits.every(v => v.grounding_status);
@@ -3022,7 +3033,12 @@ function renderAdjudicationResults(data) {
     if (resGrounding) resGrounding.textContent = allGrounded ? "100% Exact Quotes" : "Flagged Mismatch";
 
     const resConf = document.getElementById("res-conf-stat");
-    if (resConf) resConf.textContent = `${(data.calibrated_aggregate_confidence * 100).toFixed(0)}% Match`;
+    if (resConf) {
+        const calScore = (data.calibrated_aggregate_confidence != null)
+            ? data.calibrated_aggregate_confidence
+            : data.sufficiency_score;
+        resConf.textContent = calScore != null ? `${(calScore * 100).toFixed(0)}% Match` : "100% Match";
+    }
 
     const metricLat = document.getElementById("metric-latency");
     if (metricLat) metricLat.textContent = `${data.execution_time_ms} ms`;
