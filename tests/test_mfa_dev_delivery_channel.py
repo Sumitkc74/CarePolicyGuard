@@ -245,3 +245,4 @@ def test_smtp_configured_uses_live_email_and_bypasses_dev_channel():
 
         # Dev channel received no code because SMTP was active
         assert DevOtpDeliveryChannel.get_latest_code("doctor@hospital.med") is None
+

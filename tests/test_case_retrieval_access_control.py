@@ -243,3 +243,4 @@ def test_signing_clinician_gains_retrieval_rights(setup_access_control_users_and
     assert final_res.status_code == 200
     assert final_res.json()["determination_stage"] == "FINAL"
     assert final_res.json()["is_releasable"] is True
+

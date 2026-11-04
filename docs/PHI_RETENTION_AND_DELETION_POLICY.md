@@ -64,3 +64,4 @@ The script:
 2. Applies `sanitize_phi()` to `full_ehr_text`, `sanitized_ehr_preview`, and JSON payload fields.
 3. Preserves `audit_hash`, `determination_stage`, `human_sign_off_status`, `signed_by`, and case identifiers.
 4. Commits changes atomically without silent auto-wipe or data destruction.
+
