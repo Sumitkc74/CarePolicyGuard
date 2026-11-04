@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, Any, List, Optional
@@ -42,8 +43,10 @@ class DeferralQueueItem(BaseModel):
 
 class DeferralWorkQueue:
     """
-    In-Memory & Persistent Deferral Work Queue.
+    Persistent Deferral Work Queue backed by relational database (SQLite/PostgreSQL)
+    via DeferralQueueRecord table with in-memory caching.
     Tracks cases requiring clinical review, supplementary records, or clinician attestation.
+    Survives process restarts by synchronizing state from persistent storage.
     """
 
     _QUEUE: Dict[str, DeferralQueueItem] = {}
@@ -52,35 +55,143 @@ class DeferralWorkQueue:
     def add_case(
         cls,
         adjudication: FinalAdjudication,
-        action_questions: Optional[List[str]] = None
+        action_questions: Optional[List[str]] = None,
+        db: Optional[Any] = None
     ) -> DeferralQueueItem:
         missing = [c.criterion_code for c in adjudication.criterion_assessments if c.status == DeterminationStatus.NOT_MET and not c.is_exclusion]
         insufficient = [c.criterion_code for c in adjudication.criterion_assessments if c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE and not c.is_exclusion]
         questions = action_questions or adjudication.action_required_questions or []
+        state = InternalWorkflowState.PENDING_EVIDENCE if insufficient or missing else InternalWorkflowState.HUMAN_REVIEW
+
+        decision_str = adjudication.adjudication_decision.value if hasattr(adjudication.adjudication_decision, 'value') else str(adjudication.adjudication_decision)
 
         item = DeferralQueueItem(
             case_id=adjudication.case_id,
             patient_id_masked=adjudication.patient_id_masked,
             policy_id=adjudication.policy_id,
             policy_title=adjudication.policy_title,
-            provisional_decision=adjudication.adjudication_decision.value,
+            provisional_decision=decision_str,
             missing_criteria=missing,
             insufficient_criteria=insufficient,
             action_required_questions=questions,
             audit_hash=adjudication.audit_hash,
             created_at=datetime.now(timezone.utc).isoformat(),
-            current_state=InternalWorkflowState.PENDING_EVIDENCE if insufficient or missing else InternalWorkflowState.HUMAN_REVIEW
+            current_state=state
         )
         cls._QUEUE[adjudication.case_id] = item
+
+        # Persist to database
+        try:
+            from app.db.session import SessionLocal
+            from app.db.models import DeferralQueueRecord
+            local_db = db or SessionLocal()
+            close_db = db is None
+            try:
+                rec = local_db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == adjudication.case_id).first()
+                if not rec:
+                    rec = DeferralQueueRecord(
+                        case_id=adjudication.case_id,
+                        patient_id_masked=adjudication.patient_id_masked,
+                        policy_id=adjudication.policy_id,
+                        policy_title=adjudication.policy_title,
+                        provisional_decision=decision_str,
+                        missing_criteria_json=json.dumps(missing),
+                        insufficient_criteria_json=json.dumps(insufficient),
+                        action_required_questions_json=json.dumps(questions),
+                        audit_hash=adjudication.audit_hash,
+                        current_state=state.value
+                    )
+                    local_db.add(rec)
+                else:
+                    rec.patient_id_masked = adjudication.patient_id_masked
+                    rec.policy_id = adjudication.policy_id
+                    rec.policy_title = adjudication.policy_title
+                    rec.provisional_decision = decision_str
+                    rec.missing_criteria_json = json.dumps(missing)
+                    rec.insufficient_criteria_json = json.dumps(insufficient)
+                    rec.action_required_questions_json = json.dumps(questions)
+                    rec.audit_hash = adjudication.audit_hash
+                    rec.current_state = state.value
+                local_db.commit()
+            except Exception:
+                local_db.rollback()
+            finally:
+                if close_db:
+                    local_db.close()
+        except Exception:
+            pass
+
         return item
 
     @classmethod
-    def list_queue(cls) -> List[DeferralQueueItem]:
+    def list_queue(cls, db: Optional[Any] = None) -> List[DeferralQueueItem]:
+        # Sync from DB to ensure survival across process restarts
+        try:
+            from app.db.session import SessionLocal
+            from app.db.models import DeferralQueueRecord
+            local_db = db or SessionLocal()
+            close_db = db is None
+            try:
+                records = local_db.query(DeferralQueueRecord).all()
+                for rec in records:
+                    if rec.case_id not in cls._QUEUE:
+                        cls._QUEUE[rec.case_id] = DeferralQueueItem(
+                            case_id=rec.case_id,
+                            patient_id_masked=rec.patient_id_masked,
+                            policy_id=rec.policy_id,
+                            policy_title=rec.policy_title,
+                            provisional_decision=rec.provisional_decision,
+                            missing_criteria=json.loads(rec.missing_criteria_json or "[]"),
+                            insufficient_criteria=json.loads(rec.insufficient_criteria_json or "[]"),
+                            action_required_questions=json.loads(rec.action_required_questions_json or "[]"),
+                            audit_hash=rec.audit_hash,
+                            created_at=rec.created_at.isoformat() if rec.created_at else datetime.now(timezone.utc).isoformat(),
+                            current_state=InternalWorkflowState(rec.current_state) if rec.current_state in InternalWorkflowState._value2member_map_ else InternalWorkflowState.PRE_CHECK
+                        )
+            except Exception:
+                pass
+            finally:
+                if close_db:
+                    local_db.close()
+        except Exception:
+            pass
         return list(cls._QUEUE.values())
 
     @classmethod
-    def get_item(cls, case_id: str) -> Optional[DeferralQueueItem]:
-        return cls._QUEUE.get(case_id)
+    def get_item(cls, case_id: str, db: Optional[Any] = None) -> Optional[DeferralQueueItem]:
+        if case_id in cls._QUEUE:
+            return cls._QUEUE[case_id]
+        try:
+            from app.db.session import SessionLocal
+            from app.db.models import DeferralQueueRecord
+            local_db = db or SessionLocal()
+            close_db = db is None
+            try:
+                rec = local_db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
+                if rec:
+                    item = DeferralQueueItem(
+                        case_id=rec.case_id,
+                        patient_id_masked=rec.patient_id_masked,
+                        policy_id=rec.policy_id,
+                        policy_title=rec.policy_title,
+                        provisional_decision=rec.provisional_decision,
+                        missing_criteria=json.loads(rec.missing_criteria_json or "[]"),
+                        insufficient_criteria=json.loads(rec.insufficient_criteria_json or "[]"),
+                        action_required_questions=json.loads(rec.action_required_questions_json or "[]"),
+                        audit_hash=rec.audit_hash,
+                        created_at=rec.created_at.isoformat() if rec.created_at else datetime.now(timezone.utc).isoformat(),
+                        current_state=InternalWorkflowState(rec.current_state) if rec.current_state in InternalWorkflowState._value2member_map_ else InternalWorkflowState.PRE_CHECK
+                    )
+                    cls._QUEUE[case_id] = item
+                    return item
+            except Exception:
+                pass
+            finally:
+                if close_db:
+                    local_db.close()
+        except Exception:
+            pass
+        return None
 
     @classmethod
     def clear(cls) -> None:
@@ -193,7 +304,8 @@ class HumanSignOffService:
 
 class ResubmissionLifecycleManager:
     """
-    Resubmission & Case Lifecycle Manager.
+    Resubmission & Case Lifecycle Manager backed by relational database.
+    Survives process restarts.
     Allowed transition paths:
     PRE_CHECK -> PENDING_EVIDENCE -> HUMAN_REVIEW -> FINAL_RECOMMENDATION -> SIGNED_OFF
     or PRE_CHECK -> HUMAN_REVIEW -> FINAL_RECOMMENDATION -> SIGNED_OFF
@@ -220,12 +332,32 @@ class ResubmissionLifecycleManager:
     _CASE_STATES: Dict[str, InternalWorkflowState] = {}
 
     @classmethod
-    def get_state(cls, case_id: str) -> InternalWorkflowState:
-        return cls._CASE_STATES.get(case_id, InternalWorkflowState.PRE_CHECK)
+    def get_state(cls, case_id: str, db: Optional[Any] = None) -> InternalWorkflowState:
+        if case_id in cls._CASE_STATES:
+            return cls._CASE_STATES[case_id]
+        try:
+            from app.db.session import SessionLocal
+            from app.db.models import DeferralQueueRecord
+            local_db = db or SessionLocal()
+            close_db = db is None
+            try:
+                rec = local_db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
+                if rec and rec.current_state in InternalWorkflowState._value2member_map_:
+                    st = InternalWorkflowState(rec.current_state)
+                    cls._CASE_STATES[case_id] = st
+                    return st
+            except Exception:
+                pass
+            finally:
+                if close_db:
+                    local_db.close()
+        except Exception:
+            pass
+        return InternalWorkflowState.PRE_CHECK
 
     @classmethod
-    def transition(cls, case_id: str, target_state: InternalWorkflowState) -> InternalWorkflowState:
-        current = cls.get_state(case_id)
+    def transition(cls, case_id: str, target_state: InternalWorkflowState, db: Optional[Any] = None) -> InternalWorkflowState:
+        current = cls.get_state(case_id, db=db)
         if target_state == current:
             return current
 
@@ -237,6 +369,23 @@ class ResubmissionLifecycleManager:
             )
 
         cls._CASE_STATES[case_id] = target_state
+        try:
+            from app.db.session import SessionLocal
+            from app.db.models import DeferralQueueRecord
+            local_db = db or SessionLocal()
+            close_db = db is None
+            try:
+                rec = local_db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
+                if rec:
+                    rec.current_state = target_state.value
+                    local_db.commit()
+            except Exception:
+                local_db.rollback()
+            finally:
+                if close_db:
+                    local_db.close()
+        except Exception:
+            pass
         return target_state
 
     @classmethod

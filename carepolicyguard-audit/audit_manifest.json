@@ -1,0 +1,359 @@
+{
+  "audit_package_version": "1.0.0",
+  "audit_status": "AUDIT_PENDING_INDEPENDENT_REVIEW",
+  "independent_reviewer_certified": false,
+  "policies_count": 8,
+  "total_criteria_count": 26,
+  "policies": [
+    {
+      "policy_id": "LCD-L33829",
+      "title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+      "jurisdiction": "Local Coverage Determination (LCD)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CPAP-01",
+          "name": "Diagnostic Polysomnography (AHI/RDI)",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
+          "source_section": "Coverage Indications, Limitations, and/or Medical Necessity - Initial Coverage",
+          "source_paragraph": "Paragraph 1: AHI or RDI >= 15 events/hr, or AHI/RDI >= 5 and <= 14 with documented comorbid hypertension, stroke, or daytime sleepiness",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "An initial positive airway pressure device is covered for beneficiaries with an AHI or RDI >= 15 events per hour, or an AHI or RDI >= 5 and <= 14 events per hour with documented symptoms of excessive daytime sleepiness, impaired cognition, mood disorders, or insomnia, or documented hypertension, ischemic heart disease, or history of stroke.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-CPAP-02",
+          "name": "Face-to-Face Clinical Evaluation",
+          "criterion_type": "FINDING_PRESENCE",
+          "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
+          "source_section": "General Requirements",
+          "source_paragraph": "Paragraph A: Face-to-Face Clinical Evaluation",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Prior to the sleep test, the beneficiary must have a face-to-face clinical evaluation by the treating physician or practitioner to assess the patient for obstructive sleep apnea.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    },
+    {
+      "policy_id": "LCD-TOTAL-KNEE-01",
+      "title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+      "jurisdiction": "Local Coverage Determination (LCD)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-TKA-01",
+          "name": "Severe Flexion Limitation (<= 90 degrees)",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
+          "source_section": "Indications and Limitations of Coverage",
+          "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
+          "source_traceability_status": "UNVERIFIED",
+          "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-TKA-02",
+          "name": "Failure of Conservative Therapy Duration",
+          "criterion_type": "TEMPORAL_DURATION",
+          "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
+          "source_section": "Conservative Management Prerequisites",
+          "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
+          "source_traceability_status": "UNVERIFIED",
+          "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-TKA-EXCL-01",
+          "name": "Active Joint Infection Exclusion",
+          "criterion_type": "EXCLUSION_SYMPTOM",
+          "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
+          "source_section": "Contraindications",
+          "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
+          "source_traceability_status": "UNVERIFIED",
+          "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    },
+    {
+      "policy_id": "NCD-20.29",
+      "title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+      "jurisdiction": "National Coverage Determination (CMS)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-HBOT-01",
+          "name": "Severe Diabetic Wound Wagner Grade 3 or Higher",
+          "criterion_type": "ORDINAL_RANK",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
+          "source_section": "Section B: Covered Conditions",
+          "source_paragraph": "Paragraph 4: Diabetic wounds of the lower extremities in patients who have Wagner grade III or higher lesions",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Diabetic wounds of the lower extremities in patients who have Wagner grade III or higher lesions.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-HBOT-02",
+          "name": "Failure of >= 30 Days Standard Conservative Wound Therapy",
+          "criterion_type": "TEMPORAL_DURATION",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
+          "source_section": "Section B: Covered Conditions",
+          "source_paragraph": "Paragraph 4: Prerequisite Failure of Standard Wound Therapy",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "The patient must have completed at least 30 continuous days of standard wound therapy without evidence of measurable signs of healing.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-HBOT-03",
+          "name": "Lower Extremity Vascular Assessment",
+          "criterion_type": "FINDING_PRESENCE",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
+          "source_section": "Section B: Covered Conditions",
+          "source_paragraph": "Paragraph 4: Vascular Assessment Requirement",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Evaluation of lower extremity vascular status and treatment of any treatable vascular problem.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    },
+    {
+      "policy_id": "NCD-20.33",
+      "title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "jurisdiction": "National Coverage Determination (NCD)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-TAVR-01",
+          "name": "Severe Aortic Stenosis Hemodynamic Threshold",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+          "source_section": "Section B: Covered Indications",
+          "source_paragraph": "Paragraph 1: Severe Symptomatic Aortic Stenosis",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Patients with severe symptomatic aortic stenosis (AVA <= 1.0 cm2 or mean aortic gradient >= 40 mmHg or peak velocity >= 4.0 m/s).",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-TAVR-02",
+          "name": "Heart Team Consultation",
+          "criterion_type": "FINDING_PRESENCE",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+          "source_section": "Section B: Covered Indications",
+          "source_paragraph": "Paragraph 2: Multidisciplinary Heart Team Collaboration",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "A multidisciplinary team (heart team) that includes a cardiac surgeon and an interventional cardiologist who have independently evaluated the patient.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-TAVR-EXCL-01",
+          "name": "Procedural Futility Exclusion",
+          "criterion_type": "EXCLUSION_SYMPTOM",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+          "source_section": "Section C: Non-Covered / Exclusions",
+          "source_paragraph": "Paragraph 1: Procedural Futility",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "TAVR is non-covered when procedural futility exists due to severe non-cardiac conditions with life expectancy < 1 year or terminal comorbid illness.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-TAVR-EXCL-02",
+          "name": "Prohibitive Surgical or Anatomical Contraindication Exclusion",
+          "criterion_type": "EXCLUSION_SYMPTOM",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
+          "source_section": "Section C: Non-Covered / Exclusions",
+          "source_paragraph": "Paragraph 2: Prohibitive Surgical and Anatomical Contraindications",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "TAVR is non-covered for patients with prohibitive anatomical contraindications or uncontrolled systemic sepsis.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    },
+    {
+      "policy_id": "NCD-20.4",
+      "title": "Implantable Automatic Defibrillators (ICDs)",
+      "jurisdiction": "National Coverage Determination (CMS)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-ICD-01",
+          "name": "Severe LV Systolic Dysfunction (LVEF <= 35%)",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
+          "source_section": "Section B: Covered Indications",
+          "source_paragraph": "Paragraph 1(a): Patients with LVEF <= 35%",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Patients with documented left ventricular ejection fraction <= 35% on diagnostic imaging.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-ICD-02",
+          "name": "Heart Failure Functional Classification (NYHA II/III)",
+          "criterion_type": "ORDINAL_RANK",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
+          "source_section": "Section B: Covered Indications",
+          "source_paragraph": "Paragraph 1(b): NYHA Class II or III functional symptoms",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Patients with New York Heart Association (NYHA) Class II or III heart failure symptoms.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-ICD-03",
+          "name": "Guideline-Directed Medical Therapy Duration (>=90 Days)",
+          "criterion_type": "TEMPORAL_DURATION",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
+          "source_section": "Section A: General Requirements",
+          "source_paragraph": "Paragraph 2: Medical Therapy Optimization",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Patients must have received optimal guideline-directed medical therapy for heart failure for at least 3 months.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-ICD-04",
+          "name": "Cardiomyopathy Etiology & Revascularization Timeline",
+          "criterion_type": "TEMPORAL_DURATION",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
+          "source_section": "Section B: Longitudinal Post-Event Intervals",
+          "source_paragraph": "Paragraph 3: Minimum Revascularization Intervals",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "At least 40 days must have elapsed after acute myocardial infarction, or at least 90 days after coronary artery bypass graft (CABG) or percutaneous coronary intervention (PCI).",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-ICD-EXCL-01",
+          "name": "Cardiogenic Shock or Terminal Illness Exclusion",
+          "criterion_type": "EXCLUSION_SYMPTOM",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
+          "source_section": "Section C: Exclusions and Non-Coverage",
+          "source_paragraph": "Paragraph 1: Cardiogenic Shock and Futility",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "CMS does not cover ICD implantation for patients in cardiogenic shock, or with non-cardiac disease with life expectancy less than 1 year.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    },
+    {
+      "policy_id": "NCD-20.7",
+      "title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+      "jurisdiction": "National Coverage Determination (CMS)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CAS-01",
+          "name": "Severe Carotid Stenosis (>= 70% Symptomatic or >= 80% Asymptomatic)",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
+          "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+          "source_paragraph": "Paragraph a: Stenosis Severity Thresholds",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "FDA-approved carotid stent systems and FDA-approved embolic protection devices for patients with symptomatic carotid artery stenosis >= 70% or asymptomatic stenosis >= 80%.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-CAS-02",
+          "name": "Documented High Surgical Risk for Carotid Endarterectomy (CEA)",
+          "criterion_type": "FINDING_PRESENCE",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
+          "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+          "source_paragraph": "Paragraph b: High Surgical Risk for Carotid Endarterectomy",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Patients who are at high risk for carotid endarterectomy (CEA) due to significant medical comorbidities or anatomically unfavorable neck features.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-CAS-03",
+          "name": "Mandatory FDA-Approved Embolic Protection Device (EPD)",
+          "criterion_type": "FINDING_PRESENCE",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
+          "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+          "source_paragraph": "Paragraph c: Mandatory Embolic Protection",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Coverage is contingent upon the mandatory deployment of an FDA-approved distal embolic protection device.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    },
+    {
+      "policy_id": "NCD-220.13",
+      "title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
+      "jurisdiction": "National Coverage Determination (CMS)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-LAAC-01",
+          "name": "Non-Valvular Atrial Fibrillation with High Stroke Risk (CHA2DS2-VASc >= 3)",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
+          "source_section": "Section B: Covered Indications",
+          "source_paragraph": "Paragraph 1: Non-Valvular Atrial Fibrillation with Stroke Risk",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "A CHADS2 score >= 2 or CHA2DS2-VASc score >= 3 indicating high stroke risk in patients with non-valvular atrial fibrillation.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-LAAC-02",
+          "name": "Contraindication to Long-Term Oral Anticoagulation (HAS-BLED >= 3)",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
+          "source_section": "Section B: Covered Indications",
+          "source_paragraph": "Paragraph 2: Anticoagulation Contraindication / Unsuitability",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "A formal clinical rationale establishing that the patient is unsuitable for long-term oral anticoagulation.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-LAAC-03",
+          "name": "Pre-Procedural Imaging Verifying Absence of LA Thrombus",
+          "criterion_type": "FINDING_PRESENCE",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
+          "source_section": "Section B: Covered Indications",
+          "source_paragraph": "Paragraph 3: Pre-Procedural Imaging Requirements",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Pre-procedural imaging confirming the absence of intracardiac thrombus prior to transcatheter transseptal puncture.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    },
+    {
+      "policy_id": "NCD-240.2",
+      "title": "Home Use of Oxygen",
+      "jurisdiction": "National Coverage Determination (CMS)",
+      "policy_version": "2024.1",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-O2-01",
+          "name": "Resting Hypoxemia (PaO2 <= 55 mmHg or SpO2 <= 88%)",
+          "criterion_type": "NUMERIC_THRESHOLD",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
+          "source_section": "Section B: Group I Medical Documentation Requirements",
+          "source_paragraph": "Paragraph 1: Severe Resting Hypoxemia",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Arterial blood gas PaO2 at or below 55 mm Hg, or an arterial oxygen saturation (SpO2) at or below 88% measured at rest.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-O2-02",
+          "name": "Clinical Stability at Evaluation",
+          "criterion_type": "FINDING_PRESENCE",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
+          "source_section": "Section B: General Requirements",
+          "source_paragraph": "Paragraph 2: Clinical Stability at Testing",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "The qualifying arterial blood gas study or oximetry test was conducted in a chronic, clinically stable state.",
+          "independent_audit_verification": "PENDING"
+        },
+        {
+          "criterion_code": "CRIT-O2-EXCL-01",
+          "name": "Acute Reversible Etiology Exclusion",
+          "criterion_type": "EXCLUSION_SYMPTOM",
+          "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
+          "source_section": "Section C: Non-Covered Conditions",
+          "source_paragraph": "Paragraph 1: Acute Reversible Etiologies",
+          "source_traceability_status": "CLAIMED_UNVERIFIED",
+          "source_text_excerpt": "Oxygen therapy is non-covered for conditions where hypoxemia is transient or reversible by standard treatment.",
+          "independent_audit_verification": "PENDING"
+        }
+      ]
+    }
+  ]
+}

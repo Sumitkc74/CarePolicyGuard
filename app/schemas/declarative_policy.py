@@ -40,7 +40,7 @@ class DeclarativeCriterion(BaseModel):
     cms_document: str = Field(default="CMS National Coverage Determination (NCD)", description="Governing CMS manual or document")
     source_section: str | None = Field(default=None, description="CMS policy section (e.g., Section B.1)")
     source_paragraph: str | None = Field(default=None, description="Specific CMS paragraph or clause")
-    source_traceability_status: str = Field(default="VERIFIED_SOURCE", description="VERIFIED_SOURCE or UNVERIFIED_SOURCE")
+    source_traceability_status: str = Field(default="CLAIMED_UNVERIFIED", description="CLAIMED_UNVERIFIED, UNVERIFIED, or VERIFIED_BY_INDEPENDENT_AUDIT")
     source_text_excerpt: str | None = Field(default=None, description="Verbatim citation excerpt from CMS policy text")
 
     @model_validator(mode="after")

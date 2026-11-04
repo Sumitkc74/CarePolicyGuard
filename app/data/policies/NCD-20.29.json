@@ -31,7 +31,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
       "source_section": "Section B: Covered Conditions",
       "source_paragraph": "Paragraph 4: Diabetic wounds of the lower extremities in patients who have Wagner grade III or higher lesions",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Diabetic wounds of the lower extremities in patients who have Wagner grade III or higher lesions."
     },
     {
@@ -61,7 +61,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
       "source_section": "Section B: Covered Conditions",
       "source_paragraph": "Paragraph 4: Prerequisite Failure of Standard Wound Therapy",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "The patient must have completed at least 30 continuous days of standard wound therapy without evidence of measurable signs of healing."
     },
     {
@@ -78,7 +78,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.29",
       "source_section": "Section B: Covered Conditions",
       "source_paragraph": "Paragraph 4: Vascular Assessment Requirement",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Evaluation of lower extremity vascular status and treatment of any treatable vascular problem."
     }
   ],

@@ -343,8 +343,33 @@ def test_fhir_bundle_export_and_ehr_push_endpoints():
     assert "DocumentReference" in resource_types
 
     # 3. Sign off and Direct EHR Push Simulation
+    from app.db.session import SessionLocal
+    from app.db.models import User
+    from app.core.security import create_access_token, get_password_hash
+    import secrets
+
+    db = SessionLocal()
+    clinician_username = f"clinician_api_{secrets.token_hex(4)}"
+    try:
+        user = User(
+            username=clinician_username,
+            email=f"{clinician_username}@hospital.org",
+            hashed_password=get_password_hash(secrets.token_hex(16)),
+            role="Clinician",
+            is_active=True,
+            is_verified_medical_pro=True,
+            npi_number="1043256787",
+            credential_title="MD"
+        )
+        db.add(user)
+        db.commit()
+        token = create_access_token({"sub": clinician_username})
+    finally:
+        db.close()
+
     sign_off_res = client.post(
         f"/api/v1/determination/{case_id}/sign-off",
+        headers={"Authorization": f"Bearer {token}"},
         json={
             "signed_by": "Dr. Sarah Jenkins, MD",
             "clinician_npi": "1043256787",

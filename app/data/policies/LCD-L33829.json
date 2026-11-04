@@ -33,7 +33,7 @@
       "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
       "source_section": "Coverage Indications, Limitations, and/or Medical Necessity - Initial Coverage",
       "source_paragraph": "Paragraph 1: AHI or RDI >= 15 events/hr, or AHI/RDI >= 5 and <= 14 with documented comorbid hypertension, stroke, or daytime sleepiness",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "An initial positive airway pressure device is covered for beneficiaries with an AHI or RDI >= 15 events per hour, or an AHI or RDI >= 5 and <= 14 events per hour with documented symptoms of excessive daytime sleepiness, impaired cognition, mood disorders, or insomnia, or documented hypertension, ischemic heart disease, or history of stroke."
     },
     {
@@ -50,7 +50,7 @@
       "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
       "source_section": "General Requirements",
       "source_paragraph": "Paragraph A: Face-to-Face Clinical Evaluation",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Prior to the sleep test, the beneficiary must have a face-to-face clinical evaluation by the treating physician or practitioner to assess the patient for obstructive sleep apnea."
     }
   ],

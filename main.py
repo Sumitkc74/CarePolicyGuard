@@ -51,6 +51,23 @@ async def lifespan(app: FastAPI):
             for col_name, col_type in new_cols:
                 if cols and col_name not in cols:
                     conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"))
+
+            res_adj = conn.execute(text("PRAGMA table_info(adjudication_logs)"))
+            adj_cols = [r[1] for r in res_adj.fetchall()]
+            new_adj_cols = [
+                ("determination_stage", "VARCHAR(50) DEFAULT 'PROVISIONAL'"),
+                ("is_releasable", "BOOLEAN DEFAULT 0"),
+                ("human_sign_off_status", "VARCHAR(50) DEFAULT 'PENDING_CLINICAL_SIGN_OFF'"),
+                ("signer_npi", "VARCHAR(20)"),
+                ("signer_credentials", "VARCHAR(50)"),
+                ("full_adjudication_json", "TEXT"),
+                ("full_packet_json", "TEXT"),
+                ("full_ehr_text", "TEXT"),
+                ("original_system_output_json", "TEXT")
+            ]
+            for col_name, col_type in new_adj_cols:
+                if adj_cols and col_name not in adj_cols:
+                    conn.execute(text(f"ALTER TABLE adjudication_logs ADD COLUMN {col_name} {col_type}"))
             conn.commit()
     except Exception as mig_err:
         print(f"[-] SQLite migration notice: {mig_err}")

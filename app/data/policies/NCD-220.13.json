@@ -33,7 +33,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
       "source_section": "Section B: Covered Indications",
       "source_paragraph": "Paragraph 1: Non-Valvular Atrial Fibrillation with Stroke Risk",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "A CHADS2 score >= 2 or CHA2DS2-VASc score >= 3 indicating high stroke risk in patients with non-valvular atrial fibrillation."
     },
     {
@@ -53,7 +53,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
       "source_section": "Section B: Covered Indications",
       "source_paragraph": "Paragraph 2: Anticoagulation Contraindication / Unsuitability",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "A formal clinical rationale establishing that the patient is unsuitable for long-term oral anticoagulation."
     },
     {
@@ -70,7 +70,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 220.13",
       "source_section": "Section B: Covered Indications",
       "source_paragraph": "Paragraph 3: Pre-Procedural Imaging Requirements",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Pre-procedural imaging confirming the absence of intracardiac thrombus prior to transcatheter transseptal puncture."
     }
   ],

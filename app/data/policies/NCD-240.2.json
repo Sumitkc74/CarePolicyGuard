@@ -33,7 +33,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
       "source_section": "Section B: Group I Medical Documentation Requirements",
       "source_paragraph": "Paragraph 1: Severe Resting Hypoxemia",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Arterial blood gas PaO2 at or below 55 mm Hg, or an arterial oxygen saturation (SpO2) at or below 88% measured at rest."
     },
     {
@@ -50,7 +50,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
       "source_section": "Section B: General Requirements",
       "source_paragraph": "Paragraph 2: Clinical Stability at Testing",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "The qualifying arterial blood gas study or oximetry test was conducted in a chronic, clinically stable state."
     },
     {
@@ -67,7 +67,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 240.2",
       "source_section": "Section C: Non-Covered Conditions",
       "source_paragraph": "Paragraph 1: Acute Reversible Etiologies",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Oxygen therapy is non-covered for conditions where hypoxemia is transient or reversible by standard treatment."
     }
   ],

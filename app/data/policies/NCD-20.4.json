@@ -33,7 +33,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
       "source_section": "Section B: Covered Indications",
       "source_paragraph": "Paragraph 1(a): Patients with LVEF <= 35%",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Patients with documented left ventricular ejection fraction <= 35% on diagnostic imaging."
     },
     {
@@ -51,7 +51,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
       "source_section": "Section B: Covered Indications",
       "source_paragraph": "Paragraph 1(b): NYHA Class II or III functional symptoms",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Patients with New York Heart Association (NYHA) Class II or III heart failure symptoms."
     },
     {
@@ -70,7 +70,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
       "source_section": "Section A: General Requirements",
       "source_paragraph": "Paragraph 2: Medical Therapy Optimization",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Patients must have received optimal guideline-directed medical therapy for heart failure for at least 3 months."
     },
     {
@@ -89,7 +89,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
       "source_section": "Section B: Longitudinal Post-Event Intervals",
       "source_paragraph": "Paragraph 3: Minimum Revascularization Intervals",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "At least 40 days must have elapsed after acute myocardial infarction, or at least 90 days after coronary artery bypass graft (CABG) or percutaneous coronary intervention (PCI)."
     },
     {
@@ -106,7 +106,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.4",
       "source_section": "Section C: Exclusions and Non-Coverage",
       "source_paragraph": "Paragraph 1: Cardiogenic Shock and Futility",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "CMS does not cover ICD implantation for patients in cardiogenic shock, or with non-cardiac disease with life expectancy less than 1 year."
     }
   ],

@@ -260,17 +260,18 @@ class MultiAgentVerificationPipeline:
         carc_codes = billing_res.carc_codes
         rarc_codes = billing_res.rarc_codes
 
-        # 5d. Multi-Agent Critic Cross-Examination & Falsification (Task 4)
-        critic_findings = self.critic_agent.critique_approval(
+        # 5d. Multi-Agent Critic Cross-Examination & Falsification (Task 2)
+        critic_findings = self.critic_agent.critique(
             provisional_decision=decision,
             criteria_assessments=criteria_assessments,
             ehr_text=sanitized_ehr,
             policy_id=policy_id
         )
         agent_disagreements: List[Dict[str, Any]] = []
-        if critic_findings.get("falsification_detected"):
+        if critic_findings.get("disagreement_recorded") or critic_findings.get("falsification_detected"):
+            action = critic_findings.get("critic_action")
             if decision == AdjudicationDecision.APPROVED:
-                if critic_findings.get("critic_action") == "VETO_TO_DENIED":
+                if action == "VETO_TO_DENIED":
                     decision = AdjudicationDecision.DENIED
                     abstention_status = False
                     abstention_reason = " | ".join(critic_findings["objections"])
@@ -291,6 +292,29 @@ class MultiAgentVerificationPipeline:
                         "provisional_proposal": "APPROVED",
                         "critic_verdict": "VETO_TO_DEFERRED",
                         "disagreement_rationale": "Critic detected contradiction or semantic support failure.",
+                        "objections": critic_findings["objections"]
+                    })
+            elif decision == AdjudicationDecision.DENIED:
+                if action == "CHALLENGE_TO_DEFERRED":
+                    # Deterministic veto engine resolves challenged denial to DEFERRED_TO_HUMAN
+                    decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+                    abstention_status = True
+                    critic_objs = " | ".join(critic_findings["objections"])
+                    abstention_reason = f"Challenged Denial: {critic_objs}"
+                    agent_disagreements.append({
+                        "agent": "CriticAgent",
+                        "provisional_proposal": "DENIED",
+                        "critic_verdict": "CHALLENGE_TO_DEFERRED",
+                        "disagreement_rationale": "Critic identified authoritative affirmative evidence challenging false denial.",
+                        "objections": critic_findings["objections"]
+                    })
+            elif decision == AdjudicationDecision.DEFERRED_TO_HUMAN:
+                if action == "CHALLENGE_WRONG_DEFERRAL":
+                    agent_disagreements.append({
+                        "agent": "CriticAgent",
+                        "provisional_proposal": "DEFERRED_TO_HUMAN",
+                        "critic_verdict": "CHALLENGE_WRONG_DEFERRAL",
+                        "disagreement_rationale": "Critic identified complete unambiguous evidence challenging unnecessary deferral.",
                         "objections": critic_findings["objections"]
                     })
 
@@ -384,6 +408,13 @@ class MultiAgentVerificationPipeline:
         )
 
         # 7. Persistence (Zero-Retention Medical Privacy Safe Harbor)
+        if decision == AdjudicationDecision.DEFERRED_TO_HUMAN:
+            try:
+                from app.services.deferral_queue import DeferralWorkQueue
+                DeferralWorkQueue.add_case(final_result, action_questions=action_required_questions, db=self.db)
+            except Exception as queue_err:
+                print(f"Deferral queue registration notice: {queue_err}")
+
         if self.db and save_record:
             try:
                 log_entry = AdjudicationLog(
@@ -404,6 +435,12 @@ class MultiAgentVerificationPipeline:
                     sanitized_ehr_preview=sanitized_ehr[:300] + "...",
                     execution_time_ms=execution_time_ms,
                     user_id=user_id,
+                    determination_stage="PROVISIONAL",
+                    is_releasable=False,
+                    human_sign_off_status="PENDING_CLINICAL_SIGN_OFF",
+                    full_adjudication_json=final_result.model_dump_json(),
+                    full_ehr_text=ehr_narrative,
+                    original_system_output_json=final_result.model_dump_json(),
                     created_at=timestamp
                 )
                 self.db.add(log_entry)

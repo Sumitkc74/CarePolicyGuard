@@ -69,7 +69,7 @@ from app.schemas.contracts import (
     BatchAdjudicationResponse,
     BatchAdjudicationItemResult
 )
-from app.api.deps import get_current_user, require_role, get_optional_current_user
+from app.api.deps import get_current_user, require_role, get_optional_current_user, get_verified_clinician_user
 from app.agents.pipeline import MultiAgentVerificationPipeline
 from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.agents.benchmark_engine import BenchmarkRunner, BENCHMARK_VIGNETTES
@@ -531,6 +531,20 @@ async def adjudicate_record(
     _EPHEMERAL_PACKETS[result.case_id] = packet
     _EPHEMERAL_EHR_TEXTS[result.case_id] = request.ehr_narrative
     _EPHEMERAL_ADJUDICATIONS[result.case_id] = result
+
+    # Persist full packet and narrative to AdjudicationLog in DB
+    if save_record and db:
+        try:
+            log_item = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == result.case_id).first()
+            if log_item:
+                log_item.full_packet_json = packet.model_dump_json()
+                if not log_item.full_adjudication_json:
+                    log_item.full_adjudication_json = result.model_dump_json()
+                if not log_item.full_ehr_text:
+                    log_item.full_ehr_text = request.ehr_narrative
+                db.commit()
+        except Exception as db_e:
+            db.rollback()
 
     return result
 
@@ -1042,7 +1056,7 @@ async def upload_clinical_note(
 def get_coverage_packet(case_id: str, db: Session = Depends(get_db)):
     """
     Retrieves the filled CMS coverage determination packet for pre-submission clinician review.
-    Checks in-memory ephemeral cache first (Zero-Retention mode), then persistent DB.
+    Checks in-memory ephemeral cache first, then persistent database storage.
     """
     if case_id in _EPHEMERAL_PACKETS:
         return _EPHEMERAL_PACKETS[case_id]
@@ -1051,8 +1065,22 @@ def get_coverage_packet(case_id: str, db: Session = Depends(get_db)):
     if not log:
         raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
 
+    if log.full_packet_json:
+        try:
+            packet = CMSCoveragePacket.model_validate_json(log.full_packet_json)
+            packet.determination_stage = log.determination_stage or packet.determination_stage
+            packet.is_releasable = log.is_releasable if log.is_releasable is not None else False
+            packet.human_sign_off_status = log.human_sign_off_status or packet.human_sign_off_status
+            packet.signed_by = log.signed_by or packet.signed_by
+            packet.signed_at = log.signed_at.isoformat() if log.signed_at else packet.signed_at
+            packet.payer_transaction_id = log.payer_transaction_id or packet.payer_transaction_id
+            _EPHEMERAL_PACKETS[case_id] = packet
+            return packet
+        except Exception:
+            pass
+
     import json
-    criterion_assessments_raw = json.loads(log.criterion_evaluations_json)
+    criterion_assessments_raw = json.loads(log.criterion_evaluations_json or "[]")
     from app.schemas.contracts import CriterionAssessment
     c_assessments = [CriterionAssessment(**c) for c in criterion_assessments_raw]
 
@@ -1066,21 +1094,29 @@ def get_coverage_packet(case_id: str, db: Session = Depends(get_db)):
         policy_title=policy_title,
         adjudication_decision=log.decision,
         abstention_status=log.abstention_status,
-        raw_aggregate_confidence=log.raw_confidence,
+        raw_aggregate_confidence=log.raw_confidence or 0.0,
         calibrated_aggregate_confidence=log.calibrated_confidence,
         abstention_threshold=0.85,
         abstention_reason=log.abstention_reason,
         criterion_assessments=c_assessments,
         verification_audits=[],
-        audit_hash=log.audit_hash,
+        audit_hash=log.audit_hash or "",
         required_clinician_action_notes=log.required_clinician_action_notes,
-        execution_time_ms=log.execution_time_ms,
+        execution_time_ms=log.execution_time_ms or 0.0,
         sanitized_ehr_text="",
+        determination_stage=log.determination_stage or "PROVISIONAL",
+        is_releasable=log.is_releasable if log.is_releasable is not None else False,
+        human_sign_off_status=log.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF",
+        signed_off_by=log.signed_by,
+        signed_off_at=log.signed_at.isoformat() if log.signed_at else None,
         timestamp=log.created_at
     )
 
     packet = CoveragePacketGenerator.generate_packet(adjudication_dummy)
     packet.submission_status = log.submission_status or "PENDING_CLINICIAN_REVIEW"
+    packet.determination_stage = log.determination_stage or "PROVISIONAL"
+    packet.is_releasable = log.is_releasable if log.is_releasable is not None else False
+    packet.human_sign_off_status = log.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF"
     packet.signed_by = log.signed_by
     packet.signed_at = log.signed_at.isoformat() if log.signed_at else None
     packet.payer_transaction_id = log.payer_transaction_id
@@ -1091,27 +1127,38 @@ def get_coverage_packet(case_id: str, db: Session = Depends(get_db)):
 def sign_off_clinical_determination(
     case_id: str,
     request: SignOffRequest,
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_verified_clinician_user),
     db: Session = Depends(get_db)
 ):
     """
     Mandatory Human Sign-Off Gate (Task 1):
-    Records licensed clinician sign-off on a provisional determination,
+    Records verified licensed clinician sign-off on a provisional determination,
     transitioning its release lifecycle stage from 'PROVISIONAL' to 'FINAL'.
+    Signer identity and clinical credentials are established from verified system records.
     Only after sign-off can the determination be released, exported as final,
     or transmitted to external payers / EHR systems.
     """
     now = datetime.now(timezone.utc)
-    signed_name = request.signed_by or (current_user.username if current_user else "Attending Clinician")
+    cred = current_user.credential_title or request.clinician_credentials
+    signed_name = f"{current_user.username}, {cred}" if cred else current_user.username
+    signer_npi = current_user.npi_number or request.clinician_npi
+    signer_credentials = cred
 
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
     adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
+    if not adj and log and log.full_adjudication_json:
+        try:
+            adj = FinalAdjudication.model_validate_json(log.full_adjudication_json)
+        except Exception:
+            pass
+
     if adj:
         from app.services.deferral_queue import HumanSignOffService
         signed_adj = HumanSignOffService.sign_off(
             adjudication=adj,
             signed_by=signed_name,
-            clinician_npi=request.clinician_npi,
-            clinician_credentials=request.clinician_credentials,
+            clinician_npi=signer_npi,
+            clinician_credentials=signer_credentials,
             notes=request.attestation_notes
         )
         _EPHEMERAL_ADJUDICATIONS[case_id] = signed_adj
@@ -1125,14 +1172,34 @@ def sign_off_clinical_determination(
         packet.signed_at = now.isoformat()
         if request.attestation_notes:
             packet.clinician_action_notes = ((packet.clinician_action_notes or "") + f"\n[Sign-Off Attestation]: {request.attestation_notes}").strip()
+    elif log and log.full_packet_json:
+        try:
+            packet = CMSCoveragePacket.model_validate_json(log.full_packet_json)
+            packet.determination_stage = "FINAL"
+            packet.is_releasable = True
+            packet.human_sign_off_status = "SIGNED_OFF"
+            packet.signed_by = signed_name
+            packet.signed_at = now.isoformat()
+            if request.attestation_notes:
+                packet.clinician_action_notes = ((packet.clinician_action_notes or "") + f"\n[Sign-Off Attestation]: {request.attestation_notes}").strip()
+            _EPHEMERAL_PACKETS[case_id] = packet
+            log.full_packet_json = packet.model_dump_json()
+        except Exception:
+            pass
 
-    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
     if log:
+        log.determination_stage = "FINAL"
+        log.is_releasable = True
+        log.human_sign_off_status = "SIGNED_OFF"
         log.signed_by = signed_name
         log.signed_at = now
         log.submission_status = "SIGNED_OFF"
+        log.signer_npi = signer_npi
+        log.signer_credentials = signer_credentials
         if request.attestation_notes:
             log.required_clinician_action_notes = ((log.required_clinician_action_notes or "") + f"\n[Sign-Off Attestation]: {request.attestation_notes}").strip()
+        if adj:
+            log.full_adjudication_json = adj.model_dump_json()
         db.commit()
 
     if not adj and case_id not in _EPHEMERAL_PACKETS and not log:
@@ -1153,20 +1220,36 @@ def get_determination_record(case_id: str, db: Session = Depends(get_db)):
     """
     Retrieves the clinical determination for case_id.
     Exposes determination_stage ('PROVISIONAL' vs 'FINAL') and is_releasable.
+    Reconstitutes from database on system restart.
     """
     adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
     if adj:
         return adj
 
-    packet = _EPHEMERAL_PACKETS.get(case_id)
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
-    if not packet and not log:
-        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
+    if not log:
+        if case_id not in _EPHEMERAL_PACKETS:
+            raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found.")
+
+    if log and log.full_adjudication_json:
+        try:
+            reconstituted_adj = FinalAdjudication.model_validate_json(log.full_adjudication_json)
+            reconstituted_adj.determination_stage = log.determination_stage or reconstituted_adj.determination_stage
+            reconstituted_adj.is_releasable = log.is_releasable if log.is_releasable is not None else False
+            reconstituted_adj.human_sign_off_status = log.human_sign_off_status or reconstituted_adj.human_sign_off_status
+            reconstituted_adj.signed_off_by = log.signed_by or reconstituted_adj.signed_off_by
+            reconstituted_adj.signed_off_at = log.signed_at.isoformat() if log.signed_at else reconstituted_adj.signed_off_at
+            _EPHEMERAL_ADJUDICATIONS[case_id] = reconstituted_adj
+            return reconstituted_adj
+        except Exception:
+            pass
 
     dummy_packet = get_coverage_packet(case_id, db=db)
-    stage = "FINAL" if (log and log.signed_by) or (dummy_packet and dummy_packet.determination_stage == "FINAL") else "PROVISIONAL"
-    releasable = stage == "FINAL"
-    signoff_status = "SIGNED_OFF" if releasable else "PENDING_CLINICAL_SIGN_OFF"
+    stage = log.determination_stage if log and log.determination_stage else (
+        "FINAL" if (log and log.signed_by) or (dummy_packet and dummy_packet.determination_stage == "FINAL") else "PROVISIONAL"
+    )
+    releasable = log.is_releasable if log and log.is_releasable is not None else (stage == "FINAL")
+    signoff_status = log.human_sign_off_status if log and log.human_sign_off_status else ("SIGNED_OFF" if releasable else "PENDING_CLINICAL_SIGN_OFF")
 
     return FinalAdjudication(
         case_id=case_id,
@@ -1183,8 +1266,8 @@ def get_determination_record(case_id: str, db: Session = Depends(get_db)):
         determination_stage=stage,
         is_releasable=releasable,
         human_sign_off_status=signoff_status,
-        signed_off_by=dummy_packet.signed_by,
-        signed_off_at=dummy_packet.signed_at,
+        signed_off_by=log.signed_by if log and log.signed_by else dummy_packet.signed_by,
+        signed_off_at=log.signed_at.isoformat() if log and log.signed_at else dummy_packet.signed_at,
         audit_hash=dummy_packet.audit_hash,
         sanitized_ehr_text="",
         timestamp=datetime.now(timezone.utc)

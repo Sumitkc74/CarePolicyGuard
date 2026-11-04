@@ -426,7 +426,7 @@ class CMSCoveragePacket(BaseModel):
     shared_decision_making_attestation: str | None = None
 
 class SignOffRequest(BaseModel):
-    signed_by: str = Field(..., description="Licensed clinician name or ID")
+    signed_by: str | None = Field(default=None, description="Optional clinician name; verified user profile identity is authoritatively used")
     clinician_npi: str | None = Field(default=None, description="Clinician NPI")
     clinician_credentials: str | None = Field(default=None, description="Clinician title e.g. MD, DO, FACC")
     attestation_notes: str | None = Field(default=None, description="Clinical attestation or sign-off notes")

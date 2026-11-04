@@ -1,0 +1,105 @@
+[
+  {
+    "pair_id": "PAIR-01-SUBJECT",
+    "dimension": "subject",
+    "policy_id": "NCD-20.4",
+    "clinical_domain": "Cardiology",
+    "clinical_facts_summary": "LVEF 26%, NYHA Class II, GDMT 180 days, prior MI 2 years ago",
+    "clean_case": {
+      "case_id": "PAIR-01-CLEAN",
+      "narrative": "CARDIOLOGY PROGRESS NOTE\nASSESSMENT & DIAGNOSTICS:\nPatient has documented ischemic cardiomyopathy following a myocardial infarction 2 years ago.\nTransthoracic echocardiogram confirms patient LVEF 26%.\nPatient exhibits NYHA Class II functional heart failure symptoms.\nPatient has been maintained on optimized guideline-directed medical therapy (GDMT) for 180 days.\nNo cardiogenic shock. Patient stable.",
+      "expected_decision": "APPROVED"
+    },
+    "framed_case": {
+      "case_id": "PAIR-01-FRAMED",
+      "narrative": "CARDIOLOGY PROGRESS NOTE\nASSESSMENT & DIAGNOSTICS:\nPatient evaluated for cardiac clearance. Family history notable:\nFather had documented ischemic cardiomyopathy following a myocardial infarction 2 years ago.\nFather had echocardiogram confirming father LVEF 26%.\nFather exhibited NYHA Class II functional heart failure symptoms.\nFather had been maintained on optimized guideline-directed medical therapy (GDMT) for 180 days.\nPatient has normal heart function with no cardiogenic shock. Patient stable.",
+      "expected_decision_not": "APPROVED"
+    }
+  },
+  {
+    "pair_id": "PAIR-02-TIMING",
+    "dimension": "timing",
+    "policy_id": "LCD-L33829",
+    "clinical_domain": "Pulmonology",
+    "clinical_facts_summary": "AHI 22 events/hr, face-to-face evaluation, excessive daytime sleepiness",
+    "clean_case": {
+      "case_id": "PAIR-02-CLEAN",
+      "narrative": "SLEEP MEDICINE CONSULTATION NOTE\nHISTORY & EVALUATION:\nFace-to-face clinical evaluation completed in office prior to diagnostic testing.\nOvernight diagnostic polysomnography completed last week reveals obstructive sleep apnea with AHI 22 events/hr.\nPatient reports persistent excessive daytime sleepiness and chronic snoring.\nPrescribing nocturnal continuous positive airway pressure (CPAP).",
+      "expected_decision": "APPROVED"
+    },
+    "framed_case": {
+      "case_id": "PAIR-02-FRAMED",
+      "narrative": "SLEEP MEDICINE CONSULTATION NOTE\nHISTORY & EVALUATION:\nFace-to-face clinical evaluation is planned for next quarter following diagnostic testing.\nOvernight diagnostic polysomnography is scheduled for next month; target threshold if positive is AHI 22 events/hr.\nPatient will be monitored if excessive daytime sleepiness and chronic snoring develop in the future.\nConsidering prospective nocturnal continuous positive airway pressure (CPAP).",
+      "expected_decision_not": "APPROVED"
+    }
+  },
+  {
+    "pair_id": "PAIR-03-MODALITY",
+    "dimension": "modality",
+    "policy_id": "NCD-20.4",
+    "clinical_domain": "Cardiology",
+    "clinical_facts_summary": "LVEF 28%, NYHA Class III, GDMT 6 months, prior MI 3 years ago",
+    "clean_case": {
+      "case_id": "PAIR-03-CLEAN",
+      "narrative": "CARDIOLOGY CLINIC SUMMARY\nCLINICAL FINDINGS:\nPatient has documented ischemic heart failure secondary to remote myocardial infarction 3 years ago.\nRecent echocardiogram confirms severe left ventricular systolic dysfunction with LVEF 28%.\nPatient has persistent NYHA Class III functional symptoms despite guideline-directed medical therapy (GDMT) for 6 months.\nNo cardiogenic shock. Recommending ICD placement.",
+      "expected_decision": "APPROVED"
+    },
+    "framed_case": {
+      "case_id": "PAIR-03-FRAMED",
+      "narrative": "CARDIOLOGY CLINIC SUMMARY\nCLINICAL FINDINGS:\nConsider potential future heart failure if patient should suffer a remote myocardial infarction 3 years from now.\nHypothetical scenario: if repeat echocardiogram were to show severe systolic dysfunction with LVEF 28%,\nand if patient were to experience persistent NYHA Class III functional symptoms despite GDMT for 6 months,\nwe would consider ICD placement. Currently patient has preserved ejection fraction with no shock.",
+      "expected_decision_not": "APPROVED"
+    }
+  },
+  {
+    "pair_id": "PAIR-04-NEGATION",
+    "dimension": "negation",
+    "policy_id": "LCD-L33829",
+    "clinical_domain": "Pulmonology",
+    "clinical_facts_summary": "AHI 8.5 events/hr, face-to-face consultation, comorbid symptoms",
+    "clean_case": {
+      "case_id": "PAIR-04-CLEAN",
+      "narrative": "SLEEP DISORDERS CLINIC EVALUATION\nIn-person face-to-face consultation completed prior to sleep study.\nDiagnostic polysomnography demonstrates mild obstructive sleep apnea with AHI 8.5 events/hr.\nComorbidities: Patient has confirmed chronic essential hypertension and severe excessive daytime sleepiness.\nMeets statutory comorbidity requirements for PAP therapy.",
+      "expected_decision": "APPROVED"
+    },
+    "framed_case": {
+      "case_id": "PAIR-04-FRAMED",
+      "narrative": "SLEEP DISORDERS CLINIC EVALUATION\nIn-person face-to-face consultation completed prior to sleep study.\nDiagnostic polysomnography demonstrates mild obstructive sleep apnea with AHI 8.5 events/hr.\nComorbidities: Patient denies any daytime sleepiness, denies snoring, and has no history of hypertension or stroke.\nNormotensive with zero daytime somnolence symptoms.",
+      "expected_decision_not": "APPROVED"
+    }
+  },
+  {
+    "pair_id": "PAIR-05-RANGE",
+    "dimension": "range",
+    "policy_id": "NCD-20.4",
+    "clinical_domain": "Cardiology",
+    "clinical_facts_summary": "Identical narrative structure, comparing in-range LVEF 28% vs out-of-range LVEF 48%",
+    "clean_case": {
+      "case_id": "PAIR-05-CLEAN",
+      "narrative": "CARDIOLOGY INPATIENT CONSULTATION\nPatient with coronary artery disease and prior myocardial infarction 2 years ago.\nNYHA Class II heart failure on guideline-directed medical therapy (GDMT) for 120 days.\nTransthoracic echocardiogram demonstrates left ventricular ejection fraction of LVEF 28%.\nNo acute shock or end-stage illness.",
+      "expected_decision": "APPROVED"
+    },
+    "framed_case": {
+      "case_id": "PAIR-05-FRAMED",
+      "narrative": "CARDIOLOGY INPATIENT CONSULTATION\nPatient with coronary artery disease and prior myocardial infarction 2 years ago.\nNYHA Class II heart failure on guideline-directed medical therapy (GDMT) for 120 days.\nTransthoracic echocardiogram demonstrates left ventricular ejection fraction of LVEF 48%.\nNo acute shock or end-stage illness.",
+      "expected_decision_not": "APPROVED"
+    }
+  },
+  {
+    "pair_id": "PAIR-06-CONTRADICTION",
+    "dimension": "contradiction",
+    "policy_id": "NCD-20.4",
+    "clinical_domain": "Cardiology",
+    "clinical_facts_summary": "Single consistent echo LVEF 25% vs discordant cross-section echo LVEF 25% and 58%",
+    "clean_case": {
+      "case_id": "PAIR-06-CLEAN",
+      "narrative": "CARDIOLOGY CLINIC PROGRESS NOTE\nHPI: Patient evaluated for ischemic cardiomyopathy with remote MI 2 years ago. On GDMT for 180 days.\nDIAGNOSTIC STUDIES: Formal echocardiogram performed on 10/12 confirms LVEF 25% with severe hypokinesis.\nASSESSMENT & PLAN: NYHA Class II heart failure. Concordant echo findings. No shock.",
+      "expected_decision": "APPROVED"
+    },
+    "framed_case": {
+      "case_id": "PAIR-06-FRAMED",
+      "narrative": "CARDIOLOGY CLINIC PROGRESS NOTE\nHPI: Patient evaluated for ischemic cardiomyopathy with remote MI 2 years ago. Outside ultrasound noted LVEF 25%. On GDMT for 180 days.\nDIAGNOSTIC STUDIES: Formal echocardiogram performed on 10/12 demonstrates normal systolic function with LVEF 58% and no wall motion abnormality.\nASSESSMENT & PLAN: NYHA Class II heart failure. Discordant echo findings require clinician review.",
+      "expected_decision_not": "APPROVED"
+    }
+  }
+]
+

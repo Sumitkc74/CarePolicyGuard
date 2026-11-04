@@ -33,7 +33,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
       "source_section": "Section B: Covered Indications",
       "source_paragraph": "Paragraph 1: Severe Symptomatic Aortic Stenosis",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Patients with severe symptomatic aortic stenosis (AVA <= 1.0 cm2 or mean aortic gradient >= 40 mmHg or peak velocity >= 4.0 m/s)."
     },
     {
@@ -50,7 +50,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
       "source_section": "Section B: Covered Indications",
       "source_paragraph": "Paragraph 2: Multidisciplinary Heart Team Collaboration",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "A multidisciplinary team (heart team) that includes a cardiac surgeon and an interventional cardiologist who have independently evaluated the patient."
     },
     {
@@ -67,7 +67,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
       "source_section": "Section C: Non-Covered / Exclusions",
       "source_paragraph": "Paragraph 1: Procedural Futility",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "TAVR is non-covered when procedural futility exists due to severe non-cardiac conditions with life expectancy < 1 year or terminal comorbid illness."
     },
     {
@@ -84,7 +84,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
       "source_section": "Section C: Non-Covered / Exclusions",
       "source_paragraph": "Paragraph 2: Prohibitive Surgical and Anatomical Contraindications",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "TAVR is non-covered for patients with prohibitive anatomical contraindications or uncontrolled systemic sepsis."
     }
   ],

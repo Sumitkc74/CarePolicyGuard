@@ -102,3 +102,24 @@ def get_optional_current_user(
         return db.query(User).filter(User.username == username).first()
     except Exception:
         return None
+
+
+def get_verified_clinician_user(
+    current_user: User = Depends(get_current_user)
+) -> User:
+    """
+    Enforces that the current authenticated user has the Clinician role
+    and is explicitly verified as a medical professional in the system records.
+    """
+    if current_user.role != UserRole.CLINICIAN.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Access denied: Clinical sign-off requires role '{UserRole.CLINICIAN.value}', but user has role '{current_user.role}'."
+        )
+    if not getattr(current_user, "is_verified_medical_pro", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Clinician account is not verified as a medical professional. Sign-off prohibited."
+        )
+    return current_user
+

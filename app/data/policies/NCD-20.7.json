@@ -33,7 +33,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
       "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
       "source_paragraph": "Paragraph a: Stenosis Severity Thresholds",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "FDA-approved carotid stent systems and FDA-approved embolic protection devices for patients with symptomatic carotid artery stenosis >= 70% or asymptomatic stenosis >= 80%."
     },
     {
@@ -50,7 +50,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
       "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
       "source_paragraph": "Paragraph b: High Surgical Risk for Carotid Endarterectomy",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Patients who are at high risk for carotid endarterectomy (CEA) due to significant medical comorbidities or anatomically unfavorable neck features."
     },
     {
@@ -67,7 +67,7 @@
       "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
       "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
       "source_paragraph": "Paragraph c: Mandatory Embolic Protection",
-      "source_traceability_status": "VERIFIED_SOURCE",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
       "source_text_excerpt": "Coverage is contingent upon the mandatory deployment of an FDA-approved distal embolic protection device."
     }
   ],

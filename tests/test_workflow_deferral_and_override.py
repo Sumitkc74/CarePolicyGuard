@@ -156,7 +156,56 @@ def test_signed_off_determination_can_be_retrieved_as_final_and_released():
     Task 1 Gate Enforcement:
     Proves that recording a clinical sign-off transitions determination to FINAL (is_releasable=True),
     enabling retrieval from /final, PDF export with require_final=true, and EHR push.
+    Enforces that unauthenticated requests (401) and unverified clinicians (403) are strictly rejected.
     """
+    import secrets
+    from app.db.session import SessionLocal
+    from app.db.models import User
+    from app.core.security import create_access_token, get_password_hash
+
+    db = SessionLocal()
+    try:
+        # Create verified clinician in memory/db for testing
+        clinician_user = f"clinician_{secrets.token_hex(4)}"
+        u_clinician = User(
+            username=clinician_user,
+            email=f"{clinician_user}@hospital.org",
+            hashed_password=get_password_hash(secrets.token_hex(16)),
+            role="Clinician",
+            is_active=True,
+            is_verified_medical_pro=True,
+            npi_number="1487293810",
+            credential_title="MD, FACC"
+        )
+        # Create unverified clinician
+        unverified_user = f"unverified_{secrets.token_hex(4)}"
+        u_unverified = User(
+            username=unverified_user,
+            email=f"{unverified_user}@hospital.org",
+            hashed_password=get_password_hash(secrets.token_hex(16)),
+            role="Clinician",
+            is_active=True,
+            is_verified_medical_pro=False
+        )
+        # Create non-clinician (Auditor)
+        auditor_user = f"auditor_{secrets.token_hex(4)}"
+        u_auditor = User(
+            username=auditor_user,
+            email=f"{auditor_user}@hospital.org",
+            hashed_password=get_password_hash(secrets.token_hex(16)),
+            role="Auditor",
+            is_active=True,
+            is_verified_medical_pro=False
+        )
+        db.add_all([u_clinician, u_unverified, u_auditor])
+        db.commit()
+
+        token_clinician = create_access_token({"sub": clinician_user})
+        token_unverified = create_access_token({"sub": unverified_user})
+        token_auditor = create_access_token({"sub": auditor_user})
+    finally:
+        db.close()
+
     ehr = (
         "CARDIOLOGY PROGRESS NOTE\n"
         "Patient with ischemic cardiomyopathy. LVEF 25% on echo. NYHA Class II.\n"
@@ -170,18 +219,42 @@ def test_signed_off_determination_can_be_retrieved_as_final_and_released():
     assert res.status_code == 200
     case_id = res.json()["case_id"]
 
-    # Record clinical sign-off
-    signoff_res = client.post(f"/api/v1/determination/{case_id}/sign-off", json={
-        "signed_by": "Dr. Sarah Jenkins, MD, FACC",
-        "clinician_npi": "1487293810",
-        "clinician_credentials": "MD, FACC",
-        "attestation_notes": "Clinical findings verified against source documentation under CMS-0057-F."
+    # 1. Unauthenticated sign-off attempt must return 401 Unauthorized
+    unauth_res = client.post(f"/api/v1/determination/{case_id}/sign-off", json={
+        "signed_by": "Attending Clinician",
+        "attestation_notes": "Attempt without credentials"
     })
+    assert unauth_res.status_code == 401
+
+    # 2. Non-clinician (Auditor) sign-off attempt must return 403 Forbidden
+    auditor_res = client.post(
+        f"/api/v1/determination/{case_id}/sign-off",
+        headers={"Authorization": f"Bearer {token_auditor}"},
+        json={"attestation_notes": "Attempt with non-clinician role"}
+    )
+    assert auditor_res.status_code == 403
+    assert "Clinical sign-off requires role 'Clinician'" in auditor_res.json()["detail"]
+
+    # 3. Unverified clinician sign-off attempt must return 403 Forbidden
+    unverified_res = client.post(
+        f"/api/v1/determination/{case_id}/sign-off",
+        headers={"Authorization": f"Bearer {token_unverified}"},
+        json={"attestation_notes": "Attempt with unverified account"}
+    )
+    assert unverified_res.status_code == 403
+    assert "not verified as a medical professional" in unverified_res.json()["detail"]
+
+    # 4. Verified licensed clinician sign-off must succeed
+    signoff_res = client.post(
+        f"/api/v1/determination/{case_id}/sign-off",
+        headers={"Authorization": f"Bearer {token_clinician}"},
+        json={"attestation_notes": "Clinical findings verified against source documentation under CMS-0057-F."}
+    )
     assert signoff_res.status_code == 200
     signoff_data = signoff_res.json()
     assert signoff_data["determination_stage"] == "FINAL"
     assert signoff_data["is_releasable"] is True
-    assert signoff_data["signed_off_by"] == "Dr. Sarah Jenkins, MD, FACC"
+    assert clinician_user in signoff_data["signed_off_by"]
 
     # Final retrieval endpoint now succeeds
     final_res = client.get(f"/api/v1/determination/{case_id}/final")
@@ -197,6 +270,64 @@ def test_signed_off_determination_can_be_retrieved_as_final_and_released():
     })
     assert push_res.status_code == 200
     assert push_res.json()["status"] == "SUCCESS_TRANSMITTED"
+
+
+def test_system_restart_survival_for_determinations_packets_and_deferral_queue():
+    """
+    Task 1: Proves determinations, packets, and deferral queue items survive server
+    restarts by wiping in-memory caches and asserting database reconstitution.
+    """
+    from app.api.routes import _EPHEMERAL_PACKETS, _EPHEMERAL_ADJUDICATIONS, _EPHEMERAL_EHR_TEXTS
+    pipeline = MultiAgentVerificationPipeline()
+
+    ehr = (
+        "Patient with ischemic cardiomyopathy. LVEF 25% on TTE.\n"
+        "GDMT maintained for 6 months. NYHA Class II. Remote MI 3 years ago."
+    )
+    res = client.post("/api/v1/adjudicate", json={
+        "patient_id": "PT-RESTART-SURVIVE-01",
+        "policy_id": "NCD-20.4",
+        "ehr_narrative": ehr
+    })
+    assert res.status_code == 200
+    case_id = res.json()["case_id"]
+
+    # Also add a case to the DeferralWorkQueue
+    deferral_item = DeferralWorkQueue.add_case(
+        FinalAdjudication(**res.json()),
+        action_questions=["Confirm GDMT medication dosages."]
+    )
+    assert deferral_item.case_id == case_id
+
+    # SIMULATE RESTART: completely wipe all in-memory caches and queues
+    _EPHEMERAL_PACKETS.clear()
+    _EPHEMERAL_ADJUDICATIONS.clear()
+    _EPHEMERAL_EHR_TEXTS.clear()
+    DeferralWorkQueue.clear()
+    ResubmissionLifecycleManager.clear()
+
+    # 1. Determination must be rehydrated from database
+    reloaded_det = client.get(f"/api/v1/determination/{case_id}")
+    assert reloaded_det.status_code == 200
+    det_json = reloaded_det.json()
+    assert det_json["case_id"] == case_id
+    assert det_json["determination_stage"] == "PROVISIONAL"
+    assert det_json["is_releasable"] is False
+
+    # 2. Coverage packet must be rehydrated from database
+    reloaded_packet = client.get(f"/api/v1/packet/{case_id}")
+    assert reloaded_packet.status_code == 200
+    packet_json = reloaded_packet.json()
+    assert packet_json["case_id"] == case_id
+    assert packet_json["determination_stage"] == "PROVISIONAL"
+
+    # 3. DeferralWorkQueue must be rehydrated from database
+    queue_items = DeferralWorkQueue.list_queue()
+    found_in_queue = any(q.case_id == case_id for q in queue_items)
+    assert found_in_queue is True
+    reloaded_queue_item = DeferralWorkQueue.get_item(case_id)
+    assert reloaded_queue_item is not None
+    assert reloaded_queue_item.case_id == case_id
 
 
 def test_override_preserves_original_system_output_byte_identical():

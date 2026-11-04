@@ -146,6 +146,15 @@ class AdjudicationLog(Base):
     signed_at = Column(DateTime(timezone=True), nullable=True)
     payer_transaction_id = Column(String(100), nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    determination_stage = Column(String(50), default="PROVISIONAL", nullable=False)
+    is_releasable = Column(Boolean, default=False, nullable=False)
+    human_sign_off_status = Column(String(50), default="PENDING_CLINICAL_SIGN_OFF", nullable=False)
+    signer_npi = Column(String(20), nullable=True)
+    signer_credentials = Column(String(50), nullable=True)
+    full_adjudication_json = Column(Text, nullable=True)
+    full_packet_json = Column(Text, nullable=True)
+    full_ehr_text = Column(Text, nullable=True)
+    original_system_output_json = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
 
     user = relationship("User", back_populates="adjudication_logs")
@@ -167,3 +176,22 @@ class UserSession(Base):
     last_active_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
     user = relationship("User", back_populates="sessions")
+
+
+class DeferralQueueRecord(Base):
+    __tablename__ = "deferral_queue_records"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    case_id = Column(String(100), unique=True, index=True, nullable=False)
+    patient_id_masked = Column(String(100), index=True, nullable=False)
+    policy_id = Column(String(50), index=True, nullable=False)
+    policy_title = Column(String(255), nullable=False)
+    provisional_decision = Column(String(50), nullable=False)
+    missing_criteria_json = Column(Text, nullable=False, default="[]")
+    insufficient_criteria_json = Column(Text, nullable=False, default="[]")
+    action_required_questions_json = Column(Text, nullable=False, default="[]")
+    audit_hash = Column(String(64), index=True, nullable=False)
+    current_state = Column(String(50), default="PENDING_EVIDENCE", nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
