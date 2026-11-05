@@ -121,11 +121,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L34411 governs Blepharoplasty/Eyelid Surgery, whereas policy subject is PCI with Stents. Flagged as needing realignment.",
     "real_cms_id": "LCD L34411",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Percutaneous Coronary Intervention",
-    "citation": "CMS Medicare Coverage Database LCD L34411",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Blepharoplasty, Eyelid Surgery, and Brow Lift",
+    "mcd_actual_title": "Blepharoplasty, Eyelid Surgery, and Brow Lift",
+    "citation": "CMS MCD Document at Cited ID: Blepharoplasty, Eyelid Surgery, and Brow Lift",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34411",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

@@ -119,11 +119,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "real_cms_id": "NCD 220.6",
-    "authority": "CMS National Coverage Determination (NCD)",
-    "document_title": "Positron Emission Tomography (PET) Scans",
-    "citation": "Medicare National Coverage Determinations Manual, Chapter 1, Part 4, Section 220.6",
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD database primary key ncdid=214 corresponds to Section 160.10 'Telephone Transmission of EEGs', whereas policy subject is Cardiac PET. Flagged as needing realignment.",
+    "real_cms_id": "NCD Manual Section 160.10 (MCD ncdid=214)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Telephone Transmission of EEGs",
+    "mcd_actual_title": "Telephone Transmission of EEGs",
+    "citation": "CMS MCD Document at Cited ID: Telephone Transmission of EEGs",
     "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=214",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

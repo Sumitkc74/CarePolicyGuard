@@ -123,11 +123,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "real_cms_id": "42 CFR \u00a7 419.80 / NCD 150.10",
-    "authority": "CMS Hospital Outpatient Prior Authorization / NCD Manual Section 150.10",
-    "document_title": "Lumbar and Cervical Artificial Disc Replacement",
-    "citation": "Medicare National Coverage Determinations Manual, Section 150.10 and 42 CFR \u00a7 419.80",
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD database primary key ncdid=311 corresponds to Nesiritide for Heart Failure, whereas policy subject is Cervical Artificial Disc Replacement. Flagged as needing realignment.",
+    "real_cms_id": "NCD Manual Section (MCD ncdid=311)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Nesiritide for Treatment of Heart Failure Patients",
+    "mcd_actual_title": "Nesiritide for Treatment of Heart Failure Patients",
+    "citation": "CMS MCD Document at Cited ID: Nesiritide for Treatment of Heart Failure Patients",
     "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=311",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

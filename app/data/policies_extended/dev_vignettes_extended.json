@@ -3,672 +3,672 @@
     "vignette_id": "DEV-LCD-ACDF-APP",
     "policy_id": "LCD-ACDF",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Anterior Cervical Discectomy and Fusion (ACDF)",
+    "title": "Cervical radiculopathy with MRI-proven disc herniation",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Anterior Cervical Discectomy and Fusion (ACDF) (LCD-ACDF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Anterior Cervical Discectomy and Fusion (ACDF). Clinical examination and imaging confirms documented cervical disc herniation. Patient completed trial of conservative management for 8 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo neck pain only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Anterior Cervical Discectomy and Fusion (ACDF) (LCD-ACDF). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Spine Surgery Clinic\nSUBJECTIVE: 52-year-old presenting with sharp shooting pain into right shoulder and arm in C6 dermatome. Pain began 4 months ago. Patient has participated in structured cervical physical therapy and oral NSAID treatment for 8 weeks without relief. Denies neck pain only.\nOBJECTIVE: Right biceps reflex 1+, sensory deficit in C6 distribution. Cervical spine MRI demonstrates C5-C6 right paracentral cervical disc herniation with severe neuroforaminal stenosis and nerve root impingement.\nASSESSMENT & PLAN: Intractable right C6 cervical radiculopathy refractory to 8 weeks conservative care with correlating MRI disc protrusion. Plan: Anterior cervical discectomy with interbody fusion at C5-C6."
   },
   {
     "vignette_id": "DEV-LCD-ACDF-NEG",
     "policy_id": "LCD-ACDF",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Anterior Cervical Discectomy and Fusion (ACDF)",
+    "title": "Axial neck pain without radiculopathy or disc herniation",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Anterior Cervical Discectomy and Fusion (ACDF) (LCD-ACDF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Anterior Cervical Discectomy and Fusion (ACDF). Clinical assessment indicates absence of cervical disc herniation. Inadequate trial: patient discontinued conservative management after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented neck pain only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ACDF due to active neck pain only."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Spine Surgery Clinic\nSUBJECTIVE: 44-year-old presenting with generalized dull ache across posterior neck. Patient reports neck pain only for 10 days. No radiation into upper extremities. Conservative management tried for only 1 week.\nOBJECTIVE: Full motor strength 5/5 bilaterally, reflexes 2+. Cervical MRI shows mild muscular strain without cervical disc herniation or cord compression.\nASSESSMENT & PLAN: Acute uncomplicated axial neck pain without radiculopathy. Surgical intervention is not clinically indicated."
   },
   {
     "vignette_id": "DEV-LCD-ACI-APP",
     "policy_id": "LCD-ACI",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+    "title": "Focal femoral condyle chondral defect post-microfracture failure",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects (LCD-ACI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects. Diagnostic clinical assessment demonstrates cartilage defect area: 2.0 cm2. Clinical examination and imaging confirms documented prior microfracture failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo diffuse osteoarthritis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects (LCD-ACI). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Sports Medicine\nSUBJECTIVE: 31-year-old active runner with persistent medial right knee pain. Underwent knee arthroscopy with microfracture 14 months ago with recurrent focal weight-bearing pain. No generalized diffuse osteoarthritis.\nOBJECTIVE: Diagnostic knee arthroscopy and cartilage sizing reveals isolated focal cartilage defect area of 3.2 cm2 on medial femoral condyle. Kellgren-Lawrence grade 0 in lateral and patellofemoral compartments. Prior microfracture failure confirmed.\nASSESSMENT & PLAN: Isolated Outerbridge grade IV chondral defect medial femoral condyle following failed marrow stimulation. Plan: Autologous chondrocyte implantation staged cartilage repair."
   },
   {
     "vignette_id": "DEV-LCD-ACI-NEG",
     "policy_id": "LCD-ACI",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+    "title": "Severe tricompartmental osteoarthritis with sub-threshold lesion",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects (LCD-ACI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects. Diagnostic assessment demonstrates non-qualifying cartilage defect area: 0.5 cm2. Clinical assessment indicates absence of prior microfracture failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented diffuse osteoarthritis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ACI due to active diffuse osteoarthritis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Sports Medicine\nSUBJECTIVE: 68-year-old presenting with chronic diffuse bilateral knee stiffness and deep aching pain.\nOBJECTIVE: Standing knee series demonstrates severe diffuse osteoarthritis with tricompartmental joint space collapse (Kellgren-Lawrence grade 4). Cartilage defect area measured at 0.6 cm2. No previous microfracture was attempted.\nASSESSMENT & PLAN: Advanced end-stage tricompartmental knee arthrosis. Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease."
   },
   {
     "vignette_id": "DEV-LCD-CT-CHEST-APP",
     "policy_id": "LCD-CT-CHEST",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Computed Tomography (CT) of the Chest with Contrast",
+    "title": "Solitary pulmonary nodule on chest radiograph with hemoptysis",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Thoracic Specialty Clinic\nEVALUATION FOR: Computed Tomography (CT) of the Chest with Contrast (LCD-CT-CHEST)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Computed Tomography (CT) of the Chest with Contrast. Clinical examination and imaging confirms documented solitary pulmonary nodule > 6mm. Clinical examination and imaging confirms documented unexplained hemoptysis. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo acute viral bronchitis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Computed Tomography (CT) of the Chest with Contrast (LCD-CT-CHEST). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Pulmonary Medicine Clinic\nSUBJECTIVE: 61-year-old former smoker presenting with two weeks of unexplained hemoptysis and chronic cough. No simple acute viral bronchitis.\nOBJECTIVE: Chest radiograph reveals a distinct non-calcified solitary pulmonary nodule > 6mm measuring 12 mm in the right upper lobe. Resting oxygen saturation 96% on room air.\nASSESSMENT & PLAN: Radiographically documented solitary pulmonary nodule accompanied by hemoptysis. Plan: Computed tomography of the thorax with intravenous contrast for pulmonary characterization."
   },
   {
     "vignette_id": "DEV-LCD-CT-CHEST-NEG",
     "policy_id": "LCD-CT-CHEST",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Computed Tomography (CT) of the Chest with Contrast",
+    "title": "Uncomplicated acute bronchitis without abnormal radiograph",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Thoracic Specialty Clinic\nEVALUATION FOR: Computed Tomography (CT) of the Chest with Contrast (LCD-CT-CHEST)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Computed Tomography (CT) of the Chest with Contrast. Clinical assessment indicates absence of solitary pulmonary nodule > 6mm. Clinical assessment indicates absence of unexplained hemoptysis. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented acute viral bronchitis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-CT-CHEST due to active acute viral bronchitis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Pulmonary Medicine Clinic\nSUBJECTIVE: 22-year-old presenting with 3 days of productive cough and low-grade fever following household cold.\nOBJECTIVE: Normal pulmonary examination without focal crackles. Clear lungs. Absence of chest x-ray abnormality; clinical picture consistent with uncomplicated acute viral bronchitis. No hemoptysis.\nASSESSMENT & PLAN: Acute viral tracheobronchitis. Thoracic computed tomography imaging is not clinically indicated for acute uncomplicated URI."
   },
   {
     "vignette_id": "DEV-LCD-ESI-APP",
     "policy_id": "LCD-ESI",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+    "title": "L5 radicular nerve root pain refractory to physical therapy",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Lumbar Epidural Steroid Injections (ESI) for Radiculopathy (LCD-ESI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Lumbar Epidural Steroid Injections (ESI) for Radiculopathy. Clinical examination and imaging confirms documented radicular pain. Patient completed trial of conservative treatment for 6 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo non-radicular pain.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Lumbar Epidural Steroid Injections (ESI) for Radiculopathy (LCD-ESI). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Spine Clinic\nSUBJECTIVE: 56-year-old presenting with severe shooting lumbar radicular pain radiating down left posterior thigh into the lateral calf and great toe. Pain present for 10 weeks. Patient completed structured physical therapy trial and oral gabapentin for 6 weeks without significant benefit.\nOBJECTIVE: Positive straight leg raise test on the left at 40 degrees. Lumbar MRI confirms L4-L5 disc protrusion compressing traversing L5 root. Denies non-radicular pain only.\nASSESSMENT & PLAN: Intractable subacute L5 radiculopathy following failed 6-week conservative rehabilitation. Plan: Fluoroscopically guided left lumbar transforaminal epidural steroid injection."
   },
   {
     "vignette_id": "DEV-LCD-ESI-NEG",
     "policy_id": "LCD-ESI",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+    "title": "Axial low back pain without radicular symptoms or physical therapy",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Lumbar Epidural Steroid Injections (ESI) for Radiculopathy (LCD-ESI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Lumbar Epidural Steroid Injections (ESI) for Radiculopathy. Clinical assessment indicates absence of radicular pain. Inadequate trial: patient discontinued conservative treatment after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented non-radicular pain.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ESI due to active non-radicular pain."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Spine Clinic\nSUBJECTIVE: 48-year-old presenting with non-radicular pain and muscular tightness localized to lower lumbar midline after moving heavy boxes 5 days ago. No leg radiation. No prior physical therapy.\nOBJECTIVE: Negative straight leg raise bilaterally. Normal lower extremity sensation and reflexes. Tenderness over lumbar erector spinae muscles.\nASSESSMENT & PLAN: Acute non-radicular mechanical muscular back strain. Epidural spinal injection is contraindicated for localized axial back pain without radiculopathy."
   },
   {
     "vignette_id": "DEV-LCD-EVAR-APP",
     "policy_id": "LCD-EVAR",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+    "title": "Infrarenal AAA diameter 5.8 cm with adequate proximal aortic neck",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovascular Repair of Abdominal Aortic Aneurysm (EVAR) (LCD-EVAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Endovascular Repair of Abdominal Aortic Aneurysm (EVAR). Diagnostic clinical assessment demonstrates aaa diameter: 5.5 cm. Clinical examination and imaging confirms documented suitable proximal neck. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo small stable aneurysm.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Endovascular Repair of Abdominal Aortic Aneurysm (EVAR) (LCD-EVAR). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Vascular Surgery Clinic\nSUBJECTIVE: 73-year-old male evaluated for enlarging infrarenal abdominal aortic aneurysm identified on surveillance duplex. Patient is asymptomatic.\nOBJECTIVE: CTA of the abdominal aorta reveals fusiform infrarenal aneurysm with maximum aaa diameter of 5.8 cm. Proximal infrarenal aortic neck length is 16 mm with minimal angulation (suitable proximal neck landing zone). Iliac access vessels are patent.\nASSESSMENT & PLAN: Expanding infrarenal aortic aneurysm exceeding 5.5 cm threshold with suitable anatomy for endograft fixation. Plan: Elective endovascular abdominal aortic aneurysm repair."
   },
   {
     "vignette_id": "DEV-LCD-EVAR-NEG",
     "policy_id": "LCD-EVAR",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+    "title": "Small stable infrarenal aneurysm measuring 3.8 cm",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovascular Repair of Abdominal Aortic Aneurysm (EVAR) (LCD-EVAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Endovascular Repair of Abdominal Aortic Aneurysm (EVAR). Diagnostic assessment demonstrates non-qualifying aaa diameter: 4.0 cm. Clinical assessment indicates absence of suitable proximal neck. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented small stable aneurysm.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-EVAR due to active small stable aneurysm."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Vascular Surgery Clinic\nSUBJECTIVE: 69-year-old male with history of hypertension presents for follow-up ultrasound evaluation.\nOBJECTIVE: Computed tomography angiography demonstrates small stable aneurysm measuring maximum diameter 3.8 cm, unchanged from imaging 12 months ago. Aortic neck anatomy unremarkable.\nASSESSMENT & PLAN: Small infrarenal aneurysm well below interventional threshold. Endovascular stent-graft placement is not clinically indicated; continue ultrasound surveillance in 12 months."
   },
   {
     "vignette_id": "DEV-LCD-FACET-APP",
     "policy_id": "LCD-FACET",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+    "title": "Chronic lumbar facet arthropathy with 85% relief on dual MBB",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy (LCD-FACET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy. Diagnostic clinical assessment demonstrates medial branch block relief: 85.0 %. Patient completed trial of axial back pain for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo primary radiculopathy.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy (LCD-FACET). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Pain Management\nSUBJECTIVE: 64-year-old presenting with aching axial back pain over the lumbosacral junction for 9 months, exacerbated by lumbar extension. Denies lower extremity radicular numbness. No acute fracture.\nOBJECTIVE: Tenderness over bilateral L4-L5 and L5-S1 facet columns. Patient underwent two diagnostic medial branch blocks under fluoroscopy, achieving documented medial branch block relief of 85% for the expected anesthetic duration.\nASSESSMENT & PLAN: Dual-block verified lumbar zygapophysial arthropathy with greater than 80% relief. Plan: Fluoroscopically guided lumbar medial branch radiofrequency neurotomy."
   },
   {
     "vignette_id": "DEV-LCD-FACET-NEG",
     "policy_id": "LCD-FACET",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+    "title": "Acute radicular sciatica with negative diagnostic facet block",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy (LCD-FACET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy. Diagnostic assessment demonstrates non-qualifying medial branch block relief: 70.0 %. Inadequate trial: patient discontinued axial back pain after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented primary radiculopathy.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-FACET due to active primary radiculopathy."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Pain Management\nSUBJECTIVE: 40-year-old presenting with sharp electric shock pain radiating into right foot after acute disc herniation 2 weeks ago (primary radiculopathy).\nOBJECTIVE: Straight leg raise positive on right at 30 degrees. Diagnostic medial branch block produced only 15% pain reduction.\nASSESSMENT & PLAN: Acute radiculopathy secondary to disc pathology. Facet neurotomy is contraindicated given primary radiculopathy and lack of diagnostic facet block response."
   },
   {
     "vignette_id": "DEV-LCD-HALLUX-APP",
     "policy_id": "LCD-HALLUX",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Hallux Valgus Correction (Bunionectomy)",
+    "title": "Painful hallux valgus deformity failing 16 weeks orthotics",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Foot & Ankle / Podiatry Specialty Clinic\nEVALUATION FOR: Hallux Valgus Correction (Bunionectomy) (LCD-HALLUX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Hallux Valgus Correction (Bunionectomy). Diagnostic clinical assessment demonstrates hallux valgus angle: 20.0 degrees. Patient completed trial of shoe modification for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo cosmetic bunionectomy.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Hallux Valgus Correction (Bunionectomy) (LCD-HALLUX). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Podiatric Surgery Clinic\nSUBJECTIVE: 54-year-old woman presenting with severe pain and burning over the medial eminence of the first metatarsophalangeal joint during ambulation. Symptoms present for 2 years. Patient has worn wide toe box footwear and custom functional orthotics consistently for 16 weeks without pain reduction. Denies requesting cosmetic bunionectomy.\nOBJECTIVE: Weight-bearing AP foot radiography demonstrates a hallux valgus angle of 26 degrees and intermetatarsal angle of 14 degrees. Erythema over medial bunion prominence.\nASSESSMENT & PLAN: Symptomatic moderate hallux valgus deformity with significant functional impairment refractory to 4 months of conservative orthotics. Plan: First metatarsal osteotomy bunionectomy."
   },
   {
     "vignette_id": "DEV-LCD-HALLUX-NEG",
     "policy_id": "LCD-HALLUX",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Hallux Valgus Correction (Bunionectomy)",
+    "title": "Painless cosmetic complaint with minimal 10 degree deviation",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Foot & Ankle / Podiatry Specialty Clinic\nEVALUATION FOR: Hallux Valgus Correction (Bunionectomy) (LCD-HALLUX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Hallux Valgus Correction (Bunionectomy). Diagnostic assessment demonstrates non-qualifying hallux valgus angle: 5.0 degrees. Inadequate trial: patient discontinued shoe modification after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented cosmetic bunionectomy.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-HALLUX due to active cosmetic bunionectomy."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Podiatric Surgery Clinic\nSUBJECTIVE: 27-year-old presenting because she dislikes the aesthetic appearance of her left big toe in narrow dress shoes. She reports zero pain with ambulation and no difficulty walking. No conservative shoe modifications attempted.\nOBJECTIVE: Weight-bearing radiographs show a normal hallux valgus angle of 10 degrees. No medial bunion bursitis.\nASSESSMENT & PLAN: Asymptomatic mild toe contour; request is for purely cosmetic bunionectomy. Corrective osteotomy surgery is not clinically indicated."
   },
   {
     "vignette_id": "DEV-LCD-HIP-ARTHRO-APP",
     "policy_id": "LCD-HIP-ARTHRO",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+    "title": "End-stage osteoarthritis of right hip refractory to non-operative care",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis (LCD-HIP-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis. Clinical examination and imaging confirms documented severe joint space narrowing. Patient completed trial of conservative hip therapy for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo septic arthritis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis (LCD-HIP-ARTHRO). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Adult Reconstruction Orthopedics\nSUBJECTIVE: 67-year-old male with severe groin and anterior thigh pain with weight-bearing for 14 months. Has completed 16 weeks of structured physical therapy, activity modification, and received an intra-articular steroid injection 4 months ago with waning relief. Denies active infection.\nOBJECTIVE: Antalgic gait favoring right side. Internal rotation restricted to 5 degrees with groin pain. Weight-bearing pelvic radiographs show severe joint space narrowing, subchondral sclerosis, and large femoral osteophytes (Kellgren-Lawrence grade 4).\nASSESSMENT & PLAN: End-stage primary osteoarthritis of right hip with intractable functional limitation after 4 months conservative therapy. Plan: Elective right total hip arthroplasty."
   },
   {
     "vignette_id": "DEV-LCD-HIP-ARTHRO-NEG",
     "policy_id": "LCD-HIP-ARTHRO",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+    "title": "Mild hip strain with active superficial wound infection",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis (LCD-HIP-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis. Clinical assessment indicates absence of severe joint space narrowing. Inadequate trial: patient discontinued conservative hip therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented septic arthritis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-HIP-ARTHRO due to active septic arthritis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Adult Reconstruction Orthopedics\nSUBJECTIVE: 50-year-old presenting with 2 weeks of lateral hip discomfort after yard work. Concurrently receiving intravenous antibiotics for active cellulitis of the ipsilateral groin.\nOBJECTIVE: AP pelvis and frog-leg views demonstrate preserved joint space with minimal sclerosis. Significant purulent erythema over right thigh indicating active infection.\nASSESSMENT & PLAN: Mild trochanteric bursitis complicated by active soft tissue infection. Joint replacement arthroplasty is strictly contraindicated in the presence of active infection."
   },
   {
     "vignette_id": "DEV-LCD-HIP-SCOOP-APP",
     "policy_id": "LCD-HIP-SCOOP",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+    "title": "Femoroacetabular impingement with acetabular labral tear on MRI",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears (LCD-HIP-SCOOP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears. Diagnostic clinical assessment demonstrates alpha angle: 60.0 degrees. Patient completed trial of conservative physical therapy for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo tonnis grade 2 or 3.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears (LCD-HIP-SCOOP). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Sports Medicine\nSUBJECTIVE: 28-year-old soccer player with deep anterior groin catching and sharp pain with hip flexion for 6 months. Completed 14 weeks of focused physical therapy and diagnostic intra-articular lidocaine injection. No advanced osteoarthritis.\nOBJECTIVE: Positive anterior impingement sign (FADIR test). Hip MR arthrogram demonstrates anterosuperior labral tear on mri with cam deformity (alpha angle 68 degrees). Preserved cartilage space (Tonnis grade 0).\nASSESSMENT & PLAN: Symptomatic cam-type femoroacetabular impingement and labral tear refractory to 14 weeks non-operative management. Plan: Right hip arthroscopy with labral repair and femoroplasty."
   },
   {
     "vignette_id": "DEV-LCD-HIP-SCOOP-NEG",
     "policy_id": "LCD-HIP-SCOOP",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+    "title": "Advanced degenerative hip arthritis with joint space obliteration",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears (LCD-HIP-SCOOP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears. Diagnostic assessment demonstrates non-qualifying alpha angle: 45.0 degrees. Inadequate trial: patient discontinued conservative physical therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented tonnis grade 2 or 3.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-HIP-SCOOP due to active tonnis grade 2 or 3."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Sports Medicine\nSUBJECTIVE: 71-year-old presenting with deep groin stiffness and severe limitation in walking for 2 years.\nOBJECTIVE: Radiographs reveal advanced osteoarthritis with Tonnis grade 3 joint space obliteration, diffuse bone-on-bone contact, and femoral head flattening.\nASSESSMENT & PLAN: Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis."
   },
   {
     "vignette_id": "DEV-LCD-IMRT-APP",
     "policy_id": "LCD-IMRT",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Intensity-Modulated Radiation Therapy (IMRT)",
+    "title": "Localized prostate adenocarcinoma adjacent to critical rectal wall",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Intensity-Modulated Radiation Therapy (IMRT) (LCD-IMRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Intensity-Modulated Radiation Therapy (IMRT). Clinical examination and imaging confirms documented head and neck cancer. Clinical examination and imaging confirms documented 3d conformal exceeds tolerance. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo simple palliative bone metastasis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Intensity-Modulated Radiation Therapy (IMRT) (LCD-IMRT). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with intermediate-risk prostate adenocarcinoma (Gleason 3+4=7, PSA 7.8). Initiating definitive radiation planning. No distant metastatic disease.\nOBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%). The inverse imrt plan achieves concave dose escalation to 78 Gy while reducing rectal V70 to 14% and bladder wall dose below mandatory constraints.\nASSESSMENT & PLAN: Clinically localized prostate malignancy requiring steep dose gradient adjacent to critical organs at risk. Plan: Inverse intensity-modulated radiation therapy with daily image guidance."
   },
   {
     "vignette_id": "DEV-LCD-IMRT-NEG",
     "policy_id": "LCD-IMRT",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Intensity-Modulated Radiation Therapy (IMRT)",
+    "title": "Palliative treatment of painful diffuse bone metastasis",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Intensity-Modulated Radiation Therapy (IMRT) (LCD-IMRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Intensity-Modulated Radiation Therapy (IMRT). Clinical assessment indicates absence of head and neck cancer. Clinical assessment indicates absence of 3d conformal exceeds tolerance. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented simple palliative bone metastasis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-IMRT due to active simple palliative bone metastasis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 78-year-old with metastatic lung cancer presenting with focal thoracic vertebral body metastasis causing localized aching pain.\nOBJECTIVE: Solitary mid-thoracic spinous process lesion without spinal cord compromise. Goal of therapy is simple pain palliation.\nASSESSMENT & PLAN: Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate."
   },
   {
     "vignette_id": "DEV-LCD-KNEE-ARTHRO-APP",
     "policy_id": "LCD-KNEE-ARTHRO",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Knee Arthroscopy and Meniscectomy",
+    "title": "Mechanical bucket-handle meniscal tear with persistent knee locking",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Knee Arthroscopy and Meniscectomy (LCD-KNEE-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Knee Arthroscopy and Meniscectomy. Clinical examination and imaging confirms documented true knee locking. Clinical examination and imaging confirms documented bucket-handle meniscal tear. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo kellgren-lawrence grade 4 osteoarthritis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Knee Arthroscopy and Meniscectomy (LCD-KNEE-ARTHRO). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Surgery\nSUBJECTIVE: 39-year-old with sudden onset of acute knee catching and true joint locking episodes after twisting injury 8 weeks ago. Patient has participated in 7 weeks of supervised physical therapy and rest without resolution of mechanical symptoms.\nOBJECTIVE: Joint line tenderness over medial meniscus, positive McMurray test with audible click, inability to fully extend terminal 10 degrees. Knee MRI confirms unstable meniscal tear on mri (displaced medial bucket-handle fragment). Normal cartilage contours.\nASSESSMENT & PLAN: Mechanically unstable medial meniscal tear with persistent locking refractory to 7 weeks conservative therapy. Plan: Right knee arthroscopy with partial meniscectomy."
   },
   {
     "vignette_id": "DEV-LCD-KNEE-ARTHRO-NEG",
     "policy_id": "LCD-KNEE-ARTHRO",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Knee Arthroscopy and Meniscectomy",
+    "title": "Bone-on-bone knee osteoarthritis without discrete mechanical tear",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Knee Arthroscopy and Meniscectomy (LCD-KNEE-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Knee Arthroscopy and Meniscectomy. Clinical assessment indicates absence of true knee locking. Clinical assessment indicates absence of bucket-handle meniscal tear. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented kellgren-lawrence grade 4 osteoarthritis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-KNEE-ARTHRO due to active kellgren-lawrence grade 4 osteoarthritis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Surgery\nSUBJECTIVE: 74-year-old with chronic bilateral knee aching and stiffness for 5 years. No mechanical locking or acute injury.\nOBJECTIVE: Weight-bearing knee films demonstrate diffuse bone-on-bone medial and patellofemoral joint space obliteration consistent with advanced osteoarthritis (kellgren-lawrence grade 4).\nASSESSMENT & PLAN: End-stage degenerative knee arthrosis. Arthroscopic meniscectomy or joint lavage is ineffective and contraindicated for primary advanced osteoarthritic debridement."
   },
   {
     "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
     "policy_id": "LCD-KNEE-ORTHOSIS",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Custom-Fabricated Functional Knee Orthoses",
+    "title": "Severe chronic ACL/PCL laxity failing prefabricated bracing",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Custom-Fabricated Functional Knee Orthoses (LCD-KNEE-ORTHOSIS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Custom-Fabricated Functional Knee Orthoses. Clinical examination and imaging confirms documented positive lachman test. Clinical examination and imaging confirms documented prefabricated brace cannot fit. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo short-term post-operative immobilization.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Custom-Fabricated Functional Knee Orthoses (LCD-KNEE-ORTHOSIS). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Physical Medicine and Rehabilitation\nSUBJECTIVE: 42-year-old with recurrent knee instability and giving-way episodes secondary to combined cruciate ligament insufficiency. Patient tried an off-the-shelf prefabricated brace for 4 months, which repeatedly migrated and failed to control rotational subluxation.\nOBJECTIVE: Physical exam reveals 3+ anterior drawer, grade III Lachman, and pivot shift demonstrating severe knee joint laxity. Atypical lower extremity anthropometry (conical thigh geometry).\nASSESSMENT & PLAN: Severe chronic ligamentous instability of the knee failing standard prefabricated supports. Plan: Custom-fabricated functional knee orthosis with rigid dynamic frame."
   },
   {
     "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
     "policy_id": "LCD-KNEE-ORTHOSIS",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Custom-Fabricated Functional Knee Orthoses",
+    "title": "Temporary postoperative rehabilitation following routine arthroscopy",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Custom-Fabricated Functional Knee Orthoses (LCD-KNEE-ORTHOSIS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Custom-Fabricated Functional Knee Orthoses. Clinical assessment indicates absence of positive lachman test. Clinical assessment indicates absence of prefabricated brace cannot fit. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented short-term post-operative immobilization.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-KNEE-ORTHOSIS due to active short-term post-operative immobilization."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Surgery\nSUBJECTIVE: 29-year-old 3 days status post uncomplicated diagnostic knee arthroscopy. Minimal pain, full weight bearing.\nOBJECTIVE: Stable knee examination with negative Lachman and firm end-point. Zero ligamentous laxity.\nASSESSMENT & PLAN: Normal postoperative status. Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient."
   },
   {
     "vignette_id": "DEV-LCD-KYPHO-APP",
     "policy_id": "LCD-KYPHO",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+    "title": "Acute painful osteoporotic vertebral compression fracture with bone edema",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Radiology / Spine Surgery Specialty Clinic\nEVALUATION FOR: Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty) (LCD-KYPHO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty). Diagnostic clinical assessment demonstrates pain score: 6.5 score. Clinical examination and imaging confirms documented bone marrow edema on mri. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo osteomyelitis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty) (LCD-KYPHO). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Neuroradiology\nSUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago. Pain rating is 8/10 on visual analog scale. Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks with persistent inability to ambulate. Denies fever.\nOBJECTIVE: Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema. Intact posterior vertebral wall. No signs of spinal infection.\nASSESSMENT & PLAN: Painful acute osteoporotic vertebral compression fracture of T12 with marrow edema failing conservative analgesic therapy. Plan: Percutaneous vertebral augmentation kyphoplasty."
   },
   {
     "vignette_id": "DEV-LCD-KYPHO-NEG",
     "policy_id": "LCD-KYPHO",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+    "title": "Vertebral collapse in the setting of active infectious osteomyelitis",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Radiology / Spine Surgery Specialty Clinic\nEVALUATION FOR: Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty) (LCD-KYPHO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty). Diagnostic assessment demonstrates non-qualifying pain score: 5.0 score. Clinical assessment indicates absence of bone marrow edema on mri. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented osteomyelitis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-KYPHO due to active osteomyelitis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Neuroradiology\nSUBJECTIVE: 68-year-old diabetic presenting with unremitting back pain and recurrent spiking fevers.\nOBJECTIVE: Elevated ESR and CRP. Contrast MRI reveals T8-T9 vertebral endplate destruction with disc space fluid collection and epidural phlegmon consistent with infectious spondylodiscitis and osteomyelitis.\nASSESSMENT & PLAN: Pyogenic vertebral osteomyelitis with secondary compression. Percutaneous cement augmentation is strictly contraindicated in the presence of active spinal infection."
   },
   {
     "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
     "policy_id": "LCD-LUMBAR-DECOMP",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Lumbar Laminectomy and Decompression for Spinal Stenosis",
+    "title": "Severe lumbar canal stenosis with neurogenic claudication",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Laminectomy and Decompression for Spinal Stenosis (LCD-LUMBAR-DECOMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Lumbar Laminectomy and Decompression for Spinal Stenosis. Clinical examination and imaging confirms documented central canal stenosis. Patient completed trial of conservative therapy for 8 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo asymptomatic stenosis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Lumbar Laminectomy and Decompression for Spinal Stenosis (LCD-LUMBAR-DECOMP). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Neurosurgery Clinic\nSUBJECTIVE: 69-year-old presenting with bilateral lower extremity cramping, heaviness, and numbness upon walking more than 50 meters, relieved by forward flexion (lumbar neurogenic claudication). Symptoms present for 9 months. Patient has completed 10 weeks of physical therapy, epidural injections, and oral pharmacotherapy without sustained relief.\nOBJECTIVE: Diminished ankle jerks bilaterally. Lumbar spine MRI demonstrates severe lumbar spinal stenosis at L4-L5 with thecal sac cross-sectional area < 60 mm2 secondary to facet hypertrophy and ligamentum flavum buckling.\nASSESSMENT & PLAN: Progressive lumbar neurogenic claudication refractory to 10 weeks conservative management with correlating critical central stenosis. Plan: Lumbar laminectomy and decompression at L4-L5."
   },
   {
     "vignette_id": "DEV-LCD-LUMBAR-DECOMP-NEG",
     "policy_id": "LCD-LUMBAR-DECOMP",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Lumbar Laminectomy and Decompression for Spinal Stenosis",
+    "title": "Postural low back pain with widely patent spinal canal",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Laminectomy and Decompression for Spinal Stenosis (LCD-LUMBAR-DECOMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Lumbar Laminectomy and Decompression for Spinal Stenosis. Clinical assessment indicates absence of central canal stenosis. Inadequate trial: patient discontinued conservative therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented asymptomatic stenosis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-LUMBAR-DECOMP due to active asymptomatic stenosis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Neurosurgery Clinic\nSUBJECTIVE: 38-year-old presenting with aching axial lower back pain after sitting for long periods. Walks 3 miles daily without leg discomfort.\nOBJECTIVE: Intact motor strength and reflexes. Lumbar MRI confirms a widely patent central canal with no spinal canal stenosis or neural impingement.\nASSESSMENT & PLAN: Myofascial axial back pain only without neurogenic claudication. Lumbar decompressive laminectomy is not clinically indicated."
   },
   {
     "vignette_id": "DEV-LCD-LUMBAR-FUSION-APP",
     "policy_id": "LCD-LUMBAR-FUSION",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+    "title": "Grade II degenerative spondylolisthesis with dynamic instability",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability (LCD-LUMBAR-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability. Clinical examination and imaging confirms documented degenerative spondylolisthesis. Patient completed trial of conservative therapy trial for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo axial back pain without instability.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability (LCD-LUMBAR-FUSION). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Spine Surgery\nSUBJECTIVE: 62-year-old presenting with chronic mechanical low back and radicular leg pain for 1 year. Patient has completed 16 weeks of structured physical therapy, core stabilization, and multiple epidural injections with progressive deterioration in standing tolerance.\nOBJECTIVE: Standing lumbar flexion-extension radiographs demonstrate dynamic instability with 5 mm translation at L4-L5 (lumbar spondylolisthesis). MRI confirms correlating severe central and lateral recess stenosis at the level of translation.\nASSESSMENT & PLAN: Symptomatic degenerative spondylolisthesis with verified dynamic instability refractory to 4 months of non-operative care. Plan: Lumbar spinal fusion with instrumentation and decompression at L4-L5."
   },
   {
     "vignette_id": "DEV-LCD-LUMBAR-FUSION-NEG",
     "policy_id": "LCD-LUMBAR-FUSION",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+    "title": "Isolated disc herniation without mechanical instability",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability (LCD-LUMBAR-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability. Clinical assessment indicates absence of degenerative spondylolisthesis. Inadequate trial: patient discontinued conservative therapy trial after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented axial back pain without instability.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-LUMBAR-FUSION due to active axial back pain without instability."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Spine Surgery\nSUBJECTIVE: 35-year-old presenting with acute right sciatica for 3 weeks following heavy lifting.\nOBJECTIVE: Flexion-extension dynamic views demonstrate zero translation and normal alignment. MRI shows acute paracentral soft disc protrusion without spondylolisthesis or structural instability.\nASSESSMENT & PLAN: Acute disc herniation without segmental instability. Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability."
   },
   {
     "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
     "policy_id": "LCD-MRI-BRAIN",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+    "title": "Subacute progressive right facial droop and unilateral weakness",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Neuroradiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast (LCD-MRI-BRAIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast. Clinical examination and imaging confirms documented focal neurological deficit. Clinical examination and imaging confirms documented headache with papilledema. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo stable tension headache.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast (LCD-MRI-BRAIN). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Neurology Outpatient Clinic\nSUBJECTIVE: 58-year-old presenting with four days of progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness.\nOBJECTIVE: Cranial nerve exam reveals right central facial droop. Pronator drift present in right arm. Motor strength 4+/5 in right hand intrinsics. No history of uncomplicated tension headache.\nASSESSMENT & PLAN: Subacute focal neurological deficit concerning for intracranial mass lesion or subacute cerebrovascular ischemia. Plan: Magnetic resonance imaging of the brain with and without gadolinium contrast."
   },
   {
     "vignette_id": "DEV-LCD-MRI-BRAIN-NEG",
     "policy_id": "LCD-MRI-BRAIN",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+    "title": "Chronic recurrent tension headache with normal neurological exam",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Neuroradiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast (LCD-MRI-BRAIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast. Clinical assessment indicates absence of focal neurological deficit. Clinical assessment indicates absence of headache with papilledema. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented stable tension headache.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-MRI-BRAIN due to active stable tension headache."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Neurology Outpatient Clinic\nSUBJECTIVE: 26-year-old presenting with intermittent band-like forehead tightness related to computer work. Headaches have occurred for 3 years without visual changes, vomiting, or focal weakness.\nOBJECTIVE: Cranial nerves II-XII completely intact. Normal fundoscopic examination without papilledema. Sensation, coordination, and gait completely normal.\nASSESSMENT & PLAN: Classic uncomplicated tension headache with entirely normal neurological examination. Diagnostic brain MRI neuroimaging is not indicated in the absence of red flags."
   },
   {
     "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
     "policy_id": "LCD-MRI-LUMBAR",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+    "title": "Progressive foot drop and severe S1 radiculopathy after 6 weeks therapy",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Lumbar Spine (LCD-MRI-LUMBAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Magnetic Resonance Imaging (MRI) of the Lumbar Spine. Clinical examination and imaging confirms documented failed 6 weeks conservative therapy. Clinical examination and imaging confirms documented plain lumbar radiographs performed. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo acute back pain less than 6 weeks.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Magnetic Resonance Imaging (MRI) of the Lumbar Spine (LCD-MRI-LUMBAR). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Physical Medicine and Rehabilitation\nSUBJECTIVE: 49-year-old presenting with persistent shooting pain down left posterolateral leg into the heel and plantar aspect of the foot. Symptoms began 7 weeks ago. Patient has performed 6 weeks of dedicated physical therapy without relief.\nOBJECTIVE: Absent left Achilles deep tendon reflex. Left gastrocnemius motor strength 4/5. Positive straight leg raise test on the left at 35 degrees. Clinical findings demonstrate objective lumbar radiculopathy.\nASSESSMENT & PLAN: Persistent lumbosacral nerve root compression with objective motor deficit following failed 6-week conservative trial. Plan: Magnetic resonance imaging of the lumbar spine without contrast."
   },
   {
     "vignette_id": "DEV-LCD-MRI-LUMBAR-NEG",
     "policy_id": "LCD-MRI-LUMBAR",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+    "title": "Acute muscular lumbar strain of 4 days duration",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Lumbar Spine (LCD-MRI-LUMBAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Magnetic Resonance Imaging (MRI) of the Lumbar Spine. Clinical assessment indicates absence of failed 6 weeks conservative therapy. Clinical assessment indicates absence of plain lumbar radiographs performed. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented acute back pain less than 6 weeks.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-MRI-LUMBAR due to active acute back pain less than 6 weeks."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Physical Medicine and Rehabilitation\nSUBJECTIVE: 34-year-old presenting with localized lower back stiffness that started 4 days ago while gardening. No pain radiating into the buttocks or legs.\nOBJECTIVE: Normal motor strength 5/5 across all lower extremity muscle groups. Normal sensation and symmetric reflexes. Negative straight leg raise bilaterally.\nASSESSMENT & PLAN: Acute uncomplicated low back strain of less than one week duration. Advanced lumbar MRI imaging is not indicated during the initial acute conservative phase."
   },
   {
     "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
     "policy_id": "LCD-PAD-ATHERO",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+    "title": "Severe lifestyle-limiting calf claudication with SFA occlusion",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery / Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease (LCD-PAD-ATHERO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease. Clinical examination and imaging confirms documented rutherford category 3. Diagnostic clinical assessment demonstrates arterial stenosis: 75.0 %. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo mild claudication only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease (LCD-PAD-ATHERO). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Vascular Surgery Clinic\nSUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3). Supervised exercise therapy and cilostazol for 4 months failed to improve functional walking distance.\nOBJECTIVE: Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery.\nASSESSMENT & PLAN: Advanced symptomatic peripheral artery disease failing medical and exercise therapy with severe arterial stenosis. Plan: Right superficial femoral artery atherectomy and balloon angioplasty."
   },
   {
     "vignette_id": "DEV-LCD-PAD-ATHERO-NEG",
     "policy_id": "LCD-PAD-ATHERO",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+    "title": "Asymptomatic mild peripheral arterial disease with ABI 0.88",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery / Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease (LCD-PAD-ATHERO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease. Clinical assessment indicates absence of rutherford category 3. Diagnostic assessment demonstrates non-qualifying arterial stenosis: 60.0 %. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented mild claudication only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-PAD-ATHERO due to active mild claudication only."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Vascular Surgery Clinic\nSUBJECTIVE: 71-year-old presenting for routine annual cardiovascular evaluation. Patient walks 2 miles daily with zero calf cramping or exertional leg pain.\nOBJECTIVE: Pedal pulses palpable bilaterally. Resting ankle-brachial index is 0.88 bilaterally, indicating mild subclinical disease.\nASSESSMENT & PLAN: Asymptomatic mild peripheral artery disease. Invasive percutaneous peripheral atherectomy or revascularization is contraindicated for asymptomatic patients."
   },
   {
     "vignette_id": "DEV-LCD-PCI-APP",
     "policy_id": "LCD-PCI",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+    "title": "Refractory Canadian Class III angina with 85% proximal LAD stenosis",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents (LCD-PCI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents. Diagnostic clinical assessment demonstrates coronary stenosis: 75.0 %. Clinical examination and imaging confirms documented refractory angina. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo stenosis less than 50%.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents (LCD-PCI). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Cardiology\nSUBJECTIVE: 63-year-old presenting with recurrent exertional substernal chest pressure (CCS Class III angina) triggered by minimal exertion, refractory to dual anti-anginal medications including metoprolol and isosorbide mononitrate.\nOBJECTIVE: Nuclear SPECT perfusion scan shows reversible anterior wall ischemia. Diagnostic coronary angiography confirms severe coronary artery stenosis of 85% in the proximal left anterior descending artery with TIMI 3 flow.\nASSESSMENT & PLAN: Medically refractory symptomatic ischemic heart disease with high-grade proximal LAD stenosis. Plan: Percutaneous coronary intervention with placement of drug-eluting stent."
   },
   {
     "vignette_id": "DEV-LCD-PCI-NEG",
     "policy_id": "LCD-PCI",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+    "title": "Non-hemodynamic mild 30% coronary plaque with negative stress test",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents (LCD-PCI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents. Diagnostic assessment demonstrates non-qualifying coronary stenosis: 60.0 %. Clinical assessment indicates absence of refractory angina. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented stenosis less than 50%.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-PCI due to active stenosis less than 50%."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Cardiology\nSUBJECTIVE: 54-year-old evaluated following atypical non-exertional chest twinges.\nOBJECTIVE: Exercise treadmill stress test was completely negative for ischemic ST-segment shifts or symptoms at 11 METs. Angiography reveals smooth 30% non-hemodynamic mild stenosis in the mid circumflex artery.\nASSESSMENT & PLAN: Non-obstructive coronary artery disease without demonstrable myocardial ischemia. Stenting is not clinically indicated for non-flow-limiting sub-threshold plaque."
   },
   {
     "vignette_id": "DEV-LCD-POWER-WC-APP",
     "policy_id": "LCD-POWER-WC",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Complex Rehabilitative Power Wheelchairs (Group 3)",
+    "title": "Non-ambulatory ALS with quadriplegia requiring power positioning",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Complex Rehabilitative Power Wheelchairs (Group 3) (LCD-POWER-WC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Complex Rehabilitative Power Wheelchairs (Group 3). Clinical examination and imaging confirms documented unable to perform mradls. Clinical examination and imaging confirms documented specialty seating evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo outdoor use only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Complex Rehabilitative Power Wheelchairs (Group 3) (LCD-POWER-WC). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Assistive Technology Clinic\nSUBJECTIVE: 57-year-old diagnosed with amyotrophic lateral sclerosis experiencing progressive quadriparesis. Patient is completely non-ambulatory and unable to perform MRADLs in the home. Unable to safely operate a manual wheelchair or power scooter due to severe bilateral upper extremity weakness.\nOBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP. Upper extremity strength 1/5 bilaterally, poor trunk stability. Specialty drive controls and power tilt/recline required for postural management and pressure relief.\nASSESSMENT & PLAN: Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating."
   },
   {
     "vignette_id": "DEV-LCD-POWER-WC-NEG",
     "policy_id": "LCD-POWER-WC",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Complex Rehabilitative Power Wheelchairs (Group 3)",
+    "title": "Mild mobility deficit with preserved ability to propel manual chair",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Complex Rehabilitative Power Wheelchairs (Group 3) (LCD-POWER-WC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Complex Rehabilitative Power Wheelchairs (Group 3). Clinical assessment indicates absence of unable to perform mradls. Clinical assessment indicates absence of specialty seating evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented outdoor use only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-POWER-WC due to active outdoor use only."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Assistive Technology Clinic\nSUBJECTIVE: 70-year-old presenting with mild exertional fatigue after knee arthrosis.\nOBJECTIVE: Patient ambulates independently with a single-point cane for household distances. Upper extremity strength is 5/5 bilaterally; patient easily propels a standard manual wheelchair without fatigue.\nASSESSMENT & PLAN: Mild mobility deficit. Complex Group 3 power mobility equipment is not indicated given preserved ability to ambulate and operate standard manual mobility aids."
   },
   {
     "vignette_id": "DEV-LCD-PROTON-APP",
     "policy_id": "LCD-PROTON",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Proton Beam Radiotherapy",
+    "title": "Base of skull chordoma adjacent to brainstem and optic chiasm",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Proton Beam Radiotherapy (LCD-PROTON)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Proton Beam Radiotherapy. Clinical examination and imaging confirms documented skull base chordoma. Clinical examination and imaging confirms documented comparative dosimetric plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo widespread metastases.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Proton Beam Radiotherapy (LCD-PROTON). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 44-year-old presenting with diplopia secondary to biopsy-proven clival chordoma following subtotal transsphenoidal surgical resection.\nOBJECTIVE: Lesion abuts the anterior brainstem and optic chiasm. Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy). The proton beam radiotherapy plan exploits the Bragg peak to deliver 74 Gy to gross tumor while constraining brainstem dose to 48 Gy. No metastatic disease.\nASSESSMENT & PLAN: Radioresistant skull base chordoma requiring high-dose escalation adjacent to critical neurovascular structures. Plan: Definitive proton beam radiotherapy with pencil beam scanning."
   },
   {
     "vignette_id": "DEV-LCD-PROTON-NEG",
     "policy_id": "LCD-PROTON",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Proton Beam Radiotherapy",
+    "title": "Widespread metastatic disease with multiple hepatic and bone deposits",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Proton Beam Radiotherapy (LCD-PROTON)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Proton Beam Radiotherapy. Clinical assessment indicates absence of skull base chordoma. Clinical assessment indicates absence of comparative dosimetric plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented widespread metastases.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-PROTON due to active widespread metastases."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 67-year-old with metastatic gastrointestinal carcinoma presenting with general fatigue and right upper quadrant discomfort.\nOBJECTIVE: Staging PET-CT confirms widespread metastatic disease with over ten active hepatic lesions and diffuse skeletal metastases.\nASSESSMENT & PLAN: Widely disseminated metastatic cancer. Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard."
   },
   {
     "vignette_id": "DEV-LCD-RAD-NIV-APP",
     "policy_id": "LCD-RAD-NIV",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+    "title": "Severe COPD with chronic hypercapnia failing standard PAP",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup) (LCD-RAD-NIV)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup). Diagnostic clinical assessment demonstrates paco2: 57.0 mm Hg. Clinical examination and imaging confirms documented cpap trial failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo simple obstructive sleep apnea.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup) (LCD-RAD-NIV). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Pulmonary Sleep Medicine\nSUBJECTIVE: 69-year-old with end-stage COPD and recurrent acute hypercapnic respiratory failures requiring repeated hospital admissions. Patient has used standard nocturnal CPAP and bilevel therapy without backup for 90 days with worsening morning lethargy.\nOBJECTIVE: Daytime arterial blood gas on room air shows PaCO2 of 56 mmHg and PaO2 of 58 mmHg. Nocturnal capnography demonstrates persistent sleep-induced hypoventilation with prolonged desaturations.\nASSESSMENT & PLAN: Chronic hypercapnic respiratory failure secondary to severe COPD failing standard bilevel therapy. Plan: Respiratory assist device with backup rate (BiPAP S/T) for home non-invasive ventilation."
   },
   {
     "vignette_id": "DEV-LCD-RAD-NIV-NEG",
     "policy_id": "LCD-RAD-NIV",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+    "title": "Uncomplicated obstructive sleep apnea with normal daytime carbon dioxide",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup) (LCD-RAD-NIV)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup). Diagnostic assessment demonstrates non-qualifying paco2: 42.0 mm Hg. Clinical assessment indicates absence of cpap trial failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented simple obstructive sleep apnea.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-RAD-NIV due to active simple obstructive sleep apnea."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Pulmonary Sleep Medicine\nSUBJECTIVE: 46-year-old with daytime somnolence and heavy snoring.\nOBJECTIVE: Polysomnography reveals uncomplicated obstructive sleep apnea with AHI 22 events/hr. Daytime arterial blood gas shows completely normal PaCO2 of 38 mmHg without hypoventilation.\nASSESSMENT & PLAN: Moderate obstructive sleep apnea without respiratory failure. Advanced non-invasive ventilator with backup rate is contraindicated for uncomplicated sleep apnea; standard CPAP is indicated."
   },
   {
     "vignette_id": "DEV-LCD-ROTATOR-CUFF-APP",
     "policy_id": "LCD-ROTATOR-CUFF",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Rotator Cuff Repair (Open or Arthroscopic)",
+    "title": "Full-thickness supraspinatus tear failing 16 weeks physical therapy",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Rotator Cuff Repair (Open or Arthroscopic) (LCD-ROTATOR-CUFF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Rotator Cuff Repair (Open or Arthroscopic). Clinical examination and imaging confirms documented full-thickness rotator cuff tear. Patient completed trial of physical therapy trial for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo goutallier grade 4 fatty infiltration.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Rotator Cuff Repair (Open or Arthroscopic) (LCD-ROTATOR-CUFF). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Shoulder and Elbow Orthopedic Surgery\nSUBJECTIVE: 55-year-old male presenting with severe lateral shoulder weakness and night pain for 5 months. Has completed 16 weeks of structured rotator cuff physical therapy and an ultrasound-guided subacromial corticosteroid injection without functional improvement.\nOBJECTIVE: Significant weakness on empty-can testing (3/5) and positive drop arm sign. Shoulder MRI reveals complete full-thickness rotator cuff tear of the supraspinatus tendon with 1.8 cm retraction. Plain films confirm well-preserved glenohumeral joint space without arthropathy.\nASSESSMENT & PLAN: Symptomatic full-thickness supraspinatus tendon tear refractory to 4 months of conservative management. Plan: Right arthroscopic rotator cuff repair with subacromial decompression."
   },
   {
     "vignette_id": "DEV-LCD-ROTATOR-CUFF-NEG",
     "policy_id": "LCD-ROTATOR-CUFF",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Rotator Cuff Repair (Open or Arthroscopic)",
+    "title": "Severe cuff tear arthropathy with bone-on-bone glenohumeral collapse",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Rotator Cuff Repair (Open or Arthroscopic) (LCD-ROTATOR-CUFF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Rotator Cuff Repair (Open or Arthroscopic). Clinical assessment indicates absence of full-thickness rotator cuff tear. Inadequate trial: patient discontinued physical therapy trial after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented goutallier grade 4 fatty infiltration.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ROTATOR-CUFF due to active goutallier grade 4 fatty infiltration."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Shoulder and Elbow Orthopedic Surgery\nSUBJECTIVE: 78-year-old presenting with chronic shoulder immobility and grating pain for 4 years.\nOBJECTIVE: Shoulder radiographs demonstrate superior humeral head migration with complete articulation against the acromion, severe glenoid erosion, and bone-on-bone arthritis (Hamada grade 4 rotator cuff arthropathy).\nASSESSMENT & PLAN: End-stage rotator cuff tear arthropathy. Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis."
   },
   {
     "vignette_id": "DEV-LCD-SBRT-APP",
     "policy_id": "LCD-SBRT",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Stereotactic Body Radiation Therapy (SBRT / SABR)",
+    "title": "Medically inoperable clinical Stage I NSCLC of right upper lobe",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Stereotactic Body Radiation Therapy (SBRT / SABR) (LCD-SBRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Stereotactic Body Radiation Therapy (SBRT / SABR). Clinical examination and imaging confirms documented stage i nsclc. Clinical examination and imaging confirms documented 4d ct motion management. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo polymetastatic disease.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Stereotactic Body Radiation Therapy (SBRT / SABR) (LCD-SBRT). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 76-year-old with severe baseline COPD (FEV1 32% predicted, home oxygen 2 L/min) evaluated for newly discovered right upper lobe solitary nodule. Thoracic surgery deemed patient medically inoperable due to high operative mortality risk.\nOBJECTIVE: PET-CT confirms hypermetabolic 2.2 cm peripheral pulmonary lesion (SUV max 8.4) with zero mediastinal or distant nodal uptake (cT1cN0M0). Brain MRI negative. Multidisciplinary thoracic tumor board reviewed case and recommended stereotactic ablative delivery.\nASSESSMENT & PLAN: Medically inoperable early-stage non-small cell lung cancer. Plan: Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking."
   },
   {
     "vignette_id": "DEV-LCD-SBRT-NEG",
     "policy_id": "LCD-SBRT",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Stereotactic Body Radiation Therapy (SBRT / SABR)",
+    "title": "Disseminated metastatic carcinoma with widespread organ deposits",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Stereotactic Body Radiation Therapy (SBRT / SABR) (LCD-SBRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Stereotactic Body Radiation Therapy (SBRT / SABR). Clinical assessment indicates absence of stage i nsclc. Clinical assessment indicates absence of 4d ct motion management. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented polymetastatic disease.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-SBRT due to active polymetastatic disease."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 63-year-old with metastatic breast cancer presenting for evaluation of pulmonary deposits.\nOBJECTIVE: Restaging CT shows extensive widespread metastatic disease with multiple bilateral lung nodules (> 15 nodules), diffuse liver involvement, and multiple osseous lesions.\nASSESSMENT & PLAN: Widely metastatic disseminated malignancy. Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease."
   },
   {
     "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-APP",
     "policy_id": "LCD-SHOULDER-ARTHRO",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Total and Reverse Shoulder Arthroplasty",
+    "title": "Severe glenohumeral osteoarthritis failing 5 months conservative care",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total and Reverse Shoulder Arthroplasty (LCD-SHOULDER-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Total and Reverse Shoulder Arthroplasty. Clinical examination and imaging confirms documented glenohumeral osteoarthritis. Patient completed trial of shoulder physical therapy for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo axillary nerve palsy.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Total and Reverse Shoulder Arthroplasty (LCD-SHOULDER-ARTHRO). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Adult Reconstruction Orthopedics\nSUBJECTIVE: 69-year-old presenting with chronic debilitating right shoulder pain and stiffness for 18 months. Patient has completed 20 weeks of supervised physical therapy, oral anti-inflammatories, and two intra-articular steroid injections without lasting relief. Denies active infection.\nOBJECTIVE: Passive abduction limited to 60 degrees with bone-on-bone crepitus. Axillary and AP radiographs reveal end-stage glenohumeral osteoarthritis with complete loss of joint space, extensive inferior humeral osteophytes, and posterior glenoid wear. Intact rotator cuff musculature.\nASSESSMENT & PLAN: End-stage primary glenohumeral osteoarthritis with refractory functional disability after 5 months conservative care. Plan: Right anatomic total shoulder arthroplasty."
   },
   {
     "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-NEG",
     "policy_id": "LCD-SHOULDER-ARTHRO",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Total and Reverse Shoulder Arthroplasty",
+    "title": "Severe shoulder arthrosis with active purulent joint infection",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total and Reverse Shoulder Arthroplasty (LCD-SHOULDER-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Total and Reverse Shoulder Arthroplasty. Clinical assessment indicates absence of glenohumeral osteoarthritis. Inadequate trial: patient discontinued shoulder physical therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented axillary nerve palsy.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-SHOULDER-ARTHRO due to active axillary nerve palsy."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Adult Reconstruction Orthopedics\nSUBJECTIVE: 72-year-old presenting with acute-on-chronic shoulder swelling, severe warmth, and fevers for 3 days.\nOBJECTIVE: Arthrocentesis of the right shoulder yields cloudy fluid with 85,000 WBC/uL and gram-positive cocci in clusters, confirming active joint infection (acute septic arthritis).\nASSESSMENT & PLAN: Acute septic glenohumeral joint infection on background chronic arthritis. Prosthetic total joint arthroplasty is strictly contraindicated in the presence of active sepsis."
   },
   {
     "vignette_id": "DEV-LCD-WOUND-VAC-APP",
     "policy_id": "LCD-WOUND-VAC",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+    "title": "Deep dehisced abdominal surgical wound failing 6 weeks moist dressings",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Negative Pressure Wound Therapy (NPWT / Wound VAC) (LCD-WOUND-VAC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Negative Pressure Wound Therapy (NPWT / Wound VAC). Clinical examination and imaging confirms documented stage iii pressure ulcer. Patient completed trial of conventional wound care trial for 6 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo untreated osteomyelitis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Negative Pressure Wound Therapy (NPWT / Wound VAC) (LCD-WOUND-VAC). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Advanced Wound Care Center\nSUBJECTIVE: 61-year-old presenting with non-healing dehisced midline abdominal wound following bowel resection 7 weeks ago. Patient has undergone daily wound packing with moist alginate and hydrogel dressings for 42 days with minimal granulation progress.\nOBJECTIVE: Measurement: 6.5 cm length x 3.0 cm width x 2.4 cm depth with healthy red granulation base. Sharp debridement completed; wound bed is completely clean with zero devitalized necrotic eschar. Probe to bone is negative, no untreated osteomyelitis.\nASSESSMENT & PLAN: Full-thickness chronic dehisced surgical wound refractory to 6 weeks of standard moist dressing therapy. Plan: Negative pressure wound therapy pump at 125 mmHg continuous suction."
   },
   {
     "vignette_id": "DEV-LCD-WOUND-VAC-NEG",
     "policy_id": "LCD-WOUND-VAC",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+    "title": "Sacral wound with 100% thick black necrotic eschar without debridement",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Negative Pressure Wound Therapy (NPWT / Wound VAC) (LCD-WOUND-VAC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Negative Pressure Wound Therapy (NPWT / Wound VAC). Clinical assessment indicates absence of stage iii pressure ulcer. Inadequate trial: patient discontinued conventional wound care trial after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented untreated osteomyelitis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-WOUND-VAC due to active untreated osteomyelitis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Advanced Wound Care Center\nSUBJECTIVE: 81-year-old nursing home resident evaluated for chronic sacral ulceration.\nOBJECTIVE: Examination reveals a 5 cm ulcer completely covered by thick, adherent black necrotic tissue and devitalized slough. No surgical debridement has been performed.\nASSESSMENT & PLAN: Unstageable necrotic pressure wound. Application of negative pressure wound therapy is contraindicated over un-debrided necrotic tissue or untreated osteomyelitis."
   },
   {
     "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
     "policy_id": "NCD-CARDIAC-REHAB",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Comprehensive Outpatient Cardiac Rehabilitation",
+    "title": "Recent coronary artery bypass surgery ready for structured rehab",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Preventive Cardiology Specialty Clinic\nEVALUATION FOR: Comprehensive Outpatient Cardiac Rehabilitation (NCD-CARDIAC-REHAB)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Comprehensive Outpatient Cardiac Rehabilitation. Clinical examination and imaging confirms documented acute myocardial infarction within 12 months. Clinical examination and imaging confirms documented individualized treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo decompensated heart failure.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Comprehensive Outpatient Cardiac Rehabilitation (NCD-CARDIAC-REHAB). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Preventive Cardiology & Rehabilitation\nSUBJECTIVE: 64-year-old presenting for initial intake 5 weeks following uncomplicated three-vessel coronary artery bypass graft surgery. Sternal incision well-healed without instability. Patient reports mild exertional shortness of breath when walking 1 block. Denies unstable angina or resting chest discomfort.\nOBJECTIVE: Resting blood pressure 124/76 mmHg, heart rate 68 bpm regular. Normal cardiovascular exam with no third heart sound or peripheral edema. Attending cardiologist signed formal physician referral and prescribed individualized aerobic exercise plan.\nASSESSMENT & PLAN: Recent surgical revascularization for ischemic heart disease in stable clinical condition. Plan: Outpatient comprehensive cardiac rehabilitation program, 3 sessions weekly for 36 sessions."
   },
   {
     "vignette_id": "DEV-NCD-CARDIAC-REHAB-NEG",
     "policy_id": "NCD-CARDIAC-REHAB",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Comprehensive Outpatient Cardiac Rehabilitation",
+    "title": "Resting chest pain with acute decompensated heart failure",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Preventive Cardiology Specialty Clinic\nEVALUATION FOR: Comprehensive Outpatient Cardiac Rehabilitation (NCD-CARDIAC-REHAB)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Comprehensive Outpatient Cardiac Rehabilitation. Clinical assessment indicates absence of acute myocardial infarction within 12 months. Clinical assessment indicates absence of individualized treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented decompensated heart failure.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-CARDIAC-REHAB due to active decompensated heart failure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Preventive Cardiology & Rehabilitation\nSUBJECTIVE: 71-year-old presenting for rehab consultation reporting worsening shortness of breath while lying flat and crushing substernal chest pain occurring at rest over the past 24 hours.\nOBJECTIVE: Jugular venous distension to the angle of the jaw, bilateral pulmonary crackles halfway up lung fields, and 3+ pitting pedal edema. ECG shows dynamic ST-segment depressions indicating unstable angina.\nASSESSMENT & PLAN: Acute decompensated heart failure and unstable angina. Exercise rehabilitation is strictly contraindicated; patient transferred immediately to the emergency department."
   },
   {
     "vignette_id": "DEV-NCD-CATARACT-APP",
     "policy_id": "NCD-CATARACT",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Cataract Extraction with Intraocular Lens (IOL) Implantation",
+    "title": "Dense nuclear sclerosis with visual acuity 20/60 impairing driving",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology Specialty Clinic\nEVALUATION FOR: Cataract Extraction with Intraocular Lens (IOL) Implantation (NCD-CATARACT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Cataract Extraction with Intraocular Lens (IOL) Implantation. Clinical examination and imaging confirms documented visual acuity 20/50 or worse. Clinical examination and imaging confirms documented difficulty driving due to vision. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo clear lens extraction.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Cataract Extraction with Intraocular Lens (IOL) Implantation (NCD-CATARACT). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Comprehensive Ophthalmology Clinic\nSUBJECTIVE: 73-year-old presenting with 14 months of progressive blurring and severe glare while driving at night. Patient is no longer able to read standard book print even with updated bifocal glasses, creating significant difficulty with daily activities.\nOBJECTIVE: Best corrected visual acuity is 20/60 in the right eye and 20/50 in the left eye. Slit-lamp biomicroscopy reveals 3+ dense nuclear sclerotic cataract and cortical spoking in the right eye. Dilated fundus examination shows healthy macula and optic nerve bilaterally without advanced macular degeneration.\nASSESSMENT & PLAN: Visually significant cataract in right eye causing substantial impairment of activities of daily living refractory to spectacles. Plan: Right phacoemulsification with intraocular lens implantation."
   },
   {
     "vignette_id": "DEV-NCD-CATARACT-NEG",
     "policy_id": "NCD-CATARACT",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Cataract Extraction with Intraocular Lens (IOL) Implantation",
+    "title": "Mild 20/25 vision without functional impairment in daily tasks",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology Specialty Clinic\nEVALUATION FOR: Cataract Extraction with Intraocular Lens (IOL) Implantation (NCD-CATARACT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Cataract Extraction with Intraocular Lens (IOL) Implantation. Clinical assessment indicates absence of visual acuity 20/50 or worse. Clinical assessment indicates absence of difficulty driving due to vision. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented clear lens extraction.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-CATARACT due to active clear lens extraction."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Comprehensive Ophthalmology Clinic\nSUBJECTIVE: 58-year-old presenting for routine eye checkup. Patient drives without restriction, reads comfortably, and reports zero subjective visual complaints.\nOBJECTIVE: Best corrected visual acuity is 20/25 in both eyes. Slit lamp exam shows trace 1+ nuclear discoloration. Clear macular architecture.\nASSESSMENT & PLAN: Mild non-visually significant lens changes with normal functional vision. Cataract surgery is not clinically indicated."
   },
   {
     "vignette_id": "DEV-NCD-CCTA-APP",
     "policy_id": "NCD-CCTA",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Coronary Computed Tomography Angiography (CCTA)",
+    "title": "Intermediate probability exertional chest tightness with equivocal ECG",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiovascular Radiology Specialty Clinic\nEVALUATION FOR: Coronary Computed Tomography Angiography (CCTA) (NCD-CCTA)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Coronary Computed Tomography Angiography (CCTA). Clinical examination and imaging confirms documented intermediate pre-test probability of cad. Clinical examination and imaging confirms documented inconclusive stress test. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo uncontrolled atrial fibrillation.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Coronary Computed Tomography Angiography (CCTA) (NCD-CCTA). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Outpatient Cardiology Evaluation\nSUBJECTIVE: 51-year-old female with hyperlipidemia presenting with atypical exertional chest tightness lasting 10 minutes after stair climbing. Pre-test probability for obstructive coronary artery disease is intermediate (35%).\nOBJECTIVE: Resting baseline 12-lead electrocardiogram demonstrates non-specific ST-T wave abnormalities that render exercise ECG stress testing non-diagnostic. Serum troponin negative. No signs of confirmed acute coronary syndrome.\nASSESSMENT & PLAN: Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram. Plan: Coronary computed tomography angiography (CCTA) with prospective ECG gating."
   },
   {
     "vignette_id": "DEV-NCD-CCTA-NEG",
     "policy_id": "NCD-CCTA",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Coronary Computed Tomography Angiography (CCTA)",
+    "title": "High-risk acute ST-elevation myocardial infarction",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiovascular Radiology Specialty Clinic\nEVALUATION FOR: Coronary Computed Tomography Angiography (CCTA) (NCD-CCTA)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Coronary Computed Tomography Angiography (CCTA). Clinical assessment indicates absence of intermediate pre-test probability of cad. Clinical assessment indicates absence of inconclusive stress test. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented uncontrolled atrial fibrillation.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-CCTA due to active uncontrolled atrial fibrillation."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Outpatient Cardiology Evaluation\nSUBJECTIVE: 65-year-old male presenting with 2 hours of crushing substernal chest pressure, diaphoresis, and radiation into the left jaw.\nOBJECTIVE: Immediate ECG demonstrates 4 mm ST-segment elevations across leads V1-V4 consistent with acute coronary syndrome and anterior STEMI.\nASSESSMENT & PLAN: Confirmed acute myocardial infarction. Outpatient coronary CT angiography is contraindicated; emergency invasive catheterization activated immediately."
   },
   {
     "vignette_id": "DEV-NCD-MPI-PET-APP",
     "policy_id": "NCD-MPI-PET",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+    "title": "Ischemic cardiomyopathy with inconclusive SPECT due to body habitus",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Cardiology Specialty Clinic\nEVALUATION FOR: Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging (NCD-MPI-PET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging. Clinical examination and imaging confirms documented intermediate cad risk. Diagnostic clinical assessment demonstrates body mass index: 40.0 kg/m2. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo asymptomatic screening.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging (NCD-MPI-PET). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Advanced Cardiovascular Imaging\nSUBJECTIVE: 61-year-old with ischemic cardiomyopathy and BMI 44 kg/m2 evaluated for potential surgical coronary bypass revascularization. Prior SPECT myocardial perfusion study was inconclusive due to severe soft tissue attenuation artifacts.\nOBJECTIVE: Echocardiogram shows left ventricular ejection fraction of 28% with anterior hypokinesis. Rest and pharmacological stress testing requested for evaluation of ischemia and hibernating myocardium.\nASSESSMENT & PLAN: Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT. Plan: Rubidium-82 and FDG cardiac positron emission tomography (PET) for myocardial perfusion and viability assessment."
   },
   {
     "vignette_id": "DEV-NCD-MPI-PET-NEG",
     "policy_id": "NCD-MPI-PET",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+    "title": "Asymptomatic executive checkup with zero cardiac risk factors",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Cardiology Specialty Clinic\nEVALUATION FOR: Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging (NCD-MPI-PET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging. Clinical assessment indicates absence of intermediate cad risk. Diagnostic assessment demonstrates non-qualifying body mass index: 25.0 kg/m2. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented asymptomatic screening.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-MPI-PET due to active asymptomatic screening."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Advanced Cardiovascular Imaging\nSUBJECTIVE: 36-year-old asymptomatic executive requesting comprehensive full-body cardiovascular scan. Patient exercises vigorously 6 days a week without chest symptoms.\nOBJECTIVE: Normal physical exam, normal resting ECG, zero family history of premature CAD.\nASSESSMENT & PLAN: Asymptomatic low-risk status. Diagnostic cardiac PET myocardial perfusion scanning is contraindicated for routine asymptomatic screening."
   },
   {
     "vignette_id": "DEV-NCD-PACEMAKER-APP",
     "policy_id": "NCD-PACEMAKER",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Permanent Cardiac Pacemakers for Bradyarrhythmias",
+    "title": "Symptomatic complete third-degree heart block with syncope",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiology / Electrophysiology Specialty Clinic\nEVALUATION FOR: Permanent Cardiac Pacemakers for Bradyarrhythmias (NCD-PACEMAKER)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Permanent Cardiac Pacemakers for Bradyarrhythmias. Clinical examination and imaging confirms documented third degree av block. Clinical examination and imaging confirms documented absence of drug toxicity. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo asymptomatic first degree block.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Permanent Cardiac Pacemakers for Bradyarrhythmias (NCD-PACEMAKER). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Cardiac Electrophysiology\nSUBJECTIVE: 76-year-old presenting with recurrent unheralded syncope and severe dizzy spells. Patient collapsed twice while standing. Not taking AV nodal blocking agents.\nOBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes. Normal thyroid function and serum potassium.\nASSESSMENT & PLAN: Symptomatic high-grade third-degree atrioventricular heart block in the absence of reversible causes. Plan: Dual-chamber permanent cardiac pacemaker implantation."
   },
   {
     "vignette_id": "DEV-NCD-PACEMAKER-NEG",
     "policy_id": "NCD-PACEMAKER",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Permanent Cardiac Pacemakers for Bradyarrhythmias",
+    "title": "Transient sinus bradycardia secondary to severe beta-blocker overdose",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiology / Electrophysiology Specialty Clinic\nEVALUATION FOR: Permanent Cardiac Pacemakers for Bradyarrhythmias (NCD-PACEMAKER)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Permanent Cardiac Pacemakers for Bradyarrhythmias. Clinical assessment indicates absence of third degree av block. Clinical assessment indicates absence of absence of drug toxicity. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented asymptomatic first degree block.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-PACEMAKER due to active asymptomatic first degree block."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Cardiac Electrophysiology\nSUBJECTIVE: 62-year-old presenting with lethargy after accidentally ingesting quadruple his prescribed dose of carvedilol.\nOBJECTIVE: Heart rate 42 bpm with sinus rhythm and first-degree AV block. Serum toxicology confirms toxic beta-blocker levels. Following glucagon infusion and drug clearance, heart rate normalizes to 68 bpm.\nASSESSMENT & PLAN: Transient drug-induced bradycardia due to medication toxicity. Permanent pacemaker implantation is contraindicated for reversible pharmacological etiologies."
   },
   {
     "vignette_id": "DEV-NCD-PET-ONC-APP",
     "policy_id": "NCD-PET-ONC",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+    "title": "Newly diagnosed biopsy-proven esophageal adenocarcinoma staging",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Medicine / Oncology Specialty Clinic\nEVALUATION FOR: Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging (NCD-PET-ONC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging. Clinical examination and imaging confirms documented biopsy-proven carcinoma. Clinical examination and imaging confirms documented impact on treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo routine surveillance in remission.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging (NCD-PET-ONC). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Medical Oncology Clinic\nSUBJECTIVE: 60-year-old male with progressive dysphagia for solid foods over 3 months. Endoscopy and endoscopic ultrasound revealed a distal esophageal mass.\nOBJECTIVE: Biopsy pathology confirms moderately differentiated invasive esophageal adenocarcinoma. Contrast CT of abdomen shows borderline gastrohepatic lymph nodes without definite distant metastases. Initial systemic staging required to determine resectability.\nASSESSMENT & PLAN: Newly diagnosed locally advanced esophageal carcinoma. Plan: Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging."
   },
   {
     "vignette_id": "DEV-NCD-PET-ONC-NEG",
     "policy_id": "NCD-PET-ONC",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+    "title": "Asymptomatic surveillance 5 years post-resection of early breast cancer",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Medicine / Oncology Specialty Clinic\nEVALUATION FOR: Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging (NCD-PET-ONC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging. Clinical assessment indicates absence of biopsy-proven carcinoma. Clinical assessment indicates absence of impact on treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented routine surveillance in remission.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-PET-ONC due to active routine surveillance in remission."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Medical Oncology Clinic\nSUBJECTIVE: 57-year-old female presenting for routine five-year survivorship checkup after lumpectomy for Stage IA breast cancer. Patient feels completely well with no bone pain, weight loss, or cough.\nOBJECTIVE: Normal physical examination, well-healed scar, no adenopathy, recent diagnostic mammogram was negative.\nASSESSMENT & PLAN: Disease-free survivorship with zero clinical suspicion of recurrence. Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors."
   },
   {
     "vignette_id": "DEV-NCD-PUMP-APP",
     "policy_id": "NCD-PUMP",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Implantable Infusion Pumps for Intrathecal Therapy",
+    "title": "Severe intractable cancer pain failing systemic opioids with positive trial",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Oncology Specialty Clinic\nEVALUATION FOR: Implantable Infusion Pumps for Intrathecal Therapy (NCD-PUMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Implantable Infusion Pumps for Intrathecal Therapy. Clinical examination and imaging confirms documented intrathecal trial response. Clinical examination and imaging confirms documented failed systemic analgesics. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo active sepsis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Implantable Infusion Pumps for Intrathecal Therapy (NCD-PUMP). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Pain and Palliative Medicine\nSUBJECTIVE: 54-year-old with pelvic chordoma experiencing intractable visceral and somatic pelvic pain. Maximum tolerated oral and transdermal opioid regimens have produced intolerable sedation and constipation without adequate analgesia.\nOBJECTIVE: Patient underwent temporary percutaneous intrathecal morphine screening trial under sterile conditions, achieving documented 75% pain reduction and clear sensorium. Normal CSF opening pressure; no spinal canal block. No systemic infection.\nASSESSMENT & PLAN: Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial. Plan: Surgical implantation of programmable intrathecal infusion pump."
   },
   {
     "vignette_id": "DEV-NCD-PUMP-NEG",
     "policy_id": "NCD-PUMP",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Implantable Infusion Pumps for Intrathecal Therapy",
+    "title": "Untreated bacteremia and local paraspinal abscess at surgical site",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Oncology Specialty Clinic\nEVALUATION FOR: Implantable Infusion Pumps for Intrathecal Therapy (NCD-PUMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Implantable Infusion Pumps for Intrathecal Therapy. Clinical assessment indicates absence of intrathecal trial response. Clinical assessment indicates absence of failed systemic analgesics. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented active sepsis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-PUMP due to active active sepsis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Pain and Palliative Medicine\nSUBJECTIVE: 63-year-old evaluated for severe back pain accompanied by chills and night sweats.\nOBJECTIVE: Blood cultures positive for methicillin-sensitive Staphylococcus aureus. Lumbar MRI reveals paraspinal fluid collection and epidural inflammation.\nASSESSMENT & PLAN: Active systemic bacteremia and paraspinal soft tissue infection. Implantation of foreign intrathecal pump hardware is strictly contraindicated in the presence of active sepsis."
   },
   {
     "vignette_id": "DEV-NCD-SCS-APP",
     "policy_id": "NCD-SCS",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+    "title": "Failed back surgery syndrome with 80% relief during percutaneous trial",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Neurosurgery Specialty Clinic\nEVALUATION FOR: Spinal Cord Stimulation (SCS) for Chronic Intractable Pain (NCD-SCS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Spinal Cord Stimulation (SCS) for Chronic Intractable Pain. Diagnostic clinical assessment demonstrates scs trial relief: 55.0 %. Clinical examination and imaging confirms documented psychological clearance. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo active substance abuse.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Spinal Cord Stimulation (SCS) for Chronic Intractable Pain (NCD-SCS). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Comprehensive Pain Clinic\nSUBJECTIVE: 51-year-old with persistent burning neuropathic right leg and lower back pain following two prior lumbar decompressions (failed back surgery syndrome). Physical therapy, membrane stabilizers, and injections provided no relief over 2 years.\nOBJECTIVE: Pre-procedure psychological evaluation completed and cleared with no unresolved behavioral contraindications. Patient completed a 6-day temporary percutaneous spinal cord stimulator trial, documenting 80% pain relief and significant increase in daily walking distance.\nASSESSMENT & PLAN: Chronic neuropathic lower extremity pain refractory to conventional management with highly successful trial stimulation. Plan: Permanent spinal cord stimulation system implantation."
   },
   {
     "vignette_id": "DEV-NCD-SCS-NEG",
     "policy_id": "NCD-SCS",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+    "title": "Failed trial stimulation with worsening pain and active cocaine abuse",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Neurosurgery Specialty Clinic\nEVALUATION FOR: Spinal Cord Stimulation (SCS) for Chronic Intractable Pain (NCD-SCS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Spinal Cord Stimulation (SCS) for Chronic Intractable Pain. Diagnostic assessment demonstrates non-qualifying scs trial relief: 40.0 %. Clinical assessment indicates absence of psychological clearance. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented active substance abuse.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-SCS due to active active substance abuse."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Comprehensive Pain Clinic\nSUBJECTIVE: 44-year-old presenting following a 4-day temporary percutaneous stimulation trial.\nOBJECTIVE: Patient reports that the trial device produced unpleasant dysesthesias with only 10% pain relief. Urine drug screen is positive for illicit cocaine metabolites, and psychiatric evaluation identifies active untreated substance use disorder.\nASSESSMENT & PLAN: Inadequate trial relief (< 50%) and active substance use disorder. Permanent neurostimulator implantation is contraindicated."
   },
   {
     "vignette_id": "DEV-NCD-SGD-APP",
     "policy_id": "NCD-SGD",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Speech Generating Devices (SGD)",
+    "title": "Severe expressive anarthria secondary to ALS failing natural speech",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Speech Generating Devices (SGD) (NCD-SGD)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Speech Generating Devices (SGD). Clinical examination and imaging confirms documented severe expressive aphasia. Clinical examination and imaging confirms documented speech-language pathologist evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo unlocked commercial tablet.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Speech Generating Devices (SGD) (NCD-SGD). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Speech-Language Pathology & Assistive Technology\nSUBJECTIVE: 63-year-old with bulbar-onset amyotrophic lateral sclerosis experiencing progressive loss of oral communication. Patient is unable to speak intelligibly to family or caregivers.\nOBJECTIVE: Comprehensive assessment by licensed speech-language pathologist (SLP) documents profound anarthria with severe oral-motor dyspraxia. Receptive language and cognition remain intact. SLP completed formal device trial with dedicated eye-gaze speech-generating system; patient achieved 95% message accuracy. Device requested is a dedicated augmentative communication device.\nASSESSMENT & PLAN: Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access."
   },
   {
     "vignette_id": "DEV-NCD-SGD-NEG",
     "policy_id": "NCD-SGD",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Speech Generating Devices (SGD)",
+    "title": "Request for un-adapted standard consumer entertainment tablet",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Speech Generating Devices (SGD) (NCD-SGD)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Speech Generating Devices (SGD). Clinical assessment indicates absence of severe expressive aphasia. Clinical assessment indicates absence of speech-language pathologist evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented unlocked commercial tablet.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-SGD due to active unlocked commercial tablet."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Speech-Language Pathology & Assistive Technology\nSUBJECTIVE: 50-year-old with mild slurred speech following minor concussion requesting prescription for a personal consumer electronics tablet.\nOBJECTIVE: Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.\nASSESSMENT & PLAN: Mild transient dysarthria without profound expressive impairment; requested equipment is a general-purpose consumer device rather than a dedicated medical communication prosthesis."
   },
   {
     "vignette_id": "DEV-OPD-BLEPH-APP",
     "policy_id": "OPD-BLEPH",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+    "title": "Severe dermatochalasis with superior visual field restriction",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology / Plastic Surgery Specialty Clinic\nEVALUATION FOR: Blepharoplasty, Blepharoptosis Repair, and Brow Lift (OPD-BLEPH)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Blepharoplasty, Blepharoptosis Repair, and Brow Lift. Diagnostic clinical assessment demonstrates visual field: 35.0 %. Diagnostic clinical assessment demonstrates MRD1: 1.5 mm. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo cosmetic appearance.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Blepharoplasty, Blepharoptosis Repair, and Brow Lift (OPD-BLEPH). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Ophthalmic Plastic & Reconstructive Surgery\nSUBJECTIVE: 68-year-old presenting with heavy upper eyelids obscuring superior vision while reading and driving. Experiences frequent forehead ache from compensatory frontalis muscle strain. Denies requesting cosmetic eyelid rejuvenation.\nOBJECTIVE: External photography demonstrates skin overhang resting on eyelashes in primary gaze with Marginal Reflex Distance 1 (MRD1) measured at 1.0 mm bilaterally. Automated visual field testing reveals a 36% superior visual field restriction with lids untaped, improving to normal boundaries when upper lids are manually taped.\nASSESSMENT & PLAN: Bilateral functional dermatochalasis and blepharoptosis with documented objective visual field loss and reduced MRD1. Plan: Bilateral functional upper lid blepharoplasty and ptosis repair."
   },
   {
     "vignette_id": "DEV-OPD-BLEPH-NEG",
     "policy_id": "OPD-BLEPH",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+    "title": "Mild eyelid wrinkling without visual field obscuration",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology / Plastic Surgery Specialty Clinic\nEVALUATION FOR: Blepharoplasty, Blepharoptosis Repair, and Brow Lift (OPD-BLEPH)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Blepharoplasty, Blepharoptosis Repair, and Brow Lift. Diagnostic assessment demonstrates non-qualifying visual field: 20.0 %. Diagnostic assessment demonstrates non-qualifying MRD1: 3.0 mm. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented cosmetic appearance.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-BLEPH due to active cosmetic appearance."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Ophthalmic Plastic & Reconstructive Surgery\nSUBJECTIVE: 49-year-old presenting requesting upper eyelid surgery because she feels her eyes look tired in photographs. She has zero difficulty reading or driving.\nOBJECTIVE: External photographs show mild fine skin laxity. Marginal Reflex Distance 1 is 4.0 mm bilaterally (normal). Visual field testing demonstrates zero superior field restriction (loss < 5%).\nASSESSMENT & PLAN: Normal eyelid margins and intact functional visual field; request is purely cosmetic eyelid surgery. Surgical blepharoplasty is not clinically indicated for aesthetic concerns alone."
   },
   {
     "vignette_id": "DEV-OPD-BOTOX-APP",
     "policy_id": "OPD-BOTOX",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+    "title": "Intractable chronic migraine 18 days/month failing oral prophylaxis",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Neurology Specialty Clinic\nEVALUATION FOR: Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia (OPD-BOTOX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia. Diagnostic clinical assessment demonstrates headache frequency: 20.0 days/month. Clinical examination and imaging confirms documented oral prophylactic failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo episodic migraine.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia (OPD-BOTOX). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Comprehensive Headache Center\nSUBJECTIVE: 42-year-old presenting with chronic debilitating headaches for 2 years. Headache diary confirms 18 headache days per month, with 12 days meeting full criteria for throbbing migraine with photophobia and nausea. Patient has completed adequate 8-week trials of topiramate and propranolol without efficacy.\nOBJECTIVE: Normal neurological examination. Normal brain MRI. Documented adherence to headache calendar over 4 consecutive months confirming chronic non-episodic pattern.\nASSESSMENT & PLAN: Chronic migraine refractory to two standard oral prophylactic medication classes. Plan: Botulinum toxin injection protocol (155 units across 31 designated head and neck sites)."
   },
   {
     "vignette_id": "DEV-OPD-BOTOX-NEG",
     "policy_id": "OPD-BOTOX",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+    "title": "Episodic tension headache occurring 4 days per month",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Neurology Specialty Clinic\nEVALUATION FOR: Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia (OPD-BOTOX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia. Diagnostic assessment demonstrates non-qualifying headache frequency: 5.0 days/month. Clinical assessment indicates absence of oral prophylactic failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented episodic migraine.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-BOTOX due to active episodic migraine."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Comprehensive Headache Center\nSUBJECTIVE: 33-year-old evaluated for headaches occurring approximately 4 days per month during stressful work periods. No daily headache pattern.\nOBJECTIVE: Neurological exam completely unremarkable. Patient has not trialed any daily preventive medications.\nASSESSMENT & PLAN: Episodic headache disorder (fewer than 15 headache days monthly). Botulinum toxin therapy is contraindicated for episodic migraine and requires prior oral prophylactic trials."
   },
   {
     "vignette_id": "DEV-OPD-CERV-DISC-APP",
     "policy_id": "OPD-CERV-DISC",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Cervical Artificial Disc Arthroplasty",
+    "title": "Single-level C5-C6 soft disc radiculopathy failing 8 weeks therapy",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery / Neurosurgery Specialty Clinic\nEVALUATION FOR: Cervical Artificial Disc Arthroplasty (OPD-CERV-DISC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Cervical Artificial Disc Arthroplasty. Clinical examination and imaging confirms documented cervical radiculopathy. Patient completed trial of conservative physical therapy for 8 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo severe facet arthrosis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Cervical Artificial Disc Arthroplasty (OPD-CERV-DISC). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Spine Surgery\nSUBJECTIVE: 38-year-old presenting with sharp electric radicular pain and tingling in right thumb and index finger for 3 months. Completed 8 weeks of focused physical therapy and non-steroidal medication without lasting improvement.\nOBJECTIVE: Decreased sensation in C6 distribution. Cervical MRI shows isolated single-level C5-C6 soft disc herniation compressing the exiting right C6 nerve root. Dynamic flexion-extension views demonstrate preserved sagittal motion without segmental instability; facet joints are normal without arthrosis.\nASSESSMENT & PLAN: Single-level cervical radiculopathy refractory to 8 weeks conservative therapy with healthy facet joints. Plan: C5-C6 anterior cervical artificial disc arthroplasty."
   },
   {
     "vignette_id": "DEV-OPD-CERV-DISC-NEG",
     "policy_id": "OPD-CERV-DISC",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Cervical Artificial Disc Arthroplasty",
+    "title": "Severe multilevel facet arthrosis and spondylolisthesis",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery / Neurosurgery Specialty Clinic\nEVALUATION FOR: Cervical Artificial Disc Arthroplasty (OPD-CERV-DISC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Cervical Artificial Disc Arthroplasty. Clinical assessment indicates absence of cervical radiculopathy. Inadequate trial: patient discontinued conservative physical therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented severe facet arthrosis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-CERV-DISC due to active severe facet arthrosis."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Spine Surgery\nSUBJECTIVE: 67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.\nOBJECTIVE: Cervical CT and MRI demonstrate severe facet joint spondylosis with bridging osteophytes across C4-C7 and 4 mm translation on flexion views indicating dynamic segmental instability.\nASSESSMENT & PLAN: Multilevel degenerative disc disease with severe facet arthrosis and cervical instability. Motion-sparing artificial disc arthroplasty is contraindicated in the presence of facet spondylosis."
   },
   {
     "vignette_id": "DEV-OPD-PANNI-APP",
     "policy_id": "OPD-PANNI",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Panniculectomy and Abdominoplasty",
+    "title": "Massive abdominal pannus hanging past pubis with chronic ulcerated intertrigo",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Plastic Surgery / General Surgery Specialty Clinic\nEVALUATION FOR: Panniculectomy and Abdominoplasty (OPD-PANNI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Panniculectomy and Abdominoplasty. Clinical examination and imaging confirms documented pannus hanging below pubis. Patient completed trial of intertrigo for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo body contouring only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Panniculectomy and Abdominoplasty (OPD-PANNI). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Plastic and Reconstructive Surgery\nSUBJECTIVE: 53-year-old female status post bariatric surgery with massive weight loss of 135 pounds, weight stable for 18 months. Patient presents with severe chronic painful intertrigo beneath the abdominal apron. Has performed topical antifungal powder, barrier creams, and oral antifungals for 5 months without resolution of skin breakdown. Denies cosmetic body contouring.\nOBJECTIVE: Clinical photographs demonstrate an abdominal pannus hanging below pubic symphysis to mid-thigh level. Examination of the subpannic crease reveals extensive weeping erythema, maceration, and ulceration.\nASSESSMENT & PLAN: Functional disability and chronic refractory intertrigo secondary to massive apron pannus failing 5 months of topical medical therapy. Plan: Functional surgical panniculectomy."
   },
   {
     "vignette_id": "DEV-OPD-PANNI-NEG",
     "policy_id": "OPD-PANNI",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Panniculectomy and Abdominoplasty",
+    "title": "Mild abdominal wall laxity without dermatitis or sub-pubic apron",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Plastic Surgery / General Surgery Specialty Clinic\nEVALUATION FOR: Panniculectomy and Abdominoplasty (OPD-PANNI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Panniculectomy and Abdominoplasty. Clinical assessment indicates absence of pannus hanging below pubis. Inadequate trial: patient discontinued intertrigo after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented body contouring only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-PANNI due to active body contouring only."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Plastic and Reconstructive Surgery\nSUBJECTIVE: 39-year-old presenting requesting tummy tuck surgery to tighten post-pregnancy stretch marks and abdominal bulge. Zero history of rash or skin infections.\nOBJECTIVE: Examination shows mild diastasis recti and skin redundancy. The lower abdominal contour does not reach the pubic symphysis. The skin crease is completely clean, dry, and intact.\nASSESSMENT & PLAN: Aesthetic complaint without functional skin pathology; request is for cosmetic abdominoplasty. Surgical resection is not clinically indicated for aesthetic rejuvenation."
   },
   {
     "vignette_id": "DEV-OPD-RHINO-APP",
     "policy_id": "OPD-RHINO",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Rhinoplasty and Septoplasty",
+    "title": "Severe nasal septal deviation and valve collapse failing topical steroids",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Otolaryngology / Facial Plastic Surgery Specialty Clinic\nEVALUATION FOR: Rhinoplasty and Septoplasty (OPD-RHINO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Rhinoplasty and Septoplasty. Patient completed trial of nasal obstruction for 27 weeks. Patient completed trial of intranasal steroids for 6 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo cosmetic reshaping.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Rhinoplasty and Septoplasty (OPD-RHINO). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Otolaryngology - Head and Neck Surgery\nSUBJECTIVE: 36-year-old presenting with chronic unilateral right-sided nasal airway obstruction causing persistent mouth breathing and sleep disruption for 1 year following nasal trauma. Patient has used intranasal fluticasone spray and nasal saline irrigations consistently for 8 weeks without improvement in airflow. Denies cosmetic dissatisfaction.\nOBJECTIVE: Anterior rhinoscopy reveals marked S-shaped nasal septal deviation impacting the right inferior turbinate and positive modified Cottle maneuver demonstrating external nasal valve collapse on inspiration.\nASSESSMENT & PLAN: Structural nasal airway obstruction with severe septal deviation and valve collapse refractory to 8 weeks topical medical therapy. Plan: Functional septoplasty and functional rhinoplasty with spreader grafts."
   },
   {
     "vignette_id": "DEV-OPD-RHINO-NEG",
     "policy_id": "OPD-RHINO",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Rhinoplasty and Septoplasty",
+    "title": "Desire for dorsal hump reduction without breathing obstruction",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Otolaryngology / Facial Plastic Surgery Specialty Clinic\nEVALUATION FOR: Rhinoplasty and Septoplasty (OPD-RHINO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Rhinoplasty and Septoplasty. Inadequate trial: patient discontinued nasal obstruction after only 1 week. Inadequate trial: patient discontinued intranasal steroids after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented cosmetic reshaping.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-RHINO due to active cosmetic reshaping."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Otolaryngology - Head and Neck Surgery\nSUBJECTIVE: 24-year-old presenting requesting reduction of a prominent dorsal nasal hump. Patient reports normal bilateral nasal airflow during high-intensity exercise and sleep.\nOBJECTIVE: Anterior rhinoscopy shows straight nasal septum with patent nasal passages bilaterally. Negative Cottle test. Intact internal and external valves.\nASSESSMENT & PLAN: Completely patent functional nasal airway; presentation is for cosmetic nasal reshaping. Surgical rhinoplasty is not indicated for aesthetic dorsal modification alone."
   },
   {
     "vignette_id": "DEV-OPD-SI-FUSION-APP",
     "policy_id": "OPD-SI-FUSION",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Minimally Invasive Sacroiliac (SI) Joint Fusion",
+    "title": "Chronic sacroiliac joint dysfunction with positive provocative tests and block",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Spine / Neurosurgery Specialty Clinic\nEVALUATION FOR: Minimally Invasive Sacroiliac (SI) Joint Fusion (OPD-SI-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Minimally Invasive Sacroiliac (SI) Joint Fusion. Diagnostic clinical assessment demonstrates diagnostic si block relief: 80.0 %. Diagnostic clinical assessment demonstrates positive provocation tests: 3.5 tests. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo active infection.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Minimally Invasive Sacroiliac (SI) Joint Fusion (OPD-SI-FUSION). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Spine and Orthopedics\nSUBJECTIVE: 47-year-old presenting with persistent unilateral right lower back and buttock pain below L5 for 10 months. Patient completed 16 weeks of focused physical therapy and pelvic stabilization exercises with refractory symptoms. No fever or systemic symptoms.\nOBJECTIVE: Physical exam reveals positive provocation tests on 4 validated maneuvers: positive FABER, positive Gaenslen, positive thigh thrust, and positive distraction test. Fluoroscopically guided diagnostic right sacroiliac joint block produced documented 85% relief of baseline pain during the anesthetic window.\nASSESSMENT & PLAN: Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block. Plan: Minimally invasive right sacroiliac joint fusion."
   },
   {
     "vignette_id": "DEV-OPD-SI-FUSION-NEG",
     "policy_id": "OPD-SI-FUSION",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Minimally Invasive Sacroiliac (SI) Joint Fusion",
+    "title": "Negative provocative tests and zero pain relief from diagnostic block",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Spine / Neurosurgery Specialty Clinic\nEVALUATION FOR: Minimally Invasive Sacroiliac (SI) Joint Fusion (OPD-SI-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Minimally Invasive Sacroiliac (SI) Joint Fusion. Diagnostic assessment demonstrates non-qualifying diagnostic si block relief: 65.0 %. Diagnostic assessment demonstrates non-qualifying positive provocation tests: 2.0 tests. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented active infection.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-SI-FUSION due to active active infection."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Interventional Spine and Orthopedics\nSUBJECTIVE: 55-year-old presenting with generalized pelvic and diffuse lower back discomfort.\nOBJECTIVE: Sacroiliac provocation testing is negative across all maneuvers (negative FABER, negative compression). Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.\nASSESSMENT & PLAN: Non-localized axial back pain without clinical or diagnostic evidence of sacroiliac pathology. Sacroiliac joint fusion surgery is not clinically indicated."
   },
   {
     "vignette_id": "DEV-OPD-VEIN-APP",
     "policy_id": "OPD-VEIN",
     "vignette_type": "APPROVED",
-    "title": "Qualifying Clinical Scenario for Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+    "title": "Symptomatic great saphenous insufficiency with 1200ms reflux failing stockings",
     "expected_decision": "APPROVED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovenous Ablation Therapy for Varicose Veins of Lower Extremity (OPD-VEIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Endovenous Ablation Therapy for Varicose Veins of Lower Extremity. Diagnostic clinical assessment demonstrates venous reflux: 505.0 ms. Patient completed trial of compression stockings for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo spider veins only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Endovenous Ablation Therapy for Varicose Veins of Lower Extremity (OPD-VEIN). Plan to proceed with procedure."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Vascular Surgery Outpatient Clinic\nSUBJECTIVE: 52-year-old presenting with severe aching, throbbing, and heavy sensation in right lower extremity after standing for more than 30 minutes at work. Symptoms present for 2 years. Patient has worn prescription 20-30 mmHg graduated compression stockings daily for 16 weeks with persistent painful swelling. Denies cosmetic concerns.\nOBJECTIVE: Visible tortuous bulging varicosities along the medial right calf with stasis hyperpigmentation. Standing duplex ultrasound demonstrates great saphenous vein reflux duration of 1450 ms at the saphenofemoral junction with vein diameter of 7.8 mm.\nASSESSMENT & PLAN: Symptomatic severe saphenofemoral incompetence with duplex-verified pathological venous reflux refractory to 4 months graduated compression therapy. Plan: Right great saphenous endovenous radiofrequency ablation."
   },
   {
     "vignette_id": "DEV-OPD-VEIN-NEG",
     "policy_id": "OPD-VEIN",
     "vignette_type": "NEGATIVE_FRAMED",
-    "title": "Disqualified Clinical Scenario with Exclusion for Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+    "title": "Isolated spider veins without axial reflux or compression trial",
     "expected_decision": "DENIED",
-    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovenous Ablation Therapy for Varicose Veins of Lower Extremity (OPD-VEIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Endovenous Ablation Therapy for Varicose Veins of Lower Extremity. Diagnostic assessment demonstrates non-qualifying venous reflux: 490.0 ms. Inadequate trial: patient discontinued compression stockings after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented spider veins only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-VEIN due to active spider veins only."
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Vascular Surgery Outpatient Clinic\nSUBJECTIVE: 30-year-old presenting requesting laser therapy for spider veins on the lateral thighs before summer vacation. Patient denies leg heaviness, swelling, or pain.\nOBJECTIVE: Lower extremity examination reveals small superficial telangiectasias and spider veins only. Bilateral standing duplex ultrasound demonstrates normal valvular competence with venous reflux under 150 ms in all deep and superficial veins.\nASSESSMENT & PLAN: Asymptomatic superficial telangiectasias without pathological venous reflux. Endovenous thermal ablation is contraindicated for cosmetic spider veins."
   }
 ]

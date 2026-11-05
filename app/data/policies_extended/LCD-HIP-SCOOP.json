@@ -119,11 +119,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L35456 governs Nerve Blockade, whereas policy subject is Hip Arthroscopy for FAI. Flagged as needing realignment.",
     "real_cms_id": "LCD L35456",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Hip Arthroscopy",
-    "citation": "CMS Medicare Coverage Database LCD L35456",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Nerve Blockade for Treatment of Chronic Pain and Neuropathy",
+    "mcd_actual_title": "Nerve Blockade for Treatment of Chronic Pain and Neuropathy",
+    "citation": "CMS MCD Document at Cited ID: Nerve Blockade for Treatment of Chronic Pain and Neuropathy",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=35456",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

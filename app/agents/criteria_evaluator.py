@@ -865,6 +865,111 @@ class CriteriaEvaluationAgent:
             temporal_window_met=temporal_window_met
         )
 
+    def evaluate_criterion_agentic(
+        self,
+        criterion_dict: Optional[Dict[str, Any]] = None,
+        ehr_narrative: Optional[str] = None,
+        llm_proposer: Optional[Any] = None,
+        verifier_agent: Optional[Any] = None,
+        policy_id: Optional[str] = None,
+        criterion: Optional[Dict[str, Any]] = None,
+        ehr_text: Optional[str] = None
+    ) -> CriterionAssessment:
+        """
+        Task 2: Agent 2 Autonomous Tool Selection.
+        Per criterion, Agent 2 autonomously decides which extraction method(s) to call:
+        - deterministic_extractor (first pass)
+        - timeline_validator (when temporal duration ambiguity is present)
+        - phenotype_detector / ConText scope detector (when clinical syntax or negation is ambiguous)
+        - llm_proposer (when keywords exist but deterministic extractor missed complex phrasing)
+        Records methods tried, order, selected tool, and selection rationale.
+        """
+        target_criterion = criterion_dict if criterion_dict is not None else (criterion or {})
+        text = ehr_narrative if ehr_narrative is not None else (ehr_text or "")
+
+        methods_tried = ["deterministic_extractor"]
+        order = ["deterministic_extractor"]
+        was_ambiguous = False
+        ambiguity_type = None
+        selected_tool = "deterministic_extractor"
+        selection_rationale = "Deterministic extraction completed without ambiguity."
+
+        # Pass 1: Standard deterministic extraction
+        assessment = self.evaluate_criterion(target_criterion, text)
+
+        code = str(target_criterion.get("criterion_code", ""))
+        name = str(target_criterion.get("name", ""))
+        desc = str(target_criterion.get("description", ""))
+        keywords = target_criterion.get("keywords", [])
+        if isinstance(keywords, str):
+            keywords = [k.strip() for k in keywords.split(",") if k.strip()]
+        text_lower = text.lower()
+        has_keyword_in_note = any(kw.lower() in text_lower for kw in keywords if len(kw) > 3)
+
+        # Ambiguity Check 1: Temporal duration / trial period requirement
+        has_dates = bool(re.search(r'\b\d{4}-\d{2}-\d{2}\b|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b', text, re.I))
+        has_dur_terms = bool(re.search(r'\b(?:\d+|three|six|four|twelve)\s*(?:months?|weeks?|days?|years?)\b', text_lower))
+        is_temporal = bool(
+            target_criterion.get("required_temporal_window")
+            and target_criterion.get("required_temporal_window") != "Not specified"
+        )
+        temporal_semantic_cue = any(term in (code + " " + name + " " + desc).lower() for term in ("trial", "duration", "timeline", "temporal", "waiting period", "months", "weeks"))
+
+        if is_temporal or (temporal_semantic_cue and (has_dates or has_dur_terms)):
+            was_ambiguous = True
+            ambiguity_type = "TEMPORAL_DURATION_ALIGNMENT"
+            methods_tried.append("timeline_validator")
+            order.append("timeline_validator")
+            selected_tool = "timeline_validator"
+            selection_rationale = "Detected explicit temporal duration / trial period requirement; invoked timeline validator for calendar arithmetic."
+
+        # Ambiguity Check 2: Missing evidence but high-salience keywords present
+        elif assessment.status in [DeterminationStatus.INSUFFICIENT_EVIDENCE, DeterminationStatus.NOT_MET] and has_keyword_in_note:
+            was_ambiguous = True
+            ambiguity_type = "MISSING_EVIDENCE_WITH_KEYWORD_MATCH"
+
+            # If LLM proposer is provided or enabled
+            if llm_proposer:
+                methods_tried.append("llm_proposer")
+                order.append("llm_proposer")
+                selected_tool = "llm_proposer"
+                selection_rationale = "Salient policy keywords detected but missed by regex; invoked local LLM proposer behind deterministic gates."
+
+                res = llm_proposer.propose_spans_sync(sanitized_ehr=text, criterion=target_criterion)
+                proposals = res[0] if isinstance(res, tuple) else res.get("proposals", [])
+                for prop in proposals:
+                    gate_res = llm_proposer.evaluate_proposal_through_gates(
+                        proposal=prop,
+                        sanitized_ehr=text,
+                        criterion=target_criterion,
+                        verifier_agent=verifier_agent
+                    )
+                    if gate_res.passed and gate_res.verified_span:
+                        assessment.verified_spans.append(gate_res.verified_span)
+                        if not target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
+                            assessment.status = DeterminationStatus.MET
+                            assessment.clinical_rationale += f" [Grounded LLM Proposal Accepted: '{prop.claimed_text}']"
+                        elif target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
+                            assessment.status = DeterminationStatus.MET
+                            assessment.clinical_rationale += f" [Grounded LLM Proposal Disqualifying: '{prop.claimed_text}']"
+                        break
+            else:
+                methods_tried.append("phenotype_detector")
+                order.append("phenotype_detector")
+                selected_tool = "phenotype_detector"
+                selection_rationale = "Keywords present in narrative with uncertain syntactic bounds; invoked ConText phenotype scope detector."
+
+        tool_selection = {
+            "methods_tried": methods_tried,
+            "order": order,
+            "was_ambiguous": was_ambiguous,
+            "ambiguity_type": ambiguity_type,
+            "selected_tool": selected_tool,
+            "selection_rationale": selection_rationale
+        }
+        assessment.tool_selection = tool_selection
+        return assessment
+
 
 
 
@@ -982,3 +1087,4 @@ def evaluate_patient_against_policy(ehr_text: str, policy: Any) -> Dict[str, Any
         "clinical_rationale": "Clinical narrative lacks one or more required Medicare documentation criteria.",
         "missing_criteria": missing or ["Documentation Deficiency"]
     }
+

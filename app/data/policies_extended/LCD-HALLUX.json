@@ -121,11 +121,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L34195 governs Mohs Micrographic Surgery, whereas policy subject is Bunionectomy / Hallux Valgus. Flagged as needing realignment.",
     "real_cms_id": "LCD L34195",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Surgical Treatment of Hallux Valgus and Other Bunion Deformities",
-    "citation": "CMS Medicare Coverage Database LCD L34195",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Mohs Micrographic Surgery",
+    "mcd_actual_title": "Mohs Micrographic Surgery",
+    "citation": "CMS MCD Document at Cited ID: Mohs Micrographic Surgery",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34195",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

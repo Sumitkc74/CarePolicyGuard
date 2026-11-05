@@ -96,7 +96,8 @@ class DenseSemanticRetriever:
         "total_knee_arthroplasty", "knee_arthroplasty", "knee_osteoarthritis", "total_hip_arthroplasty", "hip_arthroplasty",
         "hip_osteoarthritis", "shoulder_arthroplasty", "reverse_shoulder_arthroplasty", "rotator_cuff", "rotator_cuff_tear",
         "supraspinatus_tear", "hip_arthroscopy", "femoroacetabular_impingement", "fai", "labral_tear", "cam_lesion",
-        "knee_orthosis", "oa_knee_brace", "hallux_valgus", "bunionectomy", "intermetatarsal_angle", "chondrocyte_implantation", "aci",
+        "knee_orthosis", "oa_knee_brace", "knee_brace", "hallux_valgus", "bunionectomy", "intermetatarsal_angle", "chondrocyte_implantation", "aci",
+        "meniscus", "meniscal", "meniscectomy", "meniscal_tear", "knee_arthroscopy",
         # 5. Spine & Interventional Pain
         "anterior_cervical_discectomy_and_fusion", "acdf", "cervical_radiculopathy", "cervical_myelopathy",
         "lumbar_decompression", "lumbar_laminectomy", "lumbar_spinal_stenosis", "lumbar_fusion", "spondylolisthesis",

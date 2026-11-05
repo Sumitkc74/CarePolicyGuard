@@ -125,11 +125,13 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-05",
+    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
     "real_cms_id": "LCD L33569",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Percutaneous Vertebral Augmentation",
-    "citation": "CMS Medicare Coverage Database LCD L33569 / L34106",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33569",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "authority": "Palmetto GBA / Noridian",
+    "document_title": "Percutaneous Vertebral Augmentation (PVA) for Osteoporotic Vertebral Compression Fracture (VCF)",
+    "citation": "CMS MCD: Percutaneous Vertebral Augmentation (PVA) for Osteoporotic Vertebral Compression Fracture (VCF) (LCD L33569)",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33569"
   }
 }

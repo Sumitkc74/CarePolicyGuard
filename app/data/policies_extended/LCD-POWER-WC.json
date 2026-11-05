@@ -123,11 +123,13 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-05",
+    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
     "real_cms_id": "LCD L33789",
-    "authority": "DME MAC LCD",
+    "authority": "DME MAC (Noridian / CGS)",
     "document_title": "Power Mobility Devices",
-    "citation": "CMS Medicare Coverage Database LCD L33789",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33789",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "citation": "CMS MCD: Power Mobility Devices (LCD L33789)",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33789"
   }
 }

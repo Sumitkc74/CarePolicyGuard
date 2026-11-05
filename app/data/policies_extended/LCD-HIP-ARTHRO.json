@@ -121,11 +121,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L34032 governs Debridement Services, whereas policy subject is Total Hip Arthroplasty (THA). Flagged as needing realignment.",
     "real_cms_id": "LCD L34032",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Total Joint Arthroplasty: Hip",
-    "citation": "CMS Medicare Coverage Database LCD L34032",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Debridement Services",
+    "mcd_actual_title": "Debridement Services",
+    "citation": "CMS MCD Document at Cited ID: Debridement Services",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34032",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

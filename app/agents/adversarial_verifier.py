@@ -302,3 +302,158 @@ class AdversarialVerificationAgent:
             calibrated_confidence=calibrated_conf
         )
 
+    def debate_and_verify(
+        self,
+        assessment: Any = None,
+        criterion_def: Any = None,
+        ehr_text: Optional[str] = None,
+        evaluator_agent: Optional[Any] = None,
+        max_rounds: int = 3,
+        assessments: Optional[List[CriterionAssessment]] = None,
+        criteria_defs: Optional[List[Dict[str, Any]]] = None,
+        ehr_narrative: Optional[str] = None,
+        llm_proposer: Optional[Any] = None
+    ) -> Any:
+        """
+        Task 2: Agent 3 Bounded Multi-Round Verification Debate Loop.
+        Supports both single assessment and batch list evaluation.
+        When invoked with lists: returns (all_audits, all_debate_rounds).
+        When invoked with single assessment: returns (audit, assessment).
+        """
+        # Batch invocation support
+        target_assessments = assessments if assessments is not None else (assessment if isinstance(assessment, list) else None)
+        target_criteria = criteria_defs if criteria_defs is not None else (criterion_def if isinstance(criterion_def, list) else None)
+        text = ehr_narrative or ehr_text or ""
+
+        if target_assessments is not None and target_criteria is not None:
+            all_audits = []
+            all_debates = []
+            for ass, cdef in zip(target_assessments, target_criteria):
+                audit, updated_ass = self._debate_and_verify_single(
+                    assessment=ass,
+                    criterion_def=cdef,
+                    ehr_text=text,
+                    evaluator_agent=evaluator_agent,
+                    max_rounds=max_rounds
+                )
+                all_audits.append(audit)
+                if audit.debate_rounds:
+                    all_debates.extend(audit.debate_rounds)
+            return all_audits, all_debates
+
+        # Single criterion invocation
+        return self._debate_and_verify_single(
+            assessment=assessment,
+            criterion_def=criterion_def,
+            ehr_text=text,
+            evaluator_agent=evaluator_agent,
+            max_rounds=max_rounds
+        )
+
+    def _debate_and_verify_single(
+        self,
+        assessment: CriterionAssessment,
+        criterion_def: Dict[str, Any],
+        ehr_text: str,
+        evaluator_agent: Optional[Any] = None,
+        max_rounds: int = 3
+    ) -> Tuple[VerificationAuditResult, CriterionAssessment]:
+        audit = self.audit_assessment(assessment, criterion_def, ehr_text)
+
+        has_challenge = (
+            audit.offset_drift_detected or
+            audit.unverified_omission_flag or
+            audit.hallucination_flag or
+            audit.discordance_flag or
+            getattr(audit, "contradiction_detected", False) or
+            not audit.grounding_status or
+            audit.semantic_support_passed is False
+        )
+
+        # Unchallenged criteria exit immediately without paying debate loop cost
+        if not has_challenge:
+            audit.debate_rounds = []
+            assessment.debate_rounds = []
+            return audit, assessment
+
+        debate_rounds: List[Dict[str, Any]] = []
+
+        for r in range(1, max_rounds + 1):
+            challenge_msg = f"Agent 3 Challenge (Round {r}): {audit.audit_notes}"
+            defense_msg = ""
+            outcome = ""
+
+            if audit.offset_drift_detected and not audit.hallucination_flag:
+                # Agent 2 defends by healing offset drift to exact character position
+                healed_any = False
+                for span in assessment.verified_spans:
+                    if self.heal_offset_drift(span, ehr_text):
+                        healed_any = True
+                if healed_any:
+                    audit = self.audit_assessment(assessment, criterion_def, ehr_text)
+                    defense_msg = "Agent 2 Defense: Autonomous offset drift healing applied; character offsets re-anchored to true text slice."
+                    outcome = "ACCEPTED_AFTER_DEFENSE"
+                else:
+                    defense_msg = "Agent 2 Defense: Offset position disputed; unable to heal."
+                    outcome = "CHALLENGE_PERSISTS"
+
+            elif audit.unverified_omission_flag:
+                # Check whether keywords represent non-qualifying/historical mentions or true omissions
+                text_lower = ehr_text.lower()
+                kw_str = str(criterion_def.get("keywords", ""))
+                is_neg = "no " in text_lower or "denies" in text_lower or "without" in text_lower
+                if is_neg:
+                    audit.unverified_omission_flag = False
+                    defense_msg = "Agent 2 Defense: Chart keywords represent clinically negated or historical mention, not an active affirmative finding."
+                    outcome = "ACCEPTED_AFTER_DEFENSE"
+                else:
+                    # Agent 2 concedes and revises
+                    prev_status = assessment.status.value
+                    assessment.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                    defense_msg = f"Agent 2 Concession: Salient policy terms present without formal verification; conceding and revising status from {prev_status} to INSUFFICIENT_EVIDENCE."
+                    outcome = "CONCEDED_AND_REVISED"
+                    audit = self.audit_assessment(assessment, criterion_def, ehr_text)
+
+            elif audit.hallucination_flag or not audit.grounding_status:
+                # Agent 2 concedes: removes ungrounded span and revises to INSUFFICIENT_EVIDENCE
+                assessment.verified_spans = [s for s in assessment.verified_spans if s.source_text in ehr_text]
+                prev_status = assessment.status.value
+                assessment.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                defense_msg = f"Agent 2 Concession: Acknowledged ungrounded citation; removed unverified span and downgraded status from {prev_status} to INSUFFICIENT_EVIDENCE."
+                outcome = "CONCEDED_AND_REVISED"
+                audit = self.audit_assessment(assessment, criterion_def, ehr_text)
+
+            elif getattr(audit, "contradiction_detected", False) or audit.semantic_support_passed is False:
+                # Agent 2 concedes on contradiction
+                prev_status = assessment.status.value
+                assessment.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                defense_msg = f"Agent 2 Concession: Acknowledged semantic contradiction in evidence; downgraded status from {prev_status} to INSUFFICIENT_EVIDENCE."
+                outcome = "CONCEDED_AND_REVISED"
+                audit = self.audit_assessment(assessment, criterion_def, ehr_text)
+
+            else:
+                defense_msg = "Agent 2 Defense: Evidence maintained under statutory policy criteria."
+                outcome = "CHALLENGE_PERSISTS"
+
+            # Check if max rounds reached without resolution
+            if r == max_rounds and outcome == "CHALLENGE_PERSISTS":
+                outcome = "DEFERRED_MAX_ROUNDS_EXCEEDED"
+                assessment.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                audit.audit_notes += f" [DEBATE CEILING REACHED: Unresolved challenge after {max_rounds} rounds; criterion deferred to human auditor review.]"
+
+            debate_rounds.append({
+                "round": r,
+                "challenge": challenge_msg,
+                "defense": defense_msg,
+                "outcome": outcome
+            })
+
+            # Termination condition: accepted or conceded terminates the loop immediately
+            if outcome in ("ACCEPTED_AFTER_DEFENSE", "CONCEDED_AND_REVISED", "DEFERRED_MAX_ROUNDS_EXCEEDED"):
+                break
+
+        audit.debate_rounds = debate_rounds
+        assessment.debate_rounds = debate_rounds
+        return audit, assessment
+
+

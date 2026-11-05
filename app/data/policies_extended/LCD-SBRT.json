@@ -119,11 +119,13 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "real_cms_id": "LCD L34678",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Stereotactic Body Radiation Therapy",
-    "citation": "CMS Medicare Coverage Database LCD L34678 / L35077",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34678",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
+    "checked_date": "2026-11-05",
+    "notes": "No MCD document found at previously cited identifier L34678 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
+    "real_cms_id": null,
+    "authority": "Author Summary (No CMS source located)",
+    "document_title": null,
+    "citation": null,
+    "url": null
   }
 }

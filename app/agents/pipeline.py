@@ -20,6 +20,7 @@ from app.agents.adversarial_verifier import AdversarialVerificationAgent
 from app.agents.abstention_gate import CalibratedAbstentionGate
 from app.agents.critic_agent import CriticAgent
 from app.agents.missing_evidence_agent import MissingEvidenceAgent
+from app.agents.llm_proposer import LLMProposalAgent
 from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.agents.state_machine import ClinicalAdjudicationStateMachine
 from app.db.models import AdjudicationLog, MedicarePolicy
@@ -45,6 +46,7 @@ class MultiAgentVerificationPipeline:
         self.verifier_agent = AdversarialVerificationAgent()
         self.critic_agent = CriticAgent()
         self.missing_evidence_agent = MissingEvidenceAgent()
+        self.llm_proposer = LLMProposalAgent()
         self.abstention_gate = CalibratedAbstentionGate(tau=settings.ABSTENTION_THRESHOLD)
         self.state_machine = ClinicalAdjudicationStateMachine(db=db, tau=settings.ABSTENTION_THRESHOLD)
 
@@ -158,33 +160,28 @@ class MultiAgentVerificationPipeline:
             state_transitions = [t.model_dump() for t in sm_engine.transitions]
             criteria_assessments = sm_res.get("criterion_assessments", [])
             verification_audits = sm_res.get("verification_audits", [])
+            agent2_tool_decisions = []
+            agent3_debate_rounds = []
         elif execution_mode == "declarative":
             # Declarative Adjudication Mode:
             # Direct policy-as-data evaluation using DeclarativePolicyEngine, followed by Agent 3 & Agent 4
             from app.services.declarative_engine import DeclarativePolicyEngine
             criteria_assessments = []
+            agent2_tool_decisions = []
             for crit in criteria_defs:
                 decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
                 assessment = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
                 criteria_assessments.append(assessment)
 
-            # 4. Agent 3: Adversarial Verification
-            verification_audits = []
-            for assessment, crit_def in zip(criteria_assessments, criteria_defs):
-                audit_result = self.verifier_agent.audit_assessment(assessment, crit_def, sanitized_ehr)
-                verification_audits.append(audit_result)
-
-            # 4b. Autonomous Offset Drift Healing Feedback Loop
-            for assessment, audit in zip(criteria_assessments, verification_audits):
-                if audit.offset_drift_detected and not audit.hallucination_flag:
-                    for span in assessment.verified_spans:
-                        healed = self.verifier_agent.heal_offset_drift(span, sanitized_ehr)
-                        if healed:
-                            audit.offset_drift_detected = False
-                            audit.healed_offset_drift = True
-                            audit.grounding_status = True
-                            audit.calibrated_confidence = assessment.raw_confidence
-                            audit.audit_notes += " [AUTONOMOUSLY HEALED: Offset drift corrected to true text position.]"
+            # 4. Agent 3: Adversarial Verification (Multi-Round Debate Loop)
+            verification_audits, agent3_debate_rounds = self.verifier_agent.debate_and_verify(
+                assessments=criteria_assessments,
+                criteria_defs=criteria_defs,
+                ehr_narrative=sanitized_ehr,
+                evaluator_agent=self.evaluator_agent,
+                llm_proposer=self.llm_proposer,
+                max_rounds=3
+            )
 
             # 5. Agent 4: Calibrated Abstention Gate
             gate = CalibratedAbstentionGate(tau=gate_tau)
@@ -197,29 +194,32 @@ class MultiAgentVerificationPipeline:
                 clinician_action_notes
             ) = gate.evaluate(criteria_assessments, verification_audits)
         else:
-            # 3. Agent 2: Criteria Evaluation
+            # 3. Agent 2: Criteria Evaluation (Agentic Tool Selection)
             criteria_assessments = []
+            agent2_tool_decisions = []
             for crit in criteria_defs:
-                assessment = self.evaluator_agent.evaluate_criterion(crit, sanitized_ehr)
+                assessment = self.evaluator_agent.evaluate_criterion_agentic(
+                    criterion_dict=crit,
+                    ehr_narrative=sanitized_ehr,
+                    llm_proposer=self.llm_proposer,
+                    policy_id=policy_id
+                )
                 criteria_assessments.append(assessment)
+                if assessment.tool_selection:
+                    agent2_tool_decisions.append({
+                        "criterion_code": assessment.criterion_code,
+                        **assessment.tool_selection
+                    })
 
-            # 4. Agent 3: Adversarial Verification
-            verification_audits = []
-            for assessment, crit_def in zip(criteria_assessments, criteria_defs):
-                audit_result = self.verifier_agent.audit_assessment(assessment, crit_def, sanitized_ehr)
-                verification_audits.append(audit_result)
-
-            # 4b. Autonomous Offset Drift Healing Feedback Loop
-            for assessment, audit in zip(criteria_assessments, verification_audits):
-                if audit.offset_drift_detected and not audit.hallucination_flag:
-                    for span in assessment.verified_spans:
-                        healed = self.verifier_agent.heal_offset_drift(span, sanitized_ehr)
-                        if healed:
-                            audit.offset_drift_detected = False
-                            audit.healed_offset_drift = True
-                            audit.grounding_status = True
-                            audit.calibrated_confidence = assessment.raw_confidence
-                            audit.audit_notes += " [AUTONOMOUSLY HEALED: Offset drift corrected to true text position.]"
+            # 4. Agent 3: Adversarial Verification (Multi-Round Debate Loop)
+            verification_audits, agent3_debate_rounds = self.verifier_agent.debate_and_verify(
+                assessments=criteria_assessments,
+                criteria_defs=criteria_defs,
+                ehr_narrative=sanitized_ehr,
+                evaluator_agent=self.evaluator_agent,
+                llm_proposer=self.llm_proposer,
+                max_rounds=3
+            )
 
             # 5. Agent 4: Calibrated Abstention Gate
             gate = CalibratedAbstentionGate(tau=gate_tau)
@@ -347,6 +347,42 @@ class MultiAgentVerificationPipeline:
         insufficient_criteria = [c.criterion_code for c in criteria_assessments if c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE and not c.is_exclusion]
         deferral_reason = abstention_reason if decision == AdjudicationDecision.DEFERRED_TO_HUMAN else None
 
+        # 5h. Agent 4 Candidate Tau & Agentic Audit Trail (Task 1 & Task 2)
+        candidate_tau_analysis = self.abstention_gate.derive_candidate_tau()
+        agentic_audit_trail = {
+            "agent_1_retrieval": {
+                "selected_policy_id": policy_id,
+                "policy_title": policy_title,
+                "auto_discovered": is_auto_policy,
+                "tool_used": "HybridPolicyRetriever (BM25 + Dense RRF)",
+                "top_candidates": (retrieval_insights.get("candidates", []) if retrieval_insights else [])[:5]
+            },
+            "agent_2_tool_selection": agent2_tool_decisions,
+            "agent_3_debate_rounds": agent3_debate_rounds,
+            "agent_4_abstention_gate": {
+                "operative_tau": gate_tau,
+                "candidate_tau": candidate_tau_analysis.get("candidate_tau"),
+                "candidate_label": candidate_tau_analysis.get("label"),
+                "abstention_activated": abstention_status,
+                "decision": decision.value,
+                "sufficiency_score": calibrated_aggregate_conf
+            }
+        }
+
+        llm_telemetry = self.llm_proposer.telemetry
+        llm_proposal_metadata = {
+            "enabled": settings.ENABLE_LLM_PROPOSAL_STEP,
+            "model": settings.LOCAL_LLM_MODEL,
+            "timeout_seconds": settings.LOCAL_LLM_TIMEOUT_SECONDS,
+            "total_calls": llm_telemetry.get("total_calls", 0),
+            "proposals_generated": llm_telemetry.get("proposals_generated", 0),
+            "gate_a_rejections": llm_telemetry.get("gate_a_rejections", 0),
+            "gate_b_rejections": llm_telemetry.get("gate_b_rejections", 0),
+            "gate_c_vetoes": llm_telemetry.get("gate_c_vetoes", 0),
+            "proposals_accepted": llm_telemetry.get("proposals_accepted", 0),
+            "total_latency_ms": round(llm_telemetry.get("total_latency_ms", 0.0), 2)
+        }
+
         # 6. Cryptographic Chain-of-Custody Seal (SHA-256)
         all_spans = []
         for ca in criteria_assessments:
@@ -404,7 +440,10 @@ class MultiAgentVerificationPipeline:
             deferral_reason=deferral_reason,
             critic_findings=critic_findings,
             agent_disagreements=agent_disagreements,
-            action_required_questions=action_required_questions
+            action_required_questions=action_required_questions,
+            llm_proposal_metadata=llm_proposal_metadata,
+            agentic_audit_trail=agentic_audit_trail,
+            candidate_tau_analysis=candidate_tau_analysis
         )
 
         # 7. Persistence (Zero-Retention Medical Privacy Safe Harbor)

@@ -45,6 +45,8 @@ class CriterionAssessment(BaseModel):
     clinical_rationale: str = Field(..., description="Reasoning mapping clinical facts to policy requirement")
     raw_confidence: float = Field(..., ge=0.0, le=1.0, description="Uncalibrated model confidence score")
     temporal_window_met: bool | None = Field(default=None, description="Whether temporal prerequisite was satisfied")
+    tool_selection: dict[str, Any] | None = Field(default=None, description="Agent 2 autonomous tool selection decisions (methods, order, rationale)")
+    debate_rounds: list[dict[str, Any]] = Field(default_factory=list, description="Agent 3 multi-round adversarial verification debate audit trail")
 
 class VerificationAuditResult(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -55,6 +57,7 @@ class VerificationAuditResult(BaseModel):
     unverified_omission_flag: bool = Field(..., description="True if criterion was marked NOT_MET but salient clinical terms exist in note without citation")
     offset_drift_detected: bool = Field(..., description="True if text exists but start/end offsets drift from slice")
     discordance_flag: bool = Field(default=False, description="True if conflicting diagnostic measurements or internal contradictions exist across sections")
+    contradiction_detected: bool = Field(default=False, description="True if semantic contradiction detected")
     healed_offset_drift: bool = Field(default=False, description="True if offset drift was autonomously healed by feedback loop")
     semantic_support_passed: bool = Field(default=True, description="True if all supporting evidence spans pass semantic integrity checks")
     semantic_audit_notes: str | None = Field(default=None, description="Detailed semantic breakdown (subject, timing, modality, negation, range)")
@@ -62,6 +65,7 @@ class VerificationAuditResult(BaseModel):
     audit_notes: str = Field(..., description="Detailed adversarial verification audit findings")
     calibrated_confidence: float | None = Field(default=None, ge=0.0, le=1.0, description="Confidence recalibrated after adversarial penalization (null if uncalibrated)")
     sufficiency_score: float = Field(default=0.0, ge=0.0, le=1.0, description="Heuristic sufficiency score for this criterion")
+    debate_rounds: list[dict[str, Any]] = Field(default_factory=list, description="Agent 3 multi-round adversarial verification debate audit trail")
 
 class CodingMatch(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -191,6 +195,11 @@ class FinalAdjudication(BaseModel):
     action_required_questions: list[str] = Field(default_factory=list, description="Targeted clinical questions formulated by MissingEvidenceAgent for human reviewer")
     human_override: dict[str, Any] | None = Field(default=None, description="Recorded human override preserving original system determination")
     original_system_output_json: str | None = Field(default=None, description="Byte-identical JSON serialization of original system determination prior to human override")
+
+    # Task 1 & Task 2: Gated LLM Proposal & Autonomous Agentic Decisions
+    llm_proposal_metadata: dict[str, Any] | None = Field(default=None, description="LLM proposal runtime audit: enabled flag, model, timeout, proposal counts, gate outcomes")
+    agentic_audit_trail: dict[str, Any] | None = Field(default=None, description="Autonomous agentic decisions: Agent 2 tool selections, Agent 3 multi-round debates, Agent 4 queue priority")
+    candidate_tau_analysis: dict[str, Any] | None = Field(default=None, description="Agent 4 candidate tau derived on development data reported alongside operative 0.85")
 
 # Request / Response DTOs
 class PolicyMatchSummary(BaseModel):

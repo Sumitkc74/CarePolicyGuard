@@ -125,11 +125,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L34415 governs CT of Abdomen and Pelvis, whereas policy subject is Peripheral Atherectomy. Flagged as needing realignment.",
     "real_cms_id": "LCD L34415",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Atherectomy, Peripheral",
-    "citation": "CMS Medicare Coverage Database LCD L34415",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "CT of the Abdomen and Pelvis",
+    "mcd_actual_title": "CT of the Abdomen and Pelvis",
+    "citation": "CMS MCD Document at Cited ID: CT of the Abdomen and Pelvis",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34415",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any, Dict
 from app.schemas.contracts import (
     DeterminationStatus,
     AdjudicationDecision,
@@ -187,4 +187,97 @@ class CalibratedAbstentionGate:
             abstention_reason,
             clinician_action_notes
         )
+
+    def derive_candidate_tau(
+        self,
+        dev_dataset: Optional[List[dict]] = None,
+        max_false_approval_rate: float = 0.0
+    ) -> dict:
+        """
+        Task 2: Agent 4 Learns its Deferral Policy.
+        Derives an empirical candidate tau from development data using CalibrationHarness.
+        The candidate threshold is labelled 'derived-on-development-data' and reported
+        alongside operative tau=0.85, never silently replacing it.
+        """
+        if dev_dataset is None:
+            # Default development score profile derived from synthetic dev calibration set
+            dev_dataset = [
+                {"raw_score": 0.95, "is_false_approval": False},
+                {"raw_score": 0.92, "is_false_approval": False},
+                {"raw_score": 0.88, "is_false_approval": False},
+                {"raw_score": 0.85, "is_false_approval": False},
+                {"raw_score": 0.81, "is_false_approval": True},
+                {"raw_score": 0.75, "is_false_approval": True},
+                {"raw_score": 0.60, "is_false_approval": True},
+            ]
+        from app.services.calibration_harness import CalibrationHarness
+        analysis = CalibrationHarness.derive_selective_risk_threshold(dev_dataset, max_false_approval_rate)
+        return {
+            "candidate_tau": analysis["derived_threshold_tau"],
+            "target_false_approval_rate": max_false_approval_rate,
+            "operative_tau": self.tau,
+            "analysis_grid": analysis["analysis_grid"],
+            "label": "derived-on-development-data",
+            "notes": f"Candidate tau={analysis['derived_threshold_tau']} derived on development data at 0% false approval constraint. Operative threshold remains tau={self.tau}."
+        }
+
+    @staticmethod
+    def prioritize_deferral_queue(queue_cases: List[dict]) -> List[dict]:
+        """
+        Task 2: Agent 4 Autonomous Deferral Queue Prioritization.
+        Ranks cases in the human audit deferral queue by statutory policy risk,
+        missing evidence count, and elapsed waiting time.
+        Priority Rule Formula:
+          priority_score = (policy_risk_weight * 40.0) + (min(missing_count, 5) * 6.0) + (min(waiting_time_hours, 72) * 0.5)
+        Where high-risk policies (ICD, TAVR, SCS, PUMP, EVAR, CARDIAC, ACDF, SPINE, ONCOLOGY) have risk_weight=1.0,
+        and standard outpatient diagnostic procedures have risk_weight=0.5.
+        """
+        HIGH_RISK_DOMAINS = ("20.4", "ICD", "TAVR", "SCS", "PUMP", "EVAR", "CARDIAC", "ACDF", "SPINE", "ONCOLOGY")
+        for case in queue_cases:
+            pid = str(case.get("policy_id", "")).upper()
+            risk_weight = 1.0 if any(dom in pid for dom in HIGH_RISK_DOMAINS) else 0.5
+            missing_count = len(case.get("missing_criteria", []))
+            wait_hours = float(case.get("waiting_time_hours", 0.0))
+            score = round((risk_weight * 40.0) + (min(missing_count, 5) * 6.0) + (min(wait_hours, 72) * 0.5), 2)
+            case["priority_score"] = score
+            case["priority_tier"] = "HIGH" if score >= 45.0 else ("MEDIUM" if score >= 30.0 else "ROUTINE")
+
+        return sorted(queue_cases, key=lambda c: c["priority_score"], reverse=True)
+
+    @staticmethod
+    def record_deferral_outcome(
+        case_id: str,
+        policy_id: str,
+        machine_decision: str,
+        human_decision: str,
+        reviewer_role: str,
+        rationale: str,
+        log_file: Optional[Any] = None
+    ) -> dict:
+        """
+        Task 2: Agent 4 Deferral Outcome Logging.
+        Persists human clinical auditor sign-off decisions into a longitudinal outcome log
+        used for calibration retraining and queue policy learning.
+        """
+        import json
+        from pathlib import Path
+        from datetime import datetime, timezone
+        from app.core.config import settings
+
+        entry = {
+            "case_id": case_id,
+            "policy_id": policy_id,
+            "machine_decision": machine_decision,
+            "human_decision": human_decision,
+            "is_override": (machine_decision != human_decision),
+            "reviewer_role": reviewer_role,
+            "rationale": rationale,
+            "recorded_at": datetime.now(timezone.utc).isoformat()
+        }
+        target_path = Path(log_file) if log_file else (Path(settings.BASE_DIR) / "app" / "data" / "deferral_outcomes_log.jsonl")
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(target_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry) + "\n")
+        return entry
+
 

@@ -123,11 +123,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "real_cms_id": "NCD 20.10",
-    "authority": "CMS National Coverage Determination (NCD)",
-    "document_title": "Cardiac Rehabilitation Programs for Certain Conditions",
-    "citation": "Medicare National Coverage Determinations Manual, Chapter 1, Part 1, Section 20.10",
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD database primary key ncdid=164 corresponds to NCD 220.11 'Thermography', whereas policy subject is Cardiac Rehabilitation. NCD 20.10 was retired into 42 CFR \u00a7 410.49. Flagged as needing realignment.",
+    "real_cms_id": "NCD Manual Section 220.11 (MCD ncdid=164)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Thermography",
+    "mcd_actual_title": "Thermography",
+    "citation": "CMS MCD Document at Cited ID: Thermography",
     "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=164",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

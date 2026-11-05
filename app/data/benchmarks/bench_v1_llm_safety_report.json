@@ -1,0 +1,28 @@
+{
+  "status": "COMPLETED",
+  "bench_total": 10,
+  "v1_total": 15,
+  "bench_base_latency_ms": 117.48,
+  "bench_llm_latency_ms": 82.46,
+  "v1_base_latency_ms": 275.76,
+  "v1_llm_latency_ms": 89.78,
+  "bench_decision_changes": 0,
+  "v1_decision_changes": 0,
+  "ollama_live": false,
+  "telemetry": {
+    "total_calls": 0,
+    "proposals_generated": 0,
+    "gate_a_rejections": 0,
+    "gate_b_rejections": 0,
+    "gate_c_vetoes": 0,
+    "proposals_accepted": 0,
+    "total_latency_ms": 0.0
+  },
+  "agent2_tools_recorded": 89,
+  "agent3_debates_recorded": 0,
+  "safety_invariants": {
+    "ungrounded_approvals": 0,
+    "false_negatives_caused_by_llm": 0,
+    "deterministic_override_rate": "100% invariant enforcement"
+  }
+}

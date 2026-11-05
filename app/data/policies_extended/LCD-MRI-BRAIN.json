@@ -123,11 +123,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L34419 governs Serum Homocysteine Level, whereas policy subject is Brain MRI. Flagged as needing realignment.",
     "real_cms_id": "LCD L34419",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Magnetic Resonance Imaging, Brain",
-    "citation": "CMS Medicare Coverage Database LCD L34419",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Homocysteine Level, Serum",
+    "mcd_actual_title": "Homocysteine Level, Serum",
+    "citation": "CMS MCD Document at Cited ID: Homocysteine Level, Serum",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34419",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

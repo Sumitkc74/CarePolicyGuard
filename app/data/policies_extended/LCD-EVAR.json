@@ -117,11 +117,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L35091 governs Cataract Extraction, whereas policy subject is EVAR. Flagged as needing realignment.",
     "real_cms_id": "LCD L35091",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Endovascular Abdominal Aortic Aneurysm Repair",
-    "citation": "CMS Medicare Coverage Database LCD L35091",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Cataract Extraction (including Complex Cataract Surgery)",
+    "mcd_actual_title": "Cataract Extraction (including Complex Cataract Surgery)",
+    "citation": "CMS MCD Document at Cited ID: Cataract Extraction (including Complex Cataract Surgery)",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=35091",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

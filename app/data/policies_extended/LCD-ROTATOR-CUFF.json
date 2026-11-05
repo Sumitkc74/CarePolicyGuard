@@ -119,11 +119,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L34246 governs Routine Foot Care, whereas policy subject is Rotator Cuff Repair. Flagged as needing realignment.",
     "real_cms_id": "LCD L34246",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Rotator Cuff Repair",
-    "citation": "CMS Medicare Coverage Database LCD L34246",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Routine Foot Care and Debridement of Nails",
+    "mcd_actual_title": "Routine Foot Care and Debridement of Nails",
+    "citation": "CMS MCD Document at Cited ID: Routine Foot Care and Debridement of Nails",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34246",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

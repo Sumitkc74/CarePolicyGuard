@@ -121,11 +121,15 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "MISMATCH",
+    "checked_date": "2026-11-05",
+    "notes": "MCD document at L34417 governs 'CT of the Head', whereas policy subject is CT of the Chest with Contrast. Flagged as needing realignment.",
     "real_cms_id": "LCD L34417",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
-    "document_title": "Computed Tomography, Thorax",
-    "citation": "CMS Medicare Coverage Database LCD L34417",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "CT of the Head",
+    "mcd_actual_title": "CT of the Head",
+    "citation": "CMS MCD Document at Cited ID: CT of the Head",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34417",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "alignment_flag": "NEEDS_REALIGNMENT"
   }
 }

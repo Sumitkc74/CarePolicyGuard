@@ -1,119 +1,126 @@
-# CarePolicyGuard Extended Catalog Development Evaluation Report
+# CarePolicyGuard: 50-Policy Development Evaluation Report
 
-> [!IMPORTANT]
-> **DEVELOPMENT NUMBERS ONLY — NOT A HELD-OUT VALIDATION SET**
-> **Evaluation Run Date**: 2026-11-05 18:17:18 UTC
-> **Catalog Scope**: 42 Extended Policies (Slugs `LCD-ACDF` through `OPD-VEIN`)
-> **Dataset Provenance**: `app/data/policies_extended/dev_vignettes_extended.json` (84 synthetic vignettes: 1 clean APPROVED, 1 NEGATIVE per policy)
-> **Execution Harness**: `scripts/evaluate_extended_policies.py` (Zero clinical records, zero patient identities, zero held-out v2 evaluation)
+> **DEVELOPMENT-ONLY BENCHMARK AUDIT NOTICE**
+> **Provenance**: Synthetic Development Vignette Evaluation Set (`dev_vignettes_extended.json`).
+> **Dataset Type**: Author-written synthetic development set (84 cases: 1 approved, 1 negative per policy).
+> **Validation Status**: **DEVELOPMENT-ONLY**. This evaluation tests system behavior against author-written criteria and synthetic notes.
+> **Important Disclosures**:
+> 1. This is **NOT** a held-out validation benchmark. Real-world validation requires clinical EHR datasets with independent clinician ground-truth.
+> 2. Vignettes were constructed from the policies' own criteria definitions to test pipeline retrieval sensitivity and rule evaluation mechanics without circular cues.
+> 3. Zero circular cues: narratives contain no policy slugs, no LCD/NCD identifiers, and no coverage verdict phrases.
+> 4. Criterion traceability for all 42 extended policies remains strictly `CLAIMED_UNVERIFIED` pending independent regulatory audit.
 
-## 1. Executive Summary (Development-Only Metrics)
+**Audit Execution Timestamp**: `2026-11-05 19:11:54 UTC`  
+**Total Extended Policies Audited**: `42`  
+**Total Evaluation Cases**: `84`  
+**Pipeline Decision Threshold**: `tau = 0.85` (unchanged)  
 
-| Evaluation Metric | Development Metric | Total Cases | Target / Status |
+## Overall Development Performance
+
+| Evaluation Metric | Measured Result | Percentage | Benchmark Dataset |
 | :--- | :--- | :--- | :--- |
-| **AUTO Retrieval Top-1 Accuracy** | **100.0%** (84/84) | 84 | Evaluated across 42 clinical domains |
-| **AUTO Retrieval Top-3 Accuracy** | **100.0%** (84/84) | 84 | Evaluated across 42 clinical domains |
-| **Adjudication Decision Accuracy** | **100.0%** (84/84) | 84 | Evaluated against statutory criteria |
+| **AUTO Retrieval Top-1 Accuracy** | `74/84` | **88.1%** | Synthetic Development Set (42 Extended Policies) |
+| **AUTO Retrieval Top-3 Accuracy** | `82/84` | **97.6%** | Synthetic Development Set (42 Extended Policies) |
+| **Adjudication Decision Accuracy** | `35/84` | **41.7%** | Synthetic Development Set (42 Extended Policies) |
 
-## 2. Per-Policy Performance Breakdown
+## Per-Policy Development Results
 
-| Policy ID | Evaluated Cases | Top-1 Retrieval | Top-3 Retrieval | Decision Match | Remaining Discrepancies / Notes |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| `LCD-ACDF` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-ACI` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-CT-CHEST` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-ESI` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-EVAR` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-FACET` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-HALLUX` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-HIP-ARTHRO` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-HIP-SCOOP` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-IMRT` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-KNEE-ARTHRO` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-KNEE-ORTHOSIS` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-KYPHO` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-LUMBAR-DECOMP` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-LUMBAR-FUSION` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-MRI-BRAIN` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-MRI-LUMBAR` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-PAD-ATHERO` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-PCI` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-POWER-WC` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-PROTON` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-RAD-NIV` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-ROTATOR-CUFF` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-SBRT` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-SHOULDER-ARTHRO` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `LCD-WOUND-VAC` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-CARDIAC-REHAB` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-CATARACT` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-CCTA` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-MPI-PET` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-PACEMAKER` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-PET-ONC` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-PUMP` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-SCS` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `NCD-SGD` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `OPD-BLEPH` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `OPD-BOTOX` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `OPD-CERV-DISC` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `OPD-PANNI` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `OPD-RHINO` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `OPD-SI-FUSION` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
-| `OPD-VEIN` | 2 | 2/2 | 2/2 | 2/2 | None (100% agreement) |
+| Policy ID | Total Cases | Top-1 Hits | Top-3 Hits | Decision Matches | Failure Details |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `LCD-ACDF` | 2 | 1/2 | 2/2 | 2/2 | None (Clean) |
+| `LCD-ACI` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `LCD-CT-CHEST` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `LCD-ESI` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `LCD-EVAR` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `LCD-FACET` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `LCD-HALLUX` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `LCD-HIP-ARTHRO` | 2 | 2/2 | 2/2 | 1/2 | DEV-LCD-HIP-ARTHRO-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-HIP-01, CRIT-HIP-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-HIP-SCOOP` | 2 | 2/2 | 2/2 | 1/2 | DEV-LCD-HIP-SCOOP-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-FAI-01, CRIT-FAI-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-IMRT` | 2 | 2/2 | 2/2 | 0/2 | DEV-LCD-IMRT-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-IMRT-01, CRIT-IMRT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-LCD-IMRT-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-IMRT-01, CRIT-IMRT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-KNEE-ARTHRO` | 2 | 2/2 | 2/2 | 1/2 | DEV-LCD-KNEE-ARTHRO-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-KART-01, CRIT-KART-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-KNEE-ORTHOSIS` | 2 | 1/2 | 2/2 | 0/2 | DEV-LCD-KNEE-ORTHOSIS-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-KORTH-01, CRIT-KORTH-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-LCD-KNEE-ORTHOSIS-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-KORTH-01, CRIT-KORTH-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-KYPHO` | 2 | 1/2 | 2/2 | 1/2 | DEV-LCD-KYPHO-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-KYPHO-01, CRIT-KYPHO-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-LUMBAR-DECOMP` | 2 | 2/2 | 2/2 | 0/2 | DEV-LCD-LUMBAR-DECOMP-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-LDEC-01]. Supplementary documentation required. | Calibrated aggregate confidence (0.787) falls below safety threshold tau (0.85).); DEV-LCD-LUMBAR-DECOMP-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-LDEC-01, CRIT-LDEC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-LUMBAR-FUSION` | 2 | 2/2 | 2/2 | 1/2 | DEV-LCD-LUMBAR-FUSION-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-LUMB-01, CRIT-LUMB-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-MRI-BRAIN` | 2 | 2/2 | 2/2 | 0/2 | DEV-LCD-MRI-BRAIN-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-MRIB-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).); DEV-LCD-MRI-BRAIN-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-MRIB-01, CRIT-MRIB-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-MRI-LUMBAR` | 2 | 2/2 | 2/2 | 0/2 | DEV-LCD-MRI-LUMBAR-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-MRIL-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).); DEV-LCD-MRI-LUMBAR-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-MRIL-01, CRIT-MRIL-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-PAD-ATHERO` | 2 | 2/2 | 2/2 | 0/2 | DEV-LCD-PAD-ATHERO-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PAD-01, CRIT-PAD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-LCD-PAD-ATHERO-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PAD-01, CRIT-PAD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-PCI` | 2 | 1/2 | 1/2 | 0/2 | DEV-LCD-PCI-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PCI-01]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).); DEV-LCD-PCI-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PCI-01, CRIT-PCI-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-POWER-WC` | 2 | 2/2 | 2/2 | 0/2 | DEV-LCD-POWER-WC-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PWC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).); DEV-LCD-POWER-WC-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PWC-01, CRIT-PWC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-PROTON` | 2 | 2/2 | 2/2 | 0/2 | DEV-LCD-PROTON-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PBT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).); DEV-LCD-PROTON-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PBT-01, CRIT-PBT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-RAD-NIV` | 2 | 1/2 | 2/2 | 0/2 | DEV-LCD-RAD-NIV-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-NIV-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.793) falls below safety threshold tau (0.85).); DEV-LCD-RAD-NIV-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Potential unverified negative omission detected in [CRIT-NIV-EXCL-01]: EHR mentions clinical criteria terms but marked non-qualifying. | Calibrated aggregate confidence (0.618) falls below safety threshold tau (0.85).) |
+| `LCD-ROTATOR-CUFF` | 2 | 1/2 | 2/2 | 1/2 | DEV-LCD-ROTATOR-CUFF-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-RC-01, CRIT-RC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-SBRT` | 2 | 2/2 | 2/2 | 1/2 | DEV-LCD-SBRT-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SBRT-01, CRIT-SBRT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-SHOULDER-ARTHRO` | 2 | 1/2 | 1/2 | 1/2 | DEV-LCD-SHOULDER-ARTHRO-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SHLD-01, CRIT-SHLD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `LCD-WOUND-VAC` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `NCD-CARDIAC-REHAB` | 2 | 2/2 | 2/2 | 1/2 | DEV-NCD-CARDIAC-REHAB-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-CREH-01, CRIT-CREH-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.650) falls below safety threshold tau (0.85).) |
+| `NCD-CATARACT` | 2 | 2/2 | 2/2 | 0/2 | DEV-NCD-CATARACT-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-CAT-01, CRIT-CAT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-NCD-CATARACT-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-CAT-01, CRIT-CAT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `NCD-CCTA` | 2 | 1/2 | 2/2 | 0/2 | DEV-NCD-CCTA-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-CCTA-01, CRIT-CCTA-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-NCD-CCTA-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-CCTA-01, CRIT-CCTA-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `NCD-MPI-PET` | 2 | 2/2 | 2/2 | 1/2 | DEV-NCD-MPI-PET-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PETM-01]. Supplementary documentation required. | Calibrated aggregate confidence (0.793) falls below safety threshold tau (0.85).) |
+| `NCD-PACEMAKER` | 2 | 2/2 | 2/2 | 0/2 | DEV-NCD-PACEMAKER-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PACE-01, CRIT-PACE-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-NCD-PACEMAKER-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PACE-01, CRIT-PACE-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `NCD-PET-ONC` | 2 | 2/2 | 2/2 | 0/2 | DEV-NCD-PET-ONC-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PTONC-01, CRIT-PTONC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-NCD-PET-ONC-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PTONC-01, CRIT-PTONC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `NCD-PUMP` | 2 | 1/2 | 2/2 | 1/2 | DEV-NCD-PUMP-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-PUMP-01, CRIT-PUMP-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.650) falls below safety threshold tau (0.85).) |
+| `NCD-SCS` | 2 | 1/2 | 2/2 | 0/2 | DEV-NCD-SCS-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SCS-01, CRIT-SCS-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).); DEV-NCD-SCS-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SCS-01, CRIT-SCS-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `NCD-SGD` | 2 | 2/2 | 2/2 | 0/2 | DEV-NCD-SGD-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SGD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).); DEV-NCD-SGD-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SGD-01, CRIT-SGD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `OPD-BLEPH` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `OPD-BOTOX` | 2 | 2/2 | 2/2 | 1/2 | DEV-OPD-BOTOX-APP: expected APPROVED, got DENIED (None) |
+| `OPD-CERV-DISC` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `OPD-PANNI` | 2 | 2/2 | 2/2 | 2/2 | None (Clean) |
+| `OPD-RHINO` | 2 | 2/2 | 2/2 | 0/2 | DEV-OPD-RHINO-APP: expected APPROVED, got DENIED (None); DEV-OPD-RHINO-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-RHINO-01, CRIT-RHINO-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `OPD-SI-FUSION` | 2 | 2/2 | 2/2 | 0/2 | DEV-OPD-SI-FUSION-APP: expected APPROVED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SI-01]. Supplementary documentation required. | Calibrated aggregate confidence (0.793) falls below safety threshold tau (0.85).); DEV-OPD-SI-FUSION-NEG: expected DENIED, got DEFERRED_TO_HUMAN (Insufficient evidence for mandatory coverage criteria: [CRIT-SI-01, CRIT-SI-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).) |
+| `OPD-VEIN` | 2 | 2/2 | 2/2 | 1/2 | DEV-OPD-VEIN-APP: expected APPROVED, got DENIED (None) |
 
-## 3. Retrieval Confusion Matrix (Top-1 Predictions)
+## Confusion Matrix (AUTO Retrieval Top-1)
 
-The following matrix displays intended target policies versus the actual Top-1 retrieved policy during AUTO discovery.
+Shows which candidate policies were selected as Top-1 by the hybrid retriever for each intended policy.
 
-| Expected Policy | Top-1 Predicted Policy | Occurrences | Match Status |
-| :--- | :--- | :---: | :--- |
-| `LCD-ACDF` | `LCD-ACDF` | 2 | Exact Match |
-| `LCD-ACI` | `LCD-ACI` | 2 | Exact Match |
-| `LCD-CT-CHEST` | `LCD-CT-CHEST` | 2 | Exact Match |
-| `LCD-ESI` | `LCD-ESI` | 2 | Exact Match |
-| `LCD-EVAR` | `LCD-EVAR` | 2 | Exact Match |
-| `LCD-FACET` | `LCD-FACET` | 2 | Exact Match |
-| `LCD-HALLUX` | `LCD-HALLUX` | 2 | Exact Match |
-| `LCD-HIP-ARTHRO` | `LCD-HIP-ARTHRO` | 2 | Exact Match |
-| `LCD-HIP-SCOOP` | `LCD-HIP-SCOOP` | 2 | Exact Match |
-| `LCD-IMRT` | `LCD-IMRT` | 2 | Exact Match |
-| `LCD-KNEE-ARTHRO` | `LCD-KNEE-ARTHRO` | 2 | Exact Match |
-| `LCD-KNEE-ORTHOSIS` | `LCD-KNEE-ORTHOSIS` | 2 | Exact Match |
-| `LCD-KYPHO` | `LCD-KYPHO` | 2 | Exact Match |
-| `LCD-LUMBAR-DECOMP` | `LCD-LUMBAR-DECOMP` | 2 | Exact Match |
-| `LCD-LUMBAR-FUSION` | `LCD-LUMBAR-FUSION` | 2 | Exact Match |
-| `LCD-MRI-BRAIN` | `LCD-MRI-BRAIN` | 2 | Exact Match |
-| `LCD-MRI-LUMBAR` | `LCD-MRI-LUMBAR` | 2 | Exact Match |
-| `LCD-PAD-ATHERO` | `LCD-PAD-ATHERO` | 2 | Exact Match |
-| `LCD-PCI` | `LCD-PCI` | 2 | Exact Match |
-| `LCD-POWER-WC` | `LCD-POWER-WC` | 2 | Exact Match |
-| `LCD-PROTON` | `LCD-PROTON` | 2 | Exact Match |
-| `LCD-RAD-NIV` | `LCD-RAD-NIV` | 2 | Exact Match |
-| `LCD-ROTATOR-CUFF` | `LCD-ROTATOR-CUFF` | 2 | Exact Match |
-| `LCD-SBRT` | `LCD-SBRT` | 2 | Exact Match |
-| `LCD-SHOULDER-ARTHRO` | `LCD-SHOULDER-ARTHRO` | 2 | Exact Match |
-| `LCD-WOUND-VAC` | `LCD-WOUND-VAC` | 2 | Exact Match |
-| `NCD-CARDIAC-REHAB` | `NCD-CARDIAC-REHAB` | 2 | Exact Match |
-| `NCD-CATARACT` | `NCD-CATARACT` | 2 | Exact Match |
-| `NCD-CCTA` | `NCD-CCTA` | 2 | Exact Match |
-| `NCD-MPI-PET` | `NCD-MPI-PET` | 2 | Exact Match |
-| `NCD-PACEMAKER` | `NCD-PACEMAKER` | 2 | Exact Match |
-| `NCD-PET-ONC` | `NCD-PET-ONC` | 2 | Exact Match |
-| `NCD-PUMP` | `NCD-PUMP` | 2 | Exact Match |
-| `NCD-SCS` | `NCD-SCS` | 2 | Exact Match |
-| `NCD-SGD` | `NCD-SGD` | 2 | Exact Match |
-| `OPD-BLEPH` | `OPD-BLEPH` | 2 | Exact Match |
-| `OPD-BOTOX` | `OPD-BOTOX` | 2 | Exact Match |
-| `OPD-CERV-DISC` | `OPD-CERV-DISC` | 2 | Exact Match |
-| `OPD-PANNI` | `OPD-PANNI` | 2 | Exact Match |
-| `OPD-RHINO` | `OPD-RHINO` | 2 | Exact Match |
-| `OPD-SI-FUSION` | `OPD-SI-FUSION` | 2 | Exact Match |
-| `OPD-VEIN` | `OPD-VEIN` | 2 | Exact Match |
+| Intended Policy | `LCD-ACDF` | `LCD-ACI` | `LCD-CT-CHEST` | `LCD-ESI` | `LCD-EVAR` | `LCD-FACET` | `LCD-HALLUX` | `LCD-HIP-ARTHRO` | `LCD-HIP-SCOOP` | `LCD-IMRT` | `LCD-KNEE-ARTHRO` | `LCD-KNEE-ORTHOSIS` | `LCD-KYPHO` | `LCD-LUMBAR-DECOMP` | `LCD-LUMBAR-FUSION` | `LCD-MRI-BRAIN` | `LCD-MRI-LUMBAR` | `LCD-PAD-ATHERO` | `LCD-PCI` | `LCD-POWER-WC` | `LCD-PROTON` | `LCD-RAD-NIV` | `LCD-ROTATOR-CUFF` | `LCD-SBRT` | `LCD-SHOULDER-ARTHRO` | `LCD-WOUND-VAC` | `NCD-CARDIAC-REHAB` | `NCD-CATARACT` | `NCD-CCTA` | `NCD-MPI-PET` | `NCD-PACEMAKER` | `NCD-PET-ONC` | `NCD-PUMP` | `NCD-SCS` | `NCD-SGD` | `OPD-BLEPH` | `OPD-BOTOX` | `OPD-CERV-DISC` | `OPD-PANNI` | `OPD-RHINO` | `OPD-SI-FUSION` | `OPD-VEIN` | Other / None |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| `LCD-ACDF` | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . |
+| `LCD-ACI` | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-CT-CHEST` | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-ESI` | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-EVAR` | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-FACET` | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-HALLUX` | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-HIP-ARTHRO` | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-HIP-SCOOP` | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-IMRT` | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-KNEE-ARTHRO` | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-KNEE-ORTHOSIS` | . | . | . | . | . | . | . | . | . | . | 1 | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-KYPHO` | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-LUMBAR-DECOMP` | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-LUMBAR-FUSION` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-MRI-BRAIN` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-MRI-LUMBAR` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-PAD-ATHERO` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-PCI` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-POWER-WC` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-PROTON` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-RAD-NIV` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 |
+| `LCD-ROTATOR-CUFF` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-SBRT` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `LCD-SHOULDER-ARTHRO` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 |
+| `LCD-WOUND-VAC` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `NCD-CARDIAC-REHAB` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `NCD-CATARACT` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `NCD-CCTA` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `NCD-MPI-PET` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . | . |
+| `NCD-PACEMAKER` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . | . |
+| `NCD-PET-ONC` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . | . | . | . |
+| `NCD-PUMP` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . | . |
+| `NCD-SCS` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 1 | . | . | . | . | . | . | . | . | . |
+| `NCD-SGD` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . | . |
+| `OPD-BLEPH` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . | . |
+| `OPD-BOTOX` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . | . |
+| `OPD-CERV-DISC` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . | . |
+| `OPD-PANNI` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . | . |
+| `OPD-RHINO` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . | . |
+| `OPD-SI-FUSION` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . | . |
+| `OPD-VEIN` | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | . | 2 | . |
 
-## 4. Policy Traceability and Audit Integrity
-
-- **Criteria Provenance Status**: All 126 criteria across the 42 extended policies remain explicitly categorized as `CLAIMED_UNVERIFIED`.
-- **Statutory References**: Machine-readable CMS manual sections, LCD numbers, and 42 CFR citations are cataloged in `app/data/policies_extended/PROVENANCE.md`.
-- **Retriever Concept Coverage**: The dense semantic vocabulary covers all 42 extended clinical domains in `app/services/hybrid_retriever.py` with zero reliance on placeholder defaults.
-- **Resilient Fallback**: Fallback chunks cover all 50 policies when the database is unseeded.
+## Verification and Honesty Notes
+- **Forbidden Phrase Scan**: Verified 0 occurrences of policy slugs, LCD/NCD identifiers, or coverage verdict phrases in vignette texts.
+- **Retrieval Architecture**: Evaluated under `HybridPolicyRetriever` combining BM25 keyword matching with expanded domain clinical concept vocabulary.
+- **Adjudication Mechanics**: Evaluated under `DeclarativePolicyEngine` character-anchored extraction and ConText negation scoping.
+- **Status**: Development baseline only. All extended policies remain `CLAIMED_UNVERIFIED` at the criterion level.

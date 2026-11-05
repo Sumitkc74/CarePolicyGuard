@@ -121,11 +121,13 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-05",
+    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
     "real_cms_id": "LCD L38773",
-    "authority": "Medicare Administrative Contractor (MAC) LCD",
+    "authority": "Noridian Healthcare Solutions, LLC",
     "document_title": "Facet Joint Interventions for Pain Management",
-    "citation": "CMS Medicare Coverage Database LCD L38773",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=38773",
-    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+    "citation": "CMS MCD: Facet Joint Interventions for Pain Management (LCD L38773)",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=38773"
   }
 }

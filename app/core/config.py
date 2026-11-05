@@ -50,6 +50,13 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = float(os.getenv("LLM_TEMPERATURE", "0.7"))
     LLM_SAMPLE_PASSES: int = int(os.getenv("LLM_SAMPLE_PASSES", "3"))
 
+    # Local Ollama LLM Proposal Agent (Task 1: AI inside the system behind deterministic gates)
+    # Default-off; when enabled, connects to local Ollama runtime only (no remote egress)
+    ENABLE_LLM_PROPOSAL_STEP: bool = os.getenv("ENABLE_LLM_PROPOSAL_STEP", "false").lower() in ("true", "1", "yes")
+    LOCAL_LLM_URL: str = os.getenv("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
+    LOCAL_LLM_MODEL: str = os.getenv("LOCAL_LLM_MODEL", "qwen2.5:3b")
+    LOCAL_LLM_TIMEOUT_SECONDS: float = float(os.getenv("LOCAL_LLM_TIMEOUT_SECONDS", "5.0"))
+
     # CORS & Networking
     HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", "8000"))

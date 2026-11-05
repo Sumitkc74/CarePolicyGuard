@@ -72,19 +72,19 @@ The **10 benchmark clinical vignettes** (`BENCH-01` through `BENCH-10`) were eng
 
 ![CarePolicyGuard System Architecture Flow](assets/system_architecture_diagram.png)
 
-CarePolicyGuard is structured as an enterprise-grade **3-Tier Clinical Architecture** designed to separate client presentation, neuro-symbolic multi-agent orchestration, and cryptographic data governance:
+CarePolicyGuard is structured as an enterprise-grade **3-Tier Neuro-Symbolic Multi-Agent Architecture** designed to separate client presentation, autonomous multi-agent orchestration, and cryptographic data governance:
 
 ```
 +------------------------------------+
-| 1. FRONTEND                        |
-| Technology: HTML5, CSS, JS         |
-| Role: Web Dashboard & Note Entry   |
+| 1. PRESENTATION TIER               |
+| Technology: HTML5, CSS3, ES6       |
+| Role: Clinician UI, Queue, Sign-Off|
 +-----------------+------------------+
                   |
                   |  [Submits Patient Note]
                   v
 +-----------------+------------------+
-| 2. BACKEND API                     |
+| 2. BACKEND & GATEWAY TIER          |
 | Technology: FastAPI, Python 3.12   |
 | Role: Async Gateway & HIPAA Masking|
 +--------+------------------+--------+
@@ -92,43 +92,83 @@ CarePolicyGuard is structured as an enterprise-grade **3-Tier Clinical Architect
          | [Top Branch]     | [Bottom Branch]
          v                  v
 +--------+---------+   +----+--------------+
-| 3A. RAG ENGINE   |   | 3B. AI AGENTS     |
+| 3A. RETRIEVAL    |   | 3B. AGENT 2 & 3   |
 | Technology:      |   | Technology:       |
-| Hybrid Lexical-  |   | Gemini 1.5, GPT-4 |
-| Semantic Engine  |   | Python Math Engine|
+| BM25 + Dense RRF |   | Tool Chooser,     |
+| Curated MCD 50   |   | Multi-Round Debate|
 | Role:            |   | Role:             |
-| CMS NCD/LCD Rules|   | Extraction & Math |
+| Policy Discovery |   | Extract & Dispute |
 +--------+---------+   +----+--------------+
          |                  |
-         | [Merges Here]    | [Merges Here]
+         | [Merged Graph]   | [Merged Graph]
          +--------+---------+
                   |
                   v
 +-----------------+------------------+
-| 4. CALIBRATED GATE                 |
-| Technology: Python Substring Slice |
-| Role: Offset Check & tau >= 0.85   |
+| 4. CALIBRATED ABSTENTION GATE      |
+| Technology: Selective Risk (0.85)  |
+| Role: Autonomous vs Human Deferral |
 +-----------------+------------------+
                   |
                   |  [Stores & Exports]
                   v
 +-----------------+------------------+
-| 5. DATA AND EXPORT                 |
-| Technology: SQLAlchemy, SHA-256,   |
+| 5. DATA & AUDIT GOVERNANCE         |
+| Technology: SQLAlchemy, SHA-256    |
 |             HL7 FHIR R4 JSON       |
-| Role: Relational DB & Audit Ledger |
+| Role: Relational DB & Ledger       |
 +------------------------------------+
 ```
 
-### Multi-Agent Role Specifications (5 Specialized Agents)
+### Neuro-Symbolic Multi-Agent Specifications
 
-| Agent | Module | Core Functionality |
-| :--- | :--- | :--- |
-| **Agent 1: Policy Retrieval** | `app.agents.policy_retriever` | Ingests and indexes structured CMS coverage policies (NCDs and LCDs). Performs passage chunking and hybrid lexical/semantic matching against patient narratives to retrieve relevant governing criteria. |
-| **Agent 2: Criteria Evaluation** | `app.agents.criteria_evaluator` | Evaluates criteria using deterministic clinical extractors. Detects heart failure phenotypes (HFrEF vs HFpEF), validates imaging modalities (TTE, TEE, CMR, MUGA), computes longitudinal timelines, and extracts character offsets (`[start_char:end_char]`). |
-| **Agent 3: Adversarial Verifier** | `app.agents.adversarial_verifier` | Programmatically verifies character slices (`assert ehr[start:end] == span.text`) to catch hallucinations and offset drifts. Audits potential negative omissions and recalibrates confidence scores via penalization. |
-| **Agent 4: Abstention Gate** | `app.agents.abstention_gate` | Enforces calibrated safety threshold ($\tau = 0.85$). If any criterion exhibits hallucination, negative omission, or drops below $\tau$, the engine withholds autonomous decisions and safely defers to human clinical review. |
-| **Agent 5: Defense Packet & Appeal Generator** | `app.agents.packet_generator` | Synthesizes official CMS prior-authorization defense packets, character-offset audit exhibits, and formal physician peer-to-peer appeal letters mapped to CARC/RARC billing codes. |
+Unlike fixed pipeline stages, CarePolicyGuard's agents execute autonomous decisions, select their own tools, engage in multi-round adversarial debates, and operate behind deterministic bounding gates:
+
+#### Agent 1: Policy Retrieval (`app.agents.policy_retriever`)
+* **Autonomous Decision**: Autonomously discovers and ranks candidate Medicare coverage policies for an unlabelled clinical note across the 50-policy catalog.
+* **Tools**: `HybridPolicyRetriever` executing BM25Okapi lexical retrieval, clinical concept domain embeddings, and Reciprocal Rank Fusion (RRF) with dense concept expansion (e.g. meniscus, orthosis, arthroscopy).
+* **Inputs & Outputs**: Input: PHI-sanitized patient EHR note. Output: Top-ranked governing policy candidates, match scores, and structured policy criteria definitions.
+* **Bounding Gate**: Relevance cutoff threshold; falls back to explicit user-specified policy or default coverage rules when query ambiguity exceeds retrieval confidence.
+
+#### Agent 2: Criteria Evaluator & Tool Chooser (`app.agents.criteria_evaluator`)
+* **Autonomous Decision**: For each criterion in the active policy, Agent 2 autonomously decides which extraction method(s) to call based on detected syntactic and semantic ambiguity.
+* **Tools**: Procedural deterministic extractors, calendar `TimelineAnalyzerService`, `ClinicalScopeAnalyzer` (ConText NegEx/experiencer detector), and local `LLMProposalAgent` (`qwen2.5:3b` via Ollama).
+* **Inputs & Outputs**: Input: Structured criterion definition, sanitized EHR text. Output: `CriterionAssessment` containing character-anchored `verified_spans`, sufficiency score, and an explicit `tool_selection` audit trail (`methods_tried`, `order`, `selection_rationale`).
+* **Bounding Gate**: **Deterministic Priority Invariant**: Deterministic extractors stand first. The local LLM acts exclusively as a candidate proposer behind 3 strict deterministic gates (Gate A: exact character slice, Gate B: 5-dimension semantic check, Gate C: Agent 3 veto) and can never overwrite or downgrade deterministic determinations.
+
+#### Agent 3: Adversarial Verifier & Debate Loop (`app.agents.adversarial_verifier`)
+* **Autonomous Decision**: Independently audits proposed evidence spans and initiates a bounded multi-round debate loop (up to 3 rounds) challenging suspicious findings, offset drifts, and potential omissions.
+* **Tools**: Byte-exact slice verifier (`assert ehr[start:end] == span.text`), ConText negation scope analyzer, autonomous offset drift healer, and multi-round debate state manager.
+* **Inputs & Outputs**: Input: `CriterionAssessment`, criterion definition, sanitized EHR text. Output: `VerificationAuditResult`, healed spans, recalibrated sufficiency score, and `debate_rounds` audit log.
+* **Bounding Gate**: **Debate Ceiling & Concession Protocol**: Unchallenged criteria bypass the debate loop with 0 extra overhead. In challenged criteria, Agent 2 must defend with evidence or concede; if unresolved after 3 rounds, the debate ceiling safely defers the criterion to human auditor review.
+
+#### Agent 4: Calibrated Abstention Gate & Queue Prioritizer (`app.agents.abstention_gate`)
+* **Autonomous Decision**: Decides whether to release an autonomous adjudication determination (`APPROVED`, `DENIED`) or defer to human clinical auditor review (`DEFERRED_TO_HUMAN`). Learns deferral policies from empirical development data and autonomously prioritizes the clinical audit work queue.
+* **Tools**: Selective risk calibration harness (`derive_candidate_tau`), statutory policy risk priority model, and longitudinal deferral outcome logger (`deferral_outcomes_log.jsonl`).
+* **Inputs & Outputs**: Input: Criterion assessments, adversarial verification audits, timeline results, and billing validations. Output: Final adjudication decision, candidate tau analysis (`derived-on-development-data`), and prioritized deferral queue ranking.
+* **Bounding Gate**: **Deterministic Safety Invariant**: Zero approvals are permitted with any unmet inclusion or verified exclusion. Operating threshold $\tau = 0.85$ remains strictly operative. All outputs remain non-releasable `PROVISIONAL` until licensed clinical sign-off is recorded.
+
+#### Agent 5: Defense Packet & Appeal Generator (`app.agents.packet_generator`)
+* **Autonomous Decision**: Formulates structured prior authorization submission packets and legal/clinical peer-to-peer appeal letters based on adjudication outcomes and CARC/RARC billing codes.
+* **Tools**: Da Vinci PAS FHIR bundle compiler, CARC/RARC code cross-referencer, CMS statutory citation engine.
+* **Inputs & Outputs**: Input: `FinalAdjudication` bundle. Output: `CMSCoveragePacket` and `PeerToPeerAppealLetter`.
+* **Bounding Gate**: Mandatory human clinician attestation and NPI binding before electronic transmission to payer MAC gateways.
+
+### Scientific Framing & Honest Research Alignment
+
+To maintain strict scientific integrity, CarePolicyGuard's documentation adheres to honest definitions:
+1. **Sufficiency Scores vs Probability Calibration**: Numerical scores (`sufficiency_score`) reflect deterministic criteria sufficiency weights, not empirical Bayesian posterior probabilities. When candidate thresholds are derived via `CalibrationHarness`, they are explicitly labeled `derived-on-development-data` and reported alongside operative $\tau = 0.85$, never presented as solved medical probability calibration on open hospital records.
+2. **Curated Policy Discovery vs Open-Domain RAG**: Policy retrieval operates over a curated, verified catalog of Centers for Medicare & Medicaid Services (CMS) coverage policies, not an unconstrained vector-database web retrieval system. All provenance references are verified against the live CMS Medicare Coverage Database (MCD).
+3. **Local AI Sovereignty**: All AI proposals execute via local Ollama instances (`qwen2.5:3b`) with zero cloud egress (`ENABLE_REMOTE_LLM_EGRESS=False`). No patient data or clinical text is ever transmitted to external endpoints.
+
+### Research Questions & Multi-Agent Evaluation Plan
+
+* **RQ1 (Neuro-Symbolic Safety)**: Can a multi-agent neuro-symbolic architecture with gated local LLM proposers eliminate false approvals on Medicare coverage criteria compared to monolithic zero-shot LLMs?
+  * *Method*: Comparative evaluation across Configuration A (local zero-shot LLM), Configuration B (single-pass ablation), Configuration C (un-gated multi-agent), and Configuration D (gated multi-agent with $\tau = 0.85$).
+* **RQ2 (Autonomous Debate & Evidence Faithfulness)**: Does an autonomous tool-choosing evaluator paired with a multi-round adversarial debate loop improve character-level evidence grounding and resolve offset drift without increasing false positive risk?
+  * *Method*: Measuring gate pass rates, offset drift healing frequency, and concession rates across synthetic development vignettes.
+* **RQ3 (Selective Risk Trade-Off)**: How does selective risk thresholding ($\tau = 0.85$) balance autonomous coverage throughput against clinical audit safety?
+  * *Method*: Deriving empirical candidate thresholds under strict 0% false approval constraints and evaluating selective risk-coverage curves.
 
 ### Execution Engines & Operational Modes
 
