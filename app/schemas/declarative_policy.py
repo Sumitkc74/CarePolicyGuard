@@ -67,4 +67,5 @@ class DeclarativePolicy(BaseModel):
     change_log: list[dict[str, Any]] = Field(default_factory=list, description="Policy change history and CMS revisions")
     criteria: list[DeclarativeCriterion] = Field(default_factory=list, description="Declarative criteria set")
     statutory_waiting_periods: list[dict[str, Any]] = Field(default_factory=list, description="Longitudinal timeline rules")
+    cms_reference: dict[str, Any] | None = Field(default=None, description="Official CMS identifier, MCD document citation, and URL")
 

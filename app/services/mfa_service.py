@@ -208,11 +208,20 @@ class MFAService:
                 "message": f"Security verification code dispatched via server-side development channel for {masked_email}."
             }
 
-        # Neither SMTP nor dev channel is available: fail promptly with HTTP 503
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="MFA email delivery service is not configured. Please contact system administrator or configure TOTP application."
+        # Neither SMTP nor dev channel is available: record delivery as unavailable without raising 503
+        logger.warning(
+            f"[EMAIL OTP DELIVERY UNAVAILABLE]: Neither SMTP nor dev channel is configured. "
+            f"Authentication challenge issued for {masked_email} with delivery marked unavailable."
         )
+        return {
+            "status": "DELIVERY_UNAVAILABLE",
+            "channel": "EMAIL",
+            "delivery_mode": "NONE",
+            "destination": masked_email,
+            "sent_live_smtp": False,
+            "smtp_error": "MFA email delivery service is not configured (SMTP settings unconfigured and DEV_OTP_DELIVERY_ENABLED is disabled).",
+            "message": "Email delivery is unconfigured on the server. If an Authenticator app (TOTP) is configured on your account, please switch to TOTP."
+        }
 
     @classmethod
     def send_sms_otp(cls, phone_number: str, code: str) -> Dict[str, Any]:

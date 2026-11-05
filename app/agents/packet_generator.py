@@ -132,19 +132,13 @@ class CoveragePacketGenerator:
                 "and protocol adherence plan for diabetic foot ulcer management."
             )
 
-        from app.core.security import PRESET_PATIENT_NAMES
         resolved_pid = patient_id or getattr(adjudication, "patient_id", None)
-        if not resolved_pid or "***" in resolved_pid:
-            for pid, p_name in PRESET_PATIENT_NAMES.items():
-                if pid.endswith(adjudication.patient_id_masked[-4:]):
-                    resolved_pid = pid
-                    break
-            if not resolved_pid:
-                resolved_pid = adjudication.patient_id_masked
+        if not resolved_pid:
+            resolved_pid = adjudication.patient_id_masked
 
         resolved_pname = patient_name or getattr(adjudication, "patient_name", None)
         if not resolved_pname or "[REDACTED" in resolved_pname:
-            resolved_pname = PRESET_PATIENT_NAMES.get(resolved_pid) or "Eleanor Vance"
+            resolved_pname = "Not on file"
 
         return CMSCoveragePacket(
             packet_id=packet_id,

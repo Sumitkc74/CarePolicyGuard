@@ -209,6 +209,7 @@ class OAuthService:
             primary = user.mfa_method if user.mfa_method in enabled_methods else enabled_methods[0]
 
             dest_masked = None
+            dispatch = None
 
             if primary == "email_otp":
                 code, expires_at = MFAService.generate_numeric_otp(6)
@@ -216,16 +217,23 @@ class OAuthService:
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_email_otp(user.email, code)
-                dest_masked = dispatch["destination"]
+                dest_masked = dispatch.get("destination")
             elif primary == "sms_otp" and user.phone_number:
                 code, expires_at = MFAService.generate_numeric_otp(6)
                 user.active_otp_code = code
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_sms_otp(user.phone_number, code)
-                dest_masked = dispatch["destination"]
+                dest_masked = dispatch.get("destination")
             elif primary == "totp_app":
                 dest_masked = "Google / Microsoft Authenticator App"
+
+            delivery_status = dispatch.get("status") if dispatch else "READY"
+            msg = (
+                f"Sign-in verified via {provider.capitalize()}. Email delivery is unconfigured on the server; please authenticate with Authenticator App (TOTP) if configured."
+                if delivery_status == "DELIVERY_UNAVAILABLE"
+                else f"Sign-in verified via {provider.capitalize()}. Enter your {primary} verification code to complete authentication."
+            )
 
             return {
                 "status": "MFA_CHALLENGE_REQUIRED",
@@ -233,7 +241,8 @@ class OAuthService:
                 "mfa_method": primary,
                 "available_methods": enabled_methods,
                 "destination_masked": dest_masked,
-                "message": f"Sign-in verified via {provider.capitalize()}. Enter your {primary} verification code to complete authentication.",
+                "delivery_status": delivery_status,
+                "message": msg,
                 "oauth_provider": provider
             }
 

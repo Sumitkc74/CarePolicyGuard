@@ -45,7 +45,7 @@ class PolicyRetrievalAgent:
                     self.effective_date = p.effective_date
                     self.category = p.category
                     self.description = p.description
-                    self.criteria = []
+                    self.criteria = p.criteria
             return MockPolicyObj(decl)
         return None
 

@@ -119,5 +119,13 @@
       "source_text_excerpt": null
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "real_cms_id": "LCD L37897",
+    "authority": "Medicare Administrative Contractor (MAC) LCD",
+    "document_title": "Lumbar Spinal Fusion",
+    "citation": "CMS Medicare Coverage Database LCD L37897 / L37899",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=37897",
+    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+  }
 }

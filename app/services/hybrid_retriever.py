@@ -71,8 +71,9 @@ class DenseSemanticRetriever:
     Semantic dense retriever with medical ontology concept projection.
     Provides cosine-similarity ranking over clinical embedding representations.
     """
-    # Key clinical concept vocabulary vectors
+    # Key clinical concept vocabulary vectors covering all 50 CMS policy domains
     CLINICAL_CONCEPT_VOCAB = [
+        # 1. Core Cardiology & Sleep
         "lvef", "ejection_fraction", "systolic_heart_failure", "heart_failure", "cardiomyopathy",
         "nyha", "nyha_functional_class", "guideline_directed_medical_therapy", "gdmt",
         "implantable_cardioverter_defibrillator", "icd", "defibrillator",
@@ -80,7 +81,41 @@ class DenseSemanticRetriever:
         "obstructive_sleep_apnea", "sleep_apnea", "apnea_hypopnea_index", "ahi", "cpap", "bipap", "polysomnography",
         "aortic_stenosis", "tavr", "teer", "mitraclip", "heart_team_consensus",
         "atrial_fibrillation", "watchman", "left_atrial_appendage_closure",
-        "diabetic_foot_ulcer", "hyperbaric_oxygen_therapy", "wagner_grade_3", "conservative_wound_care"
+        "diabetic_foot_ulcer", "hyperbaric_oxygen_therapy", "wagner_grade_3", "conservative_wound_care",
+        # 2. Cardiovascular Interventions & Diagnostics
+        "cardiac_rehab", "cardiac_rehabilitation", "coronary_artery_disease", "coronary_cta", "ccta",
+        "myocardial_perfusion", "myocardial_perfusion_imaging", "pet_myocardial", "pacemaker", "cardiac_pacemaker",
+        "bradycardia", "atrioventricular_block", "percutaneous_coronary_intervention", "pci", "stent", "angioplasty",
+        "endovascular_aneurysm_repair", "evar", "abdominal_aortic_aneurysm", "peripheral_artery_disease", "atherectomy",
+        "vein_ablation", "endovenous_radiofrequency", "great_saphenous_vein", "venous_insufficiency",
+        # 3. Ophthalmology & Oculoplastic
+        "cataract", "cataract_extraction", "phacoemulsification", "visual_acuity", "snellen", "glare_disability",
+        "posterior_capsular_opacification", "blepharoplasty", "blepharoptosis", "mrd1", "marginal_reflex_distance",
+        "superior_visual_field_restriction", "pseudoptosis", "brow_lift",
+        # 4. Orthopedics (Joint & Extremity)
+        "total_knee_arthroplasty", "knee_arthroplasty", "knee_osteoarthritis", "total_hip_arthroplasty", "hip_arthroplasty",
+        "hip_osteoarthritis", "shoulder_arthroplasty", "reverse_shoulder_arthroplasty", "rotator_cuff", "rotator_cuff_tear",
+        "supraspinatus_tear", "hip_arthroscopy", "femoroacetabular_impingement", "fai", "labral_tear", "cam_lesion",
+        "knee_orthosis", "oa_knee_brace", "hallux_valgus", "bunionectomy", "intermetatarsal_angle", "chondrocyte_implantation", "aci",
+        # 5. Spine & Interventional Pain
+        "anterior_cervical_discectomy_and_fusion", "acdf", "cervical_radiculopathy", "cervical_myelopathy",
+        "lumbar_decompression", "lumbar_laminectomy", "lumbar_spinal_stenosis", "lumbar_fusion", "spondylolisthesis",
+        "cervical_artificial_disc", "cervical_disc_arthroplasty", "sacroiliac_joint_fusion", "si_joint_fusion",
+        "kyphoplasty", "vertebroplasty", "vertebral_compression_fracture", "epidural_steroid_injection", "esi",
+        "lumbar_radiculopathy", "facet_joint_injection", "facet_medial_branch_block", "radiofrequency_ablation",
+        # 6. Radiation Oncology & Oncology
+        "intensity_modulated_radiation_therapy", "imrt", "stereotactic_body_radiation_therapy", "sbrt", "stereotactic_radiosurgery",
+        "proton_beam_therapy", "proton_therapy", "oncology_pet", "fdg_pet", "pet_ct", "metabolic_tumor_volume",
+        # 7. Radiology & Diagnostics
+        "ct_chest", "chest_computed_tomography", "mri_brain", "brain_magnetic_resonance", "mri_lumbar_spine", "lumbar_mri",
+        # 8. Neuromodulation, Pain Pumps & DMEPOS
+        "spinal_cord_stimulation", "scs", "dorsal_column_stimulation", "trial_stimulation", "intrathecal_pump",
+        "infusion_pump", "intrathecal_baclofen", "power_wheelchair", "power_mobility_device", "respiratory_assist_device",
+        "noninvasive_ventilation", "bipap_st", "speech_generating_device", "augmentative_communication", "negative_pressure_wound_therapy",
+        "wound_vac", "npwt",
+        # 9. OPD Procedures & Plastic/Reconstructive
+        "botulinum_toxin", "botox_injection", "cervical_dystonia", "chronic_migraine", "panniculectomy", "abdominal_pannus",
+        "intertrigo", "rhinoplasty", "nasal_airway_obstruction", "septoplasty", "nasal_valve_collapse"
     ]
 
     def _embed_text(self, text: str) -> List[float]:
@@ -178,41 +213,28 @@ class HybridPolicyRetriever:
                         "content": f"{c.criterion_code} {c.name} {c.description} Keywords: {c.keywords} Waiting Period: {c.required_temporal_window}"
                     })
         else:
-            # Resilient statutory fallback chunks ensuring hybrid retrieval operates even without DB
-            fallback_policies_defs = [
-                {
-                    "policy_id": "NCD-20.4",
-                    "title": "Implantable Automatic Defibrillators (ICDs)",
-                    "content": "NCD-20.4 Implantable Automatic Defibrillators ICDs Cardiology primary prevention systolic heart failure LVEF <= 35% NYHA Class II/III GDMT >= 90 days post-MI 40 days CABG 90 days exclusion cardiogenic shock"
-                },
-                {
-                    "policy_id": "LCD-L33829",
-                    "title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
-                    "content": "LCD-L33829 Positive Airway Pressure PAP CPAP BiPAP DME obstructive sleep apnea AHI >= 15 events/hr daytime sleepiness Epworth sleep study polysomnography face-to-face"
-                },
-                {
-                    "policy_id": "NCD-20.33",
-                    "title": "Transcatheter Aortic Valve Replacement (TAVR)",
-                    "content": "NCD-20.33 Transcatheter Aortic Valve Replacement TAVR TEER severe symptomatic aortic stenosis AVA <= 1.0 cm2 mean gradient >= 40 mmHg peak velocity >= 4.0 m/s multidisciplinary Heart Team consensus"
-                },
-                {
-                    "policy_id": "NCD-220.13",
-                    "title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
-                    "content": "NCD-220.13 Percutaneous Left Atrial Appendage Closure LAAC Watchman non-valvular atrial fibrillation CHA2DS2-VASc >= 3 high bleeding risk HAS-BLED contraindication to oral anticoagulation"
-                },
-                {
-                    "policy_id": "NCD-20.29",
-                    "title": "Hyperbaric Oxygen Therapy (HBOT) for Diabetic Wounds",
-                    "content": "NCD-20.29 Hyperbaric Oxygen Therapy HBOT diabetic foot ulcer wound Wagner Grade 3 or higher failed standard wound care >= 30 days osteomyelitis debridement"
-                }
-            ]
-            for f_p in fallback_policies_defs:
-                chunks.append({
-                    "policy_id": f_p["policy_id"],
-                    "policy_title": f_p["title"],
-                    "section": "Indications & Coverage Summary",
-                    "content": f_p["content"]
-                })
+            # Resilient fallback: loads all 50 declarative policies from disk when database is empty
+            try:
+                from app.services.declarative_engine import DeclarativePolicyEngine
+                declarative_policies = DeclarativePolicyEngine.get_all_policies()
+                for p in declarative_policies:
+                    chunks.append({
+                        "policy_id": p.policy_id,
+                        "policy_title": p.title,
+                        "section": "Indications & Coverage Summary",
+                        "content": f"{p.policy_id} {p.title} {p.category} {p.description or ''}"
+                    })
+                    for c in p.criteria:
+                        chunks.append({
+                            "policy_id": p.policy_id,
+                            "policy_title": p.title,
+                            "section": f"Criterion: {c.criterion_code}",
+                            "criterion_code": c.criterion_code,
+                            "is_exclusion": c.is_exclusion,
+                            "content": f"{c.criterion_code} {c.name} {c.description} Keywords: {c.keywords} Waiting Period: {c.required_temporal_window}"
+                        })
+            except Exception:
+                chunks = []
 
         self.chunks = chunks
         self.bm25.index_documents(chunks)

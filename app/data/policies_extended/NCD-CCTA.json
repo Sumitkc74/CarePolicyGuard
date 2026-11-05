@@ -117,5 +117,13 @@
       "source_text_excerpt": null
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "real_cms_id": "NCD 220.1",
+    "authority": "CMS National Coverage Determination (NCD)",
+    "document_title": "Computed Tomography",
+    "citation": "Medicare National Coverage Determinations Manual, Chapter 1, Part 4, Section 220.1",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=227",
+    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+  }
 }

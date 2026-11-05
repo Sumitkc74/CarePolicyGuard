@@ -33,7 +33,7 @@ class PDFPacketGeneratorService:
             "",
             f"Packet Identifier:     {packet.packet_id}",
             f"Case Identifier:       {packet.case_id}",
-            f"Patient Legal Name:    {packet.patient_name or 'Eleanor Vance'}",
+            f"Patient Legal Name:    {packet.patient_name or 'Not on file'}",
             f"Patient ID / MRN:      {packet.patient_id or packet.patient_id_masked}",
             f"Governing Policy:      {packet.policy_id} - {packet.policy_title}",
             f"Jurisdiction:          {packet.jurisdiction}",

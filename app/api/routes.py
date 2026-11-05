@@ -204,29 +204,36 @@ def login(
             )
             
             dest_masked = None
-            
+            dispatch = None
+
             if user.mfa_method == "email_otp":
                 code, expires_at = MFAService.generate_numeric_otp(6)
                 user.active_otp_code = code
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_email_otp(user.email, code)
-                dest_masked = dispatch["destination"]
-                
+                dest_masked = dispatch.get("destination")
+
             elif user.mfa_method == "sms_otp" and user.phone_number:
                 code, expires_at = MFAService.generate_numeric_otp(6)
                 user.active_otp_code = code
                 user.otp_expires_at = expires_at
                 db.commit()
                 dispatch = MFAService.send_sms_otp(user.phone_number, code)
-                dest_masked = dispatch["destination"]
-                
+                dest_masked = dispatch.get("destination")
+
             elif user.mfa_method == "totp_app":
                 dest_masked = "Google / Microsoft Authenticator App"
 
             from fastapi.responses import JSONResponse
             enabled_methods = user.get_enabled_mfa_methods()
             primary = user.mfa_method if user.mfa_method in enabled_methods else enabled_methods[0]
+            delivery_status = dispatch.get("status") if dispatch else "READY"
+            msg = (
+                "Email delivery is unconfigured on the server. If an Authenticator app (TOTP) is configured, please switch to TOTP."
+                if delivery_status == "DELIVERY_UNAVAILABLE"
+                else f"Enter the 6-digit verification code from your {primary}."
+            )
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
                 content={
@@ -235,7 +242,8 @@ def login(
                     "mfa_method": primary,
                     "available_methods": enabled_methods,
                     "destination_masked": dest_masked,
-                    "message": f"Enter the 6-digit verification code from your {primary}."
+                    "delivery_status": delivery_status,
+                    "message": msg
                 }
             )
 
@@ -577,9 +585,8 @@ async def adjudicate_record(
 
     # In-memory ephemeral packet caching (ensures instant availability without disk footprint; PHI sanitized)
     packet = CoveragePacketGenerator.generate_packet(result)
-    from app.core.security import PRESET_PATIENT_NAMES
-    packet.patient_id = request.patient_id
-    packet.patient_name = request.patient_name or PRESET_PATIENT_NAMES.get(request.patient_id) or "Eleanor Vance"
+    packet.patient_id = request.patient_id or result.patient_id_masked
+    packet.patient_name = request.patient_name or "Not on file"
     _EPHEMERAL_PACKETS[result.case_id] = packet
     _EPHEMERAL_EHR_TEXTS[result.case_id] = result.sanitized_ehr_text
     _EPHEMERAL_ADJUDICATIONS[result.case_id] = result
@@ -797,20 +804,26 @@ def delete_single_audit_log(
 # CLINICAL PRESETS & BENCHMARK LAB
 # =============================================================================
 
-def _unmask_preset_ehr(ehr: str, patient_name: str, patient_id: str, dob: str = "05/14/1958") -> str:
-    return (
-        ehr.replace("PATIENT: [REDACTED]", f"PATIENT: {patient_name}")
-           .replace("[REDACTED-NAME]", patient_name)
-           .replace("DOB: [REDACTED]", f"DOB: {dob}")
-           .replace("MRN: [REDACTED]", f"MRN: {patient_id}")
+def _unmask_preset_ehr(ehr: str, patient_name: str, patient_id: str) -> str:
+    display_name = patient_name if (patient_name and patient_name != "Not on file") else "Not on file"
+    header = "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\n"
+    res = (
+        ehr.replace("PATIENT: [REDACTED]", f"PATIENT: {display_name}")
+           .replace("[REDACTED-NAME]", display_name)
+           .replace("DOB: [REDACTED]", "DOB: Not on file (Synthetic Test Case)")
            .replace("[REDACTED-MRN]", patient_id)
+           .replace("MRN: [REDACTED]", f"MRN: {patient_id}")
     )
+    if not res.startswith("[SYNTHETIC TEST DATA"):
+        res = header + res
+    return res
 
 @api_router.get("/presets", summary="Clinical Ingestion Presets")
 def get_clinical_presets():
     """
     Returns pre-configured clinical test scenarios representing Qualifying,
     Disqualified, and Ambiguous/Abstention edge cases.
+    All presets are synthetic test data: no invented patient names or dates of birth.
     """
     return {
         "presets": [
@@ -820,10 +833,10 @@ def get_clinical_presets():
                 "category": "Cardiology",
                 "policy_id": "NCD-20.4",
                 "patient_id": "PT-CARD-8821",
-                "patient_name": "Eleanor Vance",
+                "patient_name": "Not on file",
                 "description": "Severe ischemic cardiomyopathy (LVEF 28%, NYHA II, 6 months GDMT, 14 mos post-CABG)",
                 "expected_decision": "APPROVED",
-                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[0]["ehr"].strip(), "Eleanor Vance", "PT-CARD-8821", "05/14/1958")
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[0]["ehr"].strip(), "Not on file", "PT-CARD-8821")
             },
             {
                 "id": "preset-icd-inadequate-gdmt",
@@ -831,10 +844,10 @@ def get_clinical_presets():
                 "category": "Cardiology",
                 "policy_id": "NCD-20.4",
                 "patient_id": "PT-CARD-9014",
-                "patient_name": "Robert Thornton",
+                "patient_name": "Not on file",
                 "description": "LVEF 30% but only 3 weeks of GDMT (< 90-day requirement). Gate defers to human.",
                 "expected_decision": "DEFERRED_TO_HUMAN",
-                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[1]["ehr"].strip(), "Robert Thornton", "PT-CARD-9014", "09/22/1961")
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[1]["ehr"].strip(), "Not on file", "PT-CARD-9014")
             },
             {
                 "id": "preset-icd-disqualified",
@@ -842,10 +855,10 @@ def get_clinical_presets():
                 "category": "Cardiology",
                 "policy_id": "NCD-20.4",
                 "patient_id": "PT-ICU-1029",
-                "patient_name": "Harold Hayes",
+                "patient_name": "Not on file",
                 "description": "Patient in acute cardiogenic shock and PCI 4 days ago. Contraindicated under CMS exclusion.",
                 "expected_decision": "DENIED",
-                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[2]["ehr"].strip(), "Harold Hayes", "PT-ICU-1029", "11/03/1955")
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[2]["ehr"].strip(), "Not on file", "PT-ICU-1029")
             },
             {
                 "id": "preset-cpap-qualifying",
@@ -853,10 +866,10 @@ def get_clinical_presets():
                 "category": "Pulmonology",
                 "policy_id": "LCD-L33829",
                 "patient_id": "PT-RESP-4402",
-                "patient_name": "Arthur Miller",
+                "patient_name": "Not on file",
                 "description": "Severe obstructive sleep apnea (AHI 34.2 events/hr) with documented face-to-face evaluation.",
                 "expected_decision": "APPROVED",
-                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[3]["ehr"].strip(), "Arthur Miller", "PT-RESP-4402", "03/17/1964")
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[3]["ehr"].strip(), "Not on file", "PT-RESP-4402")
             },
             {
                 "id": "preset-cpap-borderline",
@@ -864,10 +877,10 @@ def get_clinical_presets():
                 "category": "Pulmonology",
                 "policy_id": "LCD-L33829",
                 "patient_id": "PT-RESP-5510",
-                "patient_name": "Thomas Sterling",
+                "patient_name": "Not on file",
                 "description": "AHI 7.2 events/hr but chart lacks required comorbid condition documentation.",
                 "expected_decision": "DEFERRED_TO_HUMAN",
-                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[4]["ehr"].strip(), "Thomas Sterling", "PT-RESP-5510", "08/12/1970")
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[4]["ehr"].strip(), "Not on file", "PT-RESP-5510")
             },
             {
                 "id": "preset-hbot-wagner",
@@ -875,11 +888,12 @@ def get_clinical_presets():
                 "category": "Wound Care",
                 "policy_id": "NCD-20.29",
                 "patient_id": "PT-WOUND-3390",
-                "patient_name": "Harold Washington",
+                "patient_name": "Not on file",
                 "description": "Type 2 diabetes with Wagner Grade 3 deep ulceration and failure of 30 days standard wound therapy.",
                 "expected_decision": "APPROVED",
-                "ehr_text": """CLINICAL PROGRESS NOTE - WOUND CARE CLINIC
-PATIENT: Harold Washington | DOB: 02/10/1962 | MRN: PT-WOUND-3390
+                "ehr_text": """[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]
+CLINICAL PROGRESS NOTE - WOUND CARE CLINIC
+PATIENT: Not on file | DOB: Not on file (Synthetic Test Case) | MRN: PT-WOUND-3390
 
 CHIEF COMPLAINT:
 Evaluation of non-healing plantar diabetic foot ulcer on right first metatarsal head.
@@ -1203,26 +1217,15 @@ def get_coverage_packet(
 
     # Return deep copy with role-specific PHI view to avoid mutating cached instances
     res_packet = packet.model_copy(deep=True)
-    from app.core.security import PRESET_PATIENT_NAMES
     if current_user.role in (UserRole.AUDITOR.value, "Auditor"):
         res_packet.patient_name = "[REDACTED (Auditor Mode)]"
         res_packet.patient_id = res_packet.patient_id_masked
     else:
+        # Clinician/Admin view: show true name if genuinely on record, else "Not on file"
         if not res_packet.patient_name or "[REDACTED" in res_packet.patient_name:
-            res_packet.patient_name = PRESET_PATIENT_NAMES.get(log.patient_id_masked) or "Eleanor Vance"
-            for real_id, name in PRESET_PATIENT_NAMES.items():
-                if real_id.endswith(log.patient_id_masked[-4:]):
-                    res_packet.patient_name = name
-                    res_packet.patient_id = real_id
-                    break
-
+            res_packet.patient_name = "Not on file"
         if not res_packet.patient_id or "***" in res_packet.patient_id:
-            for real_id, name in PRESET_PATIENT_NAMES.items():
-                if real_id.endswith(log.patient_id_masked[-4:]):
-                    res_packet.patient_id = real_id
-                    break
-            if not res_packet.patient_id or "***" in res_packet.patient_id:
-                res_packet.patient_id = log.patient_id_masked
+            res_packet.patient_id = log.patient_id_masked
 
     return res_packet
 

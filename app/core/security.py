@@ -125,18 +125,6 @@ def compute_audit_hash(
     serialized = json.dumps(canonical_payload, sort_keys=True, separators=(',', ':'))
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
-PRESET_PATIENT_NAMES = {
-    "PT-CARD-8821": "Eleanor Vance",
-    "PT-CARD-9014": "Robert Thornton",
-    "PT-ICU-1029": "Harold Hayes",
-    "PT-RESP-4402": "Arthur Miller",
-    "PT-RESP-5510": "Thomas Sterling",
-    "PT-WOUND-3390": "Harold Washington",
-    "PT-CARD-6612": "Margaret Campbell",
-    "PT-CARD-7731": "James Wilson",
-    "PT-CARD-9944": "Beatrice Gomez",
-}
-
 def extract_patient_name(text: str) -> str | None:
     """
     Extracts explicit patient name if present in clinical note header.
@@ -229,7 +217,7 @@ def verify_clinical_document_authenticity(text: str) -> dict[str, Any]:
     # 1. DOCTOR / PHYSICIAN NAME DETECTION
     # Match patterns like:
     # "Dr. Sarah Jenkins", "Dr. Sarah Jenkins, MD", "Attending: Dr. Robert Cole"
-    # "Provider: Michael Chang, MD", "Physician: Dr. Eleanor Vance, DO, FACC"
+    # "Provider: Dr. Clinician One, MD", "Physician: Dr. Clinician Two, DO, FACC"
     # "Sarah Jenkins, MD", "Robert Cole, DO"
     doctor_name = None
     has_doctor_name = False

@@ -119,5 +119,13 @@
       "source_text_excerpt": null
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "real_cms_id": "NCD 20.8",
+    "authority": "CMS National Coverage Determination (NCD)",
+    "document_title": "Cardiac Pacemaker Evaluation Services",
+    "citation": "Medicare National Coverage Determinations Manual, Chapter 1, Part 1, Section 20.8",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=238",
+    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+  }
 }

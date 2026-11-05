@@ -50,14 +50,25 @@ def register_credentialing_routes(api_router: APIRouter):
         """
         # Determine target clinician
         if req.clinician_id is not None:
-            if current_user.role not in (UserRole.ADMIN.value, UserRole.CREDENTIALING.value) and current_user.id != req.clinician_id:
+            if current_user.role != UserRole.CREDENTIALING.value and current_user.id != req.clinician_id:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Access denied: Cannot verify credentials for other clinicians without Credentialing or Admin role."
+                    detail="Access denied: Cannot verify credentials for other clinicians without Credentialing role."
                 )
             target = db.query(User).filter(User.id == req.clinician_id).first()
             if not target:
                 raise HTTPException(status_code=404, detail=f"Clinician with ID {req.clinician_id} not found.")
+
+            if current_user.id != target.id:
+                if target.provisioned_by and (
+                    target.provisioned_by == current_user.username
+                    or target.provisioned_by == current_user.email
+                    or target.provisioned_by == str(current_user.id)
+                ):
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Separation of duties violation: An account cannot verify a clinician it provisioned."
+                    )
         else:
             target = current_user
 
@@ -177,14 +188,15 @@ def register_credentialing_routes(api_router: APIRouter):
     )
     def manual_credentialing_review(
         req: ManualCredentialingRequest,
-        current_approver: User = Depends(require_role([UserRole.CREDENTIALING.value, UserRole.ADMIN.value])),
+        current_approver: User = Depends(require_role([UserRole.CREDENTIALING.value])),
         db: Session = Depends(get_db)
     ):
         """
         Manual Credentialing Review (Fallback Path):
-        Requires distinct approver role (Credentialing role, or Admin executing distinct credentialing action).
-        Enforces two-action rule: Admin provisioning and Credentialing verification must remain two
-        distinct recorded actions with separate audit entries even if held by the same operator.
+        Requires distinct Credentialing role (Admin role cannot approve).
+        Enforces separation of duties:
+        1. An account cannot approve its own credentials.
+        2. An account cannot approve a clinician it provisioned (actor separation).
         Records: evidence checked (NPI, license, state, org), approver, timestamp, previous state, decision.
         """
         decision_clean = req.decision.strip().upper()
@@ -200,6 +212,36 @@ def register_credentialing_routes(api_router: APIRouter):
 
         if target_clinician.role != UserRole.CLINICIAN.value:
             raise HTTPException(status_code=400, detail="Manual credentialing review applies strictly to Clinician accounts.")
+
+        # Invariant: approver cannot approve their own account
+        if target_clinician.id == current_approver.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Separation of duties violation: An approver cannot approve their own account."
+            )
+
+        # Invariant: approver cannot approve a clinician they provisioned
+        if target_clinician.provisioned_by and (
+            target_clinician.provisioned_by == current_approver.username
+            or target_clinician.provisioned_by == current_approver.email
+            or target_clinician.provisioned_by == str(current_approver.id)
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Separation of duties violation: An account cannot approve a clinician it provisioned."
+            )
+
+        # Double check provisioning audit log
+        prov_audit = db.query(CredentialingAuditLog).filter(
+            CredentialingAuditLog.clinician_id == target_clinician.id,
+            CredentialingAuditLog.action.in_(["PROVISIONED", "USER_PROVISIONED"]),
+            CredentialingAuditLog.actor_id == current_approver.id
+        ).first()
+        if prov_audit:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Separation of duties violation: An account cannot approve a clinician it provisioned."
+            )
 
         now = datetime.now(UTC)
         prev_state = "VERIFIED" if target_clinician.is_verified_medical_pro else "UNVERIFIED"
@@ -290,8 +332,12 @@ def register_credentialing_routes(api_router: APIRouter):
         now = datetime.now(UTC)
         prev_state = "VERIFIED" if target.is_verified_medical_pro else "UNVERIFIED"
 
+        is_admin = current_user.role == UserRole.ADMIN.value
+        action = "EMERGENCY_SUSPENDED" if is_admin else "REVOKED"
+        verif_method = "ADMIN_EMERGENCY_SUSPENSION" if is_admin else "CREDENTIALING_REVOCATION"
+
         target.is_verified_medical_pro = False
-        target.verification_method = "VERIFICATION_REVOKED"
+        target.verification_method = verif_method
         target.verification_reference = req.reason
 
         audit_event = CredentialingAuditLog(
@@ -301,19 +347,19 @@ def register_credentialing_routes(api_router: APIRouter):
             actor_id=current_user.id,
             actor_username=current_user.username,
             actor_role=current_user.role,
-            action="REVOKED",
-            verification_method="CREDENTIALING_REVOCATION",
+            action=action,
+            verification_method=verif_method,
             evidence_reference=req.reason,
             previous_state=prev_state,
             new_state="UNVERIFIED",
             notes=(
-                f"Credential verification revoked by {current_user.username} ({current_user.role}). "
+                f"{'Admin emergency suspension' if is_admin else 'Credential verification revoked'} by {current_user.username} ({current_user.role}). "
                 f"Reason: {req.reason}. Review Notes: {req.mandatory_review_notes or 'None'}"
             ),
             audit_hash=compute_audit_hash(
                 patient_id_masked="SYSTEM",
                 policy_id="REVOCATION",
-                decision="REVOKED",
+                decision=action,
                 calibrated_confidence=1.0,
                 criterion_assessments=[],
                 evidence_spans=[],

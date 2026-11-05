@@ -40,10 +40,12 @@ def reset_dev_channel_and_settings():
     settings.DEBUG = original_debug
 
 
-def test_smtp_off_and_dev_off_fails_promptly_with_http_503():
+def test_smtp_off_and_dev_off_returns_challenge_with_delivery_unavailable():
     """
-    Proves that when SMTP is unconfigured and DEV_OTP_DELIVERY_ENABLED is False,
-    initiating email OTP fails promptly with HTTP 503 with a clear message and no code leak.
+    Task 1 (Updated contract): Proves that when SMTP is unconfigured and DEV_OTP_DELIVERY_ENABLED is False,
+    initiating email OTP does NOT fail with HTTP 503; instead it issues an MFA challenge (HTTP 200)
+    with explicit delivery_status='DELIVERY_UNAVAILABLE' so the user is informed and not blocked,
+    without leaking any code, preview, or access token.
     """
     settings.SMTP_ENABLED = False
     settings.DEV_OTP_DELIVERY_ENABLED = False
@@ -72,11 +74,79 @@ def test_smtp_off_and_dev_off_fails_promptly_with_http_503():
         "username": test_user_email,
         "password": test_pwd
     })
-    # Must fail promptly with 503 Service Unavailable
-    assert login_res.status_code == 503
-    assert "MFA email delivery service is not configured" in login_res.json()["detail"]
+    # Must succeed with 200 and return MFA challenge with delivery_status="DELIVERY_UNAVAILABLE"
+    assert login_res.status_code == 200
+    res_data = login_res.json()
+    assert res_data["status"] == "MFA_CHALLENGE_REQUIRED"
+    assert res_data["delivery_status"] == "DELIVERY_UNAVAILABLE"
+    assert "mfa_session_token" in res_data
+    assert "access_token" not in res_data
     assert "preview" not in login_res.text.lower()
-    assert "otp" not in login_res.text.lower() or "configured" in login_res.text.lower()
+    assert "code" not in res_data
+
+
+def test_login_contract_email_delivery_unavailable_with_totp_fallback_works_end_to_end():
+    """
+    Task 1: Asserts the exact contract: login with email-OTP MFA and no delivery channel configured
+    returns a challenge (not a 503) with a delivery-unavailable status, and switching to or using
+    TOTP login still works end to end.
+    """
+    settings.SMTP_ENABLED = False
+    settings.DEV_OTP_DELIVERY_ENABLED = False
+
+    test_pwd = secrets.token_urlsafe(16)
+    test_email = f"clinician_dualmfa_{secrets.token_hex(4)}@hospital.med"
+    totp_sec = MFAService.generate_totp_secret()
+
+    db = SessionLocal()
+    try:
+        user = User(
+            username=test_email,
+            email=test_email,
+            hashed_password=get_password_hash(test_pwd),
+            role="Clinician",
+            is_active=True,
+            mfa_enabled=True,
+            mfa_method="email_otp",  # Primary is email OTP
+            mfa_enabled_methods="email_otp,totp_app",
+            totp_secret=totp_sec
+        )
+        db.add(user)
+        db.commit()
+    finally:
+        db.close()
+
+    # 1. Login with primary email-OTP returns 200 challenge with DELIVERY_UNAVAILABLE
+    login_res = client.post("/api/v1/auth/login", json={
+        "username": test_email,
+        "password": test_pwd
+    })
+    assert login_res.status_code == 200
+    challenge_data = login_res.json()
+    assert challenge_data["status"] == "MFA_CHALLENGE_REQUIRED"
+    assert challenge_data["delivery_status"] == "DELIVERY_UNAVAILABLE"
+    assert "totp_app" in challenge_data["available_methods"]
+    session_token = challenge_data["mfa_session_token"]
+
+    # 2. Switch challenge method to TOTP
+    switch_res = client.post("/api/v1/auth/mfa/challenge-method", json={
+        "mfa_session_token": session_token,
+        "requested_method": "totp_app"
+    })
+    assert switch_res.status_code == 200
+    switch_data = switch_res.json()
+    assert switch_data["mfa_method"] == "totp_app"
+
+    # 3. Generate valid TOTP code in-memory and complete verification
+    valid_code = MFAService.generate_totp_code(totp_sec)
+    verify_res = client.post("/api/v1/auth/mfa/verify-login", json={
+        "mfa_session_token": session_token,
+        "verification_code": valid_code,
+        "mfa_method": "totp_app"
+    })
+    assert verify_res.status_code == 200
+    assert verify_res.json()["mfa_verified"] is True
+    assert "access_token" in verify_res.json()
 
 
 def test_totp_path_remains_functional_when_email_unconfigured():

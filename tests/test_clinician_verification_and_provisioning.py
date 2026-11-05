@@ -579,6 +579,210 @@ def test_manual_credentialing_review_by_credentialing_role():
         db.close()
 
 
+def test_admin_attempting_manual_approval_is_strictly_forbidden_403():
+    """
+    Task 2: Manual credentialing approval must accept only the Credentialing role.
+    Admin attempting manual approval gets 403 Forbidden.
+    """
+    db = SessionLocal()
+    try:
+        adm_email = f"admin_no_appr_{uuid.uuid4().hex[:6]}@hospital.org"
+        admin = User(
+            username=adm_email,
+            email=adm_email,
+            hashed_password=get_password_hash("AdminPass123!"),
+            role=UserRole.ADMIN.value,
+            is_active=True
+        )
+        clin_email = f"clin_target_{uuid.uuid4().hex[:6]}@hospital.org"
+        clin = User(
+            username=clin_email,
+            email=clin_email,
+            hashed_password=get_password_hash("ClinPass123!"),
+            role=UserRole.CLINICIAN.value,
+            is_active=True,
+            is_verified_medical_pro=False
+        )
+        db.add_all([admin, clin])
+        db.commit()
+
+        admin_token = create_test_token(admin)
+        res = client.post(
+            "/api/v1/credentialing/verify/manual",
+            json={
+                "clinician_id": clin.id,
+                "decision": "APPROVED",
+                "evidence_checked": ["STATE_MEDICAL_BOARD"],
+                "evidence_reference": "REF-FORBIDDEN-ADMIN",
+                "notes": "Admin trying to approve directly."
+            },
+            headers={"Authorization": f"Bearer {admin_token}"}
+        )
+        assert res.status_code == 403
+        assert "Access denied" in res.json()["detail"] or "Credentialing" in res.json()["detail"]
+    finally:
+        db.close()
+
+
+def test_provisioning_account_cannot_approve_clinician_it_provisioned_403():
+    """
+    Task 2: An account holding Credentialing role cannot approve a clinician it provisioned
+    (separation of duties between provisioning and credential approval).
+    """
+    db = SessionLocal()
+    try:
+        officer_email = f"cred_provisioner_{uuid.uuid4().hex[:6]}@hospital.org"
+        officer = User(
+            username=officer_email,
+            email=officer_email,
+            hashed_password=get_password_hash("OfficerPass123!"),
+            role=UserRole.CREDENTIALING.value,
+            is_active=True
+        )
+        clin_email = f"clin_provisioned_{uuid.uuid4().hex[:6]}@hospital.org"
+        clin = User(
+            username=clin_email,
+            email=clin_email,
+            hashed_password=get_password_hash("ClinPass123!"),
+            role=UserRole.CLINICIAN.value,
+            is_active=True,
+            is_verified_medical_pro=False,
+            provisioned_by=officer_email
+        )
+        db.add_all([officer, clin])
+        db.commit()
+
+        officer_token = create_test_token(officer)
+        res = client.post(
+            "/api/v1/credentialing/verify/manual",
+            json={
+                "clinician_id": clin.id,
+                "decision": "APPROVED",
+                "evidence_checked": ["STATE_MEDICAL_BOARD"],
+                "evidence_reference": "REF-SAME-ACTOR",
+                "notes": "Attempting self-approval of provisioned user."
+            },
+            headers={"Authorization": f"Bearer {officer_token}"}
+        )
+        assert res.status_code == 403
+        assert "Separation of duties violation: An account cannot approve a clinician it provisioned" in res.json()["detail"]
+    finally:
+        db.close()
+
+
+def test_admin_emergency_suspension_blocks_sign_off_and_credentialing_approval_restores():
+    """
+    Task 2: Admin emergency suspension blocks sign-offs immediately;
+    subsequent Credentialing approval is required to restore signing authority.
+    """
+    db = SessionLocal()
+    clin_email = f"clin_suspend_restore_{uuid.uuid4().hex[:6]}@hospital.org"
+    try:
+        clin = User(
+            username=clin_email,
+            email=clin_email,
+            hashed_password=get_password_hash("Pass12345!"),
+            role=UserRole.CLINICIAN.value,
+            is_verified_medical_pro=True,
+            verification_method="NPPES_VERIFIED",
+            npi_number=SYNTHETIC_TEST_NPI_1,
+            is_active=True
+        )
+        admin = User(
+            username=f"adm_emerg_{uuid.uuid4().hex[:6]}",
+            email=f"adm_emerg_{uuid.uuid4().hex[:6]}@hospital.org",
+            hashed_password=get_password_hash("AdminPass123!"),
+            role=UserRole.ADMIN.value,
+            is_active=True
+        )
+        cred_officer = User(
+            username=f"cred_restorer_{uuid.uuid4().hex[:6]}",
+            email=f"cred_restorer_{uuid.uuid4().hex[:6]}@hospital.org",
+            hashed_password=get_password_hash("CredPass123!"),
+            role=UserRole.CREDENTIALING.value,
+            is_active=True
+        )
+        db.add_all([clin, admin, cred_officer])
+        db.commit()
+
+        clin_token = create_test_token(clin)
+        admin_token = create_test_token(admin)
+        cred_token = create_test_token(cred_officer)
+
+        # 1. Admin executes emergency suspension
+        susp_res = client.post(
+            f"/api/v1/credentialing/users/{clin.id}/revoke",
+            json={"reason": "Emergency suspension: credential anomaly flagged by security monitor"},
+            headers={"Authorization": f"Bearer {admin_token}"}
+        )
+        assert susp_res.status_code == 200
+        assert susp_res.json()["is_verified_medical_pro"] is False
+
+        # Verify audit log recorded emergency suspension
+        audit_susp = db.query(CredentialingAuditLog).filter(
+            CredentialingAuditLog.clinician_id == clin.id
+        ).order_by(CredentialingAuditLog.created_at.desc()).first()
+        assert audit_susp.action == "EMERGENCY_SUSPENDED"
+        assert audit_susp.actor_role == UserRole.ADMIN.value
+
+        # 2. Clinician sign-off is immediately blocked
+        sign_blocked_res = client.post(
+            "/api/v1/determination/CASE-SUSPENDED-1/sign-off",
+            json={
+                "signed_off": True,
+                "signature_attestation": "Signing after emergency suspension",
+                "clinical_notes": "Attempt"
+            },
+            headers={"Authorization": f"Bearer {clin_token}"}
+        )
+        assert sign_blocked_res.status_code == 403
+        assert "Clinician account verification is pending" in sign_blocked_res.json()["detail"]
+
+        # 3. Admin cannot restore/approve (gets 403)
+        admin_restore_res = client.post(
+            "/api/v1/credentialing/verify/manual",
+            json={
+                "clinician_id": clin.id,
+                "decision": "APPROVED",
+                "evidence_checked": ["HOSPITAL_PRIVILEGES"],
+                "evidence_reference": "ADMIN-ATTEMPT-RESTORE",
+                "notes": "Admin trying to restore"
+            },
+            headers={"Authorization": f"Bearer {admin_token}"}
+        )
+        assert admin_restore_res.status_code == 403
+
+        # 4. Credentialing officer approves and restores signing authority
+        restore_res = client.post(
+            "/api/v1/credentialing/verify/manual",
+            json={
+                "clinician_id": clin.id,
+                "decision": "APPROVED",
+                "evidence_checked": ["STATE_MEDICAL_BOARD", "PEER_REVIEW_CLEARANCE"],
+                "evidence_reference": "CRED-RESTORE-DOC-2026-881",
+                "notes": "Full clearance verified with medical board.",
+                "npi_number": SYNTHETIC_TEST_NPI_1,
+                "credential_title": "MD",
+                "medical_license": "CA-C123456",
+                "license_state": "CA",
+                "organization": "General Hospital"
+            },
+            headers={"Authorization": f"Bearer {cred_token}"}
+        )
+        assert restore_res.status_code == 200
+        assert restore_res.json()["is_verified_medical_pro"] is True
+
+        # Verify restoration audit record exists
+        audit_restore = db.query(CredentialingAuditLog).filter(
+            CredentialingAuditLog.clinician_id == clin.id
+        ).order_by(CredentialingAuditLog.created_at.desc()).first()
+        assert audit_restore.action == "APPROVED"
+        assert audit_restore.actor_role == UserRole.CREDENTIALING.value
+        assert "CRED-RESTORE-DOC" in audit_restore.evidence_reference
+    finally:
+        db.close()
+
+
 # =============================================================================
 # TASK 4: REVOCATION, EXPIRY & LEGACY DOWNGRADE MIGRATION
 # =============================================================================

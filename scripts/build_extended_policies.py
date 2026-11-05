@@ -2564,7 +2564,14 @@ POLICIES = [
 def generate_all_extended_policies():
     print(f"[*] Validating and generating {len(POLICIES)} extended CMS policies...")
     generated = []
+    try:
+        from scripts.update_provenance import PROVENANCE_REGISTRY
+    except ImportError:
+        PROVENANCE_REGISTRY = {}
+
     for p in POLICIES:
+        if p["policy_id"] in PROVENANCE_REGISTRY:
+            p["cms_reference"] = PROVENANCE_REGISTRY[p["policy_id"]]
         decl = DeclarativePolicy(**p)
         out_file = TARGET_DIR / f"{decl.policy_id}.json"
         with open(out_file, "w", encoding="utf-8") as f:

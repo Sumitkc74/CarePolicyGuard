@@ -1,0 +1,674 @@
+[
+  {
+    "vignette_id": "DEV-LCD-ACDF-APP",
+    "policy_id": "LCD-ACDF",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Anterior Cervical Discectomy and Fusion (ACDF)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Anterior Cervical Discectomy and Fusion (ACDF) (LCD-ACDF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Anterior Cervical Discectomy and Fusion (ACDF). Clinical examination and imaging confirms documented cervical disc herniation. Patient completed trial of conservative management for 8 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo neck pain only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Anterior Cervical Discectomy and Fusion (ACDF) (LCD-ACDF). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-ACDF-NEG",
+    "policy_id": "LCD-ACDF",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Anterior Cervical Discectomy and Fusion (ACDF)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Anterior Cervical Discectomy and Fusion (ACDF) (LCD-ACDF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Anterior Cervical Discectomy and Fusion (ACDF). Clinical assessment indicates absence of cervical disc herniation. Inadequate trial: patient discontinued conservative management after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented neck pain only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ACDF due to active neck pain only."
+  },
+  {
+    "vignette_id": "DEV-LCD-ACI-APP",
+    "policy_id": "LCD-ACI",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects (LCD-ACI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects. Diagnostic clinical assessment demonstrates cartilage defect area: 2.0 cm2. Clinical examination and imaging confirms documented prior microfracture failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo diffuse osteoarthritis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects (LCD-ACI). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-ACI-NEG",
+    "policy_id": "LCD-ACI",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects (LCD-ACI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects. Diagnostic assessment demonstrates non-qualifying cartilage defect area: 0.5 cm2. Clinical assessment indicates absence of prior microfracture failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented diffuse osteoarthritis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ACI due to active diffuse osteoarthritis."
+  },
+  {
+    "vignette_id": "DEV-LCD-CT-CHEST-APP",
+    "policy_id": "LCD-CT-CHEST",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Computed Tomography (CT) of the Chest with Contrast",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Thoracic Specialty Clinic\nEVALUATION FOR: Computed Tomography (CT) of the Chest with Contrast (LCD-CT-CHEST)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Computed Tomography (CT) of the Chest with Contrast. Clinical examination and imaging confirms documented solitary pulmonary nodule > 6mm. Clinical examination and imaging confirms documented unexplained hemoptysis. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo acute viral bronchitis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Computed Tomography (CT) of the Chest with Contrast (LCD-CT-CHEST). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-CT-CHEST-NEG",
+    "policy_id": "LCD-CT-CHEST",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Computed Tomography (CT) of the Chest with Contrast",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Thoracic Specialty Clinic\nEVALUATION FOR: Computed Tomography (CT) of the Chest with Contrast (LCD-CT-CHEST)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Computed Tomography (CT) of the Chest with Contrast. Clinical assessment indicates absence of solitary pulmonary nodule > 6mm. Clinical assessment indicates absence of unexplained hemoptysis. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented acute viral bronchitis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-CT-CHEST due to active acute viral bronchitis."
+  },
+  {
+    "vignette_id": "DEV-LCD-ESI-APP",
+    "policy_id": "LCD-ESI",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Lumbar Epidural Steroid Injections (ESI) for Radiculopathy (LCD-ESI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Lumbar Epidural Steroid Injections (ESI) for Radiculopathy. Clinical examination and imaging confirms documented radicular pain. Patient completed trial of conservative treatment for 6 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo non-radicular pain.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Lumbar Epidural Steroid Injections (ESI) for Radiculopathy (LCD-ESI). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-ESI-NEG",
+    "policy_id": "LCD-ESI",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Lumbar Epidural Steroid Injections (ESI) for Radiculopathy (LCD-ESI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Lumbar Epidural Steroid Injections (ESI) for Radiculopathy. Clinical assessment indicates absence of radicular pain. Inadequate trial: patient discontinued conservative treatment after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented non-radicular pain.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ESI due to active non-radicular pain."
+  },
+  {
+    "vignette_id": "DEV-LCD-EVAR-APP",
+    "policy_id": "LCD-EVAR",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovascular Repair of Abdominal Aortic Aneurysm (EVAR) (LCD-EVAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Endovascular Repair of Abdominal Aortic Aneurysm (EVAR). Diagnostic clinical assessment demonstrates aaa diameter: 5.5 cm. Clinical examination and imaging confirms documented suitable proximal neck. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo small stable aneurysm.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Endovascular Repair of Abdominal Aortic Aneurysm (EVAR) (LCD-EVAR). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-EVAR-NEG",
+    "policy_id": "LCD-EVAR",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovascular Repair of Abdominal Aortic Aneurysm (EVAR) (LCD-EVAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Endovascular Repair of Abdominal Aortic Aneurysm (EVAR). Diagnostic assessment demonstrates non-qualifying aaa diameter: 4.0 cm. Clinical assessment indicates absence of suitable proximal neck. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented small stable aneurysm.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-EVAR due to active small stable aneurysm."
+  },
+  {
+    "vignette_id": "DEV-LCD-FACET-APP",
+    "policy_id": "LCD-FACET",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy (LCD-FACET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy. Diagnostic clinical assessment demonstrates medial branch block relief: 85.0 %. Patient completed trial of axial back pain for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo primary radiculopathy.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy (LCD-FACET). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-FACET-NEG",
+    "policy_id": "LCD-FACET",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain Management Specialty Clinic\nEVALUATION FOR: Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy (LCD-FACET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy. Diagnostic assessment demonstrates non-qualifying medial branch block relief: 70.0 %. Inadequate trial: patient discontinued axial back pain after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented primary radiculopathy.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-FACET due to active primary radiculopathy."
+  },
+  {
+    "vignette_id": "DEV-LCD-HALLUX-APP",
+    "policy_id": "LCD-HALLUX",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Hallux Valgus Correction (Bunionectomy)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Foot & Ankle / Podiatry Specialty Clinic\nEVALUATION FOR: Hallux Valgus Correction (Bunionectomy) (LCD-HALLUX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Hallux Valgus Correction (Bunionectomy). Diagnostic clinical assessment demonstrates hallux valgus angle: 20.0 degrees. Patient completed trial of shoe modification for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo cosmetic bunionectomy.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Hallux Valgus Correction (Bunionectomy) (LCD-HALLUX). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-HALLUX-NEG",
+    "policy_id": "LCD-HALLUX",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Hallux Valgus Correction (Bunionectomy)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Foot & Ankle / Podiatry Specialty Clinic\nEVALUATION FOR: Hallux Valgus Correction (Bunionectomy) (LCD-HALLUX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Hallux Valgus Correction (Bunionectomy). Diagnostic assessment demonstrates non-qualifying hallux valgus angle: 5.0 degrees. Inadequate trial: patient discontinued shoe modification after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented cosmetic bunionectomy.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-HALLUX due to active cosmetic bunionectomy."
+  },
+  {
+    "vignette_id": "DEV-LCD-HIP-ARTHRO-APP",
+    "policy_id": "LCD-HIP-ARTHRO",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis (LCD-HIP-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis. Clinical examination and imaging confirms documented severe joint space narrowing. Patient completed trial of conservative hip therapy for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo septic arthritis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis (LCD-HIP-ARTHRO). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-HIP-ARTHRO-NEG",
+    "policy_id": "LCD-HIP-ARTHRO",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis (LCD-HIP-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis. Clinical assessment indicates absence of severe joint space narrowing. Inadequate trial: patient discontinued conservative hip therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented septic arthritis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-HIP-ARTHRO due to active septic arthritis."
+  },
+  {
+    "vignette_id": "DEV-LCD-HIP-SCOOP-APP",
+    "policy_id": "LCD-HIP-SCOOP",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears (LCD-HIP-SCOOP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears. Diagnostic clinical assessment demonstrates alpha angle: 60.0 degrees. Patient completed trial of conservative physical therapy for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo tonnis grade 2 or 3.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears (LCD-HIP-SCOOP). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-HIP-SCOOP-NEG",
+    "policy_id": "LCD-HIP-SCOOP",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears (LCD-HIP-SCOOP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears. Diagnostic assessment demonstrates non-qualifying alpha angle: 45.0 degrees. Inadequate trial: patient discontinued conservative physical therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented tonnis grade 2 or 3.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-HIP-SCOOP due to active tonnis grade 2 or 3."
+  },
+  {
+    "vignette_id": "DEV-LCD-IMRT-APP",
+    "policy_id": "LCD-IMRT",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Intensity-Modulated Radiation Therapy (IMRT)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Intensity-Modulated Radiation Therapy (IMRT) (LCD-IMRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Intensity-Modulated Radiation Therapy (IMRT). Clinical examination and imaging confirms documented head and neck cancer. Clinical examination and imaging confirms documented 3d conformal exceeds tolerance. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo simple palliative bone metastasis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Intensity-Modulated Radiation Therapy (IMRT) (LCD-IMRT). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-IMRT-NEG",
+    "policy_id": "LCD-IMRT",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Intensity-Modulated Radiation Therapy (IMRT)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Intensity-Modulated Radiation Therapy (IMRT) (LCD-IMRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Intensity-Modulated Radiation Therapy (IMRT). Clinical assessment indicates absence of head and neck cancer. Clinical assessment indicates absence of 3d conformal exceeds tolerance. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented simple palliative bone metastasis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-IMRT due to active simple palliative bone metastasis."
+  },
+  {
+    "vignette_id": "DEV-LCD-KNEE-ARTHRO-APP",
+    "policy_id": "LCD-KNEE-ARTHRO",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Knee Arthroscopy and Meniscectomy",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Knee Arthroscopy and Meniscectomy (LCD-KNEE-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Knee Arthroscopy and Meniscectomy. Clinical examination and imaging confirms documented true knee locking. Clinical examination and imaging confirms documented bucket-handle meniscal tear. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo kellgren-lawrence grade 4 osteoarthritis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Knee Arthroscopy and Meniscectomy (LCD-KNEE-ARTHRO). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-KNEE-ARTHRO-NEG",
+    "policy_id": "LCD-KNEE-ARTHRO",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Knee Arthroscopy and Meniscectomy",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Knee Arthroscopy and Meniscectomy (LCD-KNEE-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Knee Arthroscopy and Meniscectomy. Clinical assessment indicates absence of true knee locking. Clinical assessment indicates absence of bucket-handle meniscal tear. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented kellgren-lawrence grade 4 osteoarthritis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-KNEE-ARTHRO due to active kellgren-lawrence grade 4 osteoarthritis."
+  },
+  {
+    "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
+    "policy_id": "LCD-KNEE-ORTHOSIS",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Custom-Fabricated Functional Knee Orthoses",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Custom-Fabricated Functional Knee Orthoses (LCD-KNEE-ORTHOSIS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Custom-Fabricated Functional Knee Orthoses. Clinical examination and imaging confirms documented positive lachman test. Clinical examination and imaging confirms documented prefabricated brace cannot fit. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo short-term post-operative immobilization.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Custom-Fabricated Functional Knee Orthoses (LCD-KNEE-ORTHOSIS). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
+    "policy_id": "LCD-KNEE-ORTHOSIS",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Custom-Fabricated Functional Knee Orthoses",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Custom-Fabricated Functional Knee Orthoses (LCD-KNEE-ORTHOSIS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Custom-Fabricated Functional Knee Orthoses. Clinical assessment indicates absence of positive lachman test. Clinical assessment indicates absence of prefabricated brace cannot fit. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented short-term post-operative immobilization.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-KNEE-ORTHOSIS due to active short-term post-operative immobilization."
+  },
+  {
+    "vignette_id": "DEV-LCD-KYPHO-APP",
+    "policy_id": "LCD-KYPHO",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Radiology / Spine Surgery Specialty Clinic\nEVALUATION FOR: Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty) (LCD-KYPHO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty). Diagnostic clinical assessment demonstrates pain score: 6.5 score. Clinical examination and imaging confirms documented bone marrow edema on mri. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo osteomyelitis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty) (LCD-KYPHO). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-KYPHO-NEG",
+    "policy_id": "LCD-KYPHO",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Radiology / Spine Surgery Specialty Clinic\nEVALUATION FOR: Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty) (LCD-KYPHO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty). Diagnostic assessment demonstrates non-qualifying pain score: 5.0 score. Clinical assessment indicates absence of bone marrow edema on mri. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented osteomyelitis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-KYPHO due to active osteomyelitis."
+  },
+  {
+    "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
+    "policy_id": "LCD-LUMBAR-DECOMP",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Lumbar Laminectomy and Decompression for Spinal Stenosis",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Laminectomy and Decompression for Spinal Stenosis (LCD-LUMBAR-DECOMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Lumbar Laminectomy and Decompression for Spinal Stenosis. Clinical examination and imaging confirms documented central canal stenosis. Patient completed trial of conservative therapy for 8 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo asymptomatic stenosis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Lumbar Laminectomy and Decompression for Spinal Stenosis (LCD-LUMBAR-DECOMP). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-LUMBAR-DECOMP-NEG",
+    "policy_id": "LCD-LUMBAR-DECOMP",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Lumbar Laminectomy and Decompression for Spinal Stenosis",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Laminectomy and Decompression for Spinal Stenosis (LCD-LUMBAR-DECOMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Lumbar Laminectomy and Decompression for Spinal Stenosis. Clinical assessment indicates absence of central canal stenosis. Inadequate trial: patient discontinued conservative therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented asymptomatic stenosis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-LUMBAR-DECOMP due to active asymptomatic stenosis."
+  },
+  {
+    "vignette_id": "DEV-LCD-LUMBAR-FUSION-APP",
+    "policy_id": "LCD-LUMBAR-FUSION",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability (LCD-LUMBAR-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability. Clinical examination and imaging confirms documented degenerative spondylolisthesis. Patient completed trial of conservative therapy trial for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo axial back pain without instability.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability (LCD-LUMBAR-FUSION). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-LUMBAR-FUSION-NEG",
+    "policy_id": "LCD-LUMBAR-FUSION",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery Specialty Clinic\nEVALUATION FOR: Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability (LCD-LUMBAR-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability. Clinical assessment indicates absence of degenerative spondylolisthesis. Inadequate trial: patient discontinued conservative therapy trial after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented axial back pain without instability.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-LUMBAR-FUSION due to active axial back pain without instability."
+  },
+  {
+    "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
+    "policy_id": "LCD-MRI-BRAIN",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Neuroradiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast (LCD-MRI-BRAIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast. Clinical examination and imaging confirms documented focal neurological deficit. Clinical examination and imaging confirms documented headache with papilledema. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo stable tension headache.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast (LCD-MRI-BRAIN). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-MRI-BRAIN-NEG",
+    "policy_id": "LCD-MRI-BRAIN",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology / Neuroradiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast (LCD-MRI-BRAIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast. Clinical assessment indicates absence of focal neurological deficit. Clinical assessment indicates absence of headache with papilledema. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented stable tension headache.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-MRI-BRAIN due to active stable tension headache."
+  },
+  {
+    "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
+    "policy_id": "LCD-MRI-LUMBAR",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Lumbar Spine (LCD-MRI-LUMBAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Magnetic Resonance Imaging (MRI) of the Lumbar Spine. Clinical examination and imaging confirms documented failed 6 weeks conservative therapy. Clinical examination and imaging confirms documented plain lumbar radiographs performed. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo acute back pain less than 6 weeks.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Magnetic Resonance Imaging (MRI) of the Lumbar Spine (LCD-MRI-LUMBAR). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-MRI-LUMBAR-NEG",
+    "policy_id": "LCD-MRI-LUMBAR",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Diagnostic Radiology Specialty Clinic\nEVALUATION FOR: Magnetic Resonance Imaging (MRI) of the Lumbar Spine (LCD-MRI-LUMBAR)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Magnetic Resonance Imaging (MRI) of the Lumbar Spine. Clinical assessment indicates absence of failed 6 weeks conservative therapy. Clinical assessment indicates absence of plain lumbar radiographs performed. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented acute back pain less than 6 weeks.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-MRI-LUMBAR due to active acute back pain less than 6 weeks."
+  },
+  {
+    "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+    "policy_id": "LCD-PAD-ATHERO",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery / Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease (LCD-PAD-ATHERO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease. Clinical examination and imaging confirms documented rutherford category 3. Diagnostic clinical assessment demonstrates arterial stenosis: 75.0 %. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo mild claudication only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease (LCD-PAD-ATHERO). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-PAD-ATHERO-NEG",
+    "policy_id": "LCD-PAD-ATHERO",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery / Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease (LCD-PAD-ATHERO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease. Clinical assessment indicates absence of rutherford category 3. Diagnostic assessment demonstrates non-qualifying arterial stenosis: 60.0 %. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented mild claudication only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-PAD-ATHERO due to active mild claudication only."
+  },
+  {
+    "vignette_id": "DEV-LCD-PCI-APP",
+    "policy_id": "LCD-PCI",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents (LCD-PCI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents. Diagnostic clinical assessment demonstrates coronary stenosis: 75.0 %. Clinical examination and imaging confirms documented refractory angina. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo stenosis less than 50%.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents (LCD-PCI). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-PCI-NEG",
+    "policy_id": "LCD-PCI",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Cardiology Specialty Clinic\nEVALUATION FOR: Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents (LCD-PCI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents. Diagnostic assessment demonstrates non-qualifying coronary stenosis: 60.0 %. Clinical assessment indicates absence of refractory angina. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented stenosis less than 50%.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-PCI due to active stenosis less than 50%."
+  },
+  {
+    "vignette_id": "DEV-LCD-POWER-WC-APP",
+    "policy_id": "LCD-POWER-WC",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Complex Rehabilitative Power Wheelchairs (Group 3)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Complex Rehabilitative Power Wheelchairs (Group 3) (LCD-POWER-WC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Complex Rehabilitative Power Wheelchairs (Group 3). Clinical examination and imaging confirms documented unable to perform mradls. Clinical examination and imaging confirms documented specialty seating evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo outdoor use only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Complex Rehabilitative Power Wheelchairs (Group 3) (LCD-POWER-WC). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-POWER-WC-NEG",
+    "policy_id": "LCD-POWER-WC",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Complex Rehabilitative Power Wheelchairs (Group 3)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Complex Rehabilitative Power Wheelchairs (Group 3) (LCD-POWER-WC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Complex Rehabilitative Power Wheelchairs (Group 3). Clinical assessment indicates absence of unable to perform mradls. Clinical assessment indicates absence of specialty seating evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented outdoor use only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-POWER-WC due to active outdoor use only."
+  },
+  {
+    "vignette_id": "DEV-LCD-PROTON-APP",
+    "policy_id": "LCD-PROTON",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Proton Beam Radiotherapy",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Proton Beam Radiotherapy (LCD-PROTON)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Proton Beam Radiotherapy. Clinical examination and imaging confirms documented skull base chordoma. Clinical examination and imaging confirms documented comparative dosimetric plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo widespread metastases.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Proton Beam Radiotherapy (LCD-PROTON). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-PROTON-NEG",
+    "policy_id": "LCD-PROTON",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Proton Beam Radiotherapy",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Proton Beam Radiotherapy (LCD-PROTON)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Proton Beam Radiotherapy. Clinical assessment indicates absence of skull base chordoma. Clinical assessment indicates absence of comparative dosimetric plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented widespread metastases.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-PROTON due to active widespread metastases."
+  },
+  {
+    "vignette_id": "DEV-LCD-RAD-NIV-APP",
+    "policy_id": "LCD-RAD-NIV",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup) (LCD-RAD-NIV)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup). Diagnostic clinical assessment demonstrates paco2: 57.0 mm Hg. Clinical examination and imaging confirms documented cpap trial failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo simple obstructive sleep apnea.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup) (LCD-RAD-NIV). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-RAD-NIV-NEG",
+    "policy_id": "LCD-RAD-NIV",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup) (LCD-RAD-NIV)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup). Diagnostic assessment demonstrates non-qualifying paco2: 42.0 mm Hg. Clinical assessment indicates absence of cpap trial failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented simple obstructive sleep apnea.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-RAD-NIV due to active simple obstructive sleep apnea."
+  },
+  {
+    "vignette_id": "DEV-LCD-ROTATOR-CUFF-APP",
+    "policy_id": "LCD-ROTATOR-CUFF",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Rotator Cuff Repair (Open or Arthroscopic)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Rotator Cuff Repair (Open or Arthroscopic) (LCD-ROTATOR-CUFF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Rotator Cuff Repair (Open or Arthroscopic). Clinical examination and imaging confirms documented full-thickness rotator cuff tear. Patient completed trial of physical therapy trial for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo goutallier grade 4 fatty infiltration.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Rotator Cuff Repair (Open or Arthroscopic) (LCD-ROTATOR-CUFF). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-ROTATOR-CUFF-NEG",
+    "policy_id": "LCD-ROTATOR-CUFF",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Rotator Cuff Repair (Open or Arthroscopic)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Rotator Cuff Repair (Open or Arthroscopic) (LCD-ROTATOR-CUFF)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Rotator Cuff Repair (Open or Arthroscopic). Clinical assessment indicates absence of full-thickness rotator cuff tear. Inadequate trial: patient discontinued physical therapy trial after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented goutallier grade 4 fatty infiltration.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-ROTATOR-CUFF due to active goutallier grade 4 fatty infiltration."
+  },
+  {
+    "vignette_id": "DEV-LCD-SBRT-APP",
+    "policy_id": "LCD-SBRT",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Stereotactic Body Radiation Therapy (SBRT / SABR)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Stereotactic Body Radiation Therapy (SBRT / SABR) (LCD-SBRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Stereotactic Body Radiation Therapy (SBRT / SABR). Clinical examination and imaging confirms documented stage i nsclc. Clinical examination and imaging confirms documented 4d ct motion management. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo polymetastatic disease.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Stereotactic Body Radiation Therapy (SBRT / SABR) (LCD-SBRT). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-SBRT-NEG",
+    "policy_id": "LCD-SBRT",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Stereotactic Body Radiation Therapy (SBRT / SABR)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Radiation Oncology Specialty Clinic\nEVALUATION FOR: Stereotactic Body Radiation Therapy (SBRT / SABR) (LCD-SBRT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Stereotactic Body Radiation Therapy (SBRT / SABR). Clinical assessment indicates absence of stage i nsclc. Clinical assessment indicates absence of 4d ct motion management. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented polymetastatic disease.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-SBRT due to active polymetastatic disease."
+  },
+  {
+    "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-APP",
+    "policy_id": "LCD-SHOULDER-ARTHRO",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Total and Reverse Shoulder Arthroplasty",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total and Reverse Shoulder Arthroplasty (LCD-SHOULDER-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Total and Reverse Shoulder Arthroplasty. Clinical examination and imaging confirms documented glenohumeral osteoarthritis. Patient completed trial of shoulder physical therapy for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo axillary nerve palsy.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Total and Reverse Shoulder Arthroplasty (LCD-SHOULDER-ARTHRO). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-NEG",
+    "policy_id": "LCD-SHOULDER-ARTHRO",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Total and Reverse Shoulder Arthroplasty",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Surgery Specialty Clinic\nEVALUATION FOR: Total and Reverse Shoulder Arthroplasty (LCD-SHOULDER-ARTHRO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Total and Reverse Shoulder Arthroplasty. Clinical assessment indicates absence of glenohumeral osteoarthritis. Inadequate trial: patient discontinued shoulder physical therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented axillary nerve palsy.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-SHOULDER-ARTHRO due to active axillary nerve palsy."
+  },
+  {
+    "vignette_id": "DEV-LCD-WOUND-VAC-APP",
+    "policy_id": "LCD-WOUND-VAC",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Negative Pressure Wound Therapy (NPWT / Wound VAC) (LCD-WOUND-VAC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Negative Pressure Wound Therapy (NPWT / Wound VAC). Clinical examination and imaging confirms documented stage iii pressure ulcer. Patient completed trial of conventional wound care trial for 6 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo untreated osteomyelitis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Negative Pressure Wound Therapy (NPWT / Wound VAC) (LCD-WOUND-VAC). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-LCD-WOUND-VAC-NEG",
+    "policy_id": "LCD-WOUND-VAC",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Negative Pressure Wound Therapy (NPWT / Wound VAC) (LCD-WOUND-VAC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Negative Pressure Wound Therapy (NPWT / Wound VAC). Clinical assessment indicates absence of stage iii pressure ulcer. Inadequate trial: patient discontinued conventional wound care trial after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented untreated osteomyelitis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under LCD-WOUND-VAC due to active untreated osteomyelitis."
+  },
+  {
+    "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
+    "policy_id": "NCD-CARDIAC-REHAB",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Comprehensive Outpatient Cardiac Rehabilitation",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Preventive Cardiology Specialty Clinic\nEVALUATION FOR: Comprehensive Outpatient Cardiac Rehabilitation (NCD-CARDIAC-REHAB)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Comprehensive Outpatient Cardiac Rehabilitation. Clinical examination and imaging confirms documented acute myocardial infarction within 12 months. Clinical examination and imaging confirms documented individualized treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo decompensated heart failure.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Comprehensive Outpatient Cardiac Rehabilitation (NCD-CARDIAC-REHAB). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-CARDIAC-REHAB-NEG",
+    "policy_id": "NCD-CARDIAC-REHAB",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Comprehensive Outpatient Cardiac Rehabilitation",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Preventive Cardiology Specialty Clinic\nEVALUATION FOR: Comprehensive Outpatient Cardiac Rehabilitation (NCD-CARDIAC-REHAB)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Comprehensive Outpatient Cardiac Rehabilitation. Clinical assessment indicates absence of acute myocardial infarction within 12 months. Clinical assessment indicates absence of individualized treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented decompensated heart failure.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-CARDIAC-REHAB due to active decompensated heart failure."
+  },
+  {
+    "vignette_id": "DEV-NCD-CATARACT-APP",
+    "policy_id": "NCD-CATARACT",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Cataract Extraction with Intraocular Lens (IOL) Implantation",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology Specialty Clinic\nEVALUATION FOR: Cataract Extraction with Intraocular Lens (IOL) Implantation (NCD-CATARACT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Cataract Extraction with Intraocular Lens (IOL) Implantation. Clinical examination and imaging confirms documented visual acuity 20/50 or worse. Clinical examination and imaging confirms documented difficulty driving due to vision. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo clear lens extraction.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Cataract Extraction with Intraocular Lens (IOL) Implantation (NCD-CATARACT). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-CATARACT-NEG",
+    "policy_id": "NCD-CATARACT",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Cataract Extraction with Intraocular Lens (IOL) Implantation",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology Specialty Clinic\nEVALUATION FOR: Cataract Extraction with Intraocular Lens (IOL) Implantation (NCD-CATARACT)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Cataract Extraction with Intraocular Lens (IOL) Implantation. Clinical assessment indicates absence of visual acuity 20/50 or worse. Clinical assessment indicates absence of difficulty driving due to vision. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented clear lens extraction.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-CATARACT due to active clear lens extraction."
+  },
+  {
+    "vignette_id": "DEV-NCD-CCTA-APP",
+    "policy_id": "NCD-CCTA",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Coronary Computed Tomography Angiography (CCTA)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiovascular Radiology Specialty Clinic\nEVALUATION FOR: Coronary Computed Tomography Angiography (CCTA) (NCD-CCTA)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Coronary Computed Tomography Angiography (CCTA). Clinical examination and imaging confirms documented intermediate pre-test probability of cad. Clinical examination and imaging confirms documented inconclusive stress test. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo uncontrolled atrial fibrillation.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Coronary Computed Tomography Angiography (CCTA) (NCD-CCTA). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-CCTA-NEG",
+    "policy_id": "NCD-CCTA",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Coronary Computed Tomography Angiography (CCTA)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiovascular Radiology Specialty Clinic\nEVALUATION FOR: Coronary Computed Tomography Angiography (CCTA) (NCD-CCTA)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Coronary Computed Tomography Angiography (CCTA). Clinical assessment indicates absence of intermediate pre-test probability of cad. Clinical assessment indicates absence of inconclusive stress test. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented uncontrolled atrial fibrillation.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-CCTA due to active uncontrolled atrial fibrillation."
+  },
+  {
+    "vignette_id": "DEV-NCD-MPI-PET-APP",
+    "policy_id": "NCD-MPI-PET",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Cardiology Specialty Clinic\nEVALUATION FOR: Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging (NCD-MPI-PET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging. Clinical examination and imaging confirms documented intermediate cad risk. Diagnostic clinical assessment demonstrates body mass index: 40.0 kg/m2. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo asymptomatic screening.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging (NCD-MPI-PET). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-MPI-PET-NEG",
+    "policy_id": "NCD-MPI-PET",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Cardiology Specialty Clinic\nEVALUATION FOR: Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging (NCD-MPI-PET)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging. Clinical assessment indicates absence of intermediate cad risk. Diagnostic assessment demonstrates non-qualifying body mass index: 25.0 kg/m2. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented asymptomatic screening.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-MPI-PET due to active asymptomatic screening."
+  },
+  {
+    "vignette_id": "DEV-NCD-PACEMAKER-APP",
+    "policy_id": "NCD-PACEMAKER",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Permanent Cardiac Pacemakers for Bradyarrhythmias",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiology / Electrophysiology Specialty Clinic\nEVALUATION FOR: Permanent Cardiac Pacemakers for Bradyarrhythmias (NCD-PACEMAKER)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Permanent Cardiac Pacemakers for Bradyarrhythmias. Clinical examination and imaging confirms documented third degree av block. Clinical examination and imaging confirms documented absence of drug toxicity. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo asymptomatic first degree block.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Permanent Cardiac Pacemakers for Bradyarrhythmias (NCD-PACEMAKER). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-PACEMAKER-NEG",
+    "policy_id": "NCD-PACEMAKER",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Permanent Cardiac Pacemakers for Bradyarrhythmias",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Cardiology / Electrophysiology Specialty Clinic\nEVALUATION FOR: Permanent Cardiac Pacemakers for Bradyarrhythmias (NCD-PACEMAKER)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Permanent Cardiac Pacemakers for Bradyarrhythmias. Clinical assessment indicates absence of third degree av block. Clinical assessment indicates absence of absence of drug toxicity. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented asymptomatic first degree block.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-PACEMAKER due to active asymptomatic first degree block."
+  },
+  {
+    "vignette_id": "DEV-NCD-PET-ONC-APP",
+    "policy_id": "NCD-PET-ONC",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Medicine / Oncology Specialty Clinic\nEVALUATION FOR: Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging (NCD-PET-ONC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging. Clinical examination and imaging confirms documented biopsy-proven carcinoma. Clinical examination and imaging confirms documented impact on treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo routine surveillance in remission.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging (NCD-PET-ONC). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-PET-ONC-NEG",
+    "policy_id": "NCD-PET-ONC",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Nuclear Medicine / Oncology Specialty Clinic\nEVALUATION FOR: Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging (NCD-PET-ONC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging. Clinical assessment indicates absence of biopsy-proven carcinoma. Clinical assessment indicates absence of impact on treatment plan. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented routine surveillance in remission.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-PET-ONC due to active routine surveillance in remission."
+  },
+  {
+    "vignette_id": "DEV-NCD-PUMP-APP",
+    "policy_id": "NCD-PUMP",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Implantable Infusion Pumps for Intrathecal Therapy",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Oncology Specialty Clinic\nEVALUATION FOR: Implantable Infusion Pumps for Intrathecal Therapy (NCD-PUMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Implantable Infusion Pumps for Intrathecal Therapy. Clinical examination and imaging confirms documented intrathecal trial response. Clinical examination and imaging confirms documented failed systemic analgesics. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo active sepsis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Implantable Infusion Pumps for Intrathecal Therapy (NCD-PUMP). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-PUMP-NEG",
+    "policy_id": "NCD-PUMP",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Implantable Infusion Pumps for Intrathecal Therapy",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Oncology Specialty Clinic\nEVALUATION FOR: Implantable Infusion Pumps for Intrathecal Therapy (NCD-PUMP)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Implantable Infusion Pumps for Intrathecal Therapy. Clinical assessment indicates absence of intrathecal trial response. Clinical assessment indicates absence of failed systemic analgesics. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented active sepsis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-PUMP due to active active sepsis."
+  },
+  {
+    "vignette_id": "DEV-NCD-SCS-APP",
+    "policy_id": "NCD-SCS",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Neurosurgery Specialty Clinic\nEVALUATION FOR: Spinal Cord Stimulation (SCS) for Chronic Intractable Pain (NCD-SCS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Spinal Cord Stimulation (SCS) for Chronic Intractable Pain. Diagnostic clinical assessment demonstrates scs trial relief: 55.0 %. Clinical examination and imaging confirms documented psychological clearance. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo active substance abuse.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Spinal Cord Stimulation (SCS) for Chronic Intractable Pain (NCD-SCS). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-SCS-NEG",
+    "policy_id": "NCD-SCS",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Interventional Pain / Neurosurgery Specialty Clinic\nEVALUATION FOR: Spinal Cord Stimulation (SCS) for Chronic Intractable Pain (NCD-SCS)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Spinal Cord Stimulation (SCS) for Chronic Intractable Pain. Diagnostic assessment demonstrates non-qualifying scs trial relief: 40.0 %. Clinical assessment indicates absence of psychological clearance. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented active substance abuse.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-SCS due to active active substance abuse."
+  },
+  {
+    "vignette_id": "DEV-NCD-SGD-APP",
+    "policy_id": "NCD-SGD",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Speech Generating Devices (SGD)",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Speech Generating Devices (SGD) (NCD-SGD)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Speech Generating Devices (SGD). Clinical examination and imaging confirms documented severe expressive aphasia. Clinical examination and imaging confirms documented speech-language pathologist evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo unlocked commercial tablet.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Speech Generating Devices (SGD) (NCD-SGD). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-NCD-SGD-NEG",
+    "policy_id": "NCD-SGD",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Speech Generating Devices (SGD)",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Durable Medical Equipment (DMEPOS) Specialty Clinic\nEVALUATION FOR: Speech Generating Devices (SGD) (NCD-SGD)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Speech Generating Devices (SGD). Clinical assessment indicates absence of severe expressive aphasia. Clinical assessment indicates absence of speech-language pathologist evaluation. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented unlocked commercial tablet.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under NCD-SGD due to active unlocked commercial tablet."
+  },
+  {
+    "vignette_id": "DEV-OPD-BLEPH-APP",
+    "policy_id": "OPD-BLEPH",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology / Plastic Surgery Specialty Clinic\nEVALUATION FOR: Blepharoplasty, Blepharoptosis Repair, and Brow Lift (OPD-BLEPH)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Blepharoplasty, Blepharoptosis Repair, and Brow Lift. Diagnostic clinical assessment demonstrates visual field: 35.0 %. Diagnostic clinical assessment demonstrates MRD1: 1.5 mm. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo cosmetic appearance.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Blepharoplasty, Blepharoptosis Repair, and Brow Lift (OPD-BLEPH). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-OPD-BLEPH-NEG",
+    "policy_id": "OPD-BLEPH",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Ophthalmology / Plastic Surgery Specialty Clinic\nEVALUATION FOR: Blepharoplasty, Blepharoptosis Repair, and Brow Lift (OPD-BLEPH)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Blepharoplasty, Blepharoptosis Repair, and Brow Lift. Diagnostic assessment demonstrates non-qualifying visual field: 20.0 %. Diagnostic assessment demonstrates non-qualifying MRD1: 3.0 mm. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented cosmetic appearance.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-BLEPH due to active cosmetic appearance."
+  },
+  {
+    "vignette_id": "DEV-OPD-BOTOX-APP",
+    "policy_id": "OPD-BOTOX",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Neurology Specialty Clinic\nEVALUATION FOR: Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia (OPD-BOTOX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia. Diagnostic clinical assessment demonstrates headache frequency: 20.0 days/month. Clinical examination and imaging confirms documented oral prophylactic failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo episodic migraine.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia (OPD-BOTOX). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-OPD-BOTOX-NEG",
+    "policy_id": "OPD-BOTOX",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Neurology Specialty Clinic\nEVALUATION FOR: Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia (OPD-BOTOX)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia. Diagnostic assessment demonstrates non-qualifying headache frequency: 5.0 days/month. Clinical assessment indicates absence of oral prophylactic failure. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented episodic migraine.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-BOTOX due to active episodic migraine."
+  },
+  {
+    "vignette_id": "DEV-OPD-CERV-DISC-APP",
+    "policy_id": "OPD-CERV-DISC",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Cervical Artificial Disc Arthroplasty",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery / Neurosurgery Specialty Clinic\nEVALUATION FOR: Cervical Artificial Disc Arthroplasty (OPD-CERV-DISC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Cervical Artificial Disc Arthroplasty. Clinical examination and imaging confirms documented cervical radiculopathy. Patient completed trial of conservative physical therapy for 8 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo severe facet arthrosis.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Cervical Artificial Disc Arthroplasty (OPD-CERV-DISC). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-OPD-CERV-DISC-NEG",
+    "policy_id": "OPD-CERV-DISC",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Cervical Artificial Disc Arthroplasty",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Spine Surgery / Neurosurgery Specialty Clinic\nEVALUATION FOR: Cervical Artificial Disc Arthroplasty (OPD-CERV-DISC)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Cervical Artificial Disc Arthroplasty. Clinical assessment indicates absence of cervical radiculopathy. Inadequate trial: patient discontinued conservative physical therapy after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented severe facet arthrosis.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-CERV-DISC due to active severe facet arthrosis."
+  },
+  {
+    "vignette_id": "DEV-OPD-PANNI-APP",
+    "policy_id": "OPD-PANNI",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Panniculectomy and Abdominoplasty",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Plastic Surgery / General Surgery Specialty Clinic\nEVALUATION FOR: Panniculectomy and Abdominoplasty (OPD-PANNI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Panniculectomy and Abdominoplasty. Clinical examination and imaging confirms documented pannus hanging below pubis. Patient completed trial of intertrigo for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo body contouring only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Panniculectomy and Abdominoplasty (OPD-PANNI). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-OPD-PANNI-NEG",
+    "policy_id": "OPD-PANNI",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Panniculectomy and Abdominoplasty",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Plastic Surgery / General Surgery Specialty Clinic\nEVALUATION FOR: Panniculectomy and Abdominoplasty (OPD-PANNI)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Panniculectomy and Abdominoplasty. Clinical assessment indicates absence of pannus hanging below pubis. Inadequate trial: patient discontinued intertrigo after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented body contouring only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-PANNI due to active body contouring only."
+  },
+  {
+    "vignette_id": "DEV-OPD-RHINO-APP",
+    "policy_id": "OPD-RHINO",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Rhinoplasty and Septoplasty",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Otolaryngology / Facial Plastic Surgery Specialty Clinic\nEVALUATION FOR: Rhinoplasty and Septoplasty (OPD-RHINO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Rhinoplasty and Septoplasty. Patient completed trial of nasal obstruction for 27 weeks. Patient completed trial of intranasal steroids for 6 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo cosmetic reshaping.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Rhinoplasty and Septoplasty (OPD-RHINO). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-OPD-RHINO-NEG",
+    "policy_id": "OPD-RHINO",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Rhinoplasty and Septoplasty",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Otolaryngology / Facial Plastic Surgery Specialty Clinic\nEVALUATION FOR: Rhinoplasty and Septoplasty (OPD-RHINO)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Rhinoplasty and Septoplasty. Inadequate trial: patient discontinued nasal obstruction after only 1 week. Inadequate trial: patient discontinued intranasal steroids after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented cosmetic reshaping.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-RHINO due to active cosmetic reshaping."
+  },
+  {
+    "vignette_id": "DEV-OPD-SI-FUSION-APP",
+    "policy_id": "OPD-SI-FUSION",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Minimally Invasive Sacroiliac (SI) Joint Fusion",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Spine / Neurosurgery Specialty Clinic\nEVALUATION FOR: Minimally Invasive Sacroiliac (SI) Joint Fusion (OPD-SI-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Minimally Invasive Sacroiliac (SI) Joint Fusion. Diagnostic clinical assessment demonstrates diagnostic si block relief: 80.0 %. Diagnostic clinical assessment demonstrates positive provocation tests: 3.5 tests. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo active infection.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Minimally Invasive Sacroiliac (SI) Joint Fusion (OPD-SI-FUSION). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-OPD-SI-FUSION-NEG",
+    "policy_id": "OPD-SI-FUSION",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Minimally Invasive Sacroiliac (SI) Joint Fusion",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Orthopedic Spine / Neurosurgery Specialty Clinic\nEVALUATION FOR: Minimally Invasive Sacroiliac (SI) Joint Fusion (OPD-SI-FUSION)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Minimally Invasive Sacroiliac (SI) Joint Fusion. Diagnostic assessment demonstrates non-qualifying diagnostic si block relief: 65.0 %. Diagnostic assessment demonstrates non-qualifying positive provocation tests: 2.0 tests. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented active infection.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-SI-FUSION due to active active infection."
+  },
+  {
+    "vignette_id": "DEV-OPD-VEIN-APP",
+    "policy_id": "OPD-VEIN",
+    "vignette_type": "APPROVED",
+    "title": "Qualifying Clinical Scenario for Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+    "expected_decision": "APPROVED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovenous Ablation Therapy for Varicose Veins of Lower Extremity (OPD-VEIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents for evaluation regarding Endovenous Ablation Therapy for Varicose Veins of Lower Extremity. Diagnostic clinical assessment demonstrates venous reflux: 505.0 ms. Patient completed trial of compression stockings for 14 weeks. REVIEW OF SYSTEMS & EXCLUSIONS:\nNo spider veins only.\nASSESSMENT & PLAN:\nPatient satisfies all clinical coverage indications for Endovenous Ablation Therapy for Varicose Veins of Lower Extremity (OPD-VEIN). Plan to proceed with procedure."
+  },
+  {
+    "vignette_id": "DEV-OPD-VEIN-NEG",
+    "policy_id": "OPD-VEIN",
+    "vignette_type": "NEGATIVE_FRAMED",
+    "title": "Disqualified Clinical Scenario with Exclusion for Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+    "expected_decision": "DENIED",
+    "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL CONSULTATION NOTE: Vascular Surgery Specialty Clinic\nEVALUATION FOR: Endovenous Ablation Therapy for Varicose Veins of Lower Extremity (OPD-VEIN)\nHISTORY OF PRESENT ILLNESS:\nPatient presents with clinical presentation relevant to Endovenous Ablation Therapy for Varicose Veins of Lower Extremity. Diagnostic assessment demonstrates non-qualifying venous reflux: 490.0 ms. Inadequate trial: patient discontinued compression stockings after only 1 week. REVIEW OF SYSTEMS & EXCLUSIONS:\nExamination confirms active documented spider veins only.\nASSESSMENT & PLAN:\nProcedure is contraindicated and denied under OPD-VEIN due to active spider veins only."
+  }
+]

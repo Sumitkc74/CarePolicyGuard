@@ -607,6 +607,17 @@ class MultiAgentVerificationPipeline:
 
     def _get_fallback_criteria(self, policy_id: str) -> list:
         """Fallback criteria definitions if DB query not initialized."""
+        from app.services.declarative_engine import DeclarativePolicyEngine
+        decl = DeclarativePolicyEngine.load_policy(policy_id)
+        if decl:
+            crit_list = []
+            for c in decl.criteria:
+                cd = c.model_dump()
+                cd["keywords"] = [k.strip().lower() for k in c.entity_names]
+                cd["entity_names"] = list(c.entity_names)
+                crit_list.append(cd)
+            return crit_list
+
         if policy_id == "NCD-20.4":
             return [
                 {

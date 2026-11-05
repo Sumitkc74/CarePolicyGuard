@@ -52,20 +52,10 @@ let clinicalPresets = [];
 let lastAdjudicationResult = null;
 let cachedPoliciesList = [];
 let currentCoveragePacket = null;
-let currentPatientName = "Eleanor Vance";
+let currentPatientName = "Not on file";
 let currentPatientId = "PT-CARD-8821";
 
-const PRESET_PATIENT_NAME_MAP = {
-    "PT-CARD-8821": "Eleanor Vance",
-    "PT-CARD-9014": "Robert Thornton",
-    "PT-ICU-1029": "Harold Hayes",
-    "PT-RESP-4402": "Arthur Miller",
-    "PT-RESP-5510": "Thomas Sterling",
-    "PT-WOUND-3390": "Harold Washington",
-    "PT-CARD-6612": "Margaret Campbell",
-    "PT-CARD-7731": "James Wilson",
-    "PT-CARD-9944": "Beatrice Gomez"
-};
+const PRESET_PATIENT_NAME_MAP = {};
 
 function extractPatientNameFromNote(text) {
     if (!text) return null;
@@ -82,12 +72,12 @@ function extractPatientNameFromNote(text) {
 function formatEvidenceQuoteForClinician(quote, patientName) {
     if (!quote) return "Not documented in record";
     if (currentRole === "Auditor") return quote;
-    const patName = patientName || "Eleanor Vance";
+    const patName = patientName || "Not on file";
     return quote.replace(/\[REDACTED-NAME\]/g, patName)
                 .replace(/PATIENT:\s*\[REDACTED\]/gi, `PATIENT: ${patName}`)
                 .replace(/\[REDACTED-MRN\]/g, "MRN-882104")
                 .replace(/MRN:\s*\[REDACTED\]/gi, "MRN: PT-CARD-8821")
-                .replace(/DOB:\s*\[REDACTED\]/gi, "DOB: 05/14/1958");
+                .replace(/DOB:\s*\[REDACTED\]/gi, "DOB: Not on file (Synthetic Test Case)");
 }
 
 function getActivePatientIdentity() {
@@ -104,34 +94,22 @@ function getActivePatientIdentity() {
                 (currentCoveragePacket && currentCoveragePacket.patient_id) || 
                 currentPatientId || "PT-CARD-8821";
 
-    if (patId.includes("***")) {
-        for (let realId in PRESET_PATIENT_NAME_MAP) {
-            if (realId.endsWith(patId.slice(-4))) {
-                patId = realId;
-                break;
-            }
-        }
-        if (patId.includes("***")) patId = "PT-CARD-8821";
-    }
-
     let name = currentPatientName;
 
     const inputNameElem = document.getElementById("patient-name-input");
-    if (inputNameElem && inputNameElem.value.trim() && inputNameElem.value.trim() !== "Eleanor Vance") {
+    if (inputNameElem && inputNameElem.value.trim() && inputNameElem.value.trim() !== "Not on file") {
         name = inputNameElem.value.trim();
     } else if (currentCoveragePacket && currentCoveragePacket.patient_name && !currentCoveragePacket.patient_name.includes("REDACTED")) {
         name = currentCoveragePacket.patient_name;
-    } else if (PRESET_PATIENT_NAME_MAP[patId]) {
-        name = PRESET_PATIENT_NAME_MAP[patId];
     } else {
         const pMatch = clinicalPresets.find(p => p.patient_id === patId || p.id === selectedModalPresetId);
-        if (pMatch && pMatch.patient_name) {
+        if (pMatch && pMatch.patient_name && pMatch.patient_name !== "Not on file") {
             name = pMatch.patient_name;
         }
     }
 
     return {
-        patient_name: name || "Eleanor Vance",
+        patient_name: name || "Not on file",
         patient_id: patId
     };
 }
@@ -1972,7 +1950,7 @@ function loadPreset(presetId) {
     if (patElem) patElem.value = p.patient_id;
     if (ehrElem) ehrElem.value = p.ehr_text;
 
-    const resolvedName = p.patient_name || PRESET_PATIENT_NAME_MAP[p.patient_id] || "Eleanor Vance";
+    const resolvedName = p.patient_name || "Not on file";
     const nameElem = document.getElementById("patient-name-input");
     if (nameElem) nameElem.value = resolvedName;
     currentPatientName = resolvedName;
@@ -2139,7 +2117,7 @@ function confirmLoadSampleAndProceed() {
     const p = clinicalPresets.find(x => x.id === selectedModalPresetId);
     let sampleText = p ? p.ehr_text : (document.getElementById("ehr-input")?.value || "");
 
-    const patientName = p ? (p.patient_name || p.label) : "Eleanor Vance";
+    const patientName = p ? (p.patient_name || "Not on file") : "Not on file";
     const patientId = p ? (p.patient_id || "PT-CARD-8821") : "PT-CARD-8821";
 
     if (currentRole !== "Auditor" && sampleText) {
@@ -2158,7 +2136,7 @@ function confirmLoadSampleAndProceed() {
     const banner = document.getElementById("active-note-badge-banner");
     const descText = document.getElementById("active-note-description-text");
     if (banner && descText) {
-        const patientName = p ? (p.patient_name || p.label) : "Eleanor Vance";
+        const patientName = p ? (p.patient_name || "Not on file") : "Not on file";
         descText.textContent = `Loaded Sample Note: ${patientName} — Click "Clear" anytime to use your own note`;
         banner.classList.remove("hidden");
     }
@@ -2783,8 +2761,7 @@ function updatePolicyStep2Preview() {
         if (currentNoteMode === "actual") {
             patElem.textContent = `Patient Identifier: ${patientId} (Actual Clinical Consultation Note)`;
         } else {
-            const patName = patientId === "PT-CARD-8821" ? "Eleanor Vance" : (patientId === "PT-RESP-4402" ? "Arthur Miller" : (patientId === "PT-CARD-9014" ? "Robert Thornton" : "Harold Hayes"));
-            patElem.textContent = `Sample Patient: ${patName} (${patientId})`;
+            patElem.textContent = `Sample Case: Synthetic Test Record (${patientId})`;
         }
     }
 
@@ -4502,7 +4479,7 @@ function populatePacketDocument() {
     const docJurisdiction = document.getElementById("doc-jurisdiction");
 
     const p = currentCoveragePacket || {};
-    const patName = (currentRole === "Auditor") ? "[REDACTED (Auditor Mode)]" : (patientIdentity.patient_name || p.patient_name || "Eleanor Vance");
+    const patName = (currentRole === "Auditor") ? "[REDACTED (Auditor Mode)]" : (patientIdentity.patient_name || p.patient_name || "Not on file");
     const patId = (currentRole === "Auditor") ? (p.patient_id_masked || "PT-***8821") : (patientIdentity.patient_id || p.patient_id || "PT-CARD-8821");
 
     if (docPacketId) docPacketId.textContent = p.packet_id || (lastAdjudicationResult ? `CMS-PAC-${lastAdjudicationResult.case_id}` : "CMS-PAC-2026-8821");
@@ -4958,7 +4935,7 @@ function printPacketDocument() {
         p = {
             packet_id: document.getElementById("doc-packet-id")?.textContent || "CMS-PAC-2026-FORM",
             patient_id: patientIdentity.patient_id || "PT-CARD-8821",
-            patient_name: patientIdentity.patient_name || "Eleanor Vance",
+            patient_name: patientIdentity.patient_name || "Not on file",
             patient_id_masked: "PT-***8821",
             date_of_service: document.getElementById("doc-dos")?.textContent || new Date().toISOString().split("T")[0],
             policy_id: "NCD 20.4",
@@ -5964,7 +5941,7 @@ const SAMPLE_BATCH_ROSTERS = {
     practice: [
         {
             patient_id: "PT-CARD-881",
-            patient_name: "Eleanor Vance",
+            patient_name: "Not on file",
             demographics: "68yo M",
             procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",
@@ -6038,7 +6015,7 @@ Electronically signed by: /s/ Dr. Marcus Vance, MD`
     cardiology: [
         {
             patient_id: "PT-CARD-881",
-            patient_name: "Eleanor Vance",
+            patient_name: "Not on file",
             demographics: "68yo M",
             procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",
@@ -6164,7 +6141,7 @@ Electronically signed by: /s/ Dr. Evelyn Reed, MD`
     mixed: [
         {
             patient_id: "PT-CARD-881",
-            patient_name: "Eleanor Vance",
+            patient_name: "Not on file",
             demographics: "68yo M",
             procedure_name: "ICD Implantation (Transvenous)",
             policy_id: "NCD-20.4",

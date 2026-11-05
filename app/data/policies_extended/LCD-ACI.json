@@ -115,5 +115,13 @@
       "source_text_excerpt": null
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "real_cms_id": "LCD L35024",
+    "authority": "Medicare Administrative Contractor (MAC) LCD",
+    "document_title": "Autologous Chondrocyte Implantation (ACI)",
+    "citation": "CMS Medicare Coverage Database LCD L35024 / NCD 150.9",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=35024",
+    "provenance_status": "SUMMARIZED_FROM_CMS_MCD"
+  }
 }
