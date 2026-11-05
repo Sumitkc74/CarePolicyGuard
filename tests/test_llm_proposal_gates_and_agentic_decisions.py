@@ -407,27 +407,22 @@ def test_agent3_concession_outcome():
 
 def test_agent4_candidate_tau_and_operative_tau():
     """
-    Agent 4 derives candidate tau from development data using CalibrationHarness,
-    labels it 'derived-on-development-data', and preserves the operative tau=0.85.
+    Agent 4 runs calibration sweep over tau on development scores,
+    labels it 'exploratory-analysis-on-development-data' (not a derived tau),
+    and preserves operative tau = 0.85 without claiming a derived threshold.
     """
     gate = CalibratedAbstentionGate(tau=0.85)
 
-    synthetic_dev_data = [
-        {"raw_score": 0.95, "is_false_approval": False},
-        {"raw_score": 0.90, "is_false_approval": False},
-        {"raw_score": 0.85, "is_false_approval": False},
-        {"raw_score": 0.82, "is_false_approval": True},
-        {"raw_score": 0.70, "is_false_approval": True},
-    ]
-
-    analysis = gate.derive_candidate_tau(dev_dataset=synthetic_dev_data, max_false_approval_rate=0.0)
+    sweep = gate.run_exploratory_tau_sweep()
 
     # Operative threshold must remain exactly 0.85
-    assert analysis["operative_tau"] == 0.85
-    # Candidate tau derived at 0% false approval constraint
-    assert analysis["candidate_tau"] in (0.85, 0.90, 0.95)
-    assert analysis["label"] == "derived-on-development-data"
-    assert "0%" in analysis["notes"]
+    assert sweep["operative_tau"] == 0.85
+    assert sweep["label"] == "exploratory-analysis-on-development-data"
+    assert sweep["is_derived_tau"] is False
+    assert len(sweep["analysis_grid"]) > 0
+    # No value in the report is claimed as a derived tau
+    assert "derived_threshold_tau" not in sweep
+    assert "no threshold is claimed as a derived tau" in sweep["disclaimer"].lower()
 
 
 def test_agent4_deferral_queue_prioritization():
@@ -506,7 +501,8 @@ def test_agentic_pipeline_e2e_adjudication():
 
     assert res.candidate_tau_analysis is not None
     assert res.candidate_tau_analysis["operative_tau"] == 0.85
-    assert res.candidate_tau_analysis["label"] == "derived-on-development-data"
+    assert res.candidate_tau_analysis["label"] == "exploratory-analysis-on-development-data"
+    assert res.candidate_tau_analysis["is_derived_tau"] is False
 
     assert res.llm_proposal_metadata is not None
     assert "enabled" in res.llm_proposal_metadata

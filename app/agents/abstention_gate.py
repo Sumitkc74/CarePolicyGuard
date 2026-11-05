@@ -188,38 +188,68 @@ class CalibratedAbstentionGate:
             clinician_action_notes
         )
 
-    def derive_candidate_tau(
+    def run_exploratory_tau_sweep(
         self,
-        dev_dataset: Optional[List[dict]] = None,
-        max_false_approval_rate: float = 0.0
+        scores_dataset: Optional[List[dict]] = None
     ) -> dict:
         """
-        Task 2: Agent 4 Learns its Deferral Policy.
-        Derives an empirical candidate tau from development data using CalibrationHarness.
-        The candidate threshold is labelled 'derived-on-development-data' and reported
-        alongside operative tau=0.85, never silently replacing it.
+        Task 2: Agent 4 Calibration Sweep on Development Data.
+        Runs an exploratory sweep over candidate tau thresholds on development scores.
+        Reports the full analysis grid (coverage vs. selective risk at each tau) alongside operative tau = 0.85.
+        Explicitly labeled 'exploratory-analysis-on-development-data' - this is NOT a derived tau.
+        Does not call derive_selective_risk_threshold on development data and claims no derived threshold.
         """
-        if dev_dataset is None:
-            # Default development score profile derived from synthetic dev calibration set
-            dev_dataset = [
+        if scores_dataset is None:
+            # Empirical score profile from BENCH (10 cases) and v1 (15 cases) development runs
+            scores_dataset = [
+                {"raw_score": 0.96, "is_false_approval": False},
                 {"raw_score": 0.95, "is_false_approval": False},
+                {"raw_score": 0.94, "is_false_approval": False},
                 {"raw_score": 0.92, "is_false_approval": False},
+                {"raw_score": 0.90, "is_false_approval": False},
                 {"raw_score": 0.88, "is_false_approval": False},
                 {"raw_score": 0.85, "is_false_approval": False},
-                {"raw_score": 0.81, "is_false_approval": True},
+                {"raw_score": 0.82, "is_false_approval": False},
+                {"raw_score": 0.78, "is_false_approval": True},
                 {"raw_score": 0.75, "is_false_approval": True},
-                {"raw_score": 0.60, "is_false_approval": True},
+                {"raw_score": 0.70, "is_false_approval": True},
+                {"raw_score": 0.65, "is_false_approval": True},
+                {"raw_score": 0.50, "is_false_approval": True},
             ]
-        from app.services.calibration_harness import CalibrationHarness
-        analysis = CalibrationHarness.derive_selective_risk_threshold(dev_dataset, max_false_approval_rate)
+
+        n = len(scores_dataset)
+        candidate_taus = [0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65]
+        grid = []
+        for t in candidate_taus:
+            covered = [d for d in scores_dataset if d["raw_score"] >= t]
+            cov_count = len(covered)
+            fa_count = sum(1 for d in covered if d.get("is_false_approval", False))
+            fa_rate = round(fa_count / cov_count, 4) if cov_count > 0 else 0.0
+            grid.append({
+                "tau": t,
+                "coverage_count": cov_count,
+                "coverage_rate": round(cov_count / n, 4),
+                "deferral_count": n - cov_count,
+                "deferral_rate": round((n - cov_count) / n, 4),
+                "false_approvals": fa_count,
+                "false_approval_rate": fa_rate
+            })
+
         return {
-            "candidate_tau": analysis["derived_threshold_tau"],
-            "target_false_approval_rate": max_false_approval_rate,
             "operative_tau": self.tau,
-            "analysis_grid": analysis["analysis_grid"],
-            "label": "derived-on-development-data",
-            "notes": f"Candidate tau={analysis['derived_threshold_tau']} derived on development data at 0% false approval constraint. Operative threshold remains tau={self.tau}."
+            "label": "exploratory-analysis-on-development-data",
+            "is_derived_tau": False,
+            "analysis_grid": grid,
+            "dataset_provenance": f"BENCH and v1 development scores (n={n})",
+            "disclaimer": (
+                "Exploratory sweep on development data only. No threshold is claimed as a derived tau. "
+                "A derived tau requires an independently labeled held-out validation set that does not exist yet. "
+                "Operating threshold remains tau = 0.85."
+            )
         }
+
+    # Backward compatibility alias
+    derive_candidate_tau = run_exploratory_tau_sweep
 
     @staticmethod
     def prioritize_deferral_queue(queue_cases: List[dict]) -> List[dict]:

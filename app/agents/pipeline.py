@@ -347,8 +347,8 @@ class MultiAgentVerificationPipeline:
         insufficient_criteria = [c.criterion_code for c in criteria_assessments if c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE and not c.is_exclusion]
         deferral_reason = abstention_reason if decision == AdjudicationDecision.DEFERRED_TO_HUMAN else None
 
-        # 5h. Agent 4 Candidate Tau & Agentic Audit Trail (Task 1 & Task 2)
-        candidate_tau_analysis = self.abstention_gate.derive_candidate_tau()
+        # 5h. Agent 4 Exploratory Calibration Sweep & Agentic Audit Trail (Task 1 & Task 2)
+        candidate_tau_analysis = self.abstention_gate.run_exploratory_tau_sweep()
         agentic_audit_trail = {
             "agent_1_retrieval": {
                 "selected_policy_id": policy_id,
@@ -361,8 +361,8 @@ class MultiAgentVerificationPipeline:
             "agent_3_debate_rounds": agent3_debate_rounds,
             "agent_4_abstention_gate": {
                 "operative_tau": gate_tau,
-                "candidate_tau": candidate_tau_analysis.get("candidate_tau"),
-                "candidate_label": candidate_tau_analysis.get("label"),
+                "sweep_label": candidate_tau_analysis.get("label"),
+                "is_derived_tau": False,
                 "abstention_activated": abstention_status,
                 "decision": decision.value,
                 "sufficiency_score": calibrated_aggregate_conf
