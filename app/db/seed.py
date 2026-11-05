@@ -109,11 +109,14 @@ def seed_demo_users(db: Session):
                 mfa_method=u_data.get("mfa_method"),
                 mfa_enabled_methods=u_data.get("mfa_enabled_methods"),
                 totp_secret=totp_sec,
-                is_active=True
+                is_active=True,
+                is_demo_user=True,
+                is_bootstrap=False
             )
             db.add(user)
         else:
             existing.hashed_password = get_password_hash(u_data["password"])
+            existing.is_demo_user = True
             if totp_sec:
                 existing.totp_secret = totp_sec
                 existing.mfa_enabled_methods = u_data.get("mfa_enabled_methods")

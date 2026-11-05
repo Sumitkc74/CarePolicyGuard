@@ -93,10 +93,73 @@ In the hardened codebase:
 1. Hardcoded demo passwords have been completely purged from application configuration and source code.
 2. Demo account seeding is disabled by default (`SEED_DEMO_USERS=false`).
 3. When seeding is explicitly enabled for development environments, passwords must be supplied exclusively via environment variables (`DEMO_ADMIN_PASSWORD`, `DEMO_CLINICIAN_PASSWORD`, `DEMO_AUDITOR_PASSWORD`, `DEMO_DOCTOR_PASSWORD`) with no default fallback. Startup will fail immediately if any required environment variable is missing or empty.
+4. Demo-seeded accounts carry `is_demo_user=True` and are strictly segregated from production: they do NOT count as production administrators and cannot close the production bootstrap gateway.
 
 ---
 
-## 7. Coordinated Vulnerability Disclosure
+## 7. Clinician Verification & Account Provisioning Architecture (Separation of Duties)
+
+### A. Separation of Authority
+CarePolicyGuard enforces a strict administrative separation of duties between account provisioning and medical credential verification:
+
+```
+[System Operator / Admin] --(Provisions)--> Account Exists (UNVERIFIED, Cannot Sign)
+                                                      |
+[Primary Source / Credentialing] --(Verifies)--------+--> Signing Authority Unlocked
+```
+
+1. **Admins Provision, Never Self-Grant Verification**:
+   - Administrators create or invite clinician accounts (`POST /api/v1/admin/users/clinicians`).
+   - Accounts are created **unverified** (`is_verified_medical_pro=False`).
+   - Admin provisioning never generates or invents an NPI, clinical degree, or specialty.
+   - Self-registration requesting the Admin role is strictly rejected with HTTP 403 Forbidden.
+2. **Primary-Source Credentialing Authority**:
+   - Verification is performed exclusively via real-time primary-source lookup (`POST /api/v1/credentialing/verify/nppes`) against the CMS NPPES National Provider Identifier Registry API or manual review by a dedicated `Credentialing` role (`POST /api/v1/credentialing/verify/manual`).
+   - Requires an authentic name match between the account holder and the registered NPPES provider record.
+   - Fails closed on network timeout, registry unreachable, or name mismatch.
+3. **Mandatory Two-Action Rule**:
+   - In small deployments where the same operator holds both Administrator and Credentialing roles, the system strictly enforces two distinct recorded actions with two distinct immutable audit entries (one provisioning event, followed by an independent credentialing verification event). Single-button "provision-and-verify" bypasses are prohibited.
+
+### B. Production Bootstrap Administrator Procedure
+Production environments must initialize their initial administrator through an explicit, one-time bootstrap procedure — never through public self-registration:
+
+1. **Operator CLI Bootstrap Command (Recommended)**:
+   ```bash
+   python -m app.cli bootstrap-admin --email admin@hospital.org --password "StrongInitialPassword!2026" --name "System Administrator"
+   ```
+2. **Deployment Environment Bootstrap**:
+   Set `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` in the deployment orchestration environment (Kubernetes secret, AWS ECS task definition). The application will bootstrap the first administrator on initial startup.
+3. **Permanent Gateway Closure**:
+   Once the first production administrator account is provisioned (`is_production_admin_seeded(db) == True`), the bootstrap path permanently closes itself. Any subsequent bootstrap attempts via CLI or environment variables are rejected and recorded in security audit logs. Subsequent administrators can only be created by an authenticated administrator via `POST /api/v1/admin/users/admins`.
+4. **First-Login Security Enforcement**:
+   The bootstrap administrator is flagged with `must_change_password=True` and `must_setup_mfa=True`. The administrator must update their password and finalize secondary-factor enrollment via `POST /api/v1/auth/bootstrap/complete-setup`.
+5. **Operator Credential Recovery (No Backdoors)**:
+   CarePolicyGuard contains zero backdoor endpoints, reset tokens, or hardcoded recovery keys. If all production administrator credentials are lost, recovery requires an out-of-band operator action directly on the underlying database engine:
+   ```sql
+   -- Direct database operator action outside application code:
+   UPDATE users SET is_active = 0 WHERE role = 'Admin';
+   -- Operator then restarts the service with new BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD
+   -- or executes the CLI bootstrap command directly on the host.
+   ```
+
+### C. Legacy Self-Registered Admin Accounts Remediation
+Historical deployments may contain administrator accounts created via the open self-registration endpoint prior to remediation.
+- **Automated Startup Check**: `audit_self_registered_admins(db)` automatically executes on startup, identifying any Admin account that was not created via bootstrap, demo seed, or authorized admin provisioning.
+- **Immediate Suspension**: Suspicious legacy admin accounts are immediately suspended (`is_active=False`) with an alert logged to the operator.
+- **Mandatory Operator Action**: System operators must review the suspended accounts, verify identities out-of-band, and either permanently delete the accounts from the database or re-provision them through authorized admin workflows.
+
+### D. Credential Expiry & Annual Re-verification Policy
+Medical licensure and NPI registrations expire and require periodic re-credentialing:
+- **Policy Choice**: Verification records track `verification_expires_at`, set by default to 365 days (`CREDENTIAL_VERIFICATION_VALIDITY_DAYS=365`) from the date of primary-source verification.
+- **Hard Gate Enforcement**: If a clinician's verification has expired, `get_verified_clinician_user` immediately blocks all new clinical sign-offs with HTTP 403 Forbidden until primary-source or manual re-verification is completed.
+- **Non-Retroactive Invariant**: Revocation or expiration blocks new sign-offs immediately; it never alters, invalidates, or deletes past signed determinations, which remain permanently auditable.
+
+### E. Downgrade Migration for Legacy Accounts (No Grandfathering)
+Existing accounts that were previously marked as "verified" purely via format checks (`NPPES_CMS_LUHN_VERIFIED` / `FORMAT_CHECK_ONLY`) or OAuth auto-provisioning are automatically downgraded to unverified pending status upon application upgrade. Grandfathering is strictly prohibited to eliminate legacy credentialing vulnerabilities.
+
+---
+
+## 8. Coordinated Vulnerability Disclosure
 
 To report a suspected security vulnerability or compliance concern, please submit a detailed report to the clinical engineering team:
 - Email: `security@carepolicyguard.med`

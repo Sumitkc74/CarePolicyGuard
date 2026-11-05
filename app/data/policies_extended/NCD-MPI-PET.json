@@ -1,0 +1,121 @@
+{
+  "policy_id": "NCD-MPI-PET",
+  "title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Nuclear Cardiology",
+  "description": "CMS National Coverage Determination for Rubidium-82 / Ammonia N-13 PET myocardial perfusion imaging (NCD 220.6). Requires known or intermediate-to-high risk suspected coronary artery disease (CAD), inconclusive or uninterpretable prior SPECT or stress ECG, or severe obesity (BMI >= 35) precluding adequate SPECT quality.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 220.6 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PETM-01",
+      "name": "Intermediate-to-High Pre-Test CAD Probability",
+      "description": "Documented intermediate or high pre-test probability of ischemic coronary artery disease based on symptoms, age, and cardiac risk factors.",
+      "clinical_intent": "Establish pre-test probability threshold",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "intermediate cad risk",
+        "high cad risk",
+        "anginal chest pain",
+        "known coronary artery disease"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "intermediate cad risk",
+        "high cad risk",
+        "anginal chest pain",
+        "known coronary artery disease"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.6",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: CAD Risk",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PETM-02",
+      "name": "Suboptimal SPECT Imaging or Severe Obesity (BMI >= 35 kg/m2)",
+      "description": "Documented prior inconclusive/equivocal SPECT stress test, or severe obesity with BMI >= 35 kg/m2 causing severe soft tissue attenuation artifact.",
+      "clinical_intent": "Justify necessity of PET over standard SPECT",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "body mass index",
+        "bmi",
+        "obesity attenuation artifact"
+      ],
+      "operator": ">=",
+      "threshold": 35.0,
+      "target_unit": "kg/m2",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.8,
+      "keywords": [
+        "body mass index",
+        "bmi",
+        "obesity attenuation artifact"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.6",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Attenuation Justification",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PETM-EXCL-01",
+      "name": "Low Risk Asymptomatic Screening Exclusion",
+      "description": "Cardiac PET performed as routine general screening in asymptomatic low-risk individuals.",
+      "clinical_intent": "Statutory non-coverage of screening PET in low risk patients",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "asymptomatic screening",
+        "low cad risk screening",
+        "routine cardiac screening"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "asymptomatic screening",
+        "low cad risk screening",
+        "routine cardiac screening"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.6",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Screening Non-Coverage",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

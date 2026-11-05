@@ -78,12 +78,43 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DEBUG: bool = os.getenv("DEBUG", "true").lower() in ("true", "1", "yes")
 
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def validate_debug(cls, v: Any) -> bool:
+        if isinstance(v, bool):
+            return v
+        return str(v).lower() in ("true", "1", "yes", "dev", "development")
+
     # Retention & Minimization Policies (HIPAA 45 CFR § 164.502(b), § 164.526)
     RETENTION_DAYS_ADJUDICATION: int = int(os.getenv("RETENTION_DAYS_ADJUDICATION", "30"))
     RETENTION_DAYS_QUEUE: int = int(os.getenv("RETENTION_DAYS_QUEUE", "14"))
 
     # Development-only MFA delivery channel (Forbidden in production)
     DEV_OTP_DELIVERY_ENABLED: bool = os.getenv("DEV_OTP_DELIVERY_ENABLED", "false").lower() in ("true", "1", "yes")
+
+    # Development-only Mock OAuth Acceptance (Strictly prohibited in production)
+    DEV_MOCK_OAUTH_ENABLED: bool = os.getenv("DEV_MOCK_OAUTH_ENABLED", "false").lower() in ("true", "1", "yes")
+
+    # Production First-Admin Bootstrap (One-time, closes permanently once first admin exists)
+    BOOTSTRAP_ADMIN_EMAIL: str = os.getenv("BOOTSTRAP_ADMIN_EMAIL", "")
+    BOOTSTRAP_ADMIN_PASSWORD: str = os.getenv("BOOTSTRAP_ADMIN_PASSWORD", "")
+
+    # Credentialing & Licensure Verification Validity Period (Days until re-verification required)
+    CREDENTIAL_VERIFICATION_VALIDITY_DAYS: int = int(os.getenv("CREDENTIAL_VERIFICATION_VALIDITY_DAYS", "365"))
+
+    @field_validator("DEV_MOCK_OAUTH_ENABLED", mode="after")
+    @classmethod
+    def validate_dev_mock_oauth(cls, v: bool) -> bool:
+        env = os.getenv("ENVIRONMENT", "development").lower()
+        debug_val = os.getenv("DEBUG", "true").lower() in ("true", "1", "yes")
+        if env == "production" or not debug_val:
+            if v:
+                import logging
+                logging.getLogger("app.core.config").warning(
+                    "[SECURITY ALERT]: DEV_MOCK_OAUTH_ENABLED is strictly prohibited when ENVIRONMENT=production or DEBUG=False. Forcing to False."
+                )
+            return False
+        return v
 
     @field_validator("DEV_OTP_DELIVERY_ENABLED", mode="after")
     @classmethod

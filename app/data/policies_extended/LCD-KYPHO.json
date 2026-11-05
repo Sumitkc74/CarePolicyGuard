@@ -1,0 +1,127 @@
+{
+  "policy_id": "LCD-KYPHO",
+  "title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Interventional Radiology / Spine Surgery",
+  "description": "Medicare coverage criteria for balloon kyphoplasty and vertebroplasty. Requires acute or subacute osteoporotic vertebral compression fracture (VCF) confirmed by MRI with bone marrow edema <= 4 months old, severe focal pain (NRS >= 6/10), and failure of conservative analgesic management.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-KYPHO-01",
+      "name": "Severe Pain Score (NRS/VAS >= 6/10)",
+      "description": "Severe debilitating focal vertebral pain with pain score >= 6 on 0-10 numeric rating scale (NRS).",
+      "clinical_intent": "Validate severe acute pain intensity",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "pain score",
+        "numeric rating scale",
+        "vas score",
+        "nrs pain score"
+      ],
+      "operator": ">=",
+      "threshold": 6.0,
+      "target_unit": "score",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "pain score",
+        "numeric rating scale",
+        "vas score",
+        "nrs pain score"
+      ],
+      "cms_document": "Medicare LCD Vertebral Augmentation",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Pain Severity",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-KYPHO-02",
+      "name": "Acute Edema on MRI Confirming Recent Compression Fracture",
+      "description": "STIR or T2 MRI demonstrating hyperintense bone marrow edema confirming an acute/subacute fracture of the target vertebral body (or positive bone scan).",
+      "clinical_intent": "Confirm acute active fracture edema",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "bone marrow edema on mri",
+        "acute compression fracture",
+        "stir hyperintensity",
+        "subacute vertebral fracture"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 4 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "bone marrow edema on mri",
+        "acute compression fracture",
+        "stir hyperintensity",
+        "subacute vertebral fracture"
+      ],
+      "cms_document": "Medicare LCD Vertebral Augmentation",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Imaging Criteria",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-KYPHO-EXCL-01",
+      "name": "Active Spinal Infection or Chronic Healed Fracture Exclusion",
+      "description": "Active osteomyelitis, discitis, epidural abscess, or completely healed chronic fracture without marrow edema.",
+      "clinical_intent": "Exclude infection and chronic healed fractures",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "osteomyelitis",
+        "discitis",
+        "epidural abscess",
+        "chronic healed fracture",
+        "absence of bone marrow edema"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "osteomyelitis",
+        "discitis",
+        "epidural abscess",
+        "chronic healed fracture",
+        "absence of bone marrow edema"
+      ],
+      "cms_document": "Medicare LCD Vertebral Augmentation",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

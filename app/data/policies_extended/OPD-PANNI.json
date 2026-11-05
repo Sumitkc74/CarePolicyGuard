@@ -1,0 +1,127 @@
+{
+  "policy_id": "OPD-PANNI",
+  "title": "Panniculectomy and Abdominoplasty",
+  "jurisdiction": "CMS Hospital Outpatient Prior Authorization (42 CFR \u00a7 419.80)",
+  "effective_date": "2020-07-01",
+  "category": "Plastic Surgery / General Surgery",
+  "description": "CMS prior authorization for panniculectomy. Mandates pannus hanging below the level of the pubis symphysis, documented chronic intertrigo, cellulitis, or ulceration unresponsive to at least 3 months of medical therapy, and stable weight for >= 6 months if post-bariatric surgery.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "OPD Prior Authorization guidelines."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PANNI-01",
+      "name": "Severe Apron/Pannus (Hanging Below Pubis Symphysis)",
+      "description": "Photographic and clinical examination confirming the pannus/abdominal apron hangs below the level of the pubis symphysis.",
+      "clinical_intent": "Objective anatomical severity threshold",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "pannus hanging below pubis",
+        "pubic symphysis",
+        "abdominal apron below pubis",
+        "grade 2 pannus or higher"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "pannus hanging below pubis",
+        "pubic symphysis",
+        "abdominal apron below pubis",
+        "grade 2 pannus or higher"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 3: Panniculectomy Indications",
+      "source_paragraph": "Paragraph 1: Anatomical Severity",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PANNI-02",
+      "name": "Refractory Intertrigo / Dermatitis (>= 3 Months Medical Therapy)",
+      "description": "Documented chronic intertrigo, maceration, or fungal infection under the pannus refractory to >= 3 months of prescribed topical or systemic medical therapy.",
+      "clinical_intent": "Confirm medical necessity due to persistent chronic infection",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "intertrigo",
+        "skin breakdown",
+        "chronic maceration",
+        "antifungal therapy trial",
+        "topical medical therapy"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 3 months / 90 days",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "intertrigo",
+        "skin breakdown",
+        "chronic maceration",
+        "antifungal therapy trial",
+        "topical medical therapy"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 3: Panniculectomy Indications",
+      "source_paragraph": "Paragraph 2: Refractory Infection",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PANNI-EXCL-01",
+      "name": "Cosmetic Body Contouring Exclusion",
+      "description": "Panniculectomy or abdominoplasty performed for body contouring or cosmetic aesthetic improvement without functional infection or pannus below pubis.",
+      "clinical_intent": "Exclude non-functional cosmetic contouring",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "body contouring only",
+        "cosmetic abdominoplasty",
+        "aesthetic appearance only",
+        "lack of chronic infection"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "body contouring only",
+        "cosmetic abdominoplasty",
+        "aesthetic appearance only",
+        "lack of chronic infection"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 3: Exclusions",
+      "source_paragraph": "Paragraph 1: Cosmetic Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

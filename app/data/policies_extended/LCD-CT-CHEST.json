@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-CT-CHEST",
+  "title": "Computed Tomography (CT) of the Chest with Contrast",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Diagnostic Radiology / Thoracic",
+  "description": "Medicare coverage criteria for diagnostic chest CT with contrast. Requires abnormal chest radiograph (suspicious solitary pulmonary nodule > 6 mm, mass, lymphadenopathy, pleural effusion), hemoptysis with risk factors, or evaluation of interstitial lung disease.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual thoracic imaging LCD."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CTCH-01",
+      "name": "Abnormal Chest Radiograph (Solitary Nodule > 6 mm or Mass)",
+      "description": "Preceding chest X-ray documenting indeterminate solitary pulmonary nodule > 6 mm, hilar/mediastinal widening, lung mass, or unresolving infiltrate.",
+      "clinical_intent": "Objective abnormal baseline plain film finding",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "solitary pulmonary nodule > 6mm",
+        "lung nodule on chest x-ray",
+        "mediastinal mass",
+        "hilar lymphadenopathy",
+        "unresolved infiltrate"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 3 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "solitary pulmonary nodule > 6mm",
+        "lung nodule on chest x-ray",
+        "mediastinal mass",
+        "hilar lymphadenopathy",
+        "unresolved infiltrate"
+      ],
+      "cms_document": "Medicare LCD Chest CT",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Radiographic Findings",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CTCH-02",
+      "name": "Unexplained Hemoptysis or Interstitial Lung Disease Evaluation",
+      "description": "Documented gross hemoptysis in patient aged >= 40 or >= 30 pack-year smoking history, or clinical signs of progressive interstitial lung disease.",
+      "clinical_intent": "High risk respiratory presentation justification",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "unexplained hemoptysis",
+        "interstitial lung disease",
+        "pulmonary fibrosis evaluation"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "unexplained hemoptysis",
+        "interstitial lung disease",
+        "pulmonary fibrosis evaluation"
+      ],
+      "cms_document": "Medicare LCD Chest CT",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: High Risk Symptoms",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CTCH-EXCL-01",
+      "name": "Uncomplicated Acute Bronchitis Without Radiograph Exclusion",
+      "description": "CT chest requested for simple acute bronchitis or viral upper respiratory infection without preceding chest X-ray.",
+      "clinical_intent": "Prevent high-dose radiation CT for simple uncomplicated viral illness",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "acute viral bronchitis",
+        "uncomplicated uri",
+        "absence of chest x-ray"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "acute viral bronchitis",
+        "uncomplicated uri",
+        "absence of chest x-ray"
+      ],
+      "cms_document": "Medicare LCD Chest CT",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Uncomplicated Infection",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -1,0 +1,119 @@
+{
+  "policy_id": "LCD-EVAR",
+  "title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Vascular Surgery",
+  "description": "Medicare coverage guidelines for endovascular abdominal aortic aneurysm repair (EVAR). Requires infrarenal abdominal aortic aneurysm measuring >= 5.5 cm in men or >= 5.0 cm in women, or rapid expansion rate > 0.5 cm in 6 months, with suitable landing zone anatomy on CT angiography.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual vascular surgery LCD."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-EVAR-01",
+      "name": "Abdominal Aortic Aneurysm Diameter (>= 5.5 cm in Men / >= 5.0 cm in Women)",
+      "description": "Computed tomography angiography (CTA) confirming maximum transverse infrarenal AAA diameter >= 5.5 cm (men) or >= 5.0 cm (women), or expansion > 0.5 cm in 6 months.",
+      "clinical_intent": "Threshold diameter for rupture risk exceeding elective intervention risk",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "aaa diameter",
+        "aneurysm diameter",
+        "abdominal aortic aneurysm diameter"
+      ],
+      "operator": ">=",
+      "threshold": 5.0,
+      "target_unit": "cm",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 3 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "aaa diameter",
+        "aneurysm diameter",
+        "abdominal aortic aneurysm diameter"
+      ],
+      "cms_document": "Medicare LCD EVAR",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Diameter Thresholds",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-EVAR-02",
+      "name": "Suitable Proximal Neck Landing Zone Anatomy",
+      "description": "CTA confirming proximal infrarenal aortic neck length >= 10 mm and diameter <= 32 mm without severe circumferential thrombus or > 60 degree angulation.",
+      "clinical_intent": "Verify anatomical seal feasibility for stent graft",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "suitable proximal neck",
+        "aortic neck length >= 10mm",
+        "adequate landing zone"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Pre-operative CTA",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "suitable proximal neck",
+        "aortic neck length >= 10mm",
+        "adequate landing zone"
+      ],
+      "cms_document": "Medicare LCD EVAR",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Anatomical Suitability",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-EVAR-EXCL-01",
+      "name": "Small Stable Aneurysm (< 5.0 cm) Exclusion",
+      "description": "Elective repair of small stable asymptomatic aneurysm < 5.0 cm in diameter with expansion < 0.5 cm per year.",
+      "clinical_intent": "Exclude sub-threshold aneurysms better managed with ultrasound surveillance",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "small stable aneurysm",
+        "aaa diameter less than 5cm",
+        "sub-threshold aneurysm"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "small stable aneurysm",
+        "aaa diameter less than 5cm",
+        "sub-threshold aneurysm"
+      ],
+      "cms_document": "Medicare LCD EVAR",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Surveillance Indicated",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

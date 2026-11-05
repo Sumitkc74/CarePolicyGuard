@@ -1,0 +1,123 @@
+{
+  "policy_id": "NCD-PET-ONC",
+  "title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Nuclear Medicine / Oncology",
+  "description": "CMS National Coverage Determination for 18F-FDG PET in oncology (NCD 220.6.17). Covered for initial staging, restaging, and evaluation of treatment response for histologically proven solid tumors and hematologic malignancies (lung, colorectal, lymphoma, melanoma, head and neck).",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 220.6.17 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PTONC-01",
+      "name": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+      "description": "Pathology report documenting biopsy-proven malignancy (or solitary pulmonary nodule with high clinical cancer probability on chest CT).",
+      "clinical_intent": "Confirm qualifying solid tumor or lymphoma diagnosis",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "biopsy-proven carcinoma",
+        "pathology confirmed lymphoma",
+        "solid tumor malignancy",
+        "high probability lung nodule"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current oncologic episode",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "biopsy-proven carcinoma",
+        "pathology confirmed lymphoma",
+        "solid tumor malignancy",
+        "high probability lung nodule"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.6.17",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Biopsy Confirmation",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PTONC-02",
+      "name": "Clinical Staging Impact on Intended Treatment Strategy",
+      "description": "Documented clinical intent where PET-CT findings will directly guide management: determining surgical resectability, radiation planning, or systemic therapy change.",
+      "clinical_intent": "Verify that imaging guides therapeutic decision making",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "impact on treatment plan",
+        "determine surgical resectability",
+        "radiation therapy planning",
+        "evaluating treatment response"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current treatment evaluation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "impact on treatment plan",
+        "determine surgical resectability",
+        "radiation therapy planning",
+        "evaluating treatment response"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.6.17",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Management Impact",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PTONC-EXCL-01",
+      "name": "Routine Surveillance in Asymptomatic Remission Exclusion",
+      "description": "Routine surveillance PET performed in asymptomatic patients with complete clinical remission in the absence of biochemical (tumor marker) or clinical relapse.",
+      "clinical_intent": "Exclude non-indicated routine surveillance PET scanning",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "routine surveillance in remission",
+        "asymptomatic cancer surveillance",
+        "no evidence of recurrence"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "routine surveillance in remission",
+        "asymptomatic cancer surveillance",
+        "no evidence of recurrence"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.6.17",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Routine Surveillance",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

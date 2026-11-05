@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-HALLUX",
+  "title": "Hallux Valgus Correction (Bunionectomy)",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Orthopedic Foot & Ankle / Podiatry",
+  "description": "Medicare coverage criteria for surgical correction of hallux valgus (bunionectomy with osteotomy). Requires documented severe pain interfering with ambulation, weight-bearing hallux valgus angle > 15 degrees or 1st-2nd intermetatarsal angle > 9 degrees, and failure of conservative management (shoe modification, orthotics).",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-HAL-01",
+      "name": "Hallux Valgus Angle (> 15 Degrees on Weight-Bearing Radiographs)",
+      "description": "Weight-bearing radiograph confirming hallux valgus angle (HVA) > 15 degrees or intermetatarsal angle (IMA) > 9 degrees.",
+      "clinical_intent": "Objective angular deformity threshold",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "hallux valgus angle",
+        "hva angle",
+        "intermetatarsal angle",
+        "bunion angle"
+      ],
+      "operator": ">",
+      "threshold": 15.0,
+      "target_unit": "degrees",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "hallux valgus angle",
+        "hva angle",
+        "intermetatarsal angle",
+        "bunion angle"
+      ],
+      "cms_document": "Medicare LCD Bunionectomy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Radiographic Angle",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-HAL-02",
+      "name": "Conservative Footwear and Orthotic Trial Failure (>= 3 Months)",
+      "description": "Documented trial and failure of >= 3 months of conservative care including wide-toe-box shoes, orthotics, toe spacers, or padding.",
+      "clinical_intent": "Mandatory non-surgical conservative trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "shoe modification",
+        "wide toe box footwear",
+        "orthotics trial",
+        "conservative bunion trial"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "shoe modification",
+        "wide toe box footwear",
+        "orthotics trial",
+        "conservative bunion trial"
+      ],
+      "cms_document": "Medicare LCD Bunionectomy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Conservative Care",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-HAL-EXCL-01",
+      "name": "Asymptomatic Cosmetic Bunionectomy Exclusion",
+      "description": "Bunionectomy performed purely for cosmetic contouring in the absence of disabling pain or functional limitation in footwear.",
+      "clinical_intent": "Disqualify asymptomatic cosmetic surgery",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "cosmetic bunionectomy",
+        "asymptomatic bunion",
+        "no pain with ambulation"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "cosmetic bunionectomy",
+        "asymptomatic bunion",
+        "no pain with ambulation"
+      ],
+      "cms_document": "Medicare LCD Bunionectomy",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Cosmetic Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

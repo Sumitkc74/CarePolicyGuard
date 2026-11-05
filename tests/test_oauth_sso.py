@@ -46,14 +46,18 @@ def test_google_sso_auto_provision_and_mfa():
     assert token_data["role"] == "Clinician"
     assert token_data["username"] == "dr.smith@pacificheart.org"
 
-    # 3. Verify user record in database
+    # 3. Verify user record in database: OAuth auto-provisioned accounts are created UNVERIFIED
+    # with no invented NPI, title, specialty, or organization
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.email == "dr.smith@pacificheart.org").first()
         assert user is not None
         assert user.oauth_provider == "google"
-        assert user.is_verified_medical_pro is True
-        assert user.verification_method == "OAUTH_GOOGLE_VERIFIED"
+        assert user.is_verified_medical_pro is False
+        assert user.npi_number is None
+        assert user.credential_title is None
+        assert user.specialty is None
+        assert user.organization is None
     finally:
         db.close()
 

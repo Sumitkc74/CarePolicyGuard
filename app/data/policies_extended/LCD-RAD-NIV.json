@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-RAD-NIV",
+  "title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+  "jurisdiction": "DME MAC Local Coverage Determination",
+  "effective_date": "2023-01-01",
+  "category": "Durable Medical Equipment (DMEPOS)",
+  "description": "DME MAC coverage criteria for respiratory assist devices (RAD / non-invasive ventilation, HCPCS E0470, E0471). Requires documented daytime hypercapnia with arterial PaCO2 >= 52 mmHg (or nocturnal oximetry showing SpO2 <= 88% for >= 5 continuous minutes) in chronic severe COPD or neuromuscular restrictive disease.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "DME MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-NIV-01",
+      "name": "Daytime Hypercapnia (Arterial PaCO2 >= 52 mm Hg)",
+      "description": "Arterial blood gas (ABG) drawn while awake and breathing prescribed room air/oxygen documenting daytime PaCO2 >= 52 mm Hg.",
+      "clinical_intent": "Objective arterial threshold for chronic ventilatory failure",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "paco2",
+        "arterial paco2",
+        "daytime paco2",
+        "hypercapnia"
+      ],
+      "operator": ">=",
+      "threshold": 52.0,
+      "target_unit": "mm Hg",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "paco2",
+        "arterial paco2",
+        "daytime paco2",
+        "hypercapnia"
+      ],
+      "cms_document": "DME MAC LCD Respiratory Assist Devices",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Arterial PaCO2",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-NIV-02",
+      "name": "Prior CPAP Trial Failure or Severe Hypoventilation Syndrome",
+      "description": "Documented failure of standard CPAP to resolve hypoxemia/hypercapnia, or underlying diagnosis of Amyotrophic Lateral Sclerosis (ALS) / thoracic restrictive disorder.",
+      "clinical_intent": "Differentiate complex ventilatory insufficiency from simple OSA",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "cpap trial failure",
+        "obesity hypoventilation syndrome",
+        "als ventilatory support",
+        "thoracic restrictive disease"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in clinical record",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "cpap trial failure",
+        "obesity hypoventilation syndrome",
+        "als ventilatory support",
+        "thoracic restrictive disease"
+      ],
+      "cms_document": "DME MAC LCD Respiratory Assist Devices",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: CPAP Failure",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-NIV-EXCL-01",
+      "name": "Simple Obstructive Sleep Apnea Without Hypoventilation Exclusion",
+      "description": "Device requested for uncomplicated obstructive sleep apnea in the absence of hypercapnia (PaCO2 < 45) or daytime hypoventilation.",
+      "clinical_intent": "Exclude BiPAP with backup for simple sleep apnea",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "simple obstructive sleep apnea",
+        "absence of hypercapnia",
+        "normocapnic sleep apnea"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "simple obstructive sleep apnea",
+        "absence of hypercapnia",
+        "normocapnic sleep apnea"
+      ],
+      "cms_document": "DME MAC LCD Respiratory Assist Devices",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Simple OSA Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

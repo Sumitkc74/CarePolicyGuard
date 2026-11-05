@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-ACDF",
+  "title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Spine Surgery",
+  "description": "Medicare coverage criteria for anterior cervical discectomy and fusion (ACDF). Requires documented cervical radiculopathy with dermatomal distribution or cervical myelopathy, confirmed neural compression on MRI/CT, and failure of at least 6 weeks of conservative management (unless progressive motor deficit).",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-ACDF-01",
+      "name": "Correlating Cervical Disc Herniation or Osteophyte on MRI",
+      "description": "MRI or CT myelogram demonstrating cervical disc protrusion, spondylotic ridge, or neuroforaminal stenosis correlating directly with clinical symptoms.",
+      "clinical_intent": "Radiographic verification of cervical pathology",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "cervical disc herniation",
+        "cervical spondylosis with radiculopathy",
+        "cervical cord compression",
+        "nerve root impingement on mri"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "cervical disc herniation",
+        "cervical spondylosis with radiculopathy",
+        "cervical cord compression",
+        "nerve root impingement on mri"
+      ],
+      "cms_document": "Medicare LCD ACDF",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Diagnostic Imaging",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-ACDF-02",
+      "name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+      "description": "Documented trial of non-surgical management for >= 6 weeks, or documented progressive or acute focal motor deficit requiring urgent intervention.",
+      "clinical_intent": "Verify conservative therapy trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative management",
+        "cervical physical therapy",
+        "conservative trial 6 weeks",
+        "progressive motor deficit"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 42,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 6 weeks duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative management",
+        "cervical physical therapy",
+        "conservative trial 6 weeks",
+        "progressive motor deficit"
+      ],
+      "cms_document": "Medicare LCD ACDF",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Conservative Care",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-ACDF-EXCL-01",
+      "name": "Neck Pain Only Without Neuropathy Exclusion",
+      "description": "Surgical fusion performed solely for uncomplicated axial neck pain without radiculopathy, myelopathy, or neurologic deficit.",
+      "clinical_intent": "Exclude fusion for isolated muscular neck strain",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "neck pain only",
+        "axial neck pain without radiculopathy",
+        "uncomplicated neck strain"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "neck pain only",
+        "axial neck pain without radiculopathy",
+        "uncomplicated neck strain"
+      ],
+      "cms_document": "Medicare LCD ACDF",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Neck Pain Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -518,7 +518,7 @@ Open your browser to:
 
 ## Demo Evaluation Accounts & Security Notice
 
-### Mandatory Operator Action: Rotation or Deletion of Seeded Accounts
+### 1. Mandatory Operator Action: Rotation or Deletion of Seeded Accounts
 
 Any deployment that ever ran with seeded demo accounts (specifically accounts for the admin, clinician, doctor, or auditor roles) must delete those accounts or rotate their passwords immediately. The historical demo passwords for these roles were published in the repository and must be treated as compromised.
 
@@ -528,6 +528,27 @@ In accordance with production security standards:
 - Hardcoded demo credentials and UI autofill chips have been removed from the platform.
 - Demo user seeding is disabled by default (`SEED_DEMO_USERS=false`).
 - For local development environments where demo seeding is enabled, passwords must be supplied exclusively through environment variables (`DEMO_ADMIN_PASSWORD`, `DEMO_CLINICIAN_PASSWORD`, `DEMO_AUDITOR_PASSWORD`, `DEMO_DOCTOR_PASSWORD`) with no fallback defaults. Startup fails immediately if any required environment variable is omitted.
+- Demo accounts are tagged with `is_demo_user=True` and do NOT count as production administrators.
+
+### 2. Production First-Admin Bootstrap Procedure
+
+In production deployments, the initial administrator must be bootstrapped out-of-band:
+- **CLI Bootstrap Command**:
+  ```bash
+  python -m app.cli bootstrap-admin --email admin@hospital.org --password "StrongInitialPassword!2026" --name "Lead Administrator"
+  ```
+- **Environment Bootstrap**: Set `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` in the orchestration environment.
+- **Permanent Closure**: Once the first administrator exists, the bootstrap path closes permanently. Subsequent administrators can only be created by an active administrator via `POST /api/v1/admin/users/admins`.
+- **First-Login Security Enforcement**: The bootstrap administrator must change their password and finalize MFA setup on first login via `POST /api/v1/auth/bootstrap/complete-setup`.
+- **Operator Credential Recovery (No Backdoors)**: There are no backdoor endpoints or automated recovery keys. If administrator credentials are lost, operators must execute an out-of-band database update directly on the database engine. See [SECURITY.md](SECURITY.md) for full details.
+
+### 3. Separation of Duties: Provisioning vs Credentialing
+
+- **Admin Provisions**: Creates unverified clinician accounts (`POST /api/v1/admin/users/clinicians`). Clinicians cannot sign determinations while unverified.
+- **Credentialing Verifies**: Unlocks signing authority strictly through real-time primary-source CMS NPPES NPI Registry lookup (`POST /api/v1/credentialing/verify/nppes`) or manual review by an independent Credentialing officer (`POST /api/v1/credentialing/verify/manual`).
+- **Two-Action Rule**: Even if an operator holds both Admin and Credentialing roles, the system enforces two distinct recorded actions with independent immutable audit trail entries. Single-click combined actions are forbidden.
+- **Annual Re-verification**: Verification records include an expiration timestamp (default: 365 days). Expired verifications block new sign-offs until re-verified.
+- **No Grandfathering**: Legacy format-checked or OAuth-verified accounts are automatically downgraded to unverified on upgrade.
 
 ---
 

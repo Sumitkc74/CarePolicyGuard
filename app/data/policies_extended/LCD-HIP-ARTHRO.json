@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-HIP-ARTHRO",
+  "title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Orthopedic Surgery",
+  "description": "Medicare coverage guidelines for elective primary total hip arthroplasty. Requires advanced radiographic osteoarthritis (severe joint space narrowing, subchondral sclerosis, osteophytes), severe functional disability in daily living, and failure of at least 3 months of conservative therapy.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual joint replacement LCD update."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-HIP-01",
+      "name": "Advanced Radiographic Hip Osteoarthritis",
+      "description": "Weight-bearing radiographs demonstrating moderate to severe joint space narrowing, subchondral sclerosis, cyst formation, or osteophytes (Tonnis Grade 2 or 3).",
+      "clinical_intent": "Confirm structural end-stage joint destruction",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "severe joint space narrowing",
+        "end-stage osteoarthritis of hip",
+        "subchondral sclerosis",
+        "tonnis grade 2 or 3"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "severe joint space narrowing",
+        "end-stage osteoarthritis of hip",
+        "subchondral sclerosis",
+        "tonnis grade 2 or 3"
+      ],
+      "cms_document": "Medicare LCD Total Hip Arthroplasty",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Radiographic Criteria",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-HIP-02",
+      "name": "Conservative Non-Surgical Management Trial (>= 3 Months)",
+      "description": "Documented trial and failure of >= 3 months (90 days) of conservative treatments including physical therapy, assistive ambulation devices, NSAIDs, or intra-articular injections.",
+      "clinical_intent": "Mandatory non-surgical conservative trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative hip therapy",
+        "physical therapy trial",
+        "hip injection trial",
+        "90 days conservative care"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative hip therapy",
+        "physical therapy trial",
+        "hip injection trial",
+        "90 days conservative care"
+      ],
+      "cms_document": "Medicare LCD Total Hip Arthroplasty",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Conservative Therapy",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-HIP-EXCL-01",
+      "name": "Active Joint Infection Exclusion",
+      "description": "Active localized hip joint sepsis, osteomyelitis, or uncontrolled systemic infection.",
+      "clinical_intent": "Exclude active septic arthritis",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "septic arthritis",
+        "active hip infection",
+        "joint sepsis"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "septic arthritis",
+        "active hip infection",
+        "joint sepsis"
+      ],
+      "cms_document": "Medicare LCD Total Hip Arthroplasty",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Infection Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -259,6 +259,8 @@ class TokenResponse(BaseModel):
     credential_title: str | None = None
     specialty: str | None = None
     organization: str | None = None
+    must_change_password: bool = False
+    must_setup_mfa: bool = False
 
 class UserCreate(BaseModel):
     username: str
@@ -307,6 +309,84 @@ class UserOut(BaseModel):
     specialty: str | None = None
     organization: str | None = None
     is_verified_medical_pro: bool = False
+    verification_method: str | None = None
+    verified_at: datetime | None = None
+    verification_expires_at: datetime | None = None
+    provisioned_by: str | None = None
+    must_change_password: bool = False
+    must_setup_mfa: bool = False
+    created_at: datetime
+
+# =============================================================================
+# ADMIN PROVISIONING & CREDENTIALING VERIFICATION CONTRACTS
+# =============================================================================
+
+class AdminInviteClinicianRequest(BaseModel):
+    email: str
+    full_name: str | None = None
+    initial_password: str | None = None
+
+class AdminCreateAdminRequest(BaseModel):
+    email: str
+    username: str | None = None
+    full_name: str | None = None
+    password: str
+
+class BootstrapSetupRequest(BaseModel):
+    new_password: str
+
+class UserStatusUpdateRequest(BaseModel):
+    is_active: bool
+    reason: str | None = None
+
+class NppesVerificationRequest(BaseModel):
+    clinician_id: int | None = None  # Optional if clinician verifying self
+    npi_number: str
+    full_name: str | None = None
+
+class NppesVerificationResponse(BaseModel):
+    is_verified: bool
+    npi_number: str
+    verification_method: str
+    registry_reference: str | None = None
+    verified_at: str | None = None
+    expires_at: str | None = None
+    message: str
+    reasons: list[str] = []
+
+class ManualCredentialingRequest(BaseModel):
+    clinician_id: int
+    decision: str  # "APPROVED" or "REJECTED"
+    evidence_checked: list[str]  # e.g. ["NPI", "LICENSE", "STATE", "ORGANIZATION"]
+    evidence_reference: str
+    notes: str | None = None
+    npi_number: str | None = None
+    medical_license: str | None = None
+    license_state: str | None = None
+    credential_title: str | None = None
+    organization: str | None = None
+
+class RevokeVerificationRequest(BaseModel):
+    reason: str
+    mandatory_review_notes: str | None = None
+
+class CredentialingAuditLogOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    event_id: str
+    clinician_id: int
+    clinician_email: str
+    actor_id: int | None = None
+    actor_username: str
+    actor_role: str
+    action: str
+    verification_method: str
+    evidence_reference: str | None = None
+    previous_state: str | None = None
+    new_state: str
+    notes: str | None = None
+    audit_hash: str
     created_at: datetime
 
 class CriterionOut(BaseModel):

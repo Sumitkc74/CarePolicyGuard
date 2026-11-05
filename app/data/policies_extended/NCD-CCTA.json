@@ -1,0 +1,121 @@
+{
+  "policy_id": "NCD-CCTA",
+  "title": "Coronary Computed Tomography Angiography (CCTA)",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Cardiovascular Radiology",
+  "description": "CMS National Coverage Determination for coronary computed tomography angiography (NCD 220.1). Requires stable chest pain syndrome with intermediate pre-test probability of CAD, able to achieve target resting heart rate < 65 bpm with oral/IV beta-blockers, and absence of extensive coronary calcification (Agatston score > 1000).",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 220.1 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CCTA-01",
+      "name": "Intermediate CAD Probability and Target Heart Rate (< 65 bpm)",
+      "description": "Documented intermediate pre-test probability of obstructive CAD, sinus rhythm, and target heart rate < 65 bpm achievable for high image quality.",
+      "clinical_intent": "Ensure clinical pre-test probability and technical diagnostic quality",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "intermediate pre-test probability of cad",
+        "sinus rhythm heart rate < 65",
+        "stable anginal equivalent"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "intermediate pre-test probability of cad",
+        "sinus rhythm heart rate < 65",
+        "stable anginal equivalent"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.1",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Pre-test Probability",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CCTA-02",
+      "name": "Inconclusive Prior Stress Testing or Equivocal Biomarkers",
+      "description": "Documented equivocal, inconclusive, or discordant prior stress ECG / stress echocardiogram, or inability to perform physical treadmill exercise.",
+      "clinical_intent": "Justification for anatomical CT angiography",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "inconclusive stress test",
+        "equivocal stress echo",
+        "unable to exercise"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.8,
+      "keywords": [
+        "inconclusive stress test",
+        "equivocal stress echo",
+        "unable to exercise"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.1",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Stress Testing",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CCTA-EXCL-01",
+      "name": "Severe Tachyarrhythmia or Severe Renal Impairment Exclusion",
+      "description": "Severe uncontrolled atrial fibrillation, irregular ventricular tachycardia, or severe renal dysfunction (eGFR < 30 mL/min).",
+      "clinical_intent": "Exclude non-diagnostic motion artifact or contrast nephropathy risk",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "uncontrolled atrial fibrillation",
+        "severe renal failure",
+        "egfr less than 30",
+        "severe contrast allergy"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "uncontrolled atrial fibrillation",
+        "severe renal failure",
+        "egfr less than 30",
+        "severe contrast allergy"
+      ],
+      "cms_document": "CMS NCD Manual Section 220.1",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

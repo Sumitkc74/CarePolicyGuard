@@ -1,0 +1,127 @@
+{
+  "policy_id": "OPD-BOTOX",
+  "title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+  "jurisdiction": "CMS Hospital Outpatient Prior Authorization (42 CFR \u00a7 419.80)",
+  "effective_date": "2020-07-01",
+  "category": "Neurology",
+  "description": "CMS prior authorization for onabotulinumtoxinA injections for chronic migraine or cervical dystonia. Requires documented headache frequency >= 15 days per month for >= 3 months, each lasting 4+ hours, with failure or intolerance of at least two classes of oral migraine preventive medications.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "OPD Prior Authorization clinical guidelines update."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-BOTOX-01",
+      "name": "Chronic Migraine Frequency (>= 15 Days/Month)",
+      "description": "Documented headache frequency >= 15 days per month for >= 3 months, of which >= 8 days meet criteria for typical migraine attacks.",
+      "clinical_intent": "Validate chronic migraine diagnostic threshold",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "headache frequency",
+        "headache days per month",
+        "migraine frequency",
+        "headache days"
+      ],
+      "operator": ">=",
+      "threshold": 15.0,
+      "target_unit": "days/month",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 3 months duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "headache frequency",
+        "headache days per month",
+        "migraine frequency",
+        "headache days"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 2: Botulinum Toxin Indications",
+      "source_paragraph": "Paragraph 1: Migraine Frequency",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-BOTOX-02",
+      "name": "Oral Prophylactic Medication Trial Failure (>= 2 Classes)",
+      "description": "Documented inadequate response, contraindication, or intolerable side effects to adequate trials of >= 2 classes of conventional oral migraine preventives (e.g. beta-blockers, anticonvulsants, antidepressants).",
+      "clinical_intent": "Verify conservative medical management trial",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "oral prophylactic failure",
+        "failed preventive medication",
+        "topiramate",
+        "propranolol",
+        "amitriptyline",
+        "preventive drug trial"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in clinical record",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.8,
+      "keywords": [
+        "oral prophylactic failure",
+        "failed preventive medication",
+        "topiramate",
+        "propranolol",
+        "amitriptyline",
+        "preventive drug trial"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 2: Botulinum Toxin Indications",
+      "source_paragraph": "Paragraph 2: Medication Trials",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-BOTOX-EXCL-01",
+      "name": "Episodic Migraine Exclusion",
+      "description": "Patient experiencing episodic migraine (< 15 headache days per month) or simple tension headache.",
+      "clinical_intent": "Disqualify episodic headache presentations",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "episodic migraine",
+        "fewer than 15 headache days",
+        "tension headache only"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "episodic migraine",
+        "fewer than 15 headache days",
+        "tension headache only"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 2: Botulinum Toxin Exclusions",
+      "source_paragraph": "Paragraph 1: Episodic Non-Coverage",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

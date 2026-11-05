@@ -1,0 +1,123 @@
+{
+  "policy_id": "NCD-SCS",
+  "title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Interventional Pain / Neurosurgery",
+  "description": "CMS National Coverage Determination for permanent dorsal column spinal cord stimulation (NCD 160.7). Requires documented chronic intractable pain of neuropathic origin (failed back surgery syndrome or CRPS) >= 6 months, psychological clearance, failure of all standard medical therapy, and a successful preliminary temporary trial with >= 50% pain relief.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "CMS NCD 160.7 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-SCS-01",
+      "name": "Temporary Trial Pain Reduction (>= 50%)",
+      "description": "Documented >= 50% pain relief during an externalized temporary spinal cord stimulation trial lasting at least 3 to 7 days.",
+      "clinical_intent": "Mandatory objective proof of clinical efficacy before permanent implant",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "scs trial relief",
+        "trial pain reduction",
+        "temporary stimulation relief"
+      ],
+      "operator": ">=",
+      "threshold": 50.0,
+      "target_unit": "%",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "scs trial relief",
+        "trial pain reduction",
+        "temporary stimulation relief"
+      ],
+      "cms_document": "CMS NCD Manual Section 160.7",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 1: Preliminary Trial",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SCS-02",
+      "name": "Formal Psychological Evaluation Clearance",
+      "description": "Documented formal pre-implant psychological evaluation by a licensed mental health professional certifying patient suitability and absence of untreated major psychiatric contraindications.",
+      "clinical_intent": "Statutory psychological screening clearance",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "psychological clearance",
+        "psychological evaluation for scs",
+        "mental health clearance",
+        "psychological evaluation performed"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "psychological clearance",
+        "psychological evaluation for scs",
+        "mental health clearance",
+        "psychological evaluation performed"
+      ],
+      "cms_document": "CMS NCD Manual Section 160.7",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 2: Psychological Clearance",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SCS-EXCL-01",
+      "name": "Active Substance Abuse or Untreated Psychosis Exclusion",
+      "description": "Active untreated substance use disorder, severe psychosis, or major cognitive impairment precluding device management.",
+      "clinical_intent": "Disqualify active substance dependence or unmanaged psychosis",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "active substance abuse",
+        "active addiction",
+        "untreated psychosis",
+        "severe cognitive impairment"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "active substance abuse",
+        "active addiction",
+        "untreated psychosis",
+        "severe cognitive impairment"
+      ],
+      "cms_document": "CMS NCD Manual Section 160.7",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

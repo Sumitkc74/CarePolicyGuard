@@ -1,4 +1,5 @@
 import json
+import logging
 import uuid
 import urllib.request
 import urllib.parse
@@ -9,22 +10,43 @@ from app.core.config import settings
 from app.core.security import create_access_token, get_password_hash
 from app.db.models import User, UserSession
 
+logger = logging.getLogger("app.services.oauth")
+
+
+def is_dev_mock_oauth_allowed() -> bool:
+    """
+    Evaluates whether mock/test OAuth credentials are permitted.
+    Fails closed: strictly prohibited in production, when DEBUG=False,
+    or when DEV_MOCK_OAUTH_ENABLED is False.
+    """
+    env = getattr(settings, "ENVIRONMENT", "development").lower()
+    debug_mode = getattr(settings, "DEBUG", True)
+    mock_enabled = getattr(settings, "DEV_MOCK_OAUTH_ENABLED", False)
+
+    if env == "production" or not debug_mode or not mock_enabled:
+        return False
+    return True
+
+
 class OAuthService:
     """
     Unified OAuth 2.0 / OpenID Connect service for Google and Apple Single Sign-On (SSO).
     Supports live verification against provider public endpoints, account linking,
-    auto-provisioning of verified clinical accounts, and MFA integration.
+    auto-provisioning of unverified clinical accounts, and MFA integration.
     """
 
     @classmethod
     def verify_google_token(cls, credential: str) -> Dict[str, Any]:
         """
-        Validates Google ID token via Google TokenInfo or decodes standard JWT payload.
-        In production, verifies against https://oauth2.googleapis.com/tokeninfo.
-        In test/dev environments, seamlessly supports evaluation credentials.
+        Validates Google ID token via Google TokenInfo.
+        In test/dev environments with mock credentials enabled, supports evaluation credentials.
+        Never decodes unverified JWT payloads without signature verification.
         """
-        # 1. Dev / Evaluation Token Check
+        # 1. Dev / Evaluation Token Check (Strictly gated)
         if credential.startswith("mock_google_") or credential.startswith("test_google_"):
+            if not is_dev_mock_oauth_allowed():
+                raise ValueError("Mock Google OAuth credentials are not allowed in this environment.")
+
             if ":" in credential:
                 email_part = credential.split(":", 1)[1]
             elif credential.startswith("mock_google_"):
@@ -33,13 +55,13 @@ class OAuthService:
                 email_part = credential[len("test_google_"):] or "clinician.google@hospital.org"
             clean_name = email_part.split("@")[0].replace(".", " ").replace("_", " ").title()
             if "jenkins" in clean_name.lower():
-                full_display = "Dr. Sarah Jenkins, MD, FACC"
+                full_display = "Dr. Sarah Jenkins"
             elif "vance" in clean_name.lower():
-                full_display = "Dr. Marcus Vance, MD"
+                full_display = "Dr. Marcus Vance"
             elif "reed" in clean_name.lower():
-                full_display = "Dr. Evelyn Reed, MD"
+                full_display = "Dr. Evelyn Reed"
             else:
-                full_display = f"Dr. {clean_name}, MD"
+                full_display = f"Dr. {clean_name}"
             return {
                 "email": email_part,
                 "sub": f"google-sub-{uuid.uuid4().hex[:12]}",
@@ -67,25 +89,10 @@ class OAuthService:
                         "email_verified": data.get("email_verified", "true") in [True, "true"],
                         "provider": "google"
                     }
-        except Exception:
-            # Fallback decode if standard JWT format without network or during dev
-            import base64
-            parts = credential.split(".")
-            if len(parts) >= 2:
-                try:
-                    padded = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
-                    payload = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
-                    if payload.get("email"):
-                        return {
-                            "email": payload["email"].lower(),
-                            "sub": payload.get("sub", f"google-{uuid.uuid4().hex[:10]}"),
-                            "name": payload.get("name", "Google Clinician"),
-                            "email_verified": True,
-                            "provider": "google"
-                        }
-                except Exception:
-                    pass
+        except Exception as e:
+            logger.warning(f"Google TokenInfo verification failed: {e}")
 
+        # Signature verification failed or unsupported: fail closed
         raise ValueError("Invalid or unverified Google OAuth token.")
 
     @classmethod
@@ -93,9 +100,13 @@ class OAuthService:
         """
         Validates Apple ID token (JWT) and extracts verified subject and email claims.
         Supports Apple Private Relay emails and user identity attributes.
+        Fails closed on unsigned or unverifiable tokens.
         """
-        # 1. Dev / Evaluation Token Check
+        # 1. Dev / Evaluation Token Check (Strictly gated)
         if id_token.startswith("mock_apple_") or id_token.startswith("test_apple_"):
+            if not is_dev_mock_oauth_allowed():
+                raise ValueError("Mock Apple OAuth credentials are not allowed in this environment.")
+
             if ":" in id_token:
                 email_part = id_token.split(":", 1)[1]
             elif id_token.startswith("mock_apple_"):
@@ -106,46 +117,13 @@ class OAuthService:
             return {
                 "email": email_part,
                 "sub": f"apple-sub-{uuid.uuid4().hex[:12]}",
-                "name": f"Dr. {clean_name}, MD",
+                "name": f"Dr. {clean_name}",
                 "email_verified": True,
                 "provider": "apple"
             }
 
-        # 2. Decode Apple ID token JWT payload
-        import base64
-        parts = id_token.split(".")
-        if len(parts) >= 2:
-            try:
-                padded = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
-                payload = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
-                email = payload.get("email")
-                sub = payload.get("sub")
-                
-                # Apple may transmit name only on first authorization in user_json
-                name = "Apple Clinician"
-                if user_json:
-                    try:
-                        u_data = json.loads(user_json) if isinstance(user_json, str) else user_json
-                        fname = u_data.get("name", {}).get("firstName", "")
-                        lname = u_data.get("name", {}).get("lastName", "")
-                        if fname or lname:
-                            name = f"{fname} {lname}".strip()
-                    except Exception:
-                        pass
-
-                if sub:
-                    # If Apple private relay email not in token payload, construct deterministic email
-                    effective_email = email.lower() if email else f"apple.user.{sub[:10]}@privaterelay.appleid.com"
-                    return {
-                        "email": effective_email,
-                        "sub": sub,
-                        "name": name,
-                        "email_verified": True,
-                        "provider": "apple"
-                    }
-            except Exception:
-                pass
-
+        # In production, Apple ID tokens must be verified against Apple's JSON Web Key Set (JWKS).
+        # Unsigned or unverified payload decode is strictly rejected.
         raise ValueError("Invalid or unverified Apple OAuth token.")
 
     @classmethod
@@ -157,8 +135,9 @@ class OAuthService:
         request
     ) -> Dict[str, Any]:
         """
-        Finds existing user by oauth sub or email, or auto-provisions a new verified Clinician account.
-        Dispatches MFA challenge if user has MFA enforced, or issues JWT session token.
+        Finds existing user by oauth sub or email, or auto-provisions a new UNVERIFIED Clinician account.
+        OAuth provisioning never invents an NPI, credential title, specialty, or organization,
+        and creates accounts with is_verified_medical_pro=False.
         """
         email = oauth_profile["email"]
         sub = oauth_profile["sub"]
@@ -177,14 +156,10 @@ class OAuthService:
                 user.oauth_sub = sub
                 if not getattr(user, "full_name", None) and raw_name:
                     user.full_name = raw_name
-                if not getattr(user, "npi_number", None):
-                    from app.core.security import generate_deterministic_npi
-                    user.npi_number = generate_deterministic_npi(user.email)
                 db.commit()
 
-        # 2. Auto-provision new verified Clinician if first-time user
+        # 2. Auto-provision new UNVERIFIED Clinician if first-time user
         if not user:
-            from app.core.security import generate_deterministic_npi
             derived_name = raw_name or email.split("@")[0].replace(".", " ").replace("_", " ").title()
             if not derived_name.lower().startswith("dr.") and not derived_name.lower().startswith("dr "):
                 derived_name = f"Dr. {derived_name}"
@@ -194,35 +169,29 @@ class OAuthService:
                 full_name=derived_name,
                 hashed_password=get_password_hash(uuid.uuid4().hex),
                 role="Clinician",
-                credential_title="MD",
-                npi_number=generate_deterministic_npi(email),
-                specialty="Cardiology / Internal Medicine",
-                organization="CarePolicyGuard Healthcare Network",
-                is_verified_medical_pro=True,
-                verification_method=f"OAUTH_{provider.upper()}_VERIFIED",
+                credential_title=None,
+                npi_number=None,
+                specialty=None,
+                organization=None,
+                is_verified_medical_pro=False,
+                verification_method=f"OAUTH_{provider.upper()}_UNVERIFIED",
                 oauth_provider=provider,
                 oauth_sub=sub,
                 mfa_enabled=True,
                 mfa_method="email_otp",
-                mfa_enabled_methods="email_otp"
+                mfa_enabled_methods="email_otp",
+                provisioned_by=f"OAUTH_{provider.upper()}"
             )
             db.add(user)
             db.commit()
             db.refresh(user)
         else:
-            # Backfill any missing clinician profile fields on existing user
+            # Backfill name only if missing on existing user
             changed = False
             if not getattr(user, "full_name", None):
                 user.full_name = raw_name or email.split("@")[0].replace(".", " ").replace("_", " ").title()
                 if not user.full_name.lower().startswith("dr.") and not user.full_name.lower().startswith("dr "):
                     user.full_name = f"Dr. {user.full_name}"
-                changed = True
-            if not getattr(user, "npi_number", None):
-                from app.core.security import generate_deterministic_npi
-                user.npi_number = generate_deterministic_npi(user.email)
-                changed = True
-            if not getattr(user, "credential_title", None):
-                user.credential_title = "MD"
                 changed = True
             if changed:
                 db.commit()

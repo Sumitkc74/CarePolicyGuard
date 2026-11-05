@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-PCI",
+  "title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Interventional Cardiology",
+  "description": "Medicare coverage guidelines for elective percutaneous coronary intervention (PCI) with drug-eluting stents. Requires coronary angiographic stenosis >= 70% in a major epicardial vessel (or FFR <= 0.80 / iFR <= 0.89 for 50-69% lesions), with limiting Canadian Cardiovascular Society (CCS) Class II-IV angina refractory to medical therapy.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PCI-01",
+      "name": "Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80)",
+      "description": "Coronary angiography documenting >= 70% luminal diameter stenosis in a major epicardial coronary artery, or fractional flow reserve (FFR) <= 0.80 / iFR <= 0.89.",
+      "clinical_intent": "Hemodynamic significance of coronary lesion",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "coronary stenosis",
+        "luminal diameter stenosis",
+        "angiographic stenosis"
+      ],
+      "operator": ">=",
+      "threshold": 70.0,
+      "target_unit": "%",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current angiogram",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "coronary stenosis",
+        "luminal diameter stenosis",
+        "angiographic stenosis"
+      ],
+      "cms_document": "Medicare LCD Percutaneous Coronary Intervention",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Stenosis Threshold",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PCI-02",
+      "name": "Refractory Angina Despite Optimal Medical Therapy (GDMT)",
+      "description": "Persistent CCS Class II, III, or IV angina despite an adequate trial of guideline-directed medical therapy including beta-blockers, calcium channel blockers, or nitrates.",
+      "clinical_intent": "Verify symptom persistence despite medical therapy",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "refractory angina",
+        "ccs class ii angina",
+        "ccs class iii angina",
+        "angina despite medical therapy"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in clinical chart",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "refractory angina",
+        "ccs class ii angina",
+        "ccs class iii angina",
+        "angina despite medical therapy"
+      ],
+      "cms_document": "Medicare LCD Percutaneous Coronary Intervention",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Anginal Symptoms",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PCI-EXCL-01",
+      "name": "Hemodynamically Insignificant Stenosis (< 50%) Exclusion",
+      "description": "Elective PCI performed on a non-culprit lesion with < 50% stenosis or negative physiology (FFR > 0.80).",
+      "clinical_intent": "Exclude stenting of non-ischemic intermediate lesions",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "stenosis less than 50%",
+        "negative ffr",
+        "ffr greater than 0.80",
+        "hemodynamically insignificant lesion"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current angiogram",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "stenosis less than 50%",
+        "negative ffr",
+        "ffr greater than 0.80",
+        "hemodynamically insignificant lesion"
+      ],
+      "cms_document": "Medicare LCD Percutaneous Coronary Intervention",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Non-Significant Lesion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -1,0 +1,123 @@
+{
+  "policy_id": "NCD-PACEMAKER",
+  "title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Cardiology / Electrophysiology",
+  "description": "CMS National Coverage Determination for single and dual chamber permanent cardiac pacemakers (NCD 20.8). Requires documented symptomatic sinus node dysfunction (bradycardia, pauses > 3 seconds with syncope) or high-grade / Mobitz Type II second-degree or third-degree atrioventricular (AV) block.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 20.8 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PACE-01",
+      "name": "High-Grade AV Block or Symptomatic Sinus Pauses (>= 3.0 Seconds)",
+      "description": "Electrocardiographic documentation of persistent third-degree AV block, Mobitz II second-degree block, or sinus pauses >= 3.0 seconds correlating with presyncope/syncope.",
+      "clinical_intent": "Objective electrophysiologic threshold for pacing",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "third degree av block",
+        "complete heart block",
+        "mobitz type ii block",
+        "sinus pause >= 3 seconds",
+        "symptomatic bradycardia"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented on ECG, telemetry, or Holter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "third degree av block",
+        "complete heart block",
+        "mobitz type ii block",
+        "sinus pause >= 3 seconds",
+        "symptomatic bradycardia"
+      ],
+      "cms_document": "CMS NCD Manual Section 20.8",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Conduction Abnormalities",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PACE-02",
+      "name": "Absence of Reversible Etiologies",
+      "description": "Clinical confirmation that bradyarrhythmia is not caused by reversible drug toxicity (beta-blockers, digoxin), acute electrolyte disturbance, or transient hypothermia.",
+      "clinical_intent": "Exclude transient drug or electrolyte induced bradycardia",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "absence of drug toxicity",
+        "no reversible cause",
+        "irreversible bradycardia"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical evaluation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "absence of drug toxicity",
+        "no reversible cause",
+        "irreversible bradycardia"
+      ],
+      "cms_document": "CMS NCD Manual Section 20.8",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Reversible Causes",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PACE-EXCL-01",
+      "name": "Asymptomatic First-Degree AV Block Exclusion",
+      "description": "Permanent pacemaker requested for asymptomatic first-degree AV block or asymptomatic Mobitz I (Wenckebach) second-degree block.",
+      "clinical_intent": "Statutory exclusion of benign conduction delays",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "asymptomatic first degree block",
+        "asymptomatic wenckebach",
+        "mobitz i block without symptoms"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "asymptomatic first degree block",
+        "asymptomatic wenckebach",
+        "mobitz i block without symptoms"
+      ],
+      "cms_document": "CMS NCD Manual Section 20.8",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Benign Conduction Delays",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

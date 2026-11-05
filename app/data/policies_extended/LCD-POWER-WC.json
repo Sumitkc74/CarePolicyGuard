@@ -1,0 +1,125 @@
+{
+  "policy_id": "LCD-POWER-WC",
+  "title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+  "jurisdiction": "DME MAC Local Coverage Determination",
+  "effective_date": "2023-01-01",
+  "category": "Durable Medical Equipment (DMEPOS)",
+  "description": "DME MAC coverage criteria for Group 3 complex rehabilitative power wheelchairs (HCPCS K0848-K0864). Requires severe neurological condition, myopathy, or severe trauma (ALS, quadriplegia, MS), patient unable to safely ambulate or self-propel manual wheelchair within the home, and evaluation by a licensed Physical/Occupational Therapist and ATP.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "DME MAC",
+      "summary": "Annual DMEPOS policy update."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PWC-01",
+      "name": "Severe Neurologic or Myopathic Mobility Limitation (MRADLs)",
+      "description": "Documented severe mobility deficit precluding participation in mobility-related activities of daily living (MRADLs) in the home due to severe neurological condition or quadriplegia.",
+      "clinical_intent": "Confirm home mobility deficit threshold",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "unable to perform mradls",
+        "quadriplegia",
+        "amyotrophic lateral sclerosis",
+        "severe multiple sclerosis",
+        "muscular dystrophy"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "unable to perform mradls",
+        "quadriplegia",
+        "amyotrophic lateral sclerosis",
+        "severe multiple sclerosis",
+        "muscular dystrophy"
+      ],
+      "cms_document": "DME MAC LCD Power Mobility Devices",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 1: MRADL Deficit",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PWC-02",
+      "name": "Specialty Evaluation by Licensed PT/OT and Certified ATP",
+      "description": "Documented in-person specialty evaluation by a licensed Physical or Occupational Therapist (PT/OT) in coordination with an Assistive Technology Professional (ATP).",
+      "clinical_intent": "Mandatory multidisciplinary seating assessment",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "specialty seating evaluation",
+        "licensed physical therapist assessment",
+        "certified atp evaluation",
+        "pt/ot evaluation completed"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "specialty seating evaluation",
+        "licensed physical therapist assessment",
+        "certified atp evaluation",
+        "pt/ot evaluation completed"
+      ],
+      "cms_document": "DME MAC LCD Power Mobility Devices",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 2: ATP Assessment",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PWC-EXCL-01",
+      "name": "Outdoor-Only Need Without Home Mobility Deficit Exclusion",
+      "description": "Power wheelchair requested exclusively for leisure, outdoor recreation, or community transport while patient can ambulate or propel manual chair inside home.",
+      "clinical_intent": "Statutory exclusion of mobility equipment for outside-the-home use only",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "outdoor use only",
+        "able to ambulate inside home",
+        "leisure community transport only"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "outdoor use only",
+        "able to ambulate inside home",
+        "leisure community transport only"
+      ],
+      "cms_document": "DME MAC LCD Power Mobility Devices",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: In-Home Use Mandate",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

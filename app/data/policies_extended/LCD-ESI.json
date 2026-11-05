@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-ESI",
+  "title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Interventional Pain Management",
+  "description": "Medicare coverage guidelines for interlaminar and transforaminal epidural steroid injections. Requires documented radicular nerve root pain with positive straight leg raise or dermatomal sensory loss, failure of at least 4 weeks of conservative care, and limitation to a maximum of 4 injection sessions per rolling 12 months.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual interventional pain LCD."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-ESI-01",
+      "name": "Radicular Nerve Root Pain with Correlating Signs",
+      "description": "Documented dermatomal radicular pain radiating below the knee (lumbar) or into the arm (cervical), with positive nerve root tension sign or neurological deficit.",
+      "clinical_intent": "Confirm true radicular etiology",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "radicular pain",
+        "radiculopathy",
+        "positive straight leg raise",
+        "dermatomal radiation"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "radicular pain",
+        "radiculopathy",
+        "positive straight leg raise",
+        "dermatomal radiation"
+      ],
+      "cms_document": "Medicare LCD Epidural Steroid Injections",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Radicular Pain",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-ESI-02",
+      "name": "Conservative Therapy Trial Failure (>= 4 Weeks)",
+      "description": "Trial and failure of >= 4 weeks of non-invasive conservative treatment (medications, physical therapy, activity modification).",
+      "clinical_intent": "Verify conservative medical management trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative treatment",
+        "physical therapy trial",
+        "four weeks conservative care"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 28,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 4 weeks duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative treatment",
+        "physical therapy trial",
+        "four weeks conservative care"
+      ],
+      "cms_document": "Medicare LCD Epidural Steroid Injections",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Conservative Therapy",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-ESI-EXCL-01",
+      "name": "Non-Radicular Mechanical Back Pain Exclusion",
+      "description": "Epidural steroid injection performed solely for generalized non-radicular axial back pain without neural impingement.",
+      "clinical_intent": "Disqualify epidural injections for purely mechanical axial pain",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "non-radicular pain",
+        "axial back pain only",
+        "absence of radiculopathy",
+        "no nerve root involvement"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "non-radicular pain",
+        "axial back pain only",
+        "absence of radiculopathy",
+        "no nerve root involvement"
+      ],
+      "cms_document": "Medicare LCD Epidural Steroid Injections",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Non-Radicular Pain Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

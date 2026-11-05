@@ -1,0 +1,125 @@
+{
+  "policy_id": "OPD-VEIN",
+  "title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+  "jurisdiction": "CMS Hospital Outpatient Prior Authorization (42 CFR \u00a7 419.80)",
+  "effective_date": "2020-07-01",
+  "category": "Vascular Surgery",
+  "description": "CMS prior authorization for endovenous radiofrequency or laser ablation of incompetent saphenous veins. Requires duplex ultrasound demonstrating retrograde reflux >= 500 ms, symptomatic venous insufficiency interfering with daily activities, and failure of at least 3 months of trial of graduated medical compression stockings (20-30 mmHg).",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "OPD Prior Authorization guidelines."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-VEIN-01",
+      "name": "Venous Reflux Duration (>= 500 ms on Duplex Ultrasound)",
+      "description": "Duplex ultrasound examination showing retrograde flow/reflux duration >= 500 milliseconds in the great saphenous vein, small saphenous vein, or accessory saphenous vein.",
+      "clinical_intent": "Objective hemodynamic validation of saphenous insufficiency",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "venous reflux",
+        "retrograde flow",
+        "reflux duration",
+        "duplex ultrasound reflux"
+      ],
+      "operator": ">=",
+      "threshold": 500.0,
+      "target_unit": "ms",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "venous reflux",
+        "retrograde flow",
+        "reflux duration",
+        "duplex ultrasound reflux"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 5: Vein Ablation Indications",
+      "source_paragraph": "Paragraph 1: Duplex Ultrasound",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-VEIN-02",
+      "name": "Graduated Compression Stocking Trial (>= 3 Months)",
+      "description": "Documented trial of graduated medical compression therapy (at least 20-30 mmHg) for >= 3 months (90 days) with persistent pain, edema, or stasis dermatitis.",
+      "clinical_intent": "Verify conservative compression trial failure",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "compression stockings",
+        "graduated compression",
+        "compression therapy",
+        "20-30 mmhg stockings"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "compression stockings",
+        "graduated compression",
+        "compression therapy",
+        "20-30 mmhg stockings"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 5: Vein Ablation Indications",
+      "source_paragraph": "Paragraph 2: Compression Trial",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-VEIN-EXCL-01",
+      "name": "Asymptomatic Spider Vein Telangiectasia Exclusion",
+      "description": "Treatment of asymptomatic spider veins or telangiectasias without saphenous reflux or functional impairment.",
+      "clinical_intent": "Disqualify cosmetic telangiectasia treatment",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "spider veins only",
+        "telangiectasias only",
+        "cosmetic sclerotherapy",
+        "asymptomatic spider veins"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "spider veins only",
+        "telangiectasias only",
+        "cosmetic sclerotherapy",
+        "asymptomatic spider veins"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 5: Exclusions",
+      "source_paragraph": "Paragraph 1: Cosmetic Vein Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

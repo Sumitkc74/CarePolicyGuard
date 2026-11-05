@@ -324,7 +324,8 @@ def test_api_medical_registration_gate():
     user_data = accept_res.json()
     assert user_data["username"] == unique_user
     assert user_data["role"] == "Clinician"
-    assert user_data["is_verified_medical_pro"] is True
+    assert user_data["is_verified_medical_pro"] is False
+    assert user_data["verification_method"] == "FORMAT_CHECK_ONLY"
     assert user_data["npi_number"] == "1043256787"
 
 def test_role_based_audit_ledger_privacy_and_access_control():

@@ -366,5 +366,7 @@ def register_mfa_routes(api_router: APIRouter):
             "specialty": getattr(user, "specialty", "Cardiology / Internal Medicine"),
             "organization": getattr(user, "organization", "CarePolicyGuard Healthcare Network"),
             "expires_in_seconds": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-            "mfa_verified": True
+            "mfa_verified": True,
+            "must_change_password": getattr(user, "must_change_password", False),
+            "must_setup_mfa": getattr(user, "must_setup_mfa", False)
         }

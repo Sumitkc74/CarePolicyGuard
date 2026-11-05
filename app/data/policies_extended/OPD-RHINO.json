@@ -1,0 +1,125 @@
+{
+  "policy_id": "OPD-RHINO",
+  "title": "Rhinoplasty and Septoplasty",
+  "jurisdiction": "CMS Hospital Outpatient Prior Authorization (42 CFR \u00a7 419.80)",
+  "effective_date": "2020-07-01",
+  "category": "Otolaryngology / Facial Plastic Surgery",
+  "description": "CMS prior authorization for functional rhinoplasty. Requires documented structural nasal airway obstruction causing persistent continuous obstruction for >= 6 months, failure of conservative medical management (intranasal steroids, antihistamines), and objective examination confirming nasal valve collapse or severe septal deviation.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "OPD Prior Authorization guidelines."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-RHINO-01",
+      "name": "Chronic Nasal Airway Obstruction (>= 6 Months)",
+      "description": "Documented chronic symptomatic nasal airway obstruction significantly impairing breathing for >= 6 months.",
+      "clinical_intent": "Establish chronic functional airway obstruction",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "nasal obstruction",
+        "nasal airway obstruction",
+        "chronic nasal obstruction",
+        "difficulty nasal breathing"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 180,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 6 months duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "nasal obstruction",
+        "nasal airway obstruction",
+        "chronic nasal obstruction",
+        "difficulty nasal breathing"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 4: Rhinoplasty Indications",
+      "source_paragraph": "Paragraph 1: Symptom Duration",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-RHINO-02",
+      "name": "Conservative Medical Therapy Trial Failure (>= 4 Weeks)",
+      "description": "Documented trial and failure of conservative medical management including intranasal corticosteroids for >= 4 weeks.",
+      "clinical_intent": "Confirm trial of conservative pharmacotherapy",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "intranasal steroids",
+        "fluticasone",
+        "nasal steroid spray trial",
+        "medical management trial"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 28,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 4 weeks duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.8,
+      "keywords": [
+        "intranasal steroids",
+        "fluticasone",
+        "nasal steroid spray trial",
+        "medical management trial"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 4: Rhinoplasty Indications",
+      "source_paragraph": "Paragraph 2: Medical Therapy",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-RHINO-EXCL-01",
+      "name": "Cosmetic Nasal Reshaping Exclusion",
+      "description": "Rhinoplasty performed solely for aesthetic reshaping or cosmetic dissatisfaction with nasal appearance.",
+      "clinical_intent": "Exclude non-functional aesthetic surgery",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "cosmetic reshaping",
+        "cosmetic dissatisfaction",
+        "aesthetic rhinoplasty only",
+        "no airway obstruction"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "cosmetic reshaping",
+        "cosmetic dissatisfaction",
+        "aesthetic rhinoplasty only",
+        "no airway obstruction"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 4: Exclusions",
+      "source_paragraph": "Paragraph 1: Cosmetic Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

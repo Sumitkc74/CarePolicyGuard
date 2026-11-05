@@ -152,6 +152,30 @@ def handle_policies(args):
         db.close()
 
 
+def handle_bootstrap_admin(args):
+    """Executes one-time production first-admin bootstrap."""
+    from app.core.bootstrap import bootstrap_production_admin
+    db = SessionLocal()
+    try:
+        admin = bootstrap_production_admin(
+            db=db,
+            email=args.email,
+            password=args.password,
+            full_name=args.name
+        )
+        print(format_banner())
+        print("[+] SUCCESS: Production bootstrap administrator created.")
+        print(f"    Administrator Email: {admin.email}")
+        print(f"    Role:                {admin.role}")
+        print("    Security Status:     Forced password change & MFA setup required on first login.")
+        print("    Bootstrap Gateway:   PERMANENTLY CLOSED.")
+    except Exception as e:
+        print(f"[-] Bootstrap failed: {e}")
+        sys.exit(1)
+    finally:
+        db.close()
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="CarePolicyGuard: Multi-Agent Clinical Evidence & Coverage Verification Engine CLI",
@@ -183,6 +207,12 @@ def main():
     # Command: policies
     subparsers.add_parser("policies", help="List loaded CMS Medicare coverage policies")
 
+    # Command: bootstrap-admin
+    boot_parser = subparsers.add_parser("bootstrap-admin", help="Bootstrap initial production administrator")
+    boot_parser.add_argument("--email", required=True, help="Operator administrator email address")
+    boot_parser.add_argument("--password", required=True, help="Strong initial administrator password (min 12 chars)")
+    boot_parser.add_argument("--name", default=None, help="Administrator full display name")
+
     args = parser.parse_args()
 
     if args.command == "adjudicate":
@@ -195,6 +225,8 @@ def main():
         handle_cache_stats(args)
     elif args.command == "policies":
         handle_policies(args)
+    elif args.command == "bootstrap-admin":
+        handle_bootstrap_admin(args)
     else:
         parser.print_help()
 

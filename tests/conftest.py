@@ -6,6 +6,15 @@ import secrets
 if not os.environ.get("SECRET_KEY") or os.environ.get("SECRET_KEY") == "carepolicyguard-deterministic-clinical-secret-key-3849104812":
     os.environ["SECRET_KEY"] = secrets.token_urlsafe(32)
 
+os.environ["DEBUG"] = "true"
+os.environ["ENVIRONMENT"] = "development"
+os.environ["DEV_MOCK_OAUTH_ENABLED"] = "true"
+
+from app.core.config import settings
+settings.DEBUG = True
+settings.ENVIRONMENT = "development"
+settings.DEV_MOCK_OAUTH_ENABLED = True
+
 import pytest
 from app.db.session import engine, Base, SessionLocal
 from app.db.seed import seed_database

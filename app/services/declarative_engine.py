@@ -39,8 +39,22 @@ class DeclarativePolicyEngine:
 
     @classmethod
     def get_policies_dir(cls) -> Path:
-        """Returns the path to the declarative policy JSON store."""
+        """Returns the path to the primary declarative policy JSON store."""
         return Path(__file__).resolve().parent.parent / "data" / "policies"
+
+    @classmethod
+    def get_policies_extended_dir(cls) -> Path:
+        """Returns the path to the extended declarative policy JSON store."""
+        return Path(__file__).resolve().parent.parent / "data" / "policies_extended"
+
+    @classmethod
+    def get_all_policy_dirs(cls) -> List[Path]:
+        """Returns list of active policy directories in evaluation priority order."""
+        dirs = [cls.get_policies_dir()]
+        ext_dir = cls.get_policies_extended_dir()
+        if ext_dir.exists():
+            dirs.append(ext_dir)
+        return dirs
 
     @classmethod
     def load_policy(cls, policy_id: str) -> Optional[DeclarativePolicy]:
@@ -48,8 +62,12 @@ class DeclarativePolicyEngine:
         clean_id = policy_id.strip()
         file_path = cls.get_policies_dir() / f"{clean_id}.json"
         if not file_path.exists():
-            cls.invalidate_policy(clean_id)
-            return None
+            ext_path = cls.get_policies_extended_dir() / f"{clean_id}.json"
+            if ext_path.exists():
+                file_path = ext_path
+            else:
+                cls.invalidate_policy(clean_id)
+                return None
 
         try:
             current_mtime = file_path.stat().st_mtime
@@ -69,14 +87,17 @@ class DeclarativePolicyEngine:
 
     @classmethod
     def get_all_policies(cls) -> List[DeclarativePolicy]:
-        """Loads all available declarative policies from JSON store."""
+        """Loads all available declarative policies from primary and extended JSON stores."""
         policies = []
-        p_dir = cls.get_policies_dir()
-        if p_dir.exists():
-            for p_file in p_dir.glob("*.json"):
-                pol = cls.load_policy(p_file.stem)
-                if pol:
-                    policies.append(pol)
+        seen_ids = set()
+        for p_dir in cls.get_all_policy_dirs():
+            if p_dir.exists():
+                for p_file in sorted(p_dir.glob("*.json")):
+                    if p_file.stem not in seen_ids:
+                        pol = cls.load_policy(p_file.stem)
+                        if pol:
+                            policies.append(pol)
+                            seen_ids.add(p_file.stem)
         return policies
 
     @classmethod

@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-LUMBAR-FUSION",
+  "title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Spine Surgery",
+  "description": "Medicare coverage guidelines for lumbar spinal fusion. Requires documented spinal instability (grade 1 or higher spondylolisthesis or dynamic translation > 3mm on flexion-extension radiographs), severe neurogenic claudication or radiculopathy, and failure of at least 3 months (90 days) of structured conservative care.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual lumbar spine coverage review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-LUMB-01",
+      "name": "Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm)",
+      "description": "Radiographic evidence of Grade 1 or higher degenerative spondylolisthesis, or dynamic translation > 3mm on flexion-extension lumbar radiographs.",
+      "clinical_intent": "Confirm objective mechanical spinal instability",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "degenerative spondylolisthesis",
+        "grade 1 spondylolisthesis",
+        "lumbar instability",
+        "dynamic translation > 3mm"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "degenerative spondylolisthesis",
+        "grade 1 spondylolisthesis",
+        "lumbar instability",
+        "dynamic translation > 3mm"
+      ],
+      "cms_document": "Medicare LCD Lumbar Spinal Fusion",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 1: Instability Criteria",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-LUMB-02",
+      "name": "Conservative Non-Operative Care Trial (>= 90 Days)",
+      "description": "Patient completed at least 3 months (90 days) of active non-operative management including physical therapy, analgesics, or epidural injections without adequate relief.",
+      "clinical_intent": "Verify conservative medical management trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative therapy trial",
+        "physical therapy trial",
+        "non-operative care",
+        "90 days conservative therapy"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative therapy trial",
+        "physical therapy trial",
+        "non-operative care",
+        "90 days conservative therapy"
+      ],
+      "cms_document": "Medicare LCD Lumbar Spinal Fusion",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 2: Conservative Therapy",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-LUMB-EXCL-01",
+      "name": "Isolated Low Back Pain Without Instability Exclusion",
+      "description": "Fusion requested solely for uncomplicated axial low back pain without radiographic instability, facet arthropathy, or neural compression.",
+      "clinical_intent": "Disqualify fusion for non-specific axial back pain",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "axial back pain without instability",
+        "non-specific back pain only",
+        "uncomplicated discogenic back pain"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "axial back pain without instability",
+        "non-specific back pain only",
+        "uncomplicated discogenic back pain"
+      ],
+      "cms_document": "Medicare LCD Lumbar Spinal Fusion",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Axial Pain Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

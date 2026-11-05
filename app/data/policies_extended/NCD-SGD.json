@@ -1,0 +1,123 @@
+{
+  "policy_id": "NCD-SGD",
+  "title": "Speech Generating Devices (SGD)",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Durable Medical Equipment (DMEPOS)",
+  "description": "CMS National Coverage Determination for speech generating devices (NCD 50.1, HCPCS E2500-E2510). Covered for individuals with severe expressive speech impairments who have suffered significant anatomical or neurological impairment, following formal evaluation by a licensed Speech-Language Pathologist (SLP).",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 50.1 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-SGD-01",
+      "name": "Severe Expressive Speech Impairment Precluding Daily Communication",
+      "description": "Medical record documenting severe expressive communication impairment (aphasia, dysarthria, apraxia, laryngectomy) severely limiting daily communication.",
+      "clinical_intent": "Confirm profound expressive speech deficit",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "severe expressive aphasia",
+        "severe dysarthria",
+        "anarthria",
+        "total laryngectomy",
+        "unable to communicate verbally"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "severe expressive aphasia",
+        "severe dysarthria",
+        "anarthria",
+        "total laryngectomy",
+        "unable to communicate verbally"
+      ],
+      "cms_document": "CMS NCD Manual Section 50.1",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Expressive Impairment",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SGD-02",
+      "name": "Formal Evaluation by Licensed Speech-Language Pathologist (SLP)",
+      "description": "Formal written assessment by a licensed Speech-Language Pathologist (SLP) recommending the specific device and detailing trial results with AAC systems.",
+      "clinical_intent": "Mandatory professional SLP evaluation",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "speech-language pathologist evaluation",
+        "slp assessment completed",
+        "aac device trial completed"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "speech-language pathologist evaluation",
+        "slp assessment completed",
+        "aac device trial completed"
+      ],
+      "cms_document": "CMS NCD Manual Section 50.1",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: SLP Assessment",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SGD-EXCL-01",
+      "name": "Non-Dedicated Personal Computer / Tablet Exclusion",
+      "description": "Speech software requested on an unlocked commercial computer or smartphone that functions primarily as a general personal entertainment device.",
+      "clinical_intent": "Statutory exclusion of non-dedicated non-medical computer hardware",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "unlocked commercial tablet",
+        "general consumer computer",
+        "non-dedicated computing device"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "unlocked commercial tablet",
+        "general consumer computer",
+        "non-dedicated computing device"
+      ],
+      "cms_document": "CMS NCD Manual Section 50.1",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Non-Dedicated Hardware",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

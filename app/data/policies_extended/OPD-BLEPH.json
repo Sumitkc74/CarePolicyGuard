@@ -1,0 +1,123 @@
+{
+  "policy_id": "OPD-BLEPH",
+  "title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+  "jurisdiction": "CMS Hospital Outpatient Prior Authorization (42 CFR \u00a7 419.80)",
+  "effective_date": "2020-07-01",
+  "category": "Ophthalmology / Plastic Surgery",
+  "description": "CMS prior authorization requirement for functional blepharoplasty and repair of blepharoptosis. Mandates documented superior visual field restriction of at least 30% or 12 degrees, photographic documentation showing pseudoptosis or lid margin reflex distance, and subjective visual impairment during activities of daily living.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual OPD prior authorization transmittal update."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-BLEPH-01",
+      "name": "Visual Field Restriction (>= 30% or 12 Degrees)",
+      "description": "Goldmann or automated visual field testing demonstrating superior visual field restriction of >= 30% or 12 degrees of field loss with lids un-taped.",
+      "clinical_intent": "Confirm objective functional visual deficit",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "visual field",
+        "superior visual field restriction",
+        "field loss",
+        "visual field deficit"
+      ],
+      "operator": ">=",
+      "threshold": 30.0,
+      "target_unit": "%",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "visual field",
+        "superior visual field restriction",
+        "field loss",
+        "visual field deficit"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 1: Blepharoplasty Indications",
+      "source_paragraph": "Paragraph 1: Visual Field Testing",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-BLEPH-02",
+      "name": "Marginal Reflex Distance 1 (MRD1 <= 2.0 mm)",
+      "description": "Photographic measurement showing Marginal Reflex Distance 1 (MRD1) <= 2.0 mm, or skin overhang resting on the eyelashes in primary gaze.",
+      "clinical_intent": "Objective anatomical confirmation of ptosis",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "MRD1",
+        "marginal reflex distance",
+        "lid margin reflex distance"
+      ],
+      "operator": "<=",
+      "threshold": 2.0,
+      "target_unit": "mm",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in clinical photos",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "MRD1",
+        "marginal reflex distance",
+        "lid margin reflex distance"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 1: Blepharoplasty Indications",
+      "source_paragraph": "Paragraph 2: Photographic Criteria",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-BLEPH-EXCL-01",
+      "name": "Purely Cosmetic Eyelid Surgery Exclusion",
+      "description": "Procedure performed solely for cosmetic appearance without documented functional visual field restriction or symptomatic visual impairment.",
+      "clinical_intent": "Statutory exclusion of purely cosmetic rejuvenation",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "cosmetic appearance",
+        "cosmetic rejuvenation",
+        "aesthetic appearance only",
+        "absence of visual symptoms"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "cosmetic appearance",
+        "cosmetic rejuvenation",
+        "aesthetic appearance only",
+        "absence of visual symptoms"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 2: Exclusions",
+      "source_paragraph": "Paragraph 1: Cosmetic Surgery Non-Coverage",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -1,0 +1,125 @@
+{
+  "policy_id": "LCD-MRI-BRAIN",
+  "title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Diagnostic Radiology / Neuroradiology",
+  "description": "Medicare coverage criteria for diagnostic brain MRI. Requires documented focal neurological deficit, new onset seizure, intractable cognitive decline with rapid progression, suspected demyelinating disease (MS), or persistent progressive headache accompanied by focal neurological signs.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-MRIB-01",
+      "name": "Focal Neurological Deficit or New Onset Seizure",
+      "description": "Clinical examination documenting objective focal neurological deficit (cranial neuropathy, hemiparesis, visual field loss, ataxia) or new-onset unprovoked seizure.",
+      "clinical_intent": "Validate neurological indication for parenchymal evaluation",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "focal neurological deficit",
+        "new onset seizure",
+        "cranial nerve palsy",
+        "hemiparesis",
+        "suspected stroke"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "focal neurological deficit",
+        "new onset seizure",
+        "cranial nerve palsy",
+        "hemiparesis",
+        "suspected stroke"
+      ],
+      "cms_document": "Medicare LCD Brain MRI",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Neurological Findings",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-MRIB-02",
+      "name": "Progressive Headache with Red Flags or Abnormal Exam",
+      "description": "Headache with progressive severity, nocturnal awakening, papilledema on fundoscopy, or worsening with Valsalva maneuver.",
+      "clinical_intent": "Establish red-flag headache criteria",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "headache with papilledema",
+        "valsalva worsening headache",
+        "progressive severe headache",
+        "headache with focal signs"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.8,
+      "keywords": [
+        "headache with papilledema",
+        "valsalva worsening headache",
+        "progressive severe headache",
+        "headache with focal signs"
+      ],
+      "cms_document": "Medicare LCD Brain MRI",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Headache Red Flags",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-MRIB-EXCL-01",
+      "name": "Typical Chronic Stable Headache Without Red Flags Exclusion",
+      "description": "Brain MRI requested for long-standing typical tension headache or stable migraine without change in pattern or focal deficits.",
+      "clinical_intent": "Exclude neuroimaging for typical stable non-red-flag headaches",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "stable tension headache",
+        "typical migraine without red flags",
+        "long-standing unchanged headache"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "stable tension headache",
+        "typical migraine without red flags",
+        "long-standing unchanged headache"
+      ],
+      "cms_document": "Medicare LCD Brain MRI",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Stable Headache Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

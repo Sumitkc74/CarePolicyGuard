@@ -47,7 +47,16 @@ async def lifespan(app: FastAPI):
                 ("verification_method", "VARCHAR(100)"),
                 ("mfa_enabled_methods", "VARCHAR(100) DEFAULT 'email_otp'"),
                 ("oauth_provider", "VARCHAR(50)"),
-                ("oauth_sub", "VARCHAR(255)")
+                ("oauth_sub", "VARCHAR(255)"),
+                ("is_demo_user", "BOOLEAN DEFAULT 0"),
+                ("is_bootstrap", "BOOLEAN DEFAULT 0"),
+                ("must_change_password", "BOOLEAN DEFAULT 0"),
+                ("must_setup_mfa", "BOOLEAN DEFAULT 0"),
+                ("provisioned_by", "VARCHAR(150)"),
+                ("verified_at", "TIMESTAMP"),
+                ("verified_by", "VARCHAR(150)"),
+                ("verification_reference", "VARCHAR(150)"),
+                ("verification_expires_at", "TIMESTAMP")
             ]
             for col_name, col_type in new_cols:
                 if cols and col_name not in cols:
@@ -77,6 +86,36 @@ async def lifespan(app: FastAPI):
     try:
         seed_database(db)
         print("[+] Database schema verified and Medicare policies pre-seeded successfully.")
+
+        # Task 1 & Task 4 Security Hardening & Downgrade Migrations
+        from app.core.bootstrap import (
+            audit_self_registered_admins,
+            bootstrap_production_admin,
+            is_production_admin_seeded,
+            migrate_legacy_unverified_clinicians,
+        )
+
+        # 1. Audit and suspend any legacy self-registered admin accounts
+        flagged_admins = audit_self_registered_admins(db)
+        if flagged_admins:
+            print(f"[!] Security Notice: Flagged and suspended {len(flagged_admins)} legacy self-registered Admin accounts.")
+
+        # 2. Downgrade legacy format-only and OAuth-verified clinicians to pending (unverified)
+        downgraded = migrate_legacy_unverified_clinicians(db)
+        if downgraded:
+            print(f"[*] Security Migration: Downgraded {len(downgraded)} legacy self-asserted/OAuth clinicians to unverified pending primary-source review.")
+
+        # 3. Environment-driven First-Admin Bootstrap (if configured and not already seeded)
+        if settings.BOOTSTRAP_ADMIN_EMAIL and settings.BOOTSTRAP_ADMIN_PASSWORD:
+            if not is_production_admin_seeded(db):
+                bootstrap_production_admin(
+                    db=db,
+                    email=settings.BOOTSTRAP_ADMIN_EMAIL,
+                    password=settings.BOOTSTRAP_ADMIN_PASSWORD
+                )
+                print(f"[+] Production bootstrap admin created for '{settings.BOOTSTRAP_ADMIN_EMAIL}'.")
+            else:
+                print("[*] Production admin already exists; environment bootstrap is closed.")
     except Exception as e:
         print(f"[-] Database seeding warning: {e}")
         if settings.SEED_DEMO_USERS:

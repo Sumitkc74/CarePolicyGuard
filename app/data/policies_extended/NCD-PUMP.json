@@ -1,0 +1,125 @@
+{
+  "policy_id": "NCD-PUMP",
+  "title": "Implantable Infusion Pumps for Intrathecal Therapy",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Interventional Pain / Oncology",
+  "description": "CMS National Coverage Determination for implantable intrathecal drug delivery systems (NCD 160.18). Requires severe intractable chronic pain of malignant or non-malignant origin, failure of oral or transdermal opioids/adjuvants, and documented response to a preliminary trial injection.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 160.18 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PUMP-01",
+      "name": "Successful Intrathecal Preliminary Trial Response",
+      "description": "Documented positive clinical response (>= 50% pain reduction or reduction in intolerable side effects) to a temporary preliminary trial injection of intrathecal medication.",
+      "clinical_intent": "Verify trial responsiveness before permanent implantation",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "intrathecal trial response",
+        "successful trial injection",
+        "trial pain relief",
+        "positive intrathecal trial"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 3 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "intrathecal trial response",
+        "successful trial injection",
+        "trial pain relief",
+        "positive intrathecal trial"
+      ],
+      "cms_document": "CMS NCD Manual Section 160.18",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 1: Preliminary Trial",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PUMP-02",
+      "name": "Intolerable Side Effects or Failure of Systemic Analgesics",
+      "description": "Documented intractable pain unresponsive to systemic oral/transdermal analgesics, or failure due to severe dose-limiting adverse effects.",
+      "clinical_intent": "Confirm exhaustion of non-invasive systemic pharmacotherapy",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "failed systemic analgesics",
+        "dose-limiting opioid toxicity",
+        "intractable chronic pain",
+        "failure of oral opioids"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in clinical chart",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.8,
+      "keywords": [
+        "failed systemic analgesics",
+        "dose-limiting opioid toxicity",
+        "intractable chronic pain",
+        "failure of oral opioids"
+      ],
+      "cms_document": "CMS NCD Manual Section 160.18",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 2: Systemic Failure",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PUMP-EXCL-01",
+      "name": "Active Systemic Sepsis Exclusion",
+      "description": "Active systemic infection, sepsis, meningitis, or localized infection at the proposed pump pocket site.",
+      "clinical_intent": "Exclude active infection prior to foreign body implantation",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "active sepsis",
+        "systemic infection",
+        "meningitis",
+        "localized pocket infection"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "active sepsis",
+        "systemic infection",
+        "meningitis",
+        "localized pocket infection"
+      ],
+      "cms_document": "CMS NCD Manual Section 160.18",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

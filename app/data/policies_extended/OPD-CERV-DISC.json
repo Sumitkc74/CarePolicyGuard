@@ -1,0 +1,125 @@
+{
+  "policy_id": "OPD-CERV-DISC",
+  "title": "Cervical Artificial Disc Arthroplasty",
+  "jurisdiction": "CMS Hospital Outpatient Prior Authorization (42 CFR \u00a7 419.80)",
+  "effective_date": "2021-07-01",
+  "category": "Spine Surgery / Neurosurgery",
+  "description": "CMS prior authorization for cervical artificial disc arthroplasty (cervical TDR). Requires single-level or two-level cervical radiculopathy or myelopathy confirmed on MRI/CT, failure of at least 6 weeks of non-operative conservative therapy, and absence of severe facet joint arthrosis.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "OPD Prior Authorization guidelines."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CERV-01",
+      "name": "Symptomatic Cervical Radiculopathy or Myelopathy",
+      "description": "Documented cervical radiculopathy (intractable arm pain, paresthesias, reflex changes) or mild cervical myelopathy matching MRI/CT nerve root or spinal cord compression.",
+      "clinical_intent": "Confirm neurologic deficit correlating with imaging",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "cervical radiculopathy",
+        "cervical myelopathy",
+        "nerve root compression",
+        "cervical disc herniation on mri"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "cervical radiculopathy",
+        "cervical myelopathy",
+        "nerve root compression",
+        "cervical disc herniation on mri"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 6: Cervical Arthroplasty Indications",
+      "source_paragraph": "Paragraph 1: Clinical Presentation",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CERV-02",
+      "name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+      "description": "Documented trial and failure of >= 6 weeks of conservative therapy including physical therapy, analgesics, or cervical traction.",
+      "clinical_intent": "Verify conservative non-operative management trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative physical therapy",
+        "cervical physical therapy",
+        "conservative therapy trial",
+        "analgesic trial"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 42,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 6 weeks duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative physical therapy",
+        "cervical physical therapy",
+        "conservative therapy trial",
+        "analgesic trial"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 6: Cervical Arthroplasty Indications",
+      "source_paragraph": "Paragraph 2: Conservative Therapy",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CERV-EXCL-01",
+      "name": "Severe Facet Joint Spondylosis Exclusion",
+      "description": "Severe cervical facet joint degeneration, autofusion, spinal instability, or segmental kyphosis at the target level.",
+      "clinical_intent": "Exclude contraindications to mobile disc arthroplasty",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "severe facet arthrosis",
+        "facet joint spondylosis",
+        "cervical instability",
+        "segmental kyphosis"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Target level imaging",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "severe facet arthrosis",
+        "facet joint spondylosis",
+        "cervical instability",
+        "segmental kyphosis"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 6: Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

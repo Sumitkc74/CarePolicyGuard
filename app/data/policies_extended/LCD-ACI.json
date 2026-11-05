@@ -1,0 +1,119 @@
+{
+  "policy_id": "LCD-ACI",
+  "title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Orthopedic Surgery",
+  "description": "Medicare coverage criteria for matrix-induced autologous chondrocyte implantation (MACI) of the femoral condyle or trochlea. Requires full-thickness focal chondral defect (Outerbridge Grade IV, size 1.5 to 10 cm2), failure of prior conservative or surgical microfracture, and absence of diffuse osteoarthritis.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-ACI-01",
+      "name": "Focal Chondral Defect Surface Area (1.5 to 10.0 cm2)",
+      "description": "Documented full-thickness cartilage defect (Outerbridge Grade III or IV) measuring between 1.5 and 10.0 square centimeters on arthroscopy or MRI.",
+      "clinical_intent": "Verify focal lesion area within FDA approved range",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "cartilage defect area",
+        "focal chondral defect size",
+        "outerbridge grade iv lesion area"
+      ],
+      "operator": ">=",
+      "threshold": 1.5,
+      "target_unit": "cm2",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in MRI or arthroscopy",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "cartilage defect area",
+        "focal chondral defect size",
+        "outerbridge grade iv lesion area"
+      ],
+      "cms_document": "Medicare LCD Autologous Chondrocyte Implantation",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Defect Size",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-ACI-02",
+      "name": "Prior Debridement or Marrow Stimulation Failure",
+      "description": "Documented prior trial and failure of conservative management or prior surgical debridement/microfracture >= 6 months prior.",
+      "clinical_intent": "Confirm failure of initial surgical intervention",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "prior microfracture failure",
+        "failed marrow stimulation",
+        "prior knee debridement failure"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in surgical history",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "prior microfracture failure",
+        "failed marrow stimulation",
+        "prior knee debridement failure"
+      ],
+      "cms_document": "Medicare LCD Autologous Chondrocyte Implantation",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Prior Surgery",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-ACI-EXCL-01",
+      "name": "Generalized Severe Tricompartmental Osteoarthritis Exclusion",
+      "description": "Diffuse degenerative joint disease or severe osteoarthritis (Kellgren-Lawrence Grade 3 or 4) across multiple compartments.",
+      "clinical_intent": "Exclude diffuse joint degeneration where arthroplasty is indicated",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "diffuse osteoarthritis",
+        "tricompartmental osteoarthritis",
+        "kellgren-lawrence grade 3 or 4"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "diffuse osteoarthritis",
+        "tricompartmental osteoarthritis",
+        "kellgren-lawrence grade 3 or 4"
+      ],
+      "cms_document": "Medicare LCD Autologous Chondrocyte Implantation",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Diffuse Arthritis Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

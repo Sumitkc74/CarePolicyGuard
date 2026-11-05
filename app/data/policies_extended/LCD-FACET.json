@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-FACET",
+  "title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Interventional Pain Management",
+  "description": "Medicare coverage criteria for facet joint radiofrequency ablation (RFA/neurotomy). Requires chronic axial non-radicular pain >= 3 months, documented >= 80% pain relief from two separate diagnostic medial branch blocks (MBBs), and failure of conservative management.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual interventional pain review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-FACET-01",
+      "name": "Diagnostic Medial Branch Block Relief (>= 80%)",
+      "description": "Documented >= 80% relief of target facet pain following dual diagnostic medial branch nerve blocks under fluoroscopic guidance.",
+      "clinical_intent": "Validate facet joint as primary pain generator",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "medial branch block relief",
+        "diagnostic mbb relief",
+        "facet block pain reduction"
+      ],
+      "operator": ">=",
+      "threshold": 80.0,
+      "target_unit": "%",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in procedural logs",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "medial branch block relief",
+        "diagnostic mbb relief",
+        "facet block pain reduction"
+      ],
+      "cms_document": "Medicare LCD Facet Joint Interventions",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Diagnostic Relief",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-FACET-02",
+      "name": "Chronic Axial Pain Duration (>= 3 Months)",
+      "description": "Chronic non-radicular axial back or neck pain causing functional disability for >= 3 months (90 days).",
+      "clinical_intent": "Confirm chronic duration of facet pain",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "axial back pain",
+        "facet pain",
+        "chronic low back pain",
+        "three months pain duration"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "axial back pain",
+        "facet pain",
+        "chronic low back pain",
+        "three months pain duration"
+      ],
+      "cms_document": "Medicare LCD Facet Joint Interventions",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Pain Chronicity",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-FACET-EXCL-01",
+      "name": "Radiculopathy or Acute Fracture Exclusion",
+      "description": "Primary pain due to radicular disc herniation, severe canal stenosis, acute compression fracture, or active tumor.",
+      "clinical_intent": "Exclude non-facet primary pain etiologies",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "primary radiculopathy",
+        "acute fracture",
+        "spinal malignancy",
+        "acute vertebral collapse"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "primary radiculopathy",
+        "acute fracture",
+        "spinal malignancy",
+        "acute vertebral collapse"
+      ],
+      "cms_document": "Medicare LCD Facet Joint Interventions",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-LUMBAR-DECOMP",
+  "title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Spine Surgery",
+  "description": "Medicare coverage guidelines for lumbar laminectomy/decompression without fusion. Requires neurogenic claudication or radicular pain matching moderate to severe central or lateral recess stenosis on MRI/CT, and failure of at least 6 weeks of conservative therapy.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-LDEC-01",
+      "name": "Severe Central or Foraminal Stenosis on MRI/CT",
+      "description": "Diagnostic MRI or CT confirming moderate to severe lumbar central canal, subarticular, or neural foraminal stenosis correlating with clinical symptoms.",
+      "clinical_intent": "Radiographic confirmation of neural compression",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "central canal stenosis",
+        "severe lumbar stenosis",
+        "foraminal stenosis",
+        "moderate to severe stenosis on mri"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "central canal stenosis",
+        "severe lumbar stenosis",
+        "foraminal stenosis",
+        "moderate to severe stenosis on mri"
+      ],
+      "cms_document": "Medicare LCD Lumbar Decompression",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Imaging Criteria",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-LDEC-02",
+      "name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+      "description": "Trial and failure of >= 6 weeks of non-surgical conservative therapy including physical therapy, activity modification, or NSAIDs/analgesics.",
+      "clinical_intent": "Mandatory non-operative trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative therapy",
+        "physical therapy trial",
+        "six weeks conservative therapy"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 42,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 6 weeks duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative therapy",
+        "physical therapy trial",
+        "six weeks conservative therapy"
+      ],
+      "cms_document": "Medicare LCD Lumbar Decompression",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Conservative Care",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-LDEC-EXCL-01",
+      "name": "Absence of Neurologic Symptoms Exclusion",
+      "description": "Asymptomatic stenosis or incidental radiologic stenosis in the absence of functional claudication or radiculopathy.",
+      "clinical_intent": "Disqualify asymptomatic imaging findings",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "asymptomatic stenosis",
+        "incidental stenosis",
+        "no claudication",
+        "no radiculopathy"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "asymptomatic stenosis",
+        "incidental stenosis",
+        "no claudication",
+        "no radiculopathy"
+      ],
+      "cms_document": "Medicare LCD Lumbar Decompression",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Asymptomatic Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

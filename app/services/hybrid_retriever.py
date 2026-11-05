@@ -73,11 +73,13 @@ class DenseSemanticRetriever:
     """
     # Key clinical concept vocabulary vectors
     CLINICAL_CONCEPT_VOCAB = [
-        "ejection_fraction", "systolic_heart_failure", "cardiomyopathy", "nyha_functional_class",
-        "guideline_directed_medical_therapy", "gdmt", "implantable_cardioverter_defibrillator", "icd",
-        "post_myocardial_infarction", "waiting_period", "cardiogenic_shock", "obstructive_sleep_apnea",
-        "apnea_hypopnea_index", "ahi", "cpap", "polysomnography", "aortic_stenosis", "tavr",
-        "heart_team_consensus", "atrial_fibrillation", "watchman", "left_atrial_appendage_closure",
+        "lvef", "ejection_fraction", "systolic_heart_failure", "heart_failure", "cardiomyopathy",
+        "nyha", "nyha_functional_class", "guideline_directed_medical_therapy", "gdmt",
+        "implantable_cardioverter_defibrillator", "icd", "defibrillator",
+        "myocardial_infarction", "post_myocardial_infarction", "waiting_period", "cardiogenic_shock",
+        "obstructive_sleep_apnea", "sleep_apnea", "apnea_hypopnea_index", "ahi", "cpap", "bipap", "polysomnography",
+        "aortic_stenosis", "tavr", "teer", "mitraclip", "heart_team_consensus",
+        "atrial_fibrillation", "watchman", "left_atrial_appendage_closure",
         "diabetic_foot_ulcer", "hyperbaric_oxygen_therapy", "wagner_grade_3", "conservative_wound_care"
     ]
 
@@ -90,11 +92,12 @@ class DenseSemanticRetriever:
         vec = []
         for concept in self.CLINICAL_CONCEPT_VOCAB:
             parts = concept.split("_")
-            # Weight based on complete or partial phrase presence
-            if concept in lowered or " ".join(parts) in lowered:
+            phrase = " ".join(parts)
+            hyphenated = "-".join(parts)
+            if concept in lowered or phrase in lowered or hyphenated in lowered:
                 vec.append(2.0)
-            elif any(p in lowered for p in parts if len(p) >= 3):
-                vec.append(1.0)
+            elif len(parts) > 1 and all(p in lowered for p in parts):
+                vec.append(1.5)
             else:
                 vec.append(0.0)
 

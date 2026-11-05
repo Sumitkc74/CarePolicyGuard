@@ -1,0 +1,127 @@
+{
+  "policy_id": "LCD-PAD-ATHERO",
+  "title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Vascular Surgery / Interventional Cardiology",
+  "description": "Medicare coverage criteria for percutaneous peripheral atherectomy and angioplasty. Requires documented chronic lifestyle-limiting intermittent claudication (Rutherford Category 3) or critical limb ischemia (Rutherford 4-6) with non-healing ulcers, failure of >= 3 months supervised exercise therapy, and documented arterial stenosis >= 70%.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual vascular LCD."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PAD-01",
+      "name": "Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6)",
+      "description": "Clinical documentation of severe intermittent claudication severely limiting ambulation (Rutherford Category 3) or critical limb ischemia with rest pain / ischemic ulceration.",
+      "clinical_intent": "Clinical severity threshold for invasive intervention",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "rutherford category 3",
+        "severe claudication",
+        "critical limb ischemia",
+        "ischemic rest pain",
+        "arterial ulcer"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "rutherford category 3",
+        "severe claudication",
+        "critical limb ischemia",
+        "ischemic rest pain",
+        "arterial ulcer"
+      ],
+      "cms_document": "Medicare LCD Peripheral Atherectomy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Clinical Categories",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PAD-02",
+      "name": "Arterial Hemodynamic Stenosis (>= 70% on Angiography or ABI <= 0.70)",
+      "description": "Non-invasive vascular testing showing Ankle-Brachial Index (ABI) <= 0.70 and angiography/duplex showing >= 70% stenosis of target lower extremity artery.",
+      "clinical_intent": "Hemodynamic proof of severe arterial obstruction",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "arterial stenosis",
+        "abi index",
+        "ankle brachial index",
+        "iliac or femoral stenosis"
+      ],
+      "operator": ">=",
+      "threshold": 70.0,
+      "target_unit": "%",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "arterial stenosis",
+        "abi index",
+        "ankle brachial index",
+        "iliac or femoral stenosis"
+      ],
+      "cms_document": "Medicare LCD Peripheral Atherectomy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Hemodynamic Evidence",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PAD-EXCL-01",
+      "name": "Mild Claudication or Asymptomatic PAD Exclusion",
+      "description": "Invasive revascularization performed for mild claudication (Rutherford Category 1 or 2) without prior trial of supervised exercise.",
+      "clinical_intent": "Exclude premature interventional therapy for mild disease",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "mild claudication only",
+        "rutherford 1",
+        "asymptomatic pad",
+        "absence of functional limitation"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "mild claudication only",
+        "rutherford 1",
+        "asymptomatic pad",
+        "absence of functional limitation"
+      ],
+      "cms_document": "Medicare LCD Peripheral Atherectomy",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Mild Disease Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

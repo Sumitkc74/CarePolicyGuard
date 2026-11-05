@@ -15,9 +15,16 @@ class User(Base):
     username = Column(String(100), unique=True, index=True, nullable=False)
     email = Column(String(150), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    role = Column(String(50), nullable=False, default="Clinician")  # Auditor, Clinician, Admin
+    role = Column(String(50), nullable=False, default="Clinician")  # Auditor, Clinician, Admin, Credentialing
     full_name = Column(String(150), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
+
+    # Provisioning & Bootstrap Tracking
+    is_demo_user = Column(Boolean, default=False, nullable=False)
+    is_bootstrap = Column(Boolean, default=False, nullable=False)
+    must_change_password = Column(Boolean, default=False, nullable=False)
+    must_setup_mfa = Column(Boolean, default=False, nullable=False)
+    provisioned_by = Column(String(150), nullable=True)
 
     # Medical Professional Credential & Licensure Verification
     npi_number = Column(String(20), nullable=True, index=True)
@@ -28,6 +35,10 @@ class User(Base):
     organization = Column(String(150), nullable=True)
     is_verified_medical_pro = Column(Boolean, default=False, nullable=False)
     verification_method = Column(String(100), nullable=True)
+    verified_at = Column(DateTime(timezone=True), nullable=True)
+    verified_by = Column(String(150), nullable=True)
+    verification_reference = Column(String(150), nullable=True)
+    verification_expires_at = Column(DateTime(timezone=True), nullable=True)
 
     # Federated OAuth Single Sign-On (Google & Apple)
     oauth_provider = Column(String(50), nullable=True)  # "google", "apple"
@@ -195,4 +206,24 @@ class DeferralQueueRecord(Base):
     current_state = Column(String(50), default="PENDING_EVIDENCE", nullable=False)
     created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+
+class CredentialingAuditLog(Base):
+    __tablename__ = "credentialing_audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    event_id = Column(String(100), unique=True, index=True, nullable=False)
+    clinician_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    clinician_email = Column(String(150), nullable=False)
+    actor_id = Column(Integer, nullable=True)
+    actor_username = Column(String(150), nullable=False)
+    actor_role = Column(String(50), nullable=False)
+    action = Column(String(50), nullable=False)  # "VERIFIED", "REJECTED", "REVOKED", "DOWNGRADED", "PROVISIONED"
+    verification_method = Column(String(100), nullable=False)
+    evidence_reference = Column(String(150), nullable=True)
+    previous_state = Column(String(50), nullable=True)
+    new_state = Column(String(50), nullable=False)
+    notes = Column(Text, nullable=True)
+    audit_hash = Column(String(64), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
 

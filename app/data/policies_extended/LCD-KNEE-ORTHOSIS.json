@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-KNEE-ORTHOSIS",
+  "title": "Custom-Fabricated Functional Knee Orthoses",
+  "jurisdiction": "DME MAC Local Coverage Determination",
+  "effective_date": "2023-01-01",
+  "category": "Durable Medical Equipment (DMEPOS)",
+  "description": "DME MAC coverage criteria for custom-fabricated functional knee orthoses (HCPCS L1845, L1846). Requires documented chronic knee instability resulting from ligamentous deficiency (ACL, PCL, MCL/LCL) or severe osteoarthritis, failed trial of prefabricated orthosis, and specific physical exam laxity measurements.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "DME MAC",
+      "summary": "Annual orthotics review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-KORTH-01",
+      "name": "Documented Objective Knee Laxity or Ligamentous Deficiency",
+      "description": "Physical examination documenting Grade II or III ligamentous instability on anterior drawer, Lachman, pivot shift, or varus/valgus stress testing.",
+      "clinical_intent": "Confirm objective mechanical laxity",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "positive lachman test",
+        "grade 2 ligamentous instability",
+        "acl tear with instability",
+        "abnormal pivot shift"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "positive lachman test",
+        "grade 2 ligamentous instability",
+        "acl tear with instability",
+        "abnormal pivot shift"
+      ],
+      "cms_document": "DME MAC LCD Knee Orthoses",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Physical Exam",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-KORTH-02",
+      "name": "Medical Justification for Custom vs Prefabricated Device",
+      "description": "Documented anatomical justification why an off-the-shelf prefabricated brace cannot fit (e.g. disproportionate thigh/calf circumference, severe angular deformity > 15 degrees).",
+      "clinical_intent": "Mandatory justification for custom fabrication",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "prefabricated brace cannot fit",
+        "disproportionate limb circumference",
+        "severe varus deformity > 15 degrees",
+        "custom brace justification"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in clinical chart",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "prefabricated brace cannot fit",
+        "disproportionate limb circumference",
+        "severe varus deformity > 15 degrees",
+        "custom brace justification"
+      ],
+      "cms_document": "DME MAC LCD Knee Orthoses",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Custom Justification",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-KORTH-EXCL-01",
+      "name": "Temporary Post-Operative Immobilizer Exclusion",
+      "description": "Custom functional brace requested solely for short-term post-operative immobilization (< 6 weeks) where a simple immobilizer is appropriate.",
+      "clinical_intent": "Disqualify custom rigid braces for simple temporary immobilization",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "short-term post-operative immobilization",
+        "temporary immobilizer needed",
+        "absence of chronic instability"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "short-term post-operative immobilization",
+        "temporary immobilizer needed",
+        "absence of chronic instability"
+      ],
+      "cms_document": "DME MAC LCD Knee Orthoses",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Short-term Immobilization",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

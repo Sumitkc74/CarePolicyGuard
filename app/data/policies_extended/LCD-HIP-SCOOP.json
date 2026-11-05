@@ -1,0 +1,121 @@
+{
+  "policy_id": "LCD-HIP-SCOOP",
+  "title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Orthopedic Surgery",
+  "description": "Medicare coverage criteria for hip arthroscopy to treat femoroacetabular impingement (cam/pincer) and acetabular labral repair. Requires clinical groin pain with positive impingement test (FADIR), alpha angle > 55 degrees or crossover sign, failure of >= 3 months conservative therapy, and absence of advanced osteoarthritis.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-FAI-01",
+      "name": "Cam/Pincer Impingement on Radiographs (Alpha Angle > 55 deg)",
+      "description": "Radiographs or MRI confirming cam morphology with alpha angle > 55 degrees, pincer morphology (crossover sign, center-edge angle > 40), and acetabular labral tear.",
+      "clinical_intent": "Radiographic proof of mechanical bony impingement",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "alpha angle",
+        "cam morphology",
+        "femoroacetabular impingement angle",
+        "fai alpha angle"
+      ],
+      "operator": ">",
+      "threshold": 55.0,
+      "target_unit": "degrees",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "alpha angle",
+        "cam morphology",
+        "femoroacetabular impingement angle",
+        "fai alpha angle"
+      ],
+      "cms_document": "Medicare LCD Hip Arthroscopy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Radiographic Threshold",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-FAI-02",
+      "name": "Conservative Physical Therapy Trial Failure (>= 3 Months)",
+      "description": "Documented trial and failure of >= 3 months of conservative management (physical therapy, activity modification, intra-articular injection).",
+      "clinical_intent": "Mandatory non-operative conservative trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative physical therapy",
+        "intra-articular hip injection",
+        "three months conservative therapy"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative physical therapy",
+        "intra-articular hip injection",
+        "three months conservative therapy"
+      ],
+      "cms_document": "Medicare LCD Hip Arthroscopy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Conservative Therapy",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-FAI-EXCL-01",
+      "name": "Advanced Hip Osteoarthritis (Tonnis Grade >= 2)",
+      "description": "Pre-existing advanced joint space narrowing < 2 mm, subchondral sclerosis, or Tonnis Grade 2 or 3 osteoarthritis.",
+      "clinical_intent": "Exclude hip arthroscopy for advanced degenerative joint disease",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "tonnis grade 2 or 3",
+        "advanced hip osteoarthritis",
+        "joint space less than 2mm"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current imaging",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "tonnis grade 2 or 3",
+        "advanced hip osteoarthritis",
+        "joint space less than 2mm"
+      ],
+      "cms_document": "Medicare LCD Hip Arthroscopy",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Osteoarthritis Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

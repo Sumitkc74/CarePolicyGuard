@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-KNEE-ARTHRO",
+  "title": "Knee Arthroscopy and Meniscectomy",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Orthopedic Surgery",
+  "description": "Medicare coverage criteria for diagnostic and therapeutic knee arthroscopy, including partial meniscectomy and loose body removal. Requires mechanical locking/catching symptoms, MRI confirmation of unstable meniscal tear, and absence of advanced Kellgren-Lawrence Grade 4 tricompartmental osteoarthritis.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-KART-01",
+      "name": "Documented Mechanical Symptoms (Locking or Catching)",
+      "description": "Physical examination and clinical documentation confirming mechanical knee symptoms such as true joint locking, catching, or giving way.",
+      "clinical_intent": "Establish mechanical dysfunction rather than generalized ache",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "true knee locking",
+        "joint catching",
+        "mechanical knee symptoms",
+        "positive mcmurray test"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "true knee locking",
+        "joint catching",
+        "mechanical knee symptoms",
+        "positive mcmurray test"
+      ],
+      "cms_document": "Medicare LCD Knee Arthroscopy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Mechanical Symptoms",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-KART-02",
+      "name": "Unstable Meniscal Tear Confirmed on MRI",
+      "description": "Diagnostic MRI confirming displaced, bucket-handle, flap, or complex unstable meniscal tear correlating with clinical exam.",
+      "clinical_intent": "Radiographic validation of operable tear",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "bucket-handle meniscal tear",
+        "complex meniscal tear on mri",
+        "displaced meniscal flap",
+        "unstable meniscal tear"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "bucket-handle meniscal tear",
+        "complex meniscal tear on mri",
+        "displaced meniscal flap",
+        "unstable meniscal tear"
+      ],
+      "cms_document": "Medicare LCD Knee Arthroscopy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Imaging Criteria",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-KART-EXCL-01",
+      "name": "Advanced End-Stage Osteoarthritis Exclusion (Debridement Only)",
+      "description": "Arthroscopic debridement or lavage performed solely for advanced end-stage osteoarthritis (Kellgren-Lawrence Grade 4) without acute mechanical tear.",
+      "clinical_intent": "Statutory exclusion of arthroscopy for uncomplicated severe osteoarthritis",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "kellgren-lawrence grade 4 osteoarthritis",
+        "severe tricompartmental osteoarthritis",
+        "debridement for osteoarthritis only"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "kellgren-lawrence grade 4 osteoarthritis",
+        "severe tricompartmental osteoarthritis",
+        "debridement for osteoarthritis only"
+      ],
+      "cms_document": "Medicare LCD Knee Arthroscopy",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Osteoarthritis Debridement Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -403,7 +403,7 @@
                             <span class="wizard-step-pill">STEP 2</span>
                             <div>
                                 <h2>Select Medicare Policy Directive</h2>
-                                <p class="step2-subtitle">Candidate policies evaluated against clinical documentation. Best match is featured below.</p>
+                                <p class="step2-subtitle" id="step2-subtitle-text">Candidate policies evaluated against clinical documentation. Best match is featured below.</p>
                             </div>
                         </div>
                     </div>
@@ -416,8 +416,16 @@
                     <!-- OTHER CANDIDATE POLICIES (SMALLER CARDS) -->
                     <div class="other-candidates-section" id="other-candidates-section">
                         <div class="other-candidates-header">
-                            <span class="other-candidates-title">Other Candidate Policies</span>
-                            <span class="other-candidates-hint">Click any card to select as active directive</span>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="other-candidates-title" id="other-candidates-title">Top 15 Closest Candidate Policies</span>
+                                <span class="count-pill" id="candidates-count-pill" style="font-size: 0.7rem; font-weight: 700; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 999px; padding: 2px 8px;">15 Closest</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="other-candidates-hint">Click any card to select as active directive</span>
+                                <button type="button" id="btn-toggle-candidates" class="btn-toggle-candidates" onclick="toggleShowAllCandidates()">
+                                    Show All (50)
+                                </button>
+                            </div>
                         </div>
                         <div class="other-policy-grid" id="policy-match-grid">
                             <!-- Populated dynamically via app.js -->
@@ -658,23 +666,23 @@
                             <div class="packet-fields-grid">
                                 <div class="packet-field">
                                     <label>Patient Legal Name:</label>
-                                    <span id="doc-patient-name" class="field-val-bold">--</span>
+                                    <span id="doc-patient-name" class="field-val-bold">Eleanor Vance</span>
                                 </div>
                                 <div class="packet-field">
                                     <label>Patient ID / MRN:</label>
-                                    <span id="doc-patient-id" class="field-val-mono">--</span>
+                                    <span id="doc-patient-id" class="field-val-mono">PT-CARD-8821</span>
                                 </div>
                                 <div class="packet-field">
                                     <label>Date of Service:</label>
-                                    <span id="doc-dos" class="field-val">--</span>
+                                    <span id="doc-dos" class="field-val">2026-02-18</span>
                                 </div>
                                 <div class="packet-field">
                                     <label>Governing Policy:</label>
-                                    <span id="doc-policy-id" class="field-val-bold">--</span>
+                                    <span id="doc-policy-id" class="field-val-bold">NCD 20.4 - Implantable Cardioverter Defibrillators</span>
                                 </div>
                                 <div class="packet-field">
                                     <label>Medicare Jurisdiction:</label>
-                                    <span id="doc-jurisdiction" class="field-val">--</span>
+                                    <span id="doc-jurisdiction" class="field-val">National (CMS Jurisdiction)</span>
                                 </div>
                             </div>
                         </div>
@@ -779,10 +787,6 @@
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span>
                             Export FHIR
                         </button>
-                        <button class="btn-secondary btn-ehr-action" onclick="pushToHospitalEhr()" title="Direct Interoperability Push to Hospital EHR">
-                            <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
-                            Push to EHR
-                        </button>
                         <button class="btn-secondary btn-appeal-action" id="btn-step4-appeal" onclick="openPeerToPeerAppealModal()" title="Generate Peer-to-Peer Medical Reconsideration Letter">
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
                             Appeal Letter
@@ -832,6 +836,10 @@
                             <span>Current Status:</span>
                             <strong class="badge-status met">Successfully Received</strong>
                         </div>
+                        <div class="receipt-row" id="receipt-ehr-row">
+                            <span>EHR Chart Sync:</span>
+                            <strong class="mono text-cyan" id="receipt-ehr-status">Synchronizing to Epic...</strong>
+                        </div>
                     </div>
 
                     <div class="wizard-nav-footer centered">
@@ -847,9 +855,9 @@
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span>
                             Export FHIR Bundle
                         </button>
-                        <button class="btn-secondary btn-ehr-action" onclick="pushToHospitalEhr()">
+                        <button class="btn-secondary btn-ehr-action" id="btn-step5-ehr-sync" onclick="pushToHospitalEhr(true)" title="Re-synchronize with Hospital EHR">
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg></span>
-                            Sync to Hospital EHR
+                            Re-sync EHR
                         </button>
                         <button class="btn-primary btn-wizard-hero" onclick="startNewPatientNote()">
                             <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
@@ -1791,13 +1799,13 @@
                         </div>
 
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="openTotpSetup()">
+                            <button type="button" class="btn-side-tutorial" id="btn-mfa-totp" style="padding: 6px 12px; font-size: 11px;" onclick="openTotpSetup()">
                                 + Add Authenticator App
                             </button>
-                            <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="enableEmailOtpMfa()">
-                                + Add Email OTP
+                            <button type="button" class="btn-side-tutorial" id="btn-mfa-email" style="padding: 6px 12px; font-size: 11px;" onclick="enableEmailOtpMfa()">
+                                Change / Update Email OTP
                             </button>
-                            <button type="button" class="btn-side-tutorial" style="padding: 6px 12px; font-size: 11px;" onclick="openSmsSetup()">
+                            <button type="button" class="btn-side-tutorial" id="btn-mfa-sms" style="padding: 6px 12px; font-size: 11px;" onclick="openSmsSetup()">
                                 + Add SMS OTP
                             </button>
                         </div>
@@ -1823,7 +1831,7 @@
                             <p id="email-otp-target-hint" style="font-size: 11px; color: #cbd5e1; margin-bottom: 10px;">Check your email inbox for the 6-digit one-time passcode.</p>
                             <div style="display: flex; gap: 8px;">
                                 <input type="text" id="email-verify-code-input" class="login-input" maxlength="6" placeholder="6-digit code" style="font-size: 14px; text-align: center; letter-spacing: 3px; max-width: 130px;">
-                                <button type="button" class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="confirmEmailMfaActivation()">Verify &amp; Activate Email MFA</button>
+                                <button type="button" class="btn-primary" id="btn-confirm-email-mfa" style="padding: 6px 14px; font-size: 12px;" onclick="confirmEmailMfaActivation()">Verify &amp; Update Email MFA</button>
                                 <button type="button" class="btn-side-tutorial" style="padding: 6px 10px; font-size: 11px;" onclick="document.getElementById('email-setup-box').classList.add('hidden')">Cancel</button>
                             </div>
                         </div>
@@ -2469,11 +2477,11 @@
                 <div class="pin-summary-strip">
                     <div class="pin-summary-row">
                         <span>Patient Legal Name:</span>
-                        <strong id="pin-modal-patient" style="color:#F8FAFC;">--</strong>
+                        <strong id="pin-modal-patient" style="color:#F8FAFC;">Eleanor Vance</strong>
                     </div>
                     <div class="pin-summary-row">
                         <span>Patient ID / MRN:</span>
-                        <strong class="mono" id="pin-modal-patient-id" style="color:#38BDF8;">--</strong>
+                        <strong class="mono" id="pin-modal-patient-id" style="color:#38BDF8;">PT-CARD-8821</strong>
                     </div>
                     <div class="pin-summary-row">
                         <span>Case Number:</span>

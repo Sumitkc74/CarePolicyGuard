@@ -1,0 +1,121 @@
+{
+  "policy_id": "LCD-SBRT",
+  "title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Radiation Oncology",
+  "description": "Medicare coverage criteria for stereotactic body radiation therapy (SBRT/SABR). Requires biopsy-proven early stage Non-Small Cell Lung Cancer (T1-T2N0M0) in a medically inoperable patient, or oligometastatic disease (1 to 3 active lesions) with controlled primary tumor.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-SBRT-01",
+      "name": "Early-Stage NSCLC (T1-T2N0M0) or Oligometastases (<= 3 Lesions)",
+      "description": "Biopsy-proven early stage lung cancer in medically inoperable patient (poor pulmonary reserve FEV1 < 40%), or oligometastatic disease with <= 3 discrete lesions.",
+      "clinical_intent": "Establish tumor stage and volume qualifying for stereotactic hypofractionation",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "stage i nsclc",
+        "medically inoperable lung cancer",
+        "oligometastatic disease <= 3 lesions",
+        "t1n0m0 lung cancer"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 3 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "stage i nsclc",
+        "medically inoperable lung cancer",
+        "oligometastatic disease <= 3 lesions",
+        "t1n0m0 lung cancer"
+      ],
+      "cms_document": "Medicare LCD Stereotactic Body Radiation Therapy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Oncologic Indications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SBRT-02",
+      "name": "Rigid Immobilization and Organ Motion Management Plan",
+      "description": "Treatment plan incorporating sub-millimeter stereotactic localization, custom rigid immobilization, and 4D respiratory gating/motion management.",
+      "clinical_intent": "Mandatory technical precision safety requirement",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "4d ct motion management",
+        "stereotactic immobilization",
+        "respiratory gating plan"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Prior to simulation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "4d ct motion management",
+        "stereotactic immobilization",
+        "respiratory gating plan"
+      ],
+      "cms_document": "Medicare LCD Stereotactic Body Radiation Therapy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Technical Specifications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SBRT-EXCL-01",
+      "name": "Polymetastatic Disease (> 3 Lesions) Exclusion",
+      "description": "Patients with diffuse polymetastatic disease (> 3 active visceral/osseous metastases) or uncontrolled primary tumor.",
+      "clinical_intent": "Exclude widespread diffuse metastatic burden",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "polymetastatic disease",
+        "greater than 3 metastatic lesions",
+        "widespread metastasis"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "polymetastatic disease",
+        "greater than 3 metastatic lesions",
+        "widespread metastasis"
+      ],
+      "cms_document": "Medicare LCD Stereotactic Body Radiation Therapy",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

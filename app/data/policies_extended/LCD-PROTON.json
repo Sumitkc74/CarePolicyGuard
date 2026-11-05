@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-PROTON",
+  "title": "Proton Beam Radiotherapy",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Radiation Oncology",
+  "description": "Medicare coverage criteria for proton beam radiotherapy. Covered for indications requiring steep dose falloff to spare critical dose-limiting organs: chordomas and chondrosarcomas of skull base or spine, ocular melanomas, primary CNS tumors in close proximity to brainstem/optic chiasm, or re-irradiation.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual proton beam review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-PBT-01",
+      "name": "Skull Base, Spine Chordoma, or Critical Structure Proximity",
+      "description": "Histologically confirmed skull base/cervical chordoma, chondrosarcoma, ocular melanoma, or CNS tumor abutting critical dose-limiting neural structures.",
+      "clinical_intent": "Validate anatomical and dosimetric justification for Bragg peak physics",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "skull base chordoma",
+        "chondrosarcoma of skull base",
+        "ocular melanoma",
+        "tumor abutting optic chiasm",
+        "brainstem proximity"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current oncologic evaluation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "skull base chordoma",
+        "chondrosarcoma of skull base",
+        "ocular melanoma",
+        "tumor abutting optic chiasm",
+        "brainstem proximity"
+      ],
+      "cms_document": "Medicare LCD Proton Beam Therapy",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 1: Group 1 Indications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PBT-02",
+      "name": "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
+      "description": "Comparative dosimetric planning demonstrating that conventional photon IMRT cannot deliver target curative dose without exceeding normal tissue tolerance.",
+      "clinical_intent": "Objective dosimetric proof of photon inadequacy",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "comparative dosimetric plan",
+        "photon tolerance exceeded",
+        "dosimetric comparison completed"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Prior to treatment initiation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "comparative dosimetric plan",
+        "photon tolerance exceeded",
+        "dosimetric comparison completed"
+      ],
+      "cms_document": "Medicare LCD Proton Beam Therapy",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 2: Comparative Dosimetry",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-PBT-EXCL-01",
+      "name": "Widespread Distant Metastases Exclusion",
+      "description": "Patients with widespread systemic metastatic disease or terminal prognosis where focal proton curative intent cannot be achieved.",
+      "clinical_intent": "Exclude non-curative widespread metastatic presentations",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "widespread metastases",
+        "diffuse metastatic disease",
+        "terminal cancer prognosis"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "widespread metastases",
+        "diffuse metastatic disease",
+        "terminal cancer prognosis"
+      ],
+      "cms_document": "Medicare LCD Proton Beam Therapy",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

@@ -1,0 +1,121 @@
+{
+  "policy_id": "OPD-SI-FUSION",
+  "title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+  "jurisdiction": "CMS Hospital Outpatient Prior Authorization (42 CFR \u00a7 419.80)",
+  "effective_date": "2021-07-01",
+  "category": "Orthopedic Spine / Neurosurgery",
+  "description": "CMS prior authorization for minimally invasive sacroiliac joint fusion. Requires chronic low back/buttock pain >= 6 months, >= 3 positive physical exam provocation tests, failure of >= 6 months conservative management, and >= 75% pain relief from fluoroscopically guided diagnostic SI joint injection.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "OPD Prior Authorization guidelines."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-SI-01",
+      "name": "Diagnostic SI Block Pain Relief (>= 75%)",
+      "description": "Documented >= 75% relief of pain immediately following fluoroscopically or CT-guided local anesthetic injection into the SI joint.",
+      "clinical_intent": "Validate SI joint as primary pain generator",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "diagnostic si block relief",
+        "si joint injection relief",
+        "sacroiliac block pain reduction"
+      ],
+      "operator": ">=",
+      "threshold": 75.0,
+      "target_unit": "%",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented in procedure record",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "diagnostic si block relief",
+        "si joint injection relief",
+        "sacroiliac block pain reduction"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 7: SI Joint Fusion Indications",
+      "source_paragraph": "Paragraph 1: Diagnostic Block",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SI-02",
+      "name": "Positive SI Joint Provocation Tests (>= 3 Tests)",
+      "description": "Physical examination documenting positive response on >= 3 provocative SI joint maneuvers (e.g. FABER/Patrick, Gaenslen, distraction, thigh thrust, compression).",
+      "clinical_intent": "Confirm clinical exam signs of sacroiliac dysfunction",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "positive provocation tests",
+        "provocative si maneuvers",
+        "faber test",
+        "thigh thrust test"
+      ],
+      "operator": ">=",
+      "threshold": 3.0,
+      "target_unit": "tests",
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical examination",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "positive provocation tests",
+        "provocative si maneuvers",
+        "faber test",
+        "thigh thrust test"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 7: SI Joint Fusion Indications",
+      "source_paragraph": "Paragraph 2: Physical Exam",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SI-EXCL-01",
+      "name": "Active Systemic Infection Exclusion",
+      "description": "Active localized or systemic infection, osteomyelitis of pelvis, or untreated inflammatory sacroiliitis (ankylosing spondylitis).",
+      "clinical_intent": "Exclude infectious or active rheumatologic spondyloarthropathy",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "active infection",
+        "pelvic osteomyelitis",
+        "untreated ankylosing spondylitis"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "active infection",
+        "pelvic osteomyelitis",
+        "untreated ankylosing spondylitis"
+      ],
+      "cms_document": "CMS OPD Prior Authorization Program Guide",
+      "source_section": "Section 7: Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

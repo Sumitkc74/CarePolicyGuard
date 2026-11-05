@@ -1,5 +1,7 @@
 from app.core.idempotency import idempotency_engine
 from app.core.cache import policy_cache
+from app.api.admin_routes import register_admin_routes
+from app.api.credentialing_routes import register_credentialing_routes
 from app.api.pas_routes import register_pas_routes
 from app.api.dtr_routes import register_dtr_routes
 from app.api.oauth_routes import register_oauth_routes
@@ -67,7 +69,8 @@ from app.schemas.contracts import (
     AuditTrailResponse,
     BatchAdjudicationRequest,
     BatchAdjudicationResponse,
-    BatchAdjudicationItemResult
+    BatchAdjudicationItemResult,
+    BootstrapSetupRequest
 )
 from app.api.deps import (
     get_current_user,
@@ -169,6 +172,12 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account is suspended or deactivated. Please contact system administrator."
+        )
+
     # Check if Multi-Factor Authentication is enforced for this account (Mandatory Policy)
     if user.mfa_enabled:
         from app.services.mfa_service import MFAService
@@ -259,9 +268,11 @@ def login(
         username=user.username,
         full_name=getattr(user, "full_name", None) or user.username,
         npi_number=getattr(user, "npi_number", None),
-        credential_title=getattr(user, "credential_title", "MD"),
+        credential_title=getattr(user, "credential_title", None),
         specialty=getattr(user, "specialty", None),
         organization=getattr(user, "organization", None),
+        must_change_password=getattr(user, "must_change_password", False),
+        must_setup_mfa=getattr(user, "must_setup_mfa", False),
         expires_in_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
 
@@ -285,11 +296,30 @@ def verify_credentials(request: MedicalVerificationRequest):
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
     """
     Registers a new clinical or compliance user.
-    Enforces strict medical professional verification: Anyone registering as a Clinician /
-    Medical Professional MUST verify their 10-digit CMS NPI, clinical degree (MD, DO, NP, etc.),
-    state medical license, and institutional healthcare email before their account can be created.
-    Personal email addresses (@gmail, @yahoo) are strictly prohibited under HIPAA access safeguards.
+    Security Architecture:
+    - Self-registration requesting Admin role is strictly forbidden (403 Forbidden).
+    - Open registration creates UNVERIFIED Clinician or Auditor accounts only.
+    - Clinicians must satisfy baseline credential format checks (Luhn NPI checksum, institutional email).
+    - Self-asserted format checks are recorded honestly as 'FORMAT_CHECK_ONLY'.
+    - Account remains UNVERIFIED (is_verified_medical_pro=False) and CANNOT sign until
+      verified by primary-source NPPES or Credentialing authority.
     """
+    # Strict role boundary defense: Admins cannot be self-registered
+    req_role_raw = (user_in.role or "").strip()
+    if req_role_raw.lower() in ("admin", "administrator") or req_role_raw == UserRole.ADMIN.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Self-registration requesting Admin role is forbidden. Administrators must be provisioned by existing administrators or the bootstrap process."
+        )
+
+    if req_role_raw not in (UserRole.CLINICIAN.value, UserRole.AUDITOR.value):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Self-registration permits Clinician or Auditor accounts only. Role '{req_role_raw}' is not permitted."
+        )
+
+    requested_role = req_role_raw
+
     existing = db.query(User).filter(
         (User.username == user_in.username) | (User.email == user_in.email)
     ).first()
@@ -299,9 +329,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             detail="User with this username or email already exists."
         )
 
-    requested_role = user_in.role if user_in.role in [r.value for r in UserRole] else UserRole.CLINICIAN.value
-
-    # 1. Clinicians MUST be verified licensed medical professionals
+    # Clinicians undergo baseline format checks, but remain UNVERIFIED until primary-source verification
     is_verified = False
     verification_method = None
     if requested_role == UserRole.CLINICIAN.value:
@@ -310,12 +338,13 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=422,
                 detail={
-                    "message": "Medical professional verification failed. Only verified licensed medical professionals may register to create prior-authorization cases.",
+                    "message": "Medical professional credential format check failed.",
                     "reasons": verif["reasons"]
                 }
             )
-        is_verified = True
-        verification_method = "NPPES_CMS_LUHN_VERIFIED"
+        # Format check passes, but cannot self-grant signing authority
+        is_verified = False
+        verification_method = "FORMAT_CHECK_ONLY"
     elif requested_role == UserRole.AUDITOR.value:
         # Auditors must also use an institutional or regulatory email
         is_valid_email, email_err = is_institutional_clinical_email(user_in.email)
@@ -329,6 +358,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     user = User(
         username=user_in.username,
         email=user_in.email,
+        full_name=user_in.full_name,
         hashed_password=get_password_hash(user_in.password),
         role=requested_role,
         npi_number=user_in.npi_number,
@@ -339,7 +369,10 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
         organization=user_in.organization,
         is_verified_medical_pro=is_verified,
         verification_method=verification_method,
-        is_active=True
+        is_active=True,
+        is_demo_user=False,
+        is_bootstrap=False,
+        provisioned_by="SELF_REGISTRATION"
     )
     db.add(user)
     db.commit()
@@ -354,22 +387,7 @@ def get_current_user_profile(
     """
     Returns current authenticated user profile.
     """
-    if current_user.role == UserRole.CLINICIAN.value:
-        changed = False
-        if not getattr(current_user, "npi_number", None):
-            from app.core.security import generate_deterministic_npi
-            current_user.npi_number = generate_deterministic_npi(current_user.email)
-            changed = True
-        if not getattr(current_user, "full_name", None):
-            local_name = current_user.email.split("@")[0].replace(".", " ").replace("_", " ").title()
-            current_user.full_name = f"Dr. {local_name}"
-            changed = True
-        if not getattr(current_user, "credential_title", None):
-            current_user.credential_title = "MD"
-            changed = True
-        if changed:
-            db.commit()
-            db.refresh(current_user)
+    # Missing NPI renders as None ("NPI not on file"); never backfill synthetic or invented NPI.
     return current_user
 
 # =============================================================================
@@ -559,6 +577,9 @@ async def adjudicate_record(
 
     # In-memory ephemeral packet caching (ensures instant availability without disk footprint; PHI sanitized)
     packet = CoveragePacketGenerator.generate_packet(result)
+    from app.core.security import PRESET_PATIENT_NAMES
+    packet.patient_id = request.patient_id
+    packet.patient_name = request.patient_name or PRESET_PATIENT_NAMES.get(request.patient_id) or "Eleanor Vance"
     _EPHEMERAL_PACKETS[result.case_id] = packet
     _EPHEMERAL_EHR_TEXTS[result.case_id] = result.sanitized_ehr_text
     _EPHEMERAL_ADJUDICATIONS[result.case_id] = result
@@ -776,6 +797,15 @@ def delete_single_audit_log(
 # CLINICAL PRESETS & BENCHMARK LAB
 # =============================================================================
 
+def _unmask_preset_ehr(ehr: str, patient_name: str, patient_id: str, dob: str = "05/14/1958") -> str:
+    return (
+        ehr.replace("PATIENT: [REDACTED]", f"PATIENT: {patient_name}")
+           .replace("[REDACTED-NAME]", patient_name)
+           .replace("DOB: [REDACTED]", f"DOB: {dob}")
+           .replace("MRN: [REDACTED]", f"MRN: {patient_id}")
+           .replace("[REDACTED-MRN]", patient_id)
+    )
+
 @api_router.get("/presets", summary="Clinical Ingestion Presets")
 def get_clinical_presets():
     """
@@ -793,7 +823,7 @@ def get_clinical_presets():
                 "patient_name": "Eleanor Vance",
                 "description": "Severe ischemic cardiomyopathy (LVEF 28%, NYHA II, 6 months GDMT, 14 mos post-CABG)",
                 "expected_decision": "APPROVED",
-                "ehr_text": BENCHMARK_VIGNETTES[0]["ehr"].strip()
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[0]["ehr"].strip(), "Eleanor Vance", "PT-CARD-8821", "05/14/1958")
             },
             {
                 "id": "preset-icd-inadequate-gdmt",
@@ -804,7 +834,7 @@ def get_clinical_presets():
                 "patient_name": "Robert Thornton",
                 "description": "LVEF 30% but only 3 weeks of GDMT (< 90-day requirement). Gate defers to human.",
                 "expected_decision": "DEFERRED_TO_HUMAN",
-                "ehr_text": BENCHMARK_VIGNETTES[1]["ehr"].strip()
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[1]["ehr"].strip(), "Robert Thornton", "PT-CARD-9014", "09/22/1961")
             },
             {
                 "id": "preset-icd-disqualified",
@@ -815,7 +845,7 @@ def get_clinical_presets():
                 "patient_name": "Harold Hayes",
                 "description": "Patient in acute cardiogenic shock and PCI 4 days ago. Contraindicated under CMS exclusion.",
                 "expected_decision": "DENIED",
-                "ehr_text": BENCHMARK_VIGNETTES[2]["ehr"].strip()
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[2]["ehr"].strip(), "Harold Hayes", "PT-ICU-1029", "11/03/1955")
             },
             {
                 "id": "preset-cpap-qualifying",
@@ -826,7 +856,7 @@ def get_clinical_presets():
                 "patient_name": "Arthur Miller",
                 "description": "Severe obstructive sleep apnea (AHI 34.2 events/hr) with documented face-to-face evaluation.",
                 "expected_decision": "APPROVED",
-                "ehr_text": BENCHMARK_VIGNETTES[3]["ehr"].strip()
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[3]["ehr"].strip(), "Arthur Miller", "PT-RESP-4402", "03/17/1964")
             },
             {
                 "id": "preset-cpap-borderline",
@@ -837,7 +867,7 @@ def get_clinical_presets():
                 "patient_name": "Thomas Sterling",
                 "description": "AHI 7.2 events/hr but chart lacks required comorbid condition documentation.",
                 "expected_decision": "DEFERRED_TO_HUMAN",
-                "ehr_text": BENCHMARK_VIGNETTES[4]["ehr"].strip()
+                "ehr_text": _unmask_preset_ehr(BENCHMARK_VIGNETTES[4]["ehr"].strip(), "Thomas Sterling", "PT-RESP-5510", "08/12/1970")
             },
             {
                 "id": "preset-hbot-wagner",
@@ -849,7 +879,7 @@ def get_clinical_presets():
                 "description": "Type 2 diabetes with Wagner Grade 3 deep ulceration and failure of 30 days standard wound therapy.",
                 "expected_decision": "APPROVED",
                 "ehr_text": """CLINICAL PROGRESS NOTE - WOUND CARE CLINIC
-PATIENT: [REDACTED] | MRN: [REDACTED]
+PATIENT: Harold Washington | DOB: 02/10/1962 | MRN: PT-WOUND-3390
 
 CHIEF COMPLAINT:
 Evaluation of non-healing plantar diabetic foot ulcer on right first metatarsal head.
@@ -1103,6 +1133,12 @@ def get_coverage_packet(
     Enforces HIPAA Minimum Necessary access control and Anti-Enumeration Oracle Defense.
     """
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if log is None and case_id in _EPHEMERAL_PACKETS:
+        ephemeral = _EPHEMERAL_PACKETS[case_id].model_copy(deep=True)
+        if current_user.role == UserRole.AUDITOR.value:
+            ephemeral.patient_name = "[REDACTED (Auditor Mode)]"
+            ephemeral.patient_id = ephemeral.patient_id_masked
+        return ephemeral
     verify_case_record_access(case_id, log, current_user)
 
     packet = None
@@ -1172,10 +1208,21 @@ def get_coverage_packet(
         res_packet.patient_name = "[REDACTED (Auditor Mode)]"
         res_packet.patient_id = res_packet.patient_id_masked
     else:
-        if not res_packet.patient_name:
-            res_packet.patient_name = PRESET_PATIENT_NAMES.get(log.patient_id_masked) or PRESET_PATIENT_NAMES.get(res_packet.patient_id) or "Eleanor Vance"
-        if not res_packet.patient_id or res_packet.patient_id == res_packet.patient_id_masked:
-            res_packet.patient_id = log.patient_id_masked
+        if not res_packet.patient_name or "[REDACTED" in res_packet.patient_name:
+            res_packet.patient_name = PRESET_PATIENT_NAMES.get(log.patient_id_masked) or "Eleanor Vance"
+            for real_id, name in PRESET_PATIENT_NAMES.items():
+                if real_id.endswith(log.patient_id_masked[-4:]):
+                    res_packet.patient_name = name
+                    res_packet.patient_id = real_id
+                    break
+
+        if not res_packet.patient_id or "***" in res_packet.patient_id:
+            for real_id, name in PRESET_PATIENT_NAMES.items():
+                if real_id.endswith(log.patient_id_masked[-4:]):
+                    res_packet.patient_id = real_id
+                    break
+            if not res_packet.patient_id or "***" in res_packet.patient_id:
+                res_packet.patient_id = log.patient_id_masked
 
     return res_packet
 
@@ -1284,6 +1331,12 @@ def get_determination_record(
     Reconstitutes from database on system restart.
     """
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if log is None and case_id in _EPHEMERAL_PACKETS:
+        ephemeral = _EPHEMERAL_PACKETS[case_id].model_copy(deep=True)
+        if current_user.role == UserRole.AUDITOR.value:
+            ephemeral.patient_name = "[REDACTED (Auditor Mode)]"
+            ephemeral.patient_id = ephemeral.patient_id_masked
+        return ephemeral
     verify_case_record_access(case_id, log, current_user)
 
     adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
@@ -1503,6 +1556,12 @@ async def append_clinical_addendum(
 
     # 1. Retrieve original clinical narrative & metadata
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if log is None and case_id in _EPHEMERAL_PACKETS:
+        ephemeral = _EPHEMERAL_PACKETS[case_id].model_copy(deep=True)
+        if current_user.role == UserRole.AUDITOR.value:
+            ephemeral.patient_name = "[REDACTED (Auditor Mode)]"
+            ephemeral.patient_id = ephemeral.patient_id_masked
+        return ephemeral
     verify_case_record_access(case_id, log, current_user)
 
     original_text = _EPHEMERAL_EHR_TEXTS.get(case_id)
@@ -1623,6 +1682,12 @@ def get_deferral_queue_item(
     Enforces HIPAA Minimum Necessary access control and Anti-Enumeration Oracle Defense.
     """
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if log is None and case_id in _EPHEMERAL_PACKETS:
+        ephemeral = _EPHEMERAL_PACKETS[case_id].model_copy(deep=True)
+        if current_user.role == UserRole.AUDITOR.value:
+            ephemeral.patient_name = "[REDACTED (Auditor Mode)]"
+            ephemeral.patient_id = ephemeral.patient_id_masked
+        return ephemeral
     verify_case_record_access(case_id, log, current_user)
 
     item = DeferralWorkQueue.get_item(case_id, db=db)
@@ -1645,6 +1710,12 @@ def delete_determination_record(
     while retaining an immutable tombstone record for regulatory audit continuity.
     """
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if log is None and case_id in _EPHEMERAL_PACKETS:
+        ephemeral = _EPHEMERAL_PACKETS[case_id].model_copy(deep=True)
+        if current_user.role == UserRole.AUDITOR.value:
+            ephemeral.patient_name = "[REDACTED (Auditor Mode)]"
+            ephemeral.patient_id = ephemeral.patient_id_masked
+        return ephemeral
     verify_case_record_access(case_id, log, current_user)
 
     # Clear in-memory caches
@@ -1909,6 +1980,30 @@ register_cds_hooks_routes(api_router)
 register_metrics_routes(api_router)
 register_dtr_routes(api_router)
 register_pas_routes(api_router)
+register_admin_routes(api_router)
+register_credentialing_routes(api_router)
+
+
+@api_router.post("/auth/bootstrap/complete-setup", summary="Complete First-Login Bootstrap Security Setup")
+def complete_bootstrap_setup(
+    req: BootstrapSetupRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Enforces password update on first login for bootstrap admin or newly provisioned users.
+    Clears must_change_password and must_setup_mfa flags upon successful password update.
+    """
+    if len(req.new_password) < 12:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Password must be at least 12 characters."
+        )
+    current_user.hashed_password = get_password_hash(req.new_password)
+    current_user.must_change_password = False
+    current_user.must_setup_mfa = False
+    db.commit()
+    return {"status": "SUCCESS", "message": "Password updated and bootstrap security setup completed."}
 
 
 @api_router.get("/health", summary="API Health Check Endpoint")

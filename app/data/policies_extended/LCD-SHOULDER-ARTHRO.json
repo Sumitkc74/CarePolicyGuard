@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-SHOULDER-ARTHRO",
+  "title": "Total and Reverse Shoulder Arthroplasty",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Orthopedic Surgery",
+  "description": "Medicare coverage guidelines for anatomic total shoulder arthroplasty (TSA) and reverse total shoulder arthroplasty (RTSA). Requires advanced glenohumeral osteoarthritis, rotator cuff tear arthropathy, severe pain and loss of motion, and failure of at least 3 months of conservative care.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-SHLD-01",
+      "name": "Advanced Glenohumeral Arthropathy or Cuff Tear Arthropathy",
+      "description": "Radiographs or MRI demonstrating severe glenohumeral joint space narrowing, subchondral sclerosis, or Hamada Stage 3+ rotator cuff tear arthropathy.",
+      "clinical_intent": "Confirm structural joint destruction",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "glenohumeral osteoarthritis",
+        "cuff tear arthropathy",
+        "severe shoulder arthritis",
+        "subchondral sclerosis of glenoid"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "glenohumeral osteoarthritis",
+        "cuff tear arthropathy",
+        "severe shoulder arthritis",
+        "subchondral sclerosis of glenoid"
+      ],
+      "cms_document": "Medicare LCD Shoulder Arthroplasty",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Diagnostic Imaging",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SHLD-02",
+      "name": "Conservative Therapy Trial Failure (>= 3 Months)",
+      "description": "Documented trial and failure of >= 3 months of conservative treatment including physical therapy, NSAIDs, or subacromial/glenohumeral steroid injection.",
+      "clinical_intent": "Mandatory conservative non-operative trial",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "shoulder physical therapy",
+        "conservative treatment trial",
+        "corticosteroid injection trial",
+        "three months conservative therapy"
+      ],
+      "operator": ">=",
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 90,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": ">= 90 days duration",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "shoulder physical therapy",
+        "conservative treatment trial",
+        "corticosteroid injection trial",
+        "three months conservative therapy"
+      ],
+      "cms_document": "Medicare LCD Shoulder Arthroplasty",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Conservative Care",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-SHLD-EXCL-01",
+      "name": "Paralyzed Deltoid Muscle Exclusion for Reverse Shoulder",
+      "description": "Complete axillary nerve palsy or absent deltoid muscle function in candidates for reverse shoulder arthroplasty.",
+      "clinical_intent": "Exclude patients lacking functional deltoid required for reverse mechanics",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "axillary nerve palsy",
+        "absent deltoid function",
+        "paralyzed deltoid"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "axillary nerve palsy",
+        "absent deltoid function",
+        "paralyzed deltoid"
+      ],
+      "cms_document": "Medicare LCD Shoulder Arthroplasty",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

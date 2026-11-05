@@ -1,0 +1,123 @@
+{
+  "policy_id": "LCD-MRI-LUMBAR",
+  "title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Diagnostic Radiology",
+  "description": "Medicare coverage criteria for non-emergent lumbar spine MRI. Requires severe radicular pain with positive neurological sign (straight leg raise, reflex loss) unresponsive to at least 6 weeks of conservative care, or presence of 'red flag' symptoms (suspected cauda equina, fever/infection, history of cancer).",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual advanced imaging review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-MRIL-01",
+      "name": "Radicular Deficit After 6 Weeks Conservative Care or Red Flag",
+      "description": "Documented dermatomal radicular symptoms refractory to >= 6 weeks of conservative therapy, or immediate red flags: progressive motor deficit, suspected infection, or history of malignancy.",
+      "clinical_intent": "Prevent premature MRI for acute uncomplicated back strain",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "failed 6 weeks conservative therapy",
+        "lumbar radiculopathy",
+        "progressive motor deficit",
+        "red flag symptoms",
+        "history of cancer"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current clinical encounter",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "failed 6 weeks conservative therapy",
+        "lumbar radiculopathy",
+        "progressive motor deficit",
+        "red flag symptoms",
+        "history of cancer"
+      ],
+      "cms_document": "Medicare LCD Lumbar Spine MRI",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Clinical Indications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-MRIL-02",
+      "name": "Preceding Plain Lumbar Radiograph Evaluation",
+      "description": "Recent plain radiographs of the lumbar spine performed prior to or in conjunction with advanced imaging request (unless red flag).",
+      "clinical_intent": "Verify baseline bony radiographic screening",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "plain lumbar radiographs performed",
+        "lumbar x-ray completed",
+        "preceding x-ray"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.75,
+      "keywords": [
+        "plain lumbar radiographs performed",
+        "lumbar x-ray completed",
+        "preceding x-ray"
+      ],
+      "cms_document": "Medicare LCD Lumbar Spine MRI",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Plain Film Radiography",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-MRIL-EXCL-01",
+      "name": "Acute Uncomplicated Low Back Pain (< 6 Weeks) Exclusion",
+      "description": "MRI requested for uncomplicated acute axial back pain lasting < 6 weeks in the absence of neurological deficit or red flags.",
+      "clinical_intent": "Exclude non-indicated early imaging for self-limiting back pain",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "acute back pain less than 6 weeks",
+        "uncomplicated muscular back strain",
+        "no neurological deficit"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "acute back pain less than 6 weeks",
+        "uncomplicated muscular back strain",
+        "no neurological deficit"
+      ],
+      "cms_document": "Medicare LCD Lumbar Spine MRI",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Acute Uncomplicated Back Pain",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

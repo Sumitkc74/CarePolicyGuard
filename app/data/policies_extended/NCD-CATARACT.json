@@ -1,0 +1,125 @@
+{
+  "policy_id": "NCD-CATARACT",
+  "title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Ophthalmology",
+  "description": "CMS National Coverage Determination for cataract extraction (NCD 10.1). Requires best corrected Snellen visual acuity <= 20/50, or debilitating disabling glare/contrast sensitivity loss, significantly impairing activities of daily living (driving, reading, medication management), and reasonable expectation of visual improvement.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 10.1 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CAT-01",
+      "name": "Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare",
+      "description": "Documented best-corrected Snellen distance visual acuity of 20/50 or worse in affected eye, or severe disabling glare under Brightness Acuity Testing (BAT).",
+      "clinical_intent": "Objective visual acuity threshold for functional impairment",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "visual acuity 20/50 or worse",
+        "snellen 20/50",
+        "snellen 20/60",
+        "snellen 20/70",
+        "severe disabling glare"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 6 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "visual acuity 20/50 or worse",
+        "snellen 20/50",
+        "snellen 20/60",
+        "snellen 20/70",
+        "severe disabling glare"
+      ],
+      "cms_document": "CMS NCD Manual Section 10.1",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 1: Visual Acuity",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CAT-02",
+      "name": "Documented Impairment in Activities of Daily Living (ADLs)",
+      "description": "Patient reports that visual impairment significantly interferes with essential daily activities (driving, reading, navigating steps, personal safety).",
+      "clinical_intent": "Confirm functional disability directly attributable to cataract",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "difficulty driving due to vision",
+        "impaired reading",
+        "visual impairment limiting adls",
+        "difficulty seeing steps"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Documented at clinical examination",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "difficulty driving due to vision",
+        "impaired reading",
+        "visual impairment limiting adls",
+        "difficulty seeing steps"
+      ],
+      "cms_document": "CMS NCD Manual Section 10.1",
+      "source_section": "Coverage Indications",
+      "source_paragraph": "Paragraph 2: Functional ADL Deficit",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CAT-EXCL-01",
+      "name": "Glasses Sufficient or Purely Refractive Lens Exchange Exclusion",
+      "description": "Clear lens extraction performed purely for refractive error correction, or patient whose visual needs are satisfied with glasses without lifestyle limitation.",
+      "clinical_intent": "Disqualify refractive clear lens extraction without functional cataract",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "clear lens extraction",
+        "purely refractive lens exchange",
+        "asymptomatic cataract"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "clear lens extraction",
+        "purely refractive lens exchange",
+        "asymptomatic cataract"
+      ],
+      "cms_document": "CMS NCD Manual Section 10.1",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Refractive Surgery Non-Coverage",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

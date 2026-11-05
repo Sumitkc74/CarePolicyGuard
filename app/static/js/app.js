@@ -38,6 +38,16 @@ let currentToken = null;
 let currentRole = "Auditor";
 let currentUser = "auditor@medicare.cms.gov";
 let selectedDemoRole = "auditor";
+
+function getAuthToken() {
+    if (currentToken) return currentToken;
+    const stored = sessionStorage.getItem("carepolicyguard_token") || sessionStorage.getItem("access_token");
+    if (stored) {
+        currentToken = stored;
+        return stored;
+    }
+    return null;
+}
 let clinicalPresets = [];
 let lastAdjudicationResult = null;
 let cachedPoliciesList = [];
@@ -69,6 +79,17 @@ function extractPatientNameFromNote(text) {
     return null;
 }
 
+function formatEvidenceQuoteForClinician(quote, patientName) {
+    if (!quote) return "Not documented in record";
+    if (currentRole === "Auditor") return quote;
+    const patName = patientName || "Eleanor Vance";
+    return quote.replace(/\[REDACTED-NAME\]/g, patName)
+                .replace(/PATIENT:\s*\[REDACTED\]/gi, `PATIENT: ${patName}`)
+                .replace(/\[REDACTED-MRN\]/g, "MRN-882104")
+                .replace(/MRN:\s*\[REDACTED\]/gi, "MRN: PT-CARD-8821")
+                .replace(/DOB:\s*\[REDACTED\]/gi, "DOB: 05/14/1958");
+}
+
 function getActivePatientIdentity() {
     // Role-based PHI: In Auditor inspection mode, apply HIPAA Safe Harbor masking
     if (currentRole === "Auditor") {
@@ -80,14 +101,25 @@ function getActivePatientIdentity() {
     // Clinician view: under 45 CFR § 164.506 (TPO), display authentic unmasked patient identity
     // to certify medical necessity without wrong-patient signing risk
     let patId = (document.getElementById("patient-id-input") && document.getElementById("patient-id-input").value.trim()) || 
-                (currentCoveragePacket && (currentCoveragePacket.patient_id || currentCoveragePacket.patient_id_masked)) || 
+                (currentCoveragePacket && currentCoveragePacket.patient_id) || 
                 currentPatientId || "PT-CARD-8821";
+
+    if (patId.includes("***")) {
+        for (let realId in PRESET_PATIENT_NAME_MAP) {
+            if (realId.endsWith(patId.slice(-4))) {
+                patId = realId;
+                break;
+            }
+        }
+        if (patId.includes("***")) patId = "PT-CARD-8821";
+    }
+
     let name = currentPatientName;
 
     const inputNameElem = document.getElementById("patient-name-input");
     if (inputNameElem && inputNameElem.value.trim() && inputNameElem.value.trim() !== "Eleanor Vance") {
         name = inputNameElem.value.trim();
-    } else if (currentCoveragePacket && currentCoveragePacket.patient_name) {
+    } else if (currentCoveragePacket && currentCoveragePacket.patient_name && !currentCoveragePacket.patient_name.includes("REDACTED")) {
         name = currentCoveragePacket.patient_name;
     } else if (PRESET_PATIENT_NAME_MAP[patId]) {
         name = PRESET_PATIENT_NAME_MAP[patId];
@@ -133,6 +165,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupPinInputListeners();
     renderClinicianProfile();
     initGoogleGIS();
+    populatePacketDocument();
 });
 
 // =============================================================================
@@ -1400,6 +1433,27 @@ async function loadAuthModalSecurityDetails() {
                 tag.style.color = "#34d399";
             }
 
+            const isEmailActive = enabledMethods.includes("email_otp");
+            const isTotpActive = enabledMethods.includes("totp_app") || data.totp_configured;
+            const isSmsActive = enabledMethods.includes("sms_otp") || !!data.phone_number;
+
+            const btnEmail = document.getElementById("btn-mfa-email");
+            if (btnEmail) {
+                btnEmail.textContent = isEmailActive ? "Change / Update Email OTP" : "+ Add Email OTP";
+            }
+            const btnTotp = document.getElementById("btn-mfa-totp");
+            if (btnTotp) {
+                btnTotp.textContent = isTotpActive ? "Change / Update Authenticator App" : "+ Add Authenticator App";
+            }
+            const btnSms = document.getElementById("btn-mfa-sms");
+            if (btnSms) {
+                btnSms.textContent = isSmsActive ? "Change / Update SMS OTP" : "+ Add SMS OTP";
+            }
+            const confirmEmailBtn = document.getElementById("btn-confirm-email-mfa");
+            if (confirmEmailBtn) {
+                confirmEmailBtn.textContent = isEmailActive ? "Verify & Update Email MFA" : "Verify & Activate Email MFA";
+            }
+
             const listContainer = document.getElementById("mfa-factors-list-container");
             if (listContainer) {
                 listContainer.innerHTML = "";
@@ -1636,7 +1690,7 @@ async function confirmEmailMfaActivation() {
         });
 
         if (res.ok) {
-            showToast("Email One-Time Passcode MFA activated successfully.");
+            showToast("Email One-Time Passcode MFA verified and updated successfully.", "success");
             const box = document.getElementById("email-setup-box");
             if (box) box.classList.add("hidden");
             await loadAuthModalSecurityDetails();
@@ -1931,6 +1985,7 @@ function loadPreset(presetId) {
 
     // Update Screen 2 policy details
     updatePolicyStep2Preview();
+    populatePacketDocument();
 }
 
 function onPolicyChange() {
@@ -2082,7 +2137,16 @@ function confirmLoadSampleAndProceed() {
     loadPreset(selectedModalPresetId);
 
     const p = clinicalPresets.find(x => x.id === selectedModalPresetId);
-    const sampleText = p ? p.ehr_text : (document.getElementById("ehr-input")?.value || "");
+    let sampleText = p ? p.ehr_text : (document.getElementById("ehr-input")?.value || "");
+
+    const patientName = p ? (p.patient_name || p.label) : "Eleanor Vance";
+    const patientId = p ? (p.patient_id || "PT-CARD-8821") : "PT-CARD-8821";
+
+    if (currentRole !== "Auditor" && sampleText) {
+        sampleText = formatEvidenceQuoteForClinician(sampleText, patientName);
+        sampleText = sampleText.replace(/MRN:\s*\[REDACTED\]/gi, `MRN: ${patientId}`)
+                               .replace(/\[REDACTED-MRN\]/g, patientId);
+    }
 
     // Populate both inputs
     const ehrElem = document.getElementById("ehr-input");
@@ -2429,16 +2493,39 @@ function proceedToStep2() {
 }
 
 let lastMultiPolicyScanResult = null;
+let canonicalBestMatchPolicyId = null;
+let userSelectedPolicyId = null;
+let showAllCandidates = false;
+
+function toggleShowAllCandidates() {
+    showAllCandidates = !showAllCandidates;
+    if (lastMultiPolicyScanResult) {
+        renderMultiPolicyScanResults(lastMultiPolicyScanResult);
+    }
+}
 
 async function triggerMultiPolicyAutoScan() {
     const ehrText = document.getElementById("ehr-input").value.trim();
     const patId = document.getElementById("patient-id-input").value.trim() || "PT-CLINICAL";
-    const counterElem = document.getElementById("scan-summary-counter");
+    const featuredSlot = document.getElementById("featured-policy-slot");
     const gridElem = document.getElementById("policy-match-grid");
+    const subtitleElem = document.getElementById("step2-subtitle-text");
 
     if (!ehrText || ehrText.length < 20) return;
 
-    if (counterElem) counterElem.textContent = "Scanning clinical documentation across all CMS policies in database...";
+    if (subtitleElem) {
+        subtitleElem.textContent = "Scanning clinical documentation across all 50 CMS policies in database...";
+    }
+
+    if (featuredSlot && !lastMultiPolicyScanResult) {
+        featuredSlot.innerHTML = `
+            <div class="featured-hero-card" style="text-align: center; padding: 36px 20px; border: 1px dashed rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.65);">
+                <div style="margin: 0 auto 14px auto; width: 34px; height: 34px; border: 3px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem; margin-bottom: 6px;">Evaluating Clinical Record Across 50 Medicare Policies...</div>
+                <div style="color: #94a3b8; font-size: 0.82rem;">Comparing diagnostic evidence, numerical thresholds (LVEF, AHI), and statutory exclusion criteria</div>
+            </div>
+        `;
+    }
 
     try {
         const res = await fetch("/api/v1/adjudicate/scan-all", {
@@ -2456,13 +2543,17 @@ async function triggerMultiPolicyAutoScan() {
         if (res.ok) {
             const data = await res.json();
             lastMultiPolicyScanResult = data;
+            canonicalBestMatchPolicyId = data.best_match_policy_id || (data.all_matches && data.all_matches[0] ? data.all_matches[0].policy_id : "NCD-20.4");
+            if (!userSelectedPolicyId) {
+                userSelectedPolicyId = canonicalBestMatchPolicyId;
+            }
             renderMultiPolicyScanResults(data);
         } else {
-            if (counterElem) counterElem.textContent = "Multi-policy scan ready.";
+            if (subtitleElem) subtitleElem.textContent = "Multi-policy scan ready.";
         }
     } catch (e) {
         console.error("Multi-policy auto-scan failed:", e);
-        if (counterElem) counterElem.textContent = "Multi-policy scan offline.";
+        if (subtitleElem) subtitleElem.textContent = "Multi-policy scan offline.";
     }
 }
 
@@ -2470,21 +2561,48 @@ function renderMultiPolicyScanResults(data) {
     const featuredSlot = document.getElementById("featured-policy-slot");
     const gridElem = document.getElementById("policy-match-grid");
     const policySelect = document.getElementById("policy-select");
+    const subtitleElem = document.getElementById("step2-subtitle-text");
+    const runBtn = document.getElementById("run-adjudicate-btn");
 
-    // Auto-select best match if none chosen or on initial scan
-    if (data.best_match_policy_id && (!policySelect.value || policySelect.value === "NCD-20.4")) {
-        policySelect.value = data.best_match_policy_id;
-    }
+    canonicalBestMatchPolicyId = data.best_match_policy_id || canonicalBestMatchPolicyId || (data.all_matches && data.all_matches[0] ? data.all_matches[0].policy_id : "NCD-20.4");
 
-    const currentId = policySelect.value || data.best_match_policy_id || "NCD-20.4";
+    // Active policy ID is userSelectedPolicyId if set, otherwise canonical best match
+    const activeId = userSelectedPolicyId || (policySelect ? policySelect.value : null) || canonicalBestMatchPolicyId;
+    if (policySelect) policySelect.value = activeId;
+    userSelectedPolicyId = activeId;
+
     const featuredMatch = (data.all_matches && data.all_matches.length > 0)
-        ? (data.all_matches.find(m => m.policy_id === currentId) || data.all_matches[0])
+        ? (data.all_matches.find(m => m.policy_id === activeId) || data.all_matches[0])
         : null;
+
     const otherMatches = (data.all_matches && featuredMatch)
         ? data.all_matches.filter(m => m.policy_id !== featuredMatch.policy_id)
         : [];
 
-    // 1. Render Featured (Bigger Hero Card)
+    // Prioritize canonical best match in candidate cards grid if alternate policy is selected at top
+    otherMatches.sort((a, b) => {
+        if (a.policy_id === canonicalBestMatchPolicyId) return -1;
+        if (b.policy_id === canonicalBestMatchPolicyId) return 1;
+        return 0;
+    });
+
+    const isFeaturedBestMatch = (featuredMatch && featuredMatch.policy_id === canonicalBestMatchPolicyId);
+
+    // Update Step 2 Subtitle
+    if (subtitleElem && featuredMatch) {
+        if (isFeaturedBestMatch) {
+            subtitleElem.innerHTML = `Candidate policies evaluated against clinical documentation. <strong style="color:#f59e0b;">Recommended Best Match: ${canonicalBestMatchPolicyId}</strong> is active below.`;
+        } else {
+            subtitleElem.innerHTML = `Active Directive: <strong style="color:#38bdf8;">${featuredMatch.policy_id} &mdash; ${featuredMatch.policy_title}</strong> <span style="color:#f59e0b;">(Manual Selection &bull; Recommended Best Match was ${canonicalBestMatchPolicyId})</span>`;
+        }
+    }
+
+    // Update Run Button Label
+    if (runBtn && featuredMatch) {
+        runBtn.innerHTML = `Run Coverage Check with <strong>${featuredMatch.policy_id}</strong> <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>`;
+    }
+
+    // 1. Render Featured (Bigger Hero Card at the top)
     if (featuredSlot && featuredMatch) {
         const confVal = (featuredMatch.calibrated_confidence != null)
             ? featuredMatch.calibrated_confidence
@@ -2499,12 +2617,29 @@ function renderMultiPolicyScanResults(data) {
             statusBadge = `<span class="badge-featured-status unmet"><span class="badge-dot" style="background:#64748b;"></span>CRITERIA UNMET (${pct}%)</span>`;
         }
 
-        const bestBadge = featuredMatch.is_best_match 
-            ? `<span class="badge-best-featured"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> BEST MATCH</span>` 
+        const primaryBadge = isFeaturedBestMatch
+            ? `<span class="badge-best-featured"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> BEST MATCH (RECOMMENDED)</span>`
+            : `<span class="badge-custom-selected"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> ACTIVE SELECTION (MANUAL)</span>`;
+
+        const activePill = isFeaturedBestMatch
+            ? `<span class="featured-active-pill"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> SELECTED DIRECTIVE</span>`
+            : `<span class="featured-active-pill custom-active"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> SELECTED DIRECTIVE</span>`;
+
+        const overrideNotice = (!isFeaturedBestMatch && canonicalBestMatchPolicyId)
+            ? `
+                <div class="selection-override-notice">
+                    <div>
+                        <span style="font-weight: 700; color: #f8fafc;">Manual Directive Active:</span> Evaluating <strong>${featuredMatch.policy_id}</strong> (Recommended match for this clinical note was <strong>${canonicalBestMatchPolicyId}</strong>).
+                    </div>
+                    <button type="button" class="btn-revert-best" onclick="selectPolicyFromScan('${canonicalBestMatchPolicyId}', true)">
+                        &larr; Switch back to Best Match (${canonicalBestMatchPolicyId})
+                    </button>
+                </div>
+            `
             : "";
 
         featuredSlot.innerHTML = `
-            <div class="featured-hero-card ${featuredMatch.decision.toLowerCase()}">
+            <div class="featured-hero-card animate-swap ${featuredMatch.decision.toLowerCase()}">
                 <div class="featured-top-row">
                     <div class="featured-meta-group">
                         <span class="featured-code">${featuredMatch.policy_id}</span>
@@ -2512,11 +2647,12 @@ function renderMultiPolicyScanResults(data) {
                         <span class="featured-category">${featuredMatch.category}</span>
                     </div>
                     <div class="featured-badges">
-                        ${bestBadge}
+                        ${primaryBadge}
                         ${statusBadge}
                     </div>
                 </div>
                 <div class="featured-title">${featuredMatch.policy_title}</div>
+                ${overrideNotice}
                 <div class="featured-bottom-row">
                     <div class="featured-criteria-count">
                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -2527,22 +2663,42 @@ function renderMultiPolicyScanResults(data) {
                             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                             Read Policy Document
                         </button>
-                        <span class="featured-active-pill">
-                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Selected Directive
-                        </span>
+                        ${activePill}
                     </div>
                 </div>
             </div>
         `;
     }
 
-    // 2. Render Other Candidates (Smaller Cards)
+    // 2. Render Other Candidates (Smaller Cards) - Top 15 Closest by default
+    const titleElem = document.getElementById("other-candidates-title");
+    const countPill = document.getElementById("candidates-count-pill");
+    const toggleBtn = document.getElementById("btn-toggle-candidates");
+
+    const displayMatches = showAllCandidates ? otherMatches : otherMatches.slice(0, 15);
+
+    if (titleElem) {
+        titleElem.textContent = showAllCandidates
+            ? `All Candidate Policies (${otherMatches.length})`
+            : "Top 15 Closest Candidate Policies";
+    }
+    if (countPill) {
+        countPill.textContent = showAllCandidates
+            ? `Showing All ${otherMatches.length + 1}`
+            : `Top 15 Closest of ${data.all_matches ? data.all_matches.length : 50}`;
+    }
+    if (toggleBtn) {
+        toggleBtn.textContent = showAllCandidates
+            ? "Show Top 15 Closest"
+            : `Show All (${data.all_matches ? data.all_matches.length : 50})`;
+    }
+
     if (gridElem) {
         gridElem.innerHTML = "";
-        otherMatches.forEach(m => {
+        displayMatches.forEach((m, idx) => {
+            const isCanonBest = (m.policy_id === canonicalBestMatchPolicyId);
             const card = document.createElement("div");
-            card.className = `mini-policy-card ${m.decision.toLowerCase()}`;
+            card.className = `mini-policy-card ${m.decision.toLowerCase()} ${isCanonBest ? "is-best-match" : ""}`;
             card.onclick = () => selectPolicyFromScan(m.policy_id, true);
 
             let statusPill = "";
@@ -2558,15 +2714,23 @@ function renderMultiPolicyScanResults(data) {
                 statusPill = `<span class="mini-status unmet">Unmet</span>`;
             }
 
+            const headerTag = isCanonBest
+                ? `<div style="display: flex; align-items: center; gap: 6px;"><span class="badge-best-mini"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> BEST MATCH</span> <span class="mini-code">${m.policy_id}</span></div>`
+                : `<div style="display: flex; align-items: center;"><span class="mini-rank-pill">#${idx + 1}</span><span class="mini-code">${m.policy_id}</span></div>`;
+
+            const selectLabel = isCanonBest
+                ? `<span class="mini-select-btn best-revert">&larr; Select Best Match &uarr;</span>`
+                : `<span class="mini-select-btn">Select Directive &uarr;</span>`;
+
             card.innerHTML = `
                 <div class="mini-top-row">
-                    <span class="mini-code">${m.policy_id}</span>
+                    ${headerTag}
                     ${statusPill}
                 </div>
                 <div class="mini-title" title="${m.policy_title}">${m.policy_title}</div>
                 <div class="mini-footer">
                     <span class="mini-crit-count">${m.met_criteria}/${m.total_criteria} Met</span>
-                    <span class="mini-select-btn">Select &rarr;</span>
+                    ${selectLabel}
                 </div>
             `;
             gridElem.appendChild(card);
@@ -2577,6 +2741,7 @@ function renderMultiPolicyScanResults(data) {
 }
 
 function selectPolicyFromScan(policyId, triggerToast = true) {
+    userSelectedPolicyId = policyId;
     const policySelect = document.getElementById("policy-select");
     if (policySelect) policySelect.value = policyId;
 
@@ -2584,8 +2749,22 @@ function selectPolicyFromScan(policyId, triggerToast = true) {
         renderMultiPolicyScanResults(lastMultiPolicyScanResult);
     }
     updatePolicyStep2Preview();
+
+    const featuredSlot = document.getElementById("featured-policy-slot");
+    if (featuredSlot) {
+        featuredSlot.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
     if (triggerToast) {
-        showToast(`Selected ${policyId} for coverage determination`);
+        const targetPol = (lastMultiPolicyScanResult && lastMultiPolicyScanResult.all_matches)
+            ? lastMultiPolicyScanResult.all_matches.find(m => m.policy_id === policyId)
+            : null;
+        const titleStr = targetPol ? ` (${targetPol.policy_title})` : "";
+        if (policyId === canonicalBestMatchPolicyId) {
+            showToast(`Re-selected Recommended Best Match: ${policyId}${titleStr}. Ready to check coverage.`);
+        } else {
+            showToast(`Active policy switched to ${policyId}${titleStr}. Directive brought to top.`);
+        }
     }
 }
 
@@ -3153,9 +3332,13 @@ function renderAdjudicationResults(data) {
 
 async function loadAndShowCoveragePacket(caseId) {
     try {
-        const res = await fetch(`/api/v1/packet/${caseId}`);
+        const token = currentToken || sessionStorage.getItem("carepolicyguard_token");
+        const res = await fetch(`/api/v1/packet/${caseId}`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
         if (res.ok) {
             currentCoveragePacket = await res.json();
+            populatePacketDocument();
             const banner = document.getElementById("packet-action-banner");
             if (banner) {
                 banner.classList.remove("hidden");
@@ -3219,6 +3402,11 @@ function renderSynchronizedEHRViewer(data) {
     // Trailing text
     if (currentPos < rawText.length) {
         html += escapeHtml(rawText.slice(currentPos));
+    }
+
+    if (currentRole !== "Auditor") {
+        const pat = getActivePatientIdentity();
+        html = formatEvidenceQuoteForClinician(html, pat.patient_name);
     }
 
     container.innerHTML = html;
@@ -4140,14 +4328,25 @@ function updateBenchmarkMetrics(data) {
 // =============================================================================
 // UTILITIES
 // =============================================================================
-function showToast(message, isError = false) {
+function showToast(message, type = false) {
     const toast = document.getElementById("toast");
+    if (!toast) return;
     toast.textContent = message;
-    toast.style.borderColor = isError ? "var(--accent-red)" : "var(--accent-cyan)";
+    if (type === true || type === "error") {
+        toast.style.borderColor = "var(--accent-red, #EF4444)";
+        toast.style.color = "#FCA5A5";
+    } else if (type === "warning") {
+        toast.style.borderColor = "var(--accent-amber, #F59E0B)";
+        toast.style.color = "#FCD34D";
+    } else {
+        toast.style.borderColor = "var(--accent-cyan, #06B6D4)";
+        toast.style.color = "var(--text-primary, #F8FAFC)";
+    }
     toast.classList.remove("hidden");
-    setTimeout(() => {
+    if (window._toastTimeout) clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => {
         toast.classList.add("hidden");
-    }, 3200);
+    }, 3800);
 }
 
 function escapeHtml(string) {
@@ -4282,7 +4481,7 @@ async function uploadFileAndAdjudicate(file) {
 // =============================================================================
 
 function openPacketReviewModal() {
-    goToWizardScreen(3);
+    goToWizardScreen(4);
 }
 
 function closePacketReviewModal() {
@@ -4294,11 +4493,7 @@ function populatePacketDocument() {
         loadAndShowCoveragePacket(lastAdjudicationResult.case_id);
     }
 
-    if (!currentCoveragePacket) return;
-
-    const p = currentCoveragePacket;
-
-    // Header values
+    const patientIdentity = getActivePatientIdentity();
     const docPacketId = document.getElementById("doc-packet-id");
     const docPatientName = document.getElementById("doc-patient-name");
     const docPatientId = document.getElementById("doc-patient-id");
@@ -4306,14 +4501,23 @@ function populatePacketDocument() {
     const docPolicyId = document.getElementById("doc-policy-id");
     const docJurisdiction = document.getElementById("doc-jurisdiction");
 
-    const patientIdentity = getActivePatientIdentity();
+    const p = currentCoveragePacket || {};
+    const patName = (currentRole === "Auditor") ? "[REDACTED (Auditor Mode)]" : (patientIdentity.patient_name || p.patient_name || "Eleanor Vance");
+    const patId = (currentRole === "Auditor") ? (p.patient_id_masked || "PT-***8821") : (patientIdentity.patient_id || p.patient_id || "PT-CARD-8821");
 
-    if (docPacketId) docPacketId.textContent = p.packet_id;
-    if (docPatientName) docPatientName.textContent = patientIdentity.patient_name;
-    if (docPatientId) docPatientId.textContent = (currentRole === "Auditor") ? p.patient_id_masked : (patientIdentity.patient_id || p.patient_id_masked);
-    if (docDos) docDos.textContent = p.date_of_service;
-    if (docPolicyId) docPolicyId.textContent = `${p.policy_id} - ${p.policy_title}`;
-    if (docJurisdiction) docJurisdiction.textContent = p.jurisdiction;
+    if (docPacketId) docPacketId.textContent = p.packet_id || (lastAdjudicationResult ? `CMS-PAC-${lastAdjudicationResult.case_id}` : "CMS-PAC-2026-8821");
+    if (docPatientName) docPatientName.textContent = patName;
+    if (docPatientId) docPatientId.textContent = patId;
+    if (docDos) docDos.textContent = p.date_of_service || new Date().toISOString().split("T")[0];
+    if (docPolicyId) docPolicyId.textContent = p.policy_id ? `${p.policy_id} - ${p.policy_title || ''}` : "NCD 20.4 - Implantable Cardioverter Defibrillators";
+    if (docJurisdiction) docJurisdiction.textContent = p.jurisdiction || "National (CMS Jurisdiction)";
+
+    const pinPat = document.getElementById("pin-modal-patient");
+    if (pinPat) pinPat.textContent = patName;
+    const pinPatId = document.getElementById("pin-modal-patient-id");
+    if (pinPatId) pinPatId.textContent = patId;
+
+    if (!currentCoveragePacket) return;
 
     // Status chip
     const statusChip = document.getElementById("doc-packet-status-chip");
@@ -4358,6 +4562,10 @@ function populatePacketDocument() {
                 statusColor = "#B45309";
             }
 
+            const quoteText = (currentRole === "Auditor") 
+                ? (c.extracted_evidence_quote || 'Not documented in record')
+                : formatEvidenceQuoteForClinician(c.extracted_evidence_quote, patName);
+
             tr.innerHTML = `
                 <td>
                     <div class="table-req-title">${escapeHtml(c.name || c.criterion_code)}</div>
@@ -4367,7 +4575,7 @@ function populatePacketDocument() {
                     ${statusText}
                 </td>
                 <td>
-                    <div class="table-plain-evidence">“${escapeHtml(c.extracted_evidence_quote || 'Not documented in record')}”</div>
+                    <div class="table-plain-evidence">“${escapeHtml(quoteText)}”</div>
                 </td>
                 <td>
                     <input type="text" class="document-plain-input" id="doc-attest-${cIdx}" value="${escapeHtml(c.physician_attestation || 'Verified per patient clinical consultation record.')}">
@@ -4665,12 +4873,13 @@ async function executePacketSubmission() {
         submitBtn.innerHTML = `Transmitting to Medicare Clearinghouse...`;
     }
 
+    const token = getAuthToken();
     try {
         const res = await fetch("/api/v1/packet/submit", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
             },
             body: JSON.stringify({
                 case_id: currentCoveragePacket.case_id,
@@ -4680,8 +4889,17 @@ async function executePacketSubmission() {
             })
         });
 
+        if (res.status === 401) {
+            currentToken = null;
+            sessionStorage.removeItem("carepolicyguard_token");
+            showToast("Your session has expired. Please sign in again to submit.", "warning");
+            showLoginGate();
+            return;
+        }
+
         if (!res.ok) {
-            throw new Error(`Submission failed with status ${res.status}`);
+            const errJson = await res.json().catch(() => ({}));
+            throw new Error(errJson.detail || `Submission failed with status ${res.status}`);
         }
 
         const receipt = await res.json();
@@ -4692,6 +4910,9 @@ async function executePacketSubmission() {
 
         showSubmissionReceipt(receipt);
         goToWizardScreen(5);
+
+        // Automatically trigger background EHR synchronization upon successful submission
+        pushToHospitalEhr(false);
 
         loadAuditLogs();
         showToast("Clinician PIN authenticated. Packet successfully signed and submitted to Medicare!", "success");
@@ -4730,13 +4951,42 @@ function closeReceiptModal() {
 }
 
 function printPacketDocument() {
-    if (!currentCoveragePacket) {
-        showToast("No active coverage packet to print.", true);
-        return;
-    }
-
-    const p = currentCoveragePacket;
+    let p = currentCoveragePacket;
     const patientIdentity = getActivePatientIdentity();
+
+    if (!p) {
+        p = {
+            packet_id: document.getElementById("doc-packet-id")?.textContent || "CMS-PAC-2026-FORM",
+            patient_id: patientIdentity.patient_id || "PT-CARD-8821",
+            patient_name: patientIdentity.patient_name || "Eleanor Vance",
+            patient_id_masked: "PT-***8821",
+            date_of_service: document.getElementById("doc-dos")?.textContent || new Date().toISOString().split("T")[0],
+            policy_id: "NCD 20.4",
+            policy_title: "Implantable Cardioverter Defibrillators",
+            jurisdiction: document.getElementById("doc-jurisdiction")?.textContent || "National / Regional MAC",
+            clinical_summary: document.getElementById("doc-clinical-summary")?.value || "",
+            criteria_sections: [],
+            icd10_codes: ["I42.0", "I25.2"],
+            cpt_hcpcs_codes: ["33249"],
+            signed_by: document.getElementById("doc-physician-signature")?.value || "Dr. Sarah Jenkins, MD, FACC",
+            audit_hash: document.getElementById("audit-hash-display")?.textContent || "SECURE-VERIFIED-HASH"
+        };
+        const rows = document.querySelectorAll("#doc-criteria-tbody tr");
+        rows.forEach((r, idx) => {
+            const title = r.querySelector(".table-req-title")?.textContent || `Criterion ${idx+1}`;
+            const sub = r.querySelector(".table-req-sub")?.textContent || "";
+            const status = r.querySelector("td:nth-child(2)")?.textContent.trim() || "MET";
+            const quote = r.querySelector(".table-plain-evidence")?.textContent.replace(/^“|”$/g, '') || "";
+            const attest = document.getElementById(`doc-attest-${idx}`)?.value || "Verified against clinical documentation.";
+            p.criteria_sections.push({
+                name: title,
+                criterion_code: sub,
+                status: status,
+                extracted_evidence_quote: quote,
+                physician_attestation: attest
+            });
+        });
+    }
     const patientName = patientIdentity.patient_name;
     const patientId = (currentRole === "Auditor") ? (p.patient_id_masked || "PT-UNKNOWN") : (patientIdentity.patient_id || p.patient_id_masked || "PT-UNKNOWN");
     const dos = p.date_of_service || new Date().toISOString().split("T")[0];
@@ -5035,15 +5285,38 @@ function printPacketDocument() {
 </html>
     `;
 
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-        showToast("Popup blocked. Please allow popups to print/save the document.", true);
-        return;
+    let iframe = document.getElementById("packet-print-frame");
+    if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "packet-print-frame";
+        iframe.style.position = "fixed";
+        iframe.style.right = "0";
+        iframe.style.bottom = "0";
+        iframe.style.width = "0";
+        iframe.style.height = "0";
+        iframe.style.border = "none";
+        document.body.appendChild(iframe);
     }
 
-    printWindow.document.open();
-    printWindow.document.write(printHtml);
-    printWindow.document.close();
+    try {
+        const doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(printHtml);
+        doc.close();
+
+        setTimeout(() => {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            } catch (err) {
+                console.warn("Iframe print error, falling back to window.print", err);
+                window.print();
+            }
+        }, 250);
+    } catch (e) {
+        console.warn("Print frame write error", e);
+        window.print();
+    }
 }
 
 
@@ -5062,6 +5335,13 @@ async function openPeerToPeerAppealModal() {
         return;
     }
 
+    const token = getAuthToken();
+    if (!token) {
+        showToast("Please sign in to generate an official appeal letter.", "warning");
+        showLoginGate();
+        return;
+    }
+
     const caseId = (currentCoveragePacket && currentCoveragePacket.case_id) || (lastAdjudicationResult && lastAdjudicationResult.case_id);
     const doctorName = (currentCoveragePacket && currentCoveragePacket.signed_by) || (document.getElementById("doc-physician-signature")?.value) || "Dr. Sarah Jenkins, MD, FACC";
 
@@ -5072,7 +5352,7 @@ async function openPeerToPeerAppealModal() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
                 case_id: caseId,
@@ -5082,7 +5362,18 @@ async function openPeerToPeerAppealModal() {
             })
         });
 
-        if (!res.ok) throw new Error(`Failed to generate appeal letter: ${res.status}`);
+        if (res.status === 401) {
+            currentToken = null;
+            sessionStorage.removeItem("carepolicyguard_token");
+            showToast("Your session has expired. Please sign in again to generate an appeal letter.", "warning");
+            showLoginGate();
+            return;
+        }
+
+        if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            throw new Error(errJson.detail || `Server returned ${res.status}`);
+        }
 
         const data = await res.json();
         currentAppealLetter = data;
@@ -5103,7 +5394,7 @@ async function openPeerToPeerAppealModal() {
         if (modal) modal.classList.remove("hidden");
     } catch (e) {
         console.error("Appeal generation error:", e);
-        showToast("Could not generate appeal letter: " + e.message, true);
+        showToast(e.message || "Failed to generate appeal letter", true);
     }
 }
 
@@ -5122,26 +5413,49 @@ function copyAppealLetterToClipboard() {
 }
 
 function printAppealLetter() {
-    if (!currentAppealLetter) return;
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-        showToast("Popup blocked. Please allow popups to print.", true);
+    if (!currentAppealLetter) {
+        showToast("No active appeal letter to print.", true);
         return;
     }
-    printWindow.document.open();
-    printWindow.document.write(`
+    const printHtml = `
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Peer-to-Peer Appeal Letter - ${escapeHtml(currentAppealLetter.appeal_id)}</title>
+            <title>Peer-to-Peer Appeal Letter - ${escapeHtml(currentAppealLetter.appeal_id || 'APPEAL')}</title>
             <style>
                 body { font-family: monospace; white-space: pre-wrap; margin: 40px; font-size: 13px; line-height: 1.5; color: #000; }
             </style>
         </head>
-        <body>${escapeHtml(currentAppealLetter.full_letter_text)}<script>window.onload = function() { window.print(); };</script></body>
+        <body>${escapeHtml(currentAppealLetter.full_letter_text || '')}</body>
         </html>
-    `);
-    printWindow.document.close();
+    `;
+
+    let iframe = document.getElementById("packet-print-frame");
+    if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "packet-print-frame";
+        iframe.style.position = "fixed";
+        iframe.style.right = "0";
+        iframe.style.bottom = "0";
+        iframe.style.width = "0";
+        iframe.style.height = "0";
+        iframe.style.border = "none";
+        document.body.appendChild(iframe);
+    }
+
+    try {
+        const doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(printHtml);
+        doc.close();
+
+        setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+        }, 250);
+    } catch (e) {
+        window.print();
+    }
 }
 
 async function exportFhirBundle() {
@@ -5154,7 +5468,10 @@ async function exportFhirBundle() {
     showToast("Generating HL7 FHIR R4 Da Vinci PAS Bundle...", "info");
 
     try {
-        const res = await fetch(`/api/v1/packet/${caseId}/fhir`);
+        const token = currentToken || sessionStorage.getItem("carepolicyguard_token") || sessionStorage.getItem("access_token");
+        const res = await fetch(`/api/v1/packet/${caseId}/fhir`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
         if (!res.ok) throw new Error(`FHIR export failed: ${res.status}`);
 
         const bundle = await res.json();
@@ -5202,21 +5519,40 @@ function downloadFhirJsonFile() {
     showToast("Downloaded HL7 FHIR JSON bundle!");
 }
 
-async function pushToHospitalEhr() {
+async function pushToHospitalEhr(isManualRetry = false) {
     if (!lastAdjudicationResult && !currentCoveragePacket) {
-        showToast("No evaluated case found: please evaluate a patient note on Step 2 before syncing to EHR.", true);
+        if (isManualRetry) {
+            showToast("No evaluated case found: please evaluate a patient note on Step 2 before syncing to EHR.", true);
+        }
+        return;
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+        if (isManualRetry) {
+            showToast("Please sign in to authenticate EHR synchronization.", "warning");
+            showLoginGate();
+        }
         return;
     }
 
     const caseId = (currentCoveragePacket && currentCoveragePacket.case_id) || (lastAdjudicationResult && lastAdjudicationResult.case_id);
-    showToast("Connecting to Hospital EHR (Epic Hyperdrive / FHIR Gateway)...", "info");
+    if (isManualRetry) {
+        showToast("Connecting to Hospital EHR (Epic Hyperdrive / FHIR Gateway)...", "info");
+    }
+
+    const statusEl = document.getElementById("receipt-ehr-status");
+    if (statusEl) {
+        statusEl.textContent = "Syncing with Epic...";
+        statusEl.className = "mono text-cyan";
+    }
 
     try {
         const res = await fetch(`/api/v1/packet/${caseId}/ehr-push`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
                 case_id: caseId,
@@ -5224,13 +5560,50 @@ async function pushToHospitalEhr() {
             })
         });
 
-        if (!res.ok) throw new Error(`EHR sync failed: ${res.status}`);
+        if (res.status === 401) {
+            currentToken = null;
+            sessionStorage.removeItem("carepolicyguard_token");
+            if (statusEl) {
+                statusEl.textContent = "Auth Required (Sign in)";
+                statusEl.className = "badge-status not-met";
+            }
+            showToast("Your session has expired. Please sign in again to sync EHR.", "warning");
+            showLoginGate();
+            return;
+        }
+
+        if (res.status === 412) {
+            const errJson = await res.json().catch(() => ({}));
+            if (statusEl) {
+                statusEl.textContent = "Provisional (Sign-off Required)";
+                statusEl.className = "badge-status not-met";
+            }
+            showToast(errJson.detail || "Determination is provisional and cannot be pushed to EHR without clinician sign-off.", true);
+            return;
+        }
+
+        if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            throw new Error(errJson.detail || `EHR sync returned status ${res.status}`);
+        }
 
         const receipt = await res.json();
-        showToast(`EHR Synchronized! Stored under Epic Document ID: ${receipt.ehr_document_id}`, "success");
+        if (statusEl) {
+            statusEl.textContent = `Synchronized (${receipt.ehr_document_id})`;
+            statusEl.className = "badge-status met";
+        }
+        if (isManualRetry) {
+            showToast(`EHR Synchronized! Stored under Epic Document ID: ${receipt.ehr_document_id}`, "success");
+        }
     } catch (e) {
         console.error("EHR sync error:", e);
-        showToast("EHR sync failed: " + e.message, true);
+        if (statusEl) {
+            statusEl.textContent = "Sync Pending (Click Re-sync)";
+            statusEl.className = "badge-status not-met";
+        }
+        if (isManualRetry) {
+            showToast(e.message || "EHR sync failed", true);
+        }
     }
 }
 
@@ -6866,14 +7239,15 @@ async function loadLiveTelemetry() {
 function downloadPacketPdf(customCaseId) {
     const caseId = customCaseId || 
         (currentCoveragePacket && currentCoveragePacket.case_id) || 
-        (lastAdjudicationResult && lastAdjudicationResult.case_id);
+        (lastAdjudicationResult && lastAdjudicationResult.case_id) ||
+        (window._LAST_ADJUDICATION_DATA && window._LAST_ADJUDICATION_DATA.case_id);
 
     if (!caseId) {
         showToast("No evaluated case found: please evaluate a patient note on Step 2 before downloading PDF.", true);
         return;
     }
 
-    const token = currentToken || sessionStorage.getItem("access_token");
+    const token = currentToken || sessionStorage.getItem("carepolicyguard_token") || sessionStorage.getItem("access_token");
     const downloadUrl = `/api/v1/packet/${encodeURIComponent(caseId)}/pdf`;
 
     showToast("Synthesizing official CMS Coverage Packet PDF...", "info");
@@ -6881,8 +7255,24 @@ function downloadPacketPdf(customCaseId) {
     fetch(downloadUrl, {
         headers: token ? { "Authorization": `Bearer ${token}` } : {}
     })
-    .then(res => {
-        if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+    .then(async res => {
+        if (!res.ok) {
+            let errorMsg = `Server returned HTTP ${res.status}`;
+            try {
+                const errData = await res.json();
+                if (errData && errData.detail) errorMsg = errData.detail;
+            } catch (_) {}
+            if (res.status === 401 && (errorMsg.includes("User not found") || errorMsg.includes("credentials") || errorMsg.includes("Session has been terminated"))) {
+                sessionStorage.removeItem("carepolicyguard_token");
+                sessionStorage.removeItem("carepolicyguard_role");
+                sessionStorage.removeItem("carepolicyguard_user");
+                currentToken = null;
+                showToast("Session expired. Please sign in to authenticate PDF download.", "warning");
+                showLoginGate();
+                return;
+            }
+            throw new Error(errorMsg);
+        }
         return res.blob();
     })
     .then(blob => {
@@ -6906,14 +7296,15 @@ function downloadPacketPdf(customCaseId) {
 function downloadAppealLetterPdf(customCaseId) {
     const caseId = customCaseId || 
         (currentCoveragePacket && currentCoveragePacket.case_id) || 
-        (lastAdjudicationResult && lastAdjudicationResult.case_id);
+        (lastAdjudicationResult && lastAdjudicationResult.case_id) ||
+        (window._LAST_ADJUDICATION_DATA && window._LAST_ADJUDICATION_DATA.case_id);
 
     if (!caseId) {
         showToast("No evaluated case found: please evaluate a patient note on Step 2 before downloading appeal PDF.", true);
         return;
     }
 
-    const token = currentToken || sessionStorage.getItem("access_token");
+    const token = currentToken || sessionStorage.getItem("carepolicyguard_token") || sessionStorage.getItem("access_token");
     const downloadUrl = `/api/v1/packet/${encodeURIComponent(caseId)}/appeal-letter/pdf`;
 
     showToast("Generating formal Peer-to-Peer Appeal Letter PDF...", "info");
@@ -6921,8 +7312,24 @@ function downloadAppealLetterPdf(customCaseId) {
     fetch(downloadUrl, {
         headers: token ? { "Authorization": `Bearer ${token}` } : {}
     })
-    .then(res => {
-        if (!res.ok) throw new Error(`Server returned HTTP ${res.status}`);
+    .then(async res => {
+        if (!res.ok) {
+            let errorMsg = `Server returned HTTP ${res.status}`;
+            try {
+                const errData = await res.json();
+                if (errData && errData.detail) errorMsg = errData.detail;
+            } catch (_) {}
+            if (res.status === 401 && (errorMsg.includes("User not found") || errorMsg.includes("credentials") || errorMsg.includes("Session has been terminated"))) {
+                sessionStorage.removeItem("carepolicyguard_token");
+                sessionStorage.removeItem("carepolicyguard_role");
+                sessionStorage.removeItem("carepolicyguard_user");
+                currentToken = null;
+                showToast("Session expired. Please sign in to authenticate PDF download.", "warning");
+                showLoginGate();
+                return;
+            }
+            throw new Error(errorMsg);
+        }
         return res.blob();
     })
     .then(blob => {

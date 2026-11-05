@@ -1,0 +1,125 @@
+{
+  "policy_id": "NCD-CARDIAC-REHAB",
+  "title": "Comprehensive Outpatient Cardiac Rehabilitation",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-01",
+  "category": "Preventive Cardiology",
+  "description": "CMS National Coverage Determination for outpatient cardiac rehabilitation programs (NCD 20.10). Requires documented qualifying cardiac diagnosis: acute myocardial infarction within the preceding 12 months, CABG surgery, stable angina pectoris, heart valve repair/replacement, PCI/coronary stenting, or stable chronic heart failure with LVEF <= 35%.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MCD",
+      "summary": "Annual NCD 20.10 review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CREH-01",
+      "name": "Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%)",
+      "description": "Documented qualifying diagnosis: acute MI within past 12 months, CABG, heart valve surgery, PCI/stent, stable angina, or chronic heart failure with LVEF <= 35%.",
+      "clinical_intent": "Statutory qualifying diagnosis requirement",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "acute myocardial infarction within 12 months",
+        "post cabg",
+        "valve surgery",
+        "chronic heart failure lvef <= 35%",
+        "coronary stent within 12 months"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "acute myocardial infarction within 12 months",
+        "post cabg",
+        "valve surgery",
+        "chronic heart failure lvef <= 35%",
+        "coronary stent within 12 months"
+      ],
+      "cms_document": "CMS NCD Manual Section 20.10",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Qualifying Conditions",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CREH-02",
+      "name": "Physician-Prescribed Individualized Exercise Treatment Plan",
+      "description": "Documented individualized treatment plan signed by treating physician detailing exercise prescription, risk factor modification, and psychosocial assessment.",
+      "clinical_intent": "Ensure medically supervised structured program",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "individualized treatment plan",
+        "cardiac rehab prescription",
+        "physician-directed exercise plan"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Prior to session initiation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.8,
+      "keywords": [
+        "individualized treatment plan",
+        "cardiac rehab prescription",
+        "physician-directed exercise plan"
+      ],
+      "cms_document": "CMS NCD Manual Section 20.10",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Treatment Plan",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-CREH-EXCL-01",
+      "name": "Unstable High-Risk Cardiac Condition Exclusion",
+      "description": "Patients with decompensated heart failure, unstable angina, critical aortic stenosis, or severe uncontrolled ventricular arrhythmias.",
+      "clinical_intent": "Exclude acute unstable states unsafe for exercise rehabilitation",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "decompensated heart failure",
+        "unstable angina",
+        "critical aortic stenosis",
+        "uncontrolled ventricular tachycardia"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "decompensated heart failure",
+        "unstable angina",
+        "critical aortic stenosis",
+        "uncontrolled ventricular tachycardia"
+      ],
+      "cms_document": "CMS NCD Manual Section 20.10",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Exercise Contraindications",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}

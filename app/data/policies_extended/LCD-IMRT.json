@@ -1,0 +1,119 @@
+{
+  "policy_id": "LCD-IMRT",
+  "title": "Intensity-Modulated Radiation Therapy (IMRT)",
+  "jurisdiction": "Medicare Administrative Contractor (MAC) LCD",
+  "effective_date": "2023-01-01",
+  "category": "Radiation Oncology",
+  "description": "Medicare coverage criteria for intensity-modulated radiation therapy (IMRT). Covered for head and neck cancers, prostate carcinoma, or CNS tumors where 3D conformal radiation cannot deliver the prescribed dose without exceeding normal tissue tolerance of adjacent critical organs.",
+  "policy_version": "2024.1",
+  "change_log": [
+    {
+      "version": "2024.1",
+      "date": "2024-01-01",
+      "author": "CMS MAC",
+      "summary": "Annual review."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-IMRT-01",
+      "name": "Head and Neck, Prostate, or CNS Malignancy Near Critical Organs",
+      "description": "Biopsy-proven head and neck squamous cell carcinoma, prostate adenocarcinoma, or brain/spinal tumor located adjacent to critical dose-sensitive structures.",
+      "clinical_intent": "Confirm clinical diagnosis qualifying for inverse-planned modulation",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "head and neck cancer",
+        "prostate cancer",
+        "adjacent to spinal cord",
+        "salivary gland sparing needed"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current oncologic evaluation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "head and neck cancer",
+        "prostate cancer",
+        "adjacent to spinal cord",
+        "salivary gland sparing needed"
+      ],
+      "cms_document": "Medicare LCD Intensity Modulated Radiation Therapy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 1: Tumor Sites",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-IMRT-02",
+      "name": "Dosimetric Proof of 3D Conformal Inadequacy",
+      "description": "Documented comparison confirming 3D conformal radiation would exceed safe dose constraints to parotid glands, rectum/bladder, or optic nerves.",
+      "clinical_intent": "Mandatory normal tissue tolerance justification",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "3d conformal exceeds tolerance",
+        "dosimetric normal tissue constraint",
+        "imrt necessary for organ sparing"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Prior to treatment delivery",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "3d conformal exceeds tolerance",
+        "dosimetric normal tissue constraint",
+        "imrt necessary for organ sparing"
+      ],
+      "cms_document": "Medicare LCD Intensity Modulated Radiation Therapy",
+      "source_section": "Indications",
+      "source_paragraph": "Paragraph 2: Dosimetric Justification",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    },
+    {
+      "criterion_code": "CRIT-IMRT-EXCL-01",
+      "name": "Simple Palliative Bone Metastases Exclusion",
+      "description": "IMRT requested for uncomplicated palliative irradiation of non-spinal bone metastases where 3D conformal or simple fields are standard.",
+      "clinical_intent": "Exclude inverse-planned IMRT for simple palliative treatments",
+      "criterion_type": "EXCLUSION_SYMPTOM",
+      "entity_names": [
+        "simple palliative bone metastasis",
+        "uncomplicated bone palliation"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": true,
+      "negation_sensitive": true,
+      "required_temporal_window": "Current presentation",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.9,
+      "keywords": [
+        "simple palliative bone metastasis",
+        "uncomplicated bone palliation"
+      ],
+      "cms_document": "Medicare LCD Intensity Modulated Radiation Therapy",
+      "source_section": "Exclusions",
+      "source_paragraph": "Paragraph 1: Simple Palliation Exclusion",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": null
+    }
+  ],
+  "statutory_waiting_periods": []
+}
