@@ -190,9 +190,9 @@ def test_llm_timeout_and_unavailable_graceful_fallback():
         "keywords": "osteoarthrosis, knee"
     }
 
-    # Simulate timeout by patching requests.post with Timeout exception
-    import requests
-    with patch("requests.post", side_effect=requests.exceptions.Timeout("Connection timed out")):
+    # Simulate timeout by patching httpx.Client.post with TimeoutException
+    import httpx
+    with patch("httpx.Client.post", side_effect=httpx.TimeoutException("Connection timed out")):
         res = proposer.propose_spans_sync(
             narrative=narrative,
             criterion_def=criterion_def,
@@ -202,7 +202,7 @@ def test_llm_timeout_and_unavailable_graceful_fallback():
         assert res["proposals"] == []
 
     # Simulate connection error (Ollama not running)
-    with patch("requests.post", side_effect=requests.exceptions.ConnectionError("Failed to establish connection")):
+    with patch("httpx.Client.post", side_effect=httpx.ConnectError("Failed to establish connection")):
         res = proposer.propose_spans_sync(
             narrative=narrative,
             criterion_def=criterion_def,

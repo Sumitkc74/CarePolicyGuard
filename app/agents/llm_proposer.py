@@ -201,14 +201,14 @@ class LLMProposalAgent:
         }
 
         try:
-            import requests
-            resp = requests.post(self.endpoint_url, json=payload, timeout=self.timeout_seconds)
-            elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
+            with httpx.Client(timeout=self.timeout_seconds) as client:
+                resp = client.post(self.endpoint_url, json=payload)
+                elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
 
-            if resp.status_code != 200:
-                return ProposalResult(([], f"SKIPPED_HTTP_{resp.status_code}", elapsed_ms))
+                if resp.status_code != 200:
+                    return ProposalResult(([], f"SKIPPED_HTTP_{resp.status_code}", elapsed_ms))
 
-            data = resp.json()
+                data = resp.json()
             content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
             parsed = json.loads(content)
             raw_proposals = parsed.get("proposals", [])
@@ -241,7 +241,7 @@ class LLMProposalAgent:
         except Exception as exc:
             elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
             exc_str = str(exc).lower()
-            if "timeout" in exc_str or "timed out" in exc_str:
+            if isinstance(exc, (httpx.TimeoutException, TimeoutError)) or "timeout" in exc_str or "timed out" in exc_str:
                 logger.warning(f"LLM proposal step timed out after {self.timeout_seconds}s for {ccode}: {exc}")
                 return ProposalResult(([], "SKIPPED_TIMEOUT", elapsed_ms))
             else:
