@@ -18,8 +18,8 @@
     {
       "criterion_code": "CRIT-IMRT-01",
       "name": "Head and Neck, Prostate, or CNS Malignancy Near Critical Organs",
-      "description": "Biopsy-proven head and neck squamous cell carcinoma, prostate adenocarcinoma, or brain/spinal tumor located adjacent to dose-sensitive critical normal structures (spinal cord, brainstem, optic structures, salivary glands, rectum, bladder). Note: Instance list is author-defined from policy dosimetric indications; source status is MISMATCH/unverified.",
-      "clinical_intent": "Confirm clinical diagnosis qualifying for inverse-planned modulation based on class of critical dose-limiting normal structures",
+      "description": "Biopsy-proven head and neck squamous cell carcinoma, prostate adenocarcinoma, or brain/spinal tumor located adjacent to critical dose-sensitive structures (spinal cord, brainstem, optic structures, salivary glands). Rectal and bladder dose sparing are addressed in dosimetric planning (CRIT-IMRT-02), not tumor proximity.",
+      "clinical_intent": "Confirm clinical diagnosis qualifying for inverse-planned modulation based on critical dose-limiting neural and salivary structures",
       "criterion_type": "FINDING_PRESENCE",
       "entity_names": [
         "head and neck cancer",
@@ -33,11 +33,7 @@
         "salivary gland",
         "parotid gland",
         "optic nerve",
-        "optic chiasm",
-        "rectum",
-        "rectal wall",
-        "bladder",
-        "bladder wall"
+        "optic chiasm"
       ],
       "operator": null,
       "threshold": null,
@@ -55,9 +51,7 @@
         "prostate cancer",
         "spinal cord",
         "brainstem",
-        "salivary gland",
-        "rectum",
-        "bladder"
+        "salivary gland"
       ],
       "cms_document": "Medicare LCD Intensity Modulated Radiation Therapy",
       "source_section": "Indications",

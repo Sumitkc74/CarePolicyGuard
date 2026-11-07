@@ -194,6 +194,7 @@ class OnboardingReport(BaseModel):
     evaluation_rounds: List[OnboardingEvaluationRound] = Field(default_factory=list)
     open_defects: List[str] = Field(default_factory=list)
     human_verification_required: bool = True
+    conversation_transcript: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class OnboardingResult(BaseModel):
@@ -218,7 +219,7 @@ class PolicyOnboardingAgent:
     ):
         self.local_llm_url = local_llm_url or "http://127.0.0.1:11434/v1"
         self.mcd_client = mcd_client or httpx.Client(timeout=10.0)
-        self.staging_dir = staging_dir or (Path(__file__).resolve().parent.parent / "data" / "policies_extended")
+        self.staging_dir = staging_dir or (Path(__file__).resolve().parent.parent / "data" / "policies_extended" / "drafts")
 
     def fetch_mcd_document(self, cms_id: str, clinical_subject: str) -> Optional[Dict[str, Any]]:
         """
@@ -686,6 +687,17 @@ class PolicyOnboardingAgent:
         # 6. Conversation with Agent 1 (Task 2)
         vigs_for_conv = test_vignettes or []
         reg_success, open_defects = self.run_conversation_with_agent1(policy, vigs_for_conv, conversation_id)
+        conv_msgs = AgentConversationAuditBus.get_conversation(conversation_id)
+        transcript = [
+            {
+                "round": m.round_number,
+                "sender": m.sender,
+                "receiver": m.receiver,
+                "type": m.message_type.value,
+                "summary": m.question_or_decision or ""
+            }
+            for m in conv_msgs
+        ]
 
         # 7. Write Onboarding Report
         report = OnboardingReport(
@@ -702,11 +714,13 @@ class PolicyOnboardingAgent:
             concept_map=policy.concept_map,
             evaluation_rounds=evaluation_rounds,
             open_defects=open_defects,
-            human_verification_required=True
+            human_verification_required=True,
+            conversation_transcript=transcript
         )
 
         # 8. Save DRAFT Policy JSON and Report to disk if requested
         if save_draft and self.staging_dir:
+            self.staging_dir.mkdir(parents=True, exist_ok=True)
             out_file = self.staging_dir / f"{policy.policy_id}.json"
             with open(out_file, "w", encoding="utf-8") as f:
                 json.dump(policy.model_dump(), f, indent=2)
@@ -771,5 +785,16 @@ class PolicyOnboardingAgent:
             ])
             for d in report.open_defects:
                 md.append(f"- `{d}`")
+
+        if report.conversation_transcript:
+            md.extend([
+                "",
+                "## Inter-Agent Conversation Transcript (AgentConversationAuditBus)",
+                "",
+                "| Round | Sender | Receiver | Message Type | Operational Decision / Summary |",
+                "| :---: | :--- | :--- | :--- | :--- |"
+            ])
+            for t in report.conversation_transcript:
+                md.append(f"| Round {t.get('round', 1)} | `{t.get('sender')}` | `{t.get('receiver')}` | `{t.get('type')}` | {t.get('summary')} |")
 
         report_path.write_text("\n".join(md), encoding="utf-8")

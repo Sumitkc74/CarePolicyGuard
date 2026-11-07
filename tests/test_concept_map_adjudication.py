@@ -203,10 +203,15 @@ def test_task3_rewritten_criterion_instances_and_intent():
     res_parotid = DeclarativePolicyEngine.evaluate(crit_imrt_01, note_parotid)
     assert res_parotid.status == DeterminationStatus.MET
 
-    # Instance from list: Rectal wall dose sparing
+    # Instance from list: Brainstem proximity
+    note_brainstem = "Patient has head and neck carcinoma adjacent to the brainstem."
+    res_brainstem = DeclarativePolicyEngine.evaluate(crit_imrt_01, note_brainstem)
+    assert res_brainstem.status == DeterminationStatus.MET
+
+    # Excluded instance per governing rule: Rectal wall dose sparing does not satisfy CRIT-IMRT-01
     note_rectal = "Inverse IMRT plan limits rectal wall dose below 70 Gy while escalating target volume."
     res_rectal = DeclarativePolicyEngine.evaluate(crit_imrt_01, note_rectal)
-    assert res_rectal.status == DeterminationStatus.MET
+    assert res_rectal.status != DeterminationStatus.MET
 
     # Instance outside list: Hand tendon sparing (unrelated structure)
     note_unrelated = "Patient has head and neck carcinoma; hand tendon sparing requested."
@@ -232,3 +237,45 @@ def test_task3_rewritten_criterion_instances_and_intent():
     note_chiro = "Patient completed 8 weeks of chiropractic care and NSAIDs without resolution of radiculopathy."
     res_chiro = DeclarativePolicyEngine.evaluate(crit_ldec_02, note_chiro)
     assert res_chiro.status == DeterminationStatus.MET
+
+
+def test_pipeline_level_syn06_defers_and_syn01_proceeds():
+    """
+    Task 4: Pipeline-level test (not map-only) asserting:
+    1. SYN-06 defers to human at pipeline level (rectal dose sparing does NOT silently pass spinal cord rule).
+    2. SYN-01 proceeds without deferral for synonymy alone on CRIT-IMRT-01 (prostate adenocarcinoma is understood).
+    """
+    from app.agents.pipeline import MultiAgentVerificationPipeline
+    from app.schemas.contracts import AdjudicationDecision
+
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    assert FIXTURE_PATH.exists()
+    with open(FIXTURE_PATH, "r", encoding="utf-8") as f:
+        cases = {c["case_id"]: c for c in json.load(f)["cases"]}
+
+    # 1. Pipeline-level check for SYN-06: MUST DEFER
+    syn06_case = cases["SYN-06"]
+    adj_06 = pipeline.adjudicate_sync(
+        patient_id="PT-SYN-06",
+        policy_id="LCD-IMRT",
+        ehr_narrative=syn06_case["ehr_narrative"],
+        execution_mode="declarative",
+        save_record=False
+    )
+    assert adj_06.adjudication_decision == AdjudicationDecision.DEFERRED_TO_HUMAN
+
+    # 2. Pipeline-level check for SYN-01: CRIT-IMRT-01 must proceed as MET (synonymy understood)
+    syn01_case = cases["SYN-01"]
+    adj_01 = pipeline.adjudicate_sync(
+        patient_id="PT-SYN-01",
+        policy_id="LCD-IMRT",
+        ehr_narrative=syn01_case["ehr_narrative"],
+        execution_mode="declarative",
+        save_record=False
+    )
+    crit_01_syn01 = next((a for a in adj_01.criterion_assessments if a.criterion_code == "CRIT-IMRT-01"), None)
+    assert crit_01_syn01 is not None
+    assert crit_01_syn01.status == DeterminationStatus.MET, (
+        f"SYN-01 failed to resolve prostate adenocarcinoma on CRIT-IMRT-01: {crit_01_syn01.clinical_rationale}"
+    )

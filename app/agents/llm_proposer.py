@@ -135,7 +135,8 @@ class LLMProposalAgent:
             "gate_c_map_rejections": 0,
             "gate_c_vetoes": 0,
             "proposals_accepted": 0,
-            "total_latency_ms": 0.0
+            "total_latency_ms": 0.0,
+            "call_latencies": []
         }
 
     def reset_case_budget(self) -> None:
@@ -247,6 +248,7 @@ class LLMProposalAgent:
             self.case_elapsed_ms += elapsed_ms
             self.telemetry["total_calls"] += 1
             self.telemetry["total_latency_ms"] += elapsed_ms
+            self.telemetry.setdefault("call_latencies", []).append(elapsed_ms)
 
             if resp.status_code != 200:
                 return ProposalResult(([], f"SKIPPED_HTTP_{resp.status_code}", elapsed_ms))
@@ -289,6 +291,7 @@ class LLMProposalAgent:
             self.case_elapsed_ms += elapsed_ms
             self.telemetry["total_calls"] += 1
             self.telemetry["total_latency_ms"] += elapsed_ms
+            self.telemetry.setdefault("call_latencies", []).append(elapsed_ms)
             exc_str = str(exc).lower()
             if isinstance(exc, (httpx.TimeoutException, TimeoutError)) or "timeout" in exc_str or "timed out" in exc_str:
                 logger.warning(f"LLM proposal step timed out after {self.timeout_seconds}s for {ccode}: {exc}")
@@ -608,6 +611,15 @@ class LLMProposalAgent:
         )
 
         if not gate_res.passed:
+            if gate_res.failing_gate == "GATE_A_EXACT_SLICE":
+                self.telemetry["gate_a_rejections"] += 1
+            elif gate_res.failing_gate == "GATE_B_SEMANTIC":
+                self.telemetry["gate_b_rejections"] += 1
+            elif gate_res.failing_gate == "GATE_C_MAP_CHECK":
+                self.telemetry["gate_c_map_rejections"] += 1
+            elif gate_res.failing_gate == "GATE_C_ADVERSARIAL_VETO":
+                self.telemetry["gate_c_vetoes"] += 1
+
             # Map check failure or semantic/slice failure
             if gate_res.failing_gate == "GATE_C_MAP_CHECK":
                 msg_defer = AgentMessage(
@@ -706,6 +718,7 @@ class LLMProposalAgent:
                     veto_reason = audit.audit_notes
 
         if agent3_passed:
+            self.telemetry["proposals_accepted"] += 1
             msg_accept = AgentMessage(
                 conversation_id=conv_id,
                 sender="Agent3_AdversarialVerifier",
@@ -723,6 +736,7 @@ class LLMProposalAgent:
             recorded_messages.append(msg_accept)
             return gate_res.verified_span, recorded_messages
         else:
+            self.telemetry["gate_c_vetoes"] += 1
             msg_veto = AgentMessage(
                 conversation_id=conv_id,
                 sender="Agent3_AdversarialVerifier",

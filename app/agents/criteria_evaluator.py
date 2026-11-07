@@ -961,6 +961,18 @@ class CriteriaEvaluationAgent:
                             criterion=target_criterion,
                             verifier_agent=verifier_agent
                         )
+                        if hasattr(llm_proposer, "telemetry") and isinstance(llm_proposer.telemetry, dict):
+                            if not gate_res.passed:
+                                if gate_res.failing_gate == "GATE_A_EXACT_SLICE":
+                                    llm_proposer.telemetry["gate_a_rejections"] += 1
+                                elif gate_res.failing_gate == "GATE_B_SEMANTIC":
+                                    llm_proposer.telemetry["gate_b_rejections"] += 1
+                                elif gate_res.failing_gate == "GATE_C_MAP_CHECK":
+                                    llm_proposer.telemetry["gate_c_map_rejections"] += 1
+                                elif gate_res.failing_gate == "GATE_C_ADVERSARIAL_VETO":
+                                    llm_proposer.telemetry["gate_c_vetoes"] += 1
+                            elif gate_res.passed:
+                                llm_proposer.telemetry["proposals_accepted"] += 1
                         if gate_res.passed and gate_res.verified_span:
                             assessment.verified_spans.append(gate_res.verified_span)
                             if not target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):

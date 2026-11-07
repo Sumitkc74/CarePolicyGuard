@@ -336,12 +336,11 @@ class ConceptMap:
             ],
             authorized_instances=[
                 "spinal cord", "brainstem", "optic nerves", "optic chiasm", "retina",
-                "parotid glands", "salivary glands", "submandibular glands",
-                "rectum", "rectal wall", "bladder", "bladder wall", "cochlea"
+                "parotid glands", "salivary glands", "submandibular glands", "cochlea"
             ],
             prohibited_near_misses=[],
             source=ConceptSource.TASK1_ADJUDICATION_EXPANSION,
-            source_reason="LCD-IMRT & LCD-PROTON clinical class: dose-limiting adjacent normal tissues requiring modulation."
+            source_reason="LCD-IMRT & LCD-PROTON clinical class: dose-limiting adjacent neural and salivary structures requiring modulation. Rectum/bladder excluded per governing rule ambiguity."
         ))
 
         # 4. Ophthalmology: Cataract & Lens Opacity (SYN-08)

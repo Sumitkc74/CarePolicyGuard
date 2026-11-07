@@ -1,0 +1,95 @@
+{
+  "policy_id": "LCD-L36920",
+  "title": "Epidural Steroid Injections for Pain Management",
+  "jurisdiction": "Noridian Healthcare Solutions, LLC",
+  "effective_date": "2026-11-07",
+  "category": "Specialized Procedures",
+  "description": "CMS coverage policy for Epidural Steroid Injections (DRAFT - Pending Independent Verification).",
+  "policy_version": "DRAFT-0.1",
+  "change_log": [],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-ESI-01",
+      "name": "Failure of Conservative Therapy for Radiculopathy",
+      "description": "Severe radicular pain refractory to conservative therapy for a minimum of 4 to 6 weeks.",
+      "clinical_intent": "Statutory requirement for Epidural Steroid Injections",
+      "criterion_type": "TEMPORAL_DURATION",
+      "entity_names": [
+        "conservative therapy",
+        "conservative measures",
+        "physical therapy",
+        "anti-inflammatory tablets",
+        "anti-inflammatory medications",
+        "refractory to conservative measures",
+        "refractory to conservative therapy",
+        "tried physical therapy and anti-inflammatory tablets",
+        "failing conservative therapy",
+        "conservative measures tried without relief",
+        "lumbar radiculopathy",
+        "nerve root compression",
+        "disc herniation",
+        "positive straight leg raise"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": 28,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Within past 12 months",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "conservative therapy",
+        "conservative measures",
+        "physical therapy",
+        "anti-inflammatory tablets",
+        "anti-inflammatory medications",
+        "refractory to conservative measures",
+        "refractory to conservative therapy",
+        "tried physical therapy and anti-inflammatory tablets",
+        "failing conservative therapy",
+        "conservative measures tried without relief",
+        "lumbar radiculopathy",
+        "nerve root compression",
+        "disc herniation",
+        "positive straight leg raise"
+      ],
+      "cms_document": "Epidural Steroid Injections for Pain Management",
+      "source_section": "Covered Indications",
+      "source_paragraph": "Requirements for Initial Injection: Paragraph 1",
+      "source_traceability_status": "CLAIMED_UNVERIFIED",
+      "source_text_excerpt": "The patient must have documented severe radicular pain refractory to conservative therapy for a minimum of 4 to 6 weeks, including physical therapy, pharmacologic measures (such as anti-inflammatory medications), or home exercise programs."
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-07",
+    "lifecycle_status": "DRAFT",
+    "notes": "Onboarded by Agent 5 from live CMS MCD. Verified document title: Epidural Steroid Injections for Pain Management. Awaiting independent audit.",
+    "real_cms_id": "L36920",
+    "authority": "Medicare Administrative Contractor (MAC)",
+    "document_title": "Epidural Steroid Injections for Pain Management",
+    "citation": "CMS MCD: Epidural Steroid Injections for Pain Management (L36920)",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=36920"
+  },
+  "status": "DRAFT",
+  "concept_map": {
+    "failure of conservative care": [
+      "refractory to conservative therapy",
+      "refractory to conservative measures",
+      "tried physical therapy and anti-inflammatory tablets",
+      "failing conservative therapy",
+      "conservative measures tried without relief"
+    ],
+    "radiculopathy": [
+      "lumbar radiculopathy",
+      "nerve root compression",
+      "disc herniation",
+      "positive straight leg raise"
+    ]
+  }
+}
