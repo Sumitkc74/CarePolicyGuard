@@ -28,6 +28,14 @@ class AgentMessageType(str, Enum):
     CHALLENGE = "CHALLENGE"
     CONCEDE = "CONCEDE"
     DEBATE_ROUND = "DEBATE_ROUND"
+    # Task 2: Runtime Synonymy Conversation Protocol
+    SYNONYMY_QUERY = "SYNONYMY_QUERY"
+    SYNONYMY_PROPOSAL = "SYNONYMY_PROPOSAL"
+    NO_EQUIVALENT_FOUND = "NO_EQUIVALENT_FOUND"
+    DEFENSE = "DEFENSE"
+    ACCEPT = "ACCEPT"
+    REJECT = "REJECT"
+    DEFER = "DEFER"
 
 
 class AgentMessage(BaseModel):

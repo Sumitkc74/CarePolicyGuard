@@ -18,14 +18,26 @@
     {
       "criterion_code": "CRIT-IMRT-01",
       "name": "Head and Neck, Prostate, or CNS Malignancy Near Critical Organs",
-      "description": "Biopsy-proven head and neck squamous cell carcinoma, prostate adenocarcinoma, or brain/spinal tumor located adjacent to critical dose-sensitive structures.",
-      "clinical_intent": "Confirm clinical diagnosis qualifying for inverse-planned modulation",
+      "description": "Biopsy-proven head and neck squamous cell carcinoma, prostate adenocarcinoma, or brain/spinal tumor located adjacent to dose-sensitive critical normal structures (spinal cord, brainstem, optic structures, salivary glands, rectum, bladder). Note: Instance list is author-defined from policy dosimetric indications; source status is MISMATCH/unverified.",
+      "clinical_intent": "Confirm clinical diagnosis qualifying for inverse-planned modulation based on class of critical dose-limiting normal structures",
       "criterion_type": "FINDING_PRESENCE",
       "entity_names": [
         "head and neck cancer",
         "prostate cancer",
+        "prostate adenocarcinoma",
+        "cns tumor",
+        "spinal cord",
         "adjacent to spinal cord",
-        "salivary gland sparing needed"
+        "brainstem",
+        "salivary gland sparing needed",
+        "salivary gland",
+        "parotid gland",
+        "optic nerve",
+        "optic chiasm",
+        "rectum",
+        "rectal wall",
+        "bladder",
+        "bladder wall"
       ],
       "operator": null,
       "threshold": null,
@@ -41,8 +53,11 @@
       "keywords": [
         "head and neck cancer",
         "prostate cancer",
-        "adjacent to spinal cord",
-        "salivary gland sparing needed"
+        "spinal cord",
+        "brainstem",
+        "salivary gland",
+        "rectum",
+        "bladder"
       ],
       "cms_document": "Medicare LCD Intensity Modulated Radiation Therapy",
       "source_section": "Indications",

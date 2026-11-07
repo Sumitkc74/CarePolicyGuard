@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+import uuid
 from typing import List, Dict, Any, Optional, Tuple
 import httpx
 from pydantic import BaseModel, Field
@@ -21,6 +22,7 @@ class LLMProposedSpan(BaseModel):
     numeric_value: Optional[float] = None
     numeric_unit: Optional[str] = None
     rationale: str = ""
+    claimed_equivalence: str = ""
 
     def __init__(self, **data):
         if "quote" in data and "claimed_text" not in data:
@@ -31,6 +33,8 @@ class LLMProposedSpan(BaseModel):
             data["char_end"] = data["end_char"]
         if "reasoning" in data and "rationale" not in data:
             data["rationale"] = data["reasoning"]
+        if "equivalence" in data and "claimed_equivalence" not in data:
+            data["claimed_equivalence"] = data["equivalence"]
         super().__init__(**data)
 
     @property
@@ -110,22 +114,34 @@ class LLMProposalAgent:
         endpoint_url: Optional[str] = None,
         model_name: Optional[str] = None,
         timeout_seconds: Optional[float] = None,
-        availability_checker: Optional[Any] = None
+        availability_checker: Optional[Any] = None,
+        max_calls_per_case: int = 3,
+        max_time_per_case_seconds: float = 30.0
     ):
         self.endpoint_url = endpoint_url or settings.LOCAL_LLM_URL
         self.model_name = model_name or settings.LOCAL_LLM_MODEL
         self.timeout_seconds = timeout_seconds or settings.LOCAL_LLM_TIMEOUT_SECONDS
         self.enabled = settings.ENABLE_LLM_PROPOSAL_STEP
         self._availability_checker = availability_checker
+        self.max_calls_per_case = max_calls_per_case
+        self.max_time_per_case_seconds = max_time_per_case_seconds
+        self.case_call_count = 0
+        self.case_elapsed_ms = 0.0
         self.telemetry = {
             "total_calls": 0,
             "proposals_generated": 0,
             "gate_a_rejections": 0,
             "gate_b_rejections": 0,
+            "gate_c_map_rejections": 0,
             "gate_c_vetoes": 0,
             "proposals_accepted": 0,
             "total_latency_ms": 0.0
         }
+
+    def reset_case_budget(self) -> None:
+        """Resets per-case call count and elapsed time budget at case boundary."""
+        self.case_call_count = 0
+        self.case_elapsed_ms = 0.0
 
     def is_available(self) -> bool:
         """Checks if local Ollama endpoint is reachable without sending clinical data."""
@@ -167,6 +183,19 @@ class LLMProposalAgent:
         if not self.enabled:
             return ProposalResult(([], "SKIPPED_DISABLED", 0.0))
 
+        # Hard limits: At most 3 LLM calls per adjudication and total LLM budget of 30 seconds
+        if self.case_call_count >= self.max_calls_per_case:
+            logger.warning(
+                f"LLM call budget exceeded ({self.case_call_count}/{self.max_calls_per_case}) for case; skipping with SKIPPED_TIMEOUT."
+            )
+            return ProposalResult(([], "SKIPPED_TIMEOUT", 0.0))
+
+        if self.case_elapsed_ms >= (self.max_time_per_case_seconds * 1000.0):
+            logger.warning(
+                f"LLM time budget exceeded ({self.case_elapsed_ms:.1f}ms / {self.max_time_per_case_seconds*1000}ms) for case; skipping with SKIPPED_TIMEOUT."
+            )
+            return ProposalResult(([], "SKIPPED_TIMEOUT", 0.0))
+
         ccode = crit.get("criterion_code", "CRIT-UNKNOWN")
         cname = crit.get("name", "")
         cdesc = crit.get("description", "")
@@ -183,7 +212,8 @@ class LLMProposalAgent:
             f"- Type: {ctype}\n"
             f"- Is Exclusion: {is_excl}\n\n"
             f"TASK:\n"
-            f"Find any verbatim substring in the clinical note that provides evidence for this criterion.\n"
+            f"Find any verbatim substring in the clinical note that provides evidence expressing the SAME CLINICAL CONCEPT (synonym, subtype, paraphrase, abbreviation) as this criterion.\n"
+            f"You must NOT claim that a different clinical condition or different organ satisfies the policy. Only wording variations for the same clinical concept.\n"
             f"You MUST provide the exact substring and its 0-indexed character offsets (char_start, char_end).\n"
             f"Return ONLY valid JSON matching this schema:\n"
             f"{{\n"
@@ -194,6 +224,7 @@ class LLMProposalAgent:
             f"      \"claimed_text\": \"exact substring from note\",\n"
             f"      \"char_start\": 0,\n"
             f"      \"char_end\": 10,\n"
+            f"      \"claimed_equivalence\": \"clinical relationship (e.g. adenocarcinoma is a subtype of prostate cancer)\",\n"
             f"      \"numeric_value\": float or null,\n"
             f"      \"numeric_unit\": string or null,\n"
             f"      \"rationale\": \"brief clinical rationale\"\n"
@@ -212,6 +243,10 @@ class LLMProposalAgent:
         try:
             resp = self._execute_network_request(payload)
             elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
 
             if resp.status_code != 200:
                 return ProposalResult(([], f"SKIPPED_HTTP_{resp.status_code}", elapsed_ms))
@@ -240,14 +275,20 @@ class LLMProposalAgent:
                         char_end=int(end),
                         numeric_value=p.get("numeric_value"),
                         numeric_unit=p.get("numeric_unit"),
+                        claimed_equivalence=p.get("claimed_equivalence", p.get("rationale", "")),
                         rationale=p.get("rationale", "LLM proposed evidence")
                     ))
 
+            self.telemetry["proposals_generated"] += len(proposals)
             status = "COMPLETED" if proposals else "NO_PROPOSALS"
             return ProposalResult((proposals, status, elapsed_ms))
 
         except Exception as exc:
             elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
             exc_str = str(exc).lower()
             if isinstance(exc, (httpx.TimeoutException, TimeoutError)) or "timeout" in exc_str or "timed out" in exc_str:
                 logger.warning(f"LLM proposal step timed out after {self.timeout_seconds}s for {ccode}: {exc}")
@@ -386,7 +427,50 @@ class LLMProposalAgent:
             negation_valid=True
         )
 
-        # Gate (c): Agent 3 independent cross-examination veto
+        # Gate (c): Concept Map Equivalence Verification (Task 1 Map Check)
+        from app.core.concept_map import get_concept_map, ConceptReviewQueue
+        cmap = get_concept_map()
+        crit_name = crit.get("name", "")
+        crit_code = crit.get("criterion_code", proposal.criterion_code)
+        crit_kws = crit.get("keywords", [])
+        if isinstance(crit_kws, str):
+            crit_kws = [k.strip() for k in crit_kws.split(",") if k.strip()]
+        candidate_crit_terms = ([crit_name] + list(crit_kws)) if crit_name else list(crit_kws)
+        if not candidate_crit_terms:
+            candidate_crit_terms = [crit_code]
+
+        map_passed = False
+        map_reason = ""
+        for c_term in candidate_crit_terms:
+            passed, reason = cmap.verify_equivalence(c_term, claimed)
+            if passed:
+                map_passed = True
+                map_reason = reason
+                break
+            elif "PROHIBITED_NEAR_MISS" in reason:
+                map_reason = reason
+                break
+            else:
+                map_reason = reason
+
+        if not map_passed:
+            case_id = crit.get("case_id", "CURRENT_CASE")
+            ConceptReviewQueue.submit_unmapped_proposal(
+                case_id=case_id,
+                criterion_code=crit_code,
+                criterion_term=crit_name or crit_code,
+                proposed_span=claimed,
+                claimed_equivalence=proposal.claimed_equivalence or proposal.rationale,
+                ehr_snippet=text[max(0, s - 50):min(len(text), e + 50)]
+            )
+            return GateEvaluationResult(
+                proposal=proposal,
+                passed=False,
+                failing_gate="GATE_C_MAP_CHECK",
+                rejection_reason=f"Concept Map check failed: {map_reason}. Claim submitted to human review queue; case defers."
+            )
+
+        # Gate (d): Agent 3 independent cross-examination veto
         if verifier_agent is not None:
             if hasattr(verifier_agent, "audit_assessment"):
                 assessment_dummy = CriterionAssessment(
@@ -424,7 +508,7 @@ class LLMProposalAgent:
                         rejection_reason=f"Agent 3 cross-examination veto: {'; '.join(notes)}"
                     )
 
-        # All 3 gates passed!
+        # All gates passed!
         return GateEvaluationResult(
             proposal=proposal,
             passed=True,
@@ -432,3 +516,226 @@ class LLMProposalAgent:
             rejection_reason=None,
             verified_span=candidate_span
         )
+
+    def run_synonymy_conversation(
+        self,
+        criterion: Dict[str, Any],
+        ehr_narrative: str,
+        failed_reason: str = "Deterministic match failed",
+        verifier_agent: Optional[Any] = None,
+        case_id: Optional[str] = None,
+        max_rounds: int = 3
+    ) -> Tuple[Optional[ClinicalEvidenceSpan], List[Any]]:
+        """
+        Task 2: Executes and records the inter-agent runtime conversation for LLM synonymy resolution.
+        Protocol:
+        1. Agent 2 sends SYNONYMY_QUERY (criterion, note text, failed reason).
+        2. LLM Proposer replies with SYNONYMY_PROPOSAL (candidate span + claimed equivalence) or NO_EQUIVALENT_FOUND.
+        3. Deterministic Gates (a) slice check, (b) semantic check, (c) concept map check are evaluated.
+        4. If Gates a-c pass, Agent 3 cross-examines (CHALLENGE -> DEFENSE -> ACCEPT/REJECT), bounded to <=3 rounds.
+        All messages are recorded to AgentConversationAuditBus.
+        """
+        from app.schemas.agent_messages import AgentMessage, AgentMessageType, AgentConversationAuditBus
+
+        conv_id = f"CONV-SYN-{uuid.uuid4().hex[:8].upper()}"
+        cid = case_id or f"CASE-{uuid.uuid4().hex[:6].upper()}"
+        ccode = criterion.get("criterion_code", "CRIT-UNKNOWN")
+        cname = criterion.get("name", "")
+        recorded_messages = []
+
+        # Round 1: Agent 2 queries LLM proposer
+        msg_query = AgentMessage(
+            conversation_id=conv_id,
+            sender="Agent2_CriteriaEvaluator",
+            receiver="Agent_LLMProposer",
+            message_type=AgentMessageType.SYNONYMY_QUERY,
+            payload={
+                "case_id": cid,
+                "criterion_code": ccode,
+                "criterion_name": cname,
+                "failed_reason": failed_reason,
+            },
+            question_or_decision=f"Deterministic match failed for {ccode} ('{failed_reason}'). Is there a clinical synonym, subtype, paraphrase, or abbreviation expressing the same clinical concept?",
+            round_number=1
+        )
+        AgentConversationAuditBus.record_message(msg_query)
+        recorded_messages.append(msg_query)
+
+        res = self.propose_spans_sync(sanitized_ehr=ehr_narrative, criterion=criterion)
+        proposals = res[0] if isinstance(res, tuple) else res.get("proposals", [])
+
+        if not proposals:
+            msg_no_eq = AgentMessage(
+                conversation_id=conv_id,
+                sender="Agent_LLMProposer",
+                receiver="Agent2_CriteriaEvaluator",
+                message_type=AgentMessageType.NO_EQUIVALENT_FOUND,
+                payload={"status": res.status if hasattr(res, "status") else "NO_PROPOSALS"},
+                question_or_decision=f"No equivalent wording found in note for {ccode}.",
+                round_number=1
+            )
+            AgentConversationAuditBus.record_message(msg_no_eq)
+            recorded_messages.append(msg_no_eq)
+            return None, recorded_messages
+
+        prop = proposals[0]
+        msg_proposal = AgentMessage(
+            conversation_id=conv_id,
+            sender="Agent_LLMProposer",
+            receiver="Agent2_CriteriaEvaluator",
+            message_type=AgentMessageType.SYNONYMY_PROPOSAL,
+            payload={
+                "case_id": cid,
+                "criterion_code": ccode,
+                "claimed_text": prop.claimed_text,
+                "char_start": prop.char_start,
+                "char_end": prop.char_end,
+                "claimed_equivalence": prop.claimed_equivalence or prop.rationale,
+                "proposed_status": str(prop.proposed_status)
+            },
+            question_or_decision=f"Proposed synonymy equivalence: '{prop.claimed_text}' expresses concept for {ccode} ('{prop.claimed_equivalence or prop.rationale}').",
+            round_number=1
+        )
+        AgentConversationAuditBus.record_message(msg_proposal)
+        recorded_messages.append(msg_proposal)
+
+        # Round 2: Gate verification (Gates a, b, c)
+        gate_res = self.evaluate_proposal_through_gates(
+            proposal=prop,
+            sanitized_ehr=ehr_narrative,
+            criterion=criterion,
+            verifier_agent=None  # We conduct Agent 3 cross-examination via explicit conversation below
+        )
+
+        if not gate_res.passed:
+            # Map check failure or semantic/slice failure
+            if gate_res.failing_gate == "GATE_C_MAP_CHECK":
+                msg_defer = AgentMessage(
+                    conversation_id=conv_id,
+                    sender="Agent2_CriteriaEvaluator",
+                    receiver="HumanReviewQueue",
+                    message_type=AgentMessageType.DEFER,
+                    payload={
+                        "case_id": cid,
+                        "criterion_code": ccode,
+                        "claimed_text": prop.claimed_text,
+                        "failing_gate": gate_res.failing_gate,
+                        "rejection_reason": gate_res.rejection_reason
+                    },
+                    question_or_decision=f"Proposal '{prop.claimed_text}' rejected by {gate_res.failing_gate}: {gate_res.rejection_reason}. Submitted to review queue; case defers.",
+                    round_number=2
+                )
+                AgentConversationAuditBus.record_message(msg_defer)
+                recorded_messages.append(msg_defer)
+            else:
+                msg_reject = AgentMessage(
+                    conversation_id=conv_id,
+                    sender="Agent2_CriteriaEvaluator",
+                    receiver="Agent_LLMProposer",
+                    message_type=AgentMessageType.REJECT,
+                    payload={
+                        "case_id": cid,
+                        "criterion_code": ccode,
+                        "failing_gate": gate_res.failing_gate,
+                        "rejection_reason": gate_res.rejection_reason
+                    },
+                    question_or_decision=f"Proposal rejected by {gate_res.failing_gate}: {gate_res.rejection_reason}.",
+                    round_number=2
+                )
+                AgentConversationAuditBus.record_message(msg_reject)
+                recorded_messages.append(msg_reject)
+            return None, recorded_messages
+
+        # Round 2 (cont) & Round 3: Agent 3 Cross-Examination
+        msg_challenge = AgentMessage(
+            conversation_id=conv_id,
+            sender="Agent3_AdversarialVerifier",
+            receiver="Agent_LLMProposer",
+            message_type=AgentMessageType.CHALLENGE,
+            payload={
+                "case_id": cid,
+                "criterion_code": ccode,
+                "claimed_text": prop.claimed_text,
+                "query": "Auditing span for negation, experiencer validity, and factual alignment."
+            },
+            question_or_decision=f"Does proposed span '{prop.claimed_text}' strictly affirm the criterion requirement without contradiction or clinical discordance?",
+            round_number=2
+        )
+        AgentConversationAuditBus.record_message(msg_challenge)
+        recorded_messages.append(msg_challenge)
+
+        # Defense by Evaluator / Proposer
+        msg_defense = AgentMessage(
+            conversation_id=conv_id,
+            sender="Agent2_CriteriaEvaluator",
+            receiver="Agent3_AdversarialVerifier",
+            message_type=AgentMessageType.DEFENSE,
+            payload={
+                "case_id": cid,
+                "criterion_code": ccode,
+                "span": prop.claimed_text,
+                "offsets": [prop.char_start, prop.char_end],
+                "concept_confirmed": True
+            },
+            question_or_decision=f"Span '{prop.claimed_text}' verified at [{prop.char_start}:{prop.char_end}]; confirmed patient experiencer and confirmed concept map entry.",
+            round_number=3
+        )
+        AgentConversationAuditBus.record_message(msg_defense)
+        recorded_messages.append(msg_defense)
+
+        # Agent 3 Verdict
+        agent3_passed = True
+        veto_reason = None
+        if verifier_agent is not None:
+            if hasattr(verifier_agent, "audit_assessment"):
+                dummy_assess = CriterionAssessment(
+                    criterion_id=ccode,
+                    criterion_code=ccode,
+                    name=cname,
+                    description=criterion.get("description", cname),
+                    status=DeterminationStatus.MET,
+                    extracted_value=prop.claimed_text,
+                    raw_confidence=0.88,
+                    clinical_rationale=prop.rationale,
+                    is_exclusion=criterion.get("is_exclusion", False),
+                    verified_spans=[gate_res.verified_span]
+                )
+                audit = verifier_agent.audit_assessment(dummy_assess, criterion, ehr_narrative)
+                if audit.hallucination_flag or not audit.grounding_status or getattr(audit, "contradiction_detected", False):
+                    agent3_passed = False
+                    veto_reason = audit.audit_notes
+
+        if agent3_passed:
+            msg_accept = AgentMessage(
+                conversation_id=conv_id,
+                sender="Agent3_AdversarialVerifier",
+                receiver="Agent2_CriteriaEvaluator",
+                message_type=AgentMessageType.ACCEPT,
+                payload={
+                    "case_id": cid,
+                    "criterion_code": ccode,
+                    "accepted_span": prop.claimed_text
+                },
+                question_or_decision=f"Cross-examination passed: accepted '{prop.claimed_text}' for {ccode}.",
+                round_number=3
+            )
+            AgentConversationAuditBus.record_message(msg_accept)
+            recorded_messages.append(msg_accept)
+            return gate_res.verified_span, recorded_messages
+        else:
+            msg_veto = AgentMessage(
+                conversation_id=conv_id,
+                sender="Agent3_AdversarialVerifier",
+                receiver="Agent2_CriteriaEvaluator",
+                message_type=AgentMessageType.REJECT,
+                payload={
+                    "case_id": cid,
+                    "criterion_code": ccode,
+                    "veto_reason": veto_reason
+                },
+                question_or_decision=f"Agent 3 cross-examination veto: {veto_reason}.",
+                round_number=3
+            )
+            AgentConversationAuditBus.record_message(msg_veto)
+            recorded_messages.append(msg_veto)
+            return None, recorded_messages

@@ -94,6 +94,10 @@ class MultiAgentVerificationPipeline:
         timestamp = datetime.now(timezone.utc)
         case_id = f"CASE-{uuid.uuid4().hex[:12].upper()}"
 
+        # Reset per-case LLM call and latency budget at case boundary
+        if hasattr(self.llm_proposer, "reset_case_budget"):
+            self.llm_proposer.reset_case_budget()
+
         # 1. Compliance Layer: PHI Sanitization
         sanitized_ehr = sanitize_phi(ehr_narrative) if settings.ENABLE_PHI_MASKING else ehr_narrative
         masked_patient_id = f"PT-***{patient_id[-4:]}" if len(patient_id) > 4 else f"PT-***"
@@ -171,6 +175,27 @@ class MultiAgentVerificationPipeline:
             for crit in criteria_defs:
                 decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
                 assessment = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
+                # If deterministic match missed and LLM proposer is enabled, trigger runtime synonymy conversation
+                if (
+                    assessment.status in [DeterminationStatus.INSUFFICIENT_EVIDENCE, DeterminationStatus.NOT_MET]
+                    and getattr(self.llm_proposer, "enabled", False)
+                    and hasattr(self.llm_proposer, "run_synonymy_conversation")
+                ):
+                    verified_span, conv_msgs = self.llm_proposer.run_synonymy_conversation(
+                        criterion=crit,
+                        ehr_narrative=sanitized_ehr,
+                        failed_reason=assessment.clinical_rationale or "Deterministic match missed wording",
+                        verifier_agent=self.verifier_agent,
+                        case_id=case_id
+                    )
+                    if verified_span:
+                        assessment.verified_spans.append(verified_span)
+                        if not decl_crit.is_exclusion:
+                            assessment.status = DeterminationStatus.MET
+                            assessment.clinical_rationale += f" [Conversationally Verified LLM Proposal Accepted: '{verified_span.source_text}']"
+                        else:
+                            assessment.status = DeterminationStatus.MET
+                            assessment.clinical_rationale += f" [Conversationally Verified LLM Proposal Disqualifying: '{verified_span.source_text}']"
                 criteria_assessments.append(assessment)
 
             # 4. Agent 3: Adversarial Verification (Multi-Round Debate Loop)

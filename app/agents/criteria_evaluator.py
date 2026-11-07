@@ -935,24 +935,41 @@ class CriteriaEvaluationAgent:
                 selected_tool = "llm_proposer"
                 selection_rationale = "Salient policy keywords detected but missed by regex; invoked local LLM proposer behind deterministic gates."
 
-                res = llm_proposer.propose_spans_sync(sanitized_ehr=text, criterion=target_criterion)
-                proposals = res[0] if isinstance(res, tuple) else res.get("proposals", [])
-                for prop in proposals:
-                    gate_res = llm_proposer.evaluate_proposal_through_gates(
-                        proposal=prop,
-                        sanitized_ehr=text,
+                if hasattr(llm_proposer, "run_synonymy_conversation"):
+                    verified_span, conv_msgs = llm_proposer.run_synonymy_conversation(
                         criterion=target_criterion,
-                        verifier_agent=verifier_agent
+                        ehr_narrative=text,
+                        failed_reason=assessment.clinical_rationale or "Deterministic extraction missed wording",
+                        verifier_agent=verifier_agent,
+                        case_id=policy_id or "CURRENT_CASE"
                     )
-                    if gate_res.passed and gate_res.verified_span:
-                        assessment.verified_spans.append(gate_res.verified_span)
-                        if not target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
+                    if verified_span:
+                        assessment.verified_spans.append(verified_span)
+                        if not target_criterion.get("is_exclusion", False):
                             assessment.status = DeterminationStatus.MET
-                            assessment.clinical_rationale += f" [Grounded LLM Proposal Accepted: '{prop.claimed_text}']"
-                        elif target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
+                            assessment.clinical_rationale += f" [Conversationally Verified LLM Proposal Accepted: '{verified_span.source_text}']"
+                        else:
                             assessment.status = DeterminationStatus.MET
-                            assessment.clinical_rationale += f" [Grounded LLM Proposal Disqualifying: '{prop.claimed_text}']"
-                        break
+                            assessment.clinical_rationale += f" [Conversationally Verified LLM Proposal Disqualifying: '{verified_span.source_text}']"
+                else:
+                    res = llm_proposer.propose_spans_sync(sanitized_ehr=text, criterion=target_criterion)
+                    proposals = res[0] if isinstance(res, tuple) else res.get("proposals", [])
+                    for prop in proposals:
+                        gate_res = llm_proposer.evaluate_proposal_through_gates(
+                            proposal=prop,
+                            sanitized_ehr=text,
+                            criterion=target_criterion,
+                            verifier_agent=verifier_agent
+                        )
+                        if gate_res.passed and gate_res.verified_span:
+                            assessment.verified_spans.append(gate_res.verified_span)
+                            if not target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
+                                assessment.status = DeterminationStatus.MET
+                                assessment.clinical_rationale += f" [Grounded LLM Proposal Accepted: '{prop.claimed_text}']"
+                            elif target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
+                                assessment.status = DeterminationStatus.MET
+                                assessment.clinical_rationale += f" [Grounded LLM Proposal Disqualifying: '{prop.claimed_text}']"
+                            break
             else:
                 methods_tried.append("phenotype_detector")
                 order.append("phenotype_detector")

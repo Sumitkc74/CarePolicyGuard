@@ -425,13 +425,42 @@ class DeclarativePolicyEngine:
                 rationale = "No documented statutory exclusion conditions identified in EHR narrative."
 
         else:
-            # CriterionType.FINDING_PRESENCE
-            search_terms = criterion.entity_names or [criterion.name]
+            # CriterionType.FINDING_PRESENCE: Wire ConceptMap for clinical concept matching
+            from app.core.concept_map import get_concept_map
+            cmap = get_concept_map()
+
+            base_terms = list(criterion.entity_names) if criterion.entity_names else [criterion.name]
+            search_terms: list[str] = []
+            for bt in base_terms:
+                if bt not in search_terms:
+                    search_terms.append(bt)
+                # Expand through explicit concept map
+                for cterm in cmap.get_terms_for_concept(bt):
+                    if cterm.lower() not in [t.lower() for t in search_terms]:
+                        search_terms.append(cterm)
+
             found = False
             for term in search_terms:
+                # Find occurrences in text
                 idx = ehr_text.lower().find(term.lower())
                 if idx != -1:
                     e_idx = idx + len(term)
+
+                    # Check concept prohibited near-misses on the matched span
+                    c_def = cmap.lookup_concept(term) or cmap.lookup_concept(criterion.name)
+                    is_prohibited = False
+                    if c_def:
+                        # Inspect surrounding text window (+/- 30 chars) for prohibited near-misses
+                        win_start = max(0, idx - 30)
+                        win_end = min(len(ehr_text), e_idx + 30)
+                        surrounding = ehr_text[win_start:win_end].lower()
+                        for pnm in c_def.prohibited_near_misses:
+                            if pnm.lower() in surrounding:
+                                is_prohibited = True
+                                break
+                    if is_prohibited:
+                        continue
+
                     scope = ClinicalScopeAnalyzer.analyze_scope(ehr_text, idx, e_idx)
                     ClinicalGroundingVerifier.verify_exact_slice(ehr_text, ehr_text[idx:e_idx], idx, e_idx)
                     span_obj = ClinicalEvidenceSpan(

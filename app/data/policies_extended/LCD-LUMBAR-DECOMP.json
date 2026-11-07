@@ -53,12 +53,18 @@
     {
       "criterion_code": "CRIT-LDEC-02",
       "name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
-      "description": "Trial and failure of >= 6 weeks of non-surgical conservative therapy including physical therapy, activity modification, or NSAIDs/analgesics.",
-      "clinical_intent": "Mandatory non-operative trial",
+      "description": "Trial and failure of >= 6 weeks of non-surgical conservative therapy class (physical therapy, activity modification, NSAIDs/analgesics, chiropractic care, home exercise). Note: Instance list is author-defined from policy non-operative care section; source status is MISMATCH/unverified.",
+      "clinical_intent": "Mandatory trial of non-operative conservative therapy class",
       "criterion_type": "TEMPORAL_DURATION",
       "entity_names": [
         "conservative therapy",
-        "physical therapy trial",
+        "physical therapy",
+        "activity modification",
+        "nsaids",
+        "analgesics",
+        "pharmacotherapy",
+        "chiropractic care",
+        "home exercise",
         "six weeks conservative therapy"
       ],
       "operator": ">=",
@@ -74,8 +80,10 @@
       "min_score": 0.85,
       "keywords": [
         "conservative therapy",
-        "physical therapy trial",
-        "six weeks conservative therapy"
+        "physical therapy",
+        "activity modification",
+        "nsaids",
+        "analgesics"
       ],
       "cms_document": "Medicare LCD Lumbar Decompression",
       "source_section": "Indications",

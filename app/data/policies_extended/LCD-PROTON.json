@@ -18,15 +18,21 @@
     {
       "criterion_code": "CRIT-PBT-01",
       "name": "Skull Base, Spine Chordoma, or Critical Structure Proximity",
-      "description": "Histologically confirmed skull base/cervical chordoma, chondrosarcoma, ocular melanoma, or CNS tumor abutting critical dose-limiting neural structures.",
-      "clinical_intent": "Validate anatomical and dosimetric justification for Bragg peak physics",
+      "description": "Histologically confirmed skull base/cervical chordoma, chondrosarcoma, ocular melanoma, or CNS tumor abutting critical dose-limiting neural and ocular structures (optic chiasm, optic nerve, brainstem, spinal cord, retina, cochlea). Note: Instance list is author-defined from policy indications; source status is MISMATCH/unverified.",
+      "clinical_intent": "Validate anatomical and dosimetric justification for Bragg peak physics abutting class of critical neural structures",
       "criterion_type": "FINDING_PRESENCE",
       "entity_names": [
         "skull base chordoma",
         "chondrosarcoma of skull base",
         "ocular melanoma",
         "tumor abutting optic chiasm",
-        "brainstem proximity"
+        "brainstem proximity",
+        "optic chiasm",
+        "optic nerve",
+        "brainstem",
+        "spinal cord",
+        "retina",
+        "cochlea"
       ],
       "operator": null,
       "threshold": null,
@@ -41,10 +47,11 @@
       "min_score": 0.85,
       "keywords": [
         "skull base chordoma",
-        "chondrosarcoma of skull base",
+        "chondrosarcoma",
         "ocular melanoma",
-        "tumor abutting optic chiasm",
-        "brainstem proximity"
+        "optic chiasm",
+        "brainstem",
+        "spinal cord"
       ],
       "cms_document": "Medicare LCD Proton Beam Therapy",
       "source_section": "Coverage Indications",
