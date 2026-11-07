@@ -24,10 +24,14 @@ class ClinicalScopeAnalyzer:
         r"\b(?:no evidence of|no history of|no signs of|fails to demonstrate|unremarkable for)\b"
     ]
     POST_NEGATIONS: ClassVar[list[str]] = [
-        r"\b(?:is ruled out|was ruled out|is absent|unlikely)\b"
+        r"\b(?:is ruled out|was ruled out|is absent|unlikely)\b",
+        r"\b(?:not indicated|is not indicated|was not indicated|not recommended|not applicable|not present|not found|not documented|not identified)\b",
     ]
     EXPERIENCER_TRIGGERS: ClassVar[list[str]] = [
         r"\b(?:mother|father|sister|brother|maternal|paternal|family history|fhx|relative|parent)\b"
+    ]
+    HYPOTHETICAL_TRIGGERS: ClassVar[list[str]] = [
+        r"\b(?:if|pending|awaiting|hypothetical|speculative|rule out|r/o|suspected|possible|considered)\b"
     ]
     CONJUNCTIONS: ClassVar[list[str]] = [
         r"\b(?:but|however|nevertheless|although|except|yet)\b"
@@ -79,11 +83,22 @@ class ClinicalScopeAnalyzer:
                 experiencer = "FAMILY_MEMBER"
                 break
 
+        is_hypothetical = False
+        hypothetical_trigger = None
+        for pat in cls.HYPOTHETICAL_TRIGGERS:
+            m = re.search(pat, active_preceding)
+            if m:
+                is_hypothetical = True
+                hypothetical_trigger = m.group(0)
+                break
+
         return {
             "is_negated": is_negated,
             "negation_trigger": negation_trigger,
             "is_family_history": is_family_history,
-            "experiencer": experiencer
+            "experiencer": experiencer,
+            "is_hypothetical": is_hypothetical,
+            "hypothetical_trigger": hypothetical_trigger
         }
 
 

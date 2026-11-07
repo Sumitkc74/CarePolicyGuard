@@ -69,7 +69,7 @@ def test_all_42_extended_policies_have_valid_mcd_provenance_status():
                 f"Policy {slug} criterion {crit.get('criterion_code')} traceability must remain CLAIMED_UNVERIFIED"
             )
 
-    assert status_counts["VERIFIED_FROM_MCD"] == 18
-    assert status_counts["MISMATCH"] == 16
+    assert status_counts["VERIFIED_FROM_MCD"] == 14
+    assert status_counts["MISMATCH"] == 20
     assert status_counts["UNVERIFIED_AUTHOR_SUMMARY"] == 8
 

@@ -123,13 +123,13 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "VERIFIED_FROM_MCD",
+    "provenance_status": "MISMATCH",
     "checked_date": "2026-11-05",
-    "notes": "Verified against CMS OPD Program. Rhinoplasty is a statutorily designated prior authorization service under 42 CFR \u00a7 419.80.",
-    "real_cms_id": "42 CFR \u00a7 419.80 - 419.89",
+    "notes": "Service is listed under the OPD prior-authorization program under 42 CFR § 419.80 (program-level evidence, not a coverage determination). Not verified against an MCD document.",
+    "real_cms_id": "42 CFR § 419.80 - 419.89",
     "authority": "CMS Hospital Outpatient Department (OPD) Prior Authorization Program",
     "document_title": "Prior Authorization for Certain Hospital Outpatient Department (OPD) Services",
-    "citation": "CMS MCD: Prior Authorization for Certain Hospital Outpatient Department (OPD) Services (42 CFR \u00a7 419.80 - 419.89)",
+    "citation": "CMS MCD: Prior Authorization for Certain Hospital Outpatient Department (OPD) Services (42 CFR § 419.80 - 419.89)",
     "url": "https://www.cms.gov/data-research/monitoring-programs/medicare-fee-service-compliance-programs/prior-authorization-and-pre-claim-review-initiatives/prior-authorization-certain-hospital-outpatient-department-opd-services"
   }
 }

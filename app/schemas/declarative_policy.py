@@ -68,4 +68,6 @@ class DeclarativePolicy(BaseModel):
     criteria: list[DeclarativeCriterion] = Field(default_factory=list, description="Declarative criteria set")
     statutory_waiting_periods: list[dict[str, Any]] = Field(default_factory=list, description="Longitudinal timeline rules")
     cms_reference: dict[str, Any] | None = Field(default=None, description="Official CMS identifier, MCD document citation, and URL")
+    status: str = Field(default="ACTIVE", description="Lifecycle status: ACTIVE, DRAFT, RETIRED")
+    concept_map: dict[str, list[str]] = Field(default_factory=dict, description="Synonym, subtype, paraphrase, and abbreviation mappings")
 

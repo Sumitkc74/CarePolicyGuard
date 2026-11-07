@@ -213,6 +213,13 @@ def main():
     boot_parser.add_argument("--password", required=True, help="Strong initial administrator password (min 12 chars)")
     boot_parser.add_argument("--name", default=None, help="Administrator full display name")
 
+    # Command: onboard-policy (Agent 5)
+    onb_parser = subparsers.add_parser("onboard-policy", help="Onboard CMS coverage policy via Agent 5")
+    onb_parser.add_argument("--cms-id", required=True, help="CMS MCD Identifier (e.g. L36920, L33318)")
+    onb_parser.add_argument("--subject", required=True, help="Clinical subject or procedure title")
+    onb_parser.add_argument("--vignettes", default=None, help="Optional path to frozen test vignettes JSON")
+    onb_parser.add_argument("--no-save", action="store_true", help="Do not save DRAFT policy JSON to disk")
+
     args = parser.parse_args()
 
     if args.command == "adjudicate":
@@ -227,6 +234,31 @@ def main():
         handle_policies(args)
     elif args.command == "bootstrap-admin":
         handle_bootstrap_admin(args)
+    elif args.command == "onboard-policy":
+        from app.agents.policy_onboarding import PolicyOnboardingAgent
+        agent = PolicyOnboardingAgent()
+        vignettes = None
+        if args.vignettes:
+            from pathlib import Path
+            v_path = Path(args.vignettes)
+            if v_path.exists():
+                with open(v_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    vignettes = data if isinstance(data, list) else data.get("cases", [])
+        res = agent.onboard_policy(
+            cms_id=args.cms_id,
+            clinical_subject=args.subject,
+            test_vignettes=vignettes,
+            save_draft=not args.no_save
+        )
+        print(f"[*] Result Status: {res.status}")
+        print(f"[*] Message: {res.message}")
+        if res.status == "SOURCE_NOT_FOUND":
+            sys.exit(2)
+        elif res.status == "REJECTED_VERBATIM_FAILURE":
+            sys.exit(3)
+        else:
+            sys.exit(0)
     else:
         parser.print_help()
 

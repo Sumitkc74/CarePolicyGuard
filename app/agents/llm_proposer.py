@@ -109,12 +109,14 @@ class LLMProposalAgent:
         self,
         endpoint_url: Optional[str] = None,
         model_name: Optional[str] = None,
-        timeout_seconds: Optional[float] = None
+        timeout_seconds: Optional[float] = None,
+        availability_checker: Optional[Any] = None
     ):
         self.endpoint_url = endpoint_url or settings.LOCAL_LLM_URL
         self.model_name = model_name or settings.LOCAL_LLM_MODEL
         self.timeout_seconds = timeout_seconds or settings.LOCAL_LLM_TIMEOUT_SECONDS
         self.enabled = settings.ENABLE_LLM_PROPOSAL_STEP
+        self._availability_checker = availability_checker
         self.telemetry = {
             "total_calls": 0,
             "proposals_generated": 0,
@@ -129,6 +131,8 @@ class LLMProposalAgent:
         """Checks if local Ollama endpoint is reachable without sending clinical data."""
         if not self.enabled:
             return False
+        if self._availability_checker is not None:
+            return bool(self._availability_checker())
         try:
             # Query models endpoint using short timeout
             models_url = self.endpoint_url.replace("/chat/completions", "/models")
@@ -137,6 +141,11 @@ class LLMProposalAgent:
                 return resp.status_code == 200
         except Exception:
             return False
+
+    def _execute_network_request(self, payload: Dict[str, Any]) -> httpx.Response:
+        """Sends inference request to local Ollama endpoint (separately patchable)."""
+        with httpx.Client(timeout=self.timeout_seconds) as client:
+            return client.post(self.endpoint_url, json=payload)
 
     def propose_spans_sync(
         self,
@@ -201,14 +210,13 @@ class LLMProposalAgent:
         }
 
         try:
-            with httpx.Client(timeout=self.timeout_seconds) as client:
-                resp = client.post(self.endpoint_url, json=payload)
-                elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
+            resp = self._execute_network_request(payload)
+            elapsed_ms = round((time.perf_counter() - t0) * 1000, 2)
 
-                if resp.status_code != 200:
-                    return ProposalResult(([], f"SKIPPED_HTTP_{resp.status_code}", elapsed_ms))
+            if resp.status_code != 200:
+                return ProposalResult(([], f"SKIPPED_HTTP_{resp.status_code}", elapsed_ms))
 
-                data = resp.json()
+            data = resp.json()
             content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
             parsed = json.loads(content)
             raw_proposals = parsed.get("proposals", [])

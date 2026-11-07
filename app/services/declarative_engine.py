@@ -57,8 +57,8 @@ class DeclarativePolicyEngine:
         return dirs
 
     @classmethod
-    def load_policy(cls, policy_id: str) -> Optional[DeclarativePolicy]:
-        """Loads a DeclarativePolicy with automatic timestamp invalidation."""
+    def load_policy(cls, policy_id: str, allow_draft: bool = False) -> Optional[DeclarativePolicy]:
+        """Loads a DeclarativePolicy with automatic timestamp invalidation. Excludes DRAFT policies by default."""
         clean_id = policy_id.strip()
         file_path = cls.get_policies_dir() / f"{clean_id}.json"
         if not file_path.exists():
@@ -74,19 +74,24 @@ class DeclarativePolicyEngine:
             if clean_id in cls._POLICY_CACHE:
                 cached_mtime = cls._POLICY_CACHE_MTIME.get(clean_id, 0.0)
                 if current_mtime <= cached_mtime:
-                    return cls._POLICY_CACHE[clean_id]
+                    cached_pol = cls._POLICY_CACHE[clean_id]
+                    if not allow_draft and str(cached_pol.status).strip().upper() == "DRAFT":
+                        return None
+                    return cached_pol
 
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             policy = DeclarativePolicy(**data)
             cls._POLICY_CACHE[clean_id] = policy
             cls._POLICY_CACHE_MTIME[clean_id] = current_mtime
+            if not allow_draft and str(policy.status).strip().upper() == "DRAFT":
+                return None
             return policy
         except Exception:
             return None
 
     @classmethod
-    def get_all_policies(cls) -> List[DeclarativePolicy]:
+    def get_all_policies(cls, include_drafts: bool = False) -> List[DeclarativePolicy]:
         """Loads all available declarative policies from primary and extended JSON stores."""
         policies = []
         seen_ids = set()
@@ -94,7 +99,7 @@ class DeclarativePolicyEngine:
             if p_dir.exists():
                 for p_file in sorted(p_dir.glob("*.json")):
                     if p_file.stem not in seen_ids:
-                        pol = cls.load_policy(p_file.stem)
+                        pol = cls.load_policy(p_file.stem, allow_draft=include_drafts)
                         if pol:
                             policies.append(pol)
                             seen_ids.add(p_file.stem)
@@ -437,7 +442,19 @@ class DeclarativePolicyEngine:
                         confidence=0.90
                     )
                     spans.append(span_obj)
-                    if not scope["is_negated"]:
+                    if scope.get("is_family_history"):
+                        status = DeterminationStatus.NOT_MET
+                        raw_confidence = 0.90
+                        rationale = f"Documented finding was family history only, not patient condition ({term})."
+                        found = True
+                        break
+                    elif scope.get("is_hypothetical"):
+                        status = DeterminationStatus.NOT_MET
+                        raw_confidence = 0.90
+                        rationale = f"Documented finding is hypothetical or conditional ({term})."
+                        found = True
+                        break
+                    elif not scope["is_negated"]:
                         status = DeterminationStatus.MET
                         raw_confidence = 0.92
                         rationale = f"Clinical finding documented: '{term}'."

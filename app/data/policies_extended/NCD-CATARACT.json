@@ -123,9 +123,9 @@
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "VERIFIED_FROM_MCD",
+    "provenance_status": "MISMATCH",
     "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
+    "notes": "MCD document at NCD 10.1 governs 'Use of Visual Tests Prior to and General Anesthesia during Cataract Surgery', whereas policy subject is Cataract Extraction with Intraocular Lens (IOL) Implantation. Flagged as failing title-match rule; requires re-alignment.",
     "real_cms_id": "NCD 10.1 (MCD ncdid=60)",
     "authority": "CMS National Coverage Determination",
     "document_title": "Use of Visual Tests Prior to and General Anesthesia during Cataract Surgery",

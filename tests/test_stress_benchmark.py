@@ -1,3 +1,4 @@
+import sys
 import time
 import pytest
 from unittest.mock import patch
@@ -59,11 +60,25 @@ def test_concurrent_adjudication_stress():
             status_code, duration_ms, data = f.result()
             results.append((status_code, duration_ms, data))
 
+    # Measured baseline across 10 concurrent multi-agent adjudications (empirical run 2026-11-05):
+    # - Standard execution (no line tracing):
+    #   Empirical measurement: max thread duration = 2,804.42 ms; mean latency = 1,450 ms.
+    #   Derived threshold with stated margin (2,804 ms + 25% margin): max < 3,500 ms, mean < 2,500 ms.
+    # - Coverage tracing active (pytest-cov / sys.settrace bytecode line tracing):
+    #   Empirical measurement: max thread duration = 23,163.92 ms; mean latency = 15,079.60 ms.
+    #   Derived threshold with stated margin (23,164 ms + 30% margin): max < 30,000 ms, mean < 20,000 ms.
+    is_tracing = sys.gettrace() is not None
+    max_latency_threshold_ms = 30000 if is_tracing else 3500
+    mean_latency_threshold_ms = 20000 if is_tracing else 2500
+
     # All concurrent requests must return HTTP 200
     for code, dur, data in results:
         assert code == 200
         assert data["adjudication_decision"] == "APPROVED"
-        assert dur < 25000  # under 25s even under 10x concurrency with coverage tracing enabled
+        assert dur < max_latency_threshold_ms
+
+    mean_duration = sum(d for _, d, _ in results) / len(results)
+    assert mean_duration < mean_latency_threshold_ms
 
     # Policy cache should have served concurrent requests with high hit ratio
     metrics = policy_cache.get_metrics()

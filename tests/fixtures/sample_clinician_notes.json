@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "date": "2026-11-05",
+  "file_notice": "SYNTHETIC TEST DATA ONLY. These are author-written sample clinician notes for testing the CarePolicyGuard synonymy and adjudication behaviour. They are NOT real patient records, NOT clinician notes, and must never be presented as clinical ground truth or as validation data. The user has not obtained actual clinician notes. Every note below is labelled synthetic in its own text.",
+  "governing_rule": "Semantic equivalence (synonym, subtype, paraphrase, abbreviation for the same clinical concept) must be understood and must NOT by itself cause a deferral. Genuine ambiguity (whether a different clinical fact satisfies what a policy means) MUST defer to a human.",
+  "cases": [
+    {
+      "case_id": "SYN-01",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "synonymy: histology subtype (adenocarcinoma) for criterion term (cancer)",
+      "expected_criterion_outcome": "MET",
+      "expected_overall": "Must NOT defer for synonymy alone on this criterion",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with intermediate-risk prostate adenocarcinoma (Gleason 3+4=7, PSA 7.8). No distant metastatic disease.\nOBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%). The inverse IMRT plan achieves concave dose escalation to 78 Gy while reducing rectal V70 to 14% and bladder wall dose below mandatory constraints.\nASSESSMENT & PLAN: Clinically localized prostate malignancy requiring definitive radiation. Proceed with IMRT planning."
+    },
+    {
+      "case_id": "SYN-02",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "control: literal criterion wording (prostate cancer)",
+      "expected_criterion_outcome": "MET",
+      "expected_overall": "Must NOT defer for synonymy alone on this criterion",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with intermediate-risk prostate cancer (Gleason 3+4=7, PSA 7.8). No distant metastatic disease.\nOBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%). The inverse IMRT plan achieves concave dose escalation to 78 Gy while reducing rectal V70 to 14%.\nASSESSMENT & PLAN: Clinically localized prostate cancer requiring definitive radiation. Proceed with IMRT planning."
+    },
+    {
+      "case_id": "SYN-03",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "negation trap: negated adenocarcinoma must NOT satisfy the criterion",
+      "expected_criterion_outcome": "NOT_MET",
+      "expected_overall": "Must NOT approve on negated evidence",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male referred for rising PSA. Prostate biopsy shows no evidence of prostate adenocarcinoma and no malignancy identified. Benign prostatic hyperplasia noted.\nOBJECTIVE: PSA 7.8, stable. No distant metastatic disease.\nASSESSMENT & PLAN: No prostate cancer found. IMRT not indicated. Continue surveillance."
+    },
+    {
+      "case_id": "SYN-04",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "subject trap: family history of prostate cancer must NOT satisfy the criterion (wrong experiencer)",
+      "expected_criterion_outcome": "NOT_MET",
+      "expected_overall": "Must NOT approve on family history",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with lower urinary tract symptoms. Father had prostate cancer diagnosed at age 70. Patient himself has no known malignancy.\nOBJECTIVE: PSA 7.8. Prostate exam unremarkable. No distant metastatic disease.\nASSESSMENT & PLAN: Benign symptoms. Father's history of prostate cancer noted for risk assessment only. No IMRT indication for the patient."
+    },
+    {
+      "case_id": "SYN-05",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "near-miss: adenocarcinoma of a DIFFERENT organ (lung) must NOT satisfy a prostate criterion",
+      "expected_criterion_outcome": "NOT_MET",
+      "expected_overall": "Must NOT approve on wrong-organ subtype match",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with biopsy-proven lung adenocarcinoma, stage II, currently receiving chemotherapy. No prostate disease. PSA normal.\nOBJECTIVE: Chest imaging shows a 3 cm right upper lobe mass. No distant metastatic disease beyond the lung.\nASSESSMENT & PLAN: Lung adenocarcinoma under treatment. No prostate malignancy. IMRT for prostate cancer not indicated."
+    },
+    {
+      "case_id": "SYN-06",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "genuine ambiguity: rectal sparing vs criterion written as 'adjacent to spinal cord' — a coverage judgment, not a wording difference",
+      "expected_criterion_outcome": "DEFER",
+      "expected_overall": "MUST defer to a human; the LLM or the engine must not decide that rectal sparing satisfies a spinal-cord criterion",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with intermediate-risk prostate adenocarcinoma (Gleason 3+4=7, PSA 7.8). No distant metastatic disease.\nOBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%). The inverse IMRT plan achieves concave dose escalation to 78 Gy while reducing rectal V70 to 14% and bladder wall dose below mandatory constraints. No mention of spinal cord proximity.\nASSESSMENT & PLAN: Clinically localized prostate malignancy. Question: does rectal dose sparing satisfy a criterion written for tumours adjacent to the spinal cord? Referred for human review."
+    },
+    {
+      "case_id": "SYN-07",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "hypothetical trap: possible future IMRT must NOT satisfy the criterion",
+      "expected_criterion_outcome": "NOT_MET",
+      "expected_overall": "Must NOT approve on hypothetical/speculative evidence",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with rising PSA, biopsy pending. If prostate cancer is confirmed, IMRT would be considered.\nOBJECTIVE: PSA 7.8. No distant metastatic disease.\nASSESSMENT & PLAN: Awaiting biopsy results. IMRT may be discussed if malignancy is found. No treatment decision at this time."
+    },
+    {
+      "case_id": "SYN-08",
+      "policy_id": "NCD-CATARACT",
+      "criterion_code": "CRIT-CAT-01",
+      "tests": "synonymy/paraphrase: lens opacity and glare for cataract; visual acuity value for severity",
+      "expected_criterion_outcome": "MET",
+      "expected_overall": "Must NOT defer for synonymy alone on this criterion",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Ophthalmology\nSUBJECTIVE: 74-year-old female with progressive clouding of vision in the right eye over 8 months. Reports disabling glare while driving at night and difficulty reading.\nOBJECTIVE: Visual acuity right eye 20/200, left eye 20/40. Slit-lamp examination shows a dense lens opacity in the right eye with nuclear sclerosis. No other ocular disease.\nASSESSMENT & PLAN: Symptomatic lens opacity with significant visual impairment. Cataract extraction with intraocular lens implantation planned for the right eye."
+    },
+    {
+      "case_id": "SYN-09",
+      "policy_id": "LCD-ESI",
+      "criterion_code": "CRIT-ESI-01",
+      "tests": "paraphrase: 'tried physical therapy and anti-inflammatory tablets for six weeks without relief' for 'failure of conservative care'",
+      "expected_criterion_outcome": "MET",
+      "expected_overall": "Must NOT defer for paraphrase alone on this criterion",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Pain Management\nSUBJECTIVE: 58-year-old with severe shooting pain down the left leg into the foot, present for 3 months. Tried physical therapy and anti-inflammatory tablets for six weeks without relief. Pain limits walking to one block.\nOBJECTIVE: Positive straight-leg raise on the left at 40 degrees. Lumbar MRI shows L5-S1 disc herniation compressing the left S1 nerve root.\nASSESSMENT & PLAN: Lumbar radiculopathy from disc herniation, refractory to conservative measures. Epidural steroid injection planned."
+    },
+    {
+      "case_id": "SYN-10",
+      "policy_id": "LCD-KNEE-ORTHOSIS",
+      "criterion_code": "CRIT-KORTH-01",
+      "tests": "paraphrase: 'knee gives way' and 'varus deformity' for instability and deformity criteria",
+      "expected_criterion_outcome": "MET",
+      "expected_overall": "Must NOT defer for paraphrase alone on this criterion",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedics\nSUBJECTIVE: 63-year-old with medial knee osteoarthritis. Knee gives way several times a week and pain limits walking. Bracing tried without success.\nOBJECTIVE: Varus deformity of the right knee, 8 degrees. Medial joint space narrowing on weight-bearing X-ray. Knee unstable on stress testing.\nASSESSMENT & PLAN: Symptomatic medial knee osteoarthritis with instability and varus deformity. Custom-fabricated functional knee orthosis planned."
+    },
+    {
+      "case_id": "SYN-11",
+      "policy_id": "LCD-ESI",
+      "criterion_code": "CRIT-ESI-01",
+      "tests": "negation + paraphrase combined: conservative care NOT yet tried — must NOT satisfy a 'failure of conservative care' criterion",
+      "expected_criterion_outcome": "NOT_MET",
+      "expected_overall": "Must NOT approve where the required prior treatment is absent",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Pain Management\nSUBJECTIVE: 58-year-old with shooting pain down the left leg for 2 weeks. Has not yet tried physical therapy or anti-inflammatory medication. Wants an injection promptly.\nOBJECTIVE: Positive straight-leg raise on the left. Lumbar MRI shows L5-S1 disc herniation compressing the left S1 nerve root.\nASSESSMENT & PLAN: Lumbar radiculopathy. Conservative measures not yet attempted. Epidural steroid injection requested but prior conservative care is required first."
+    },
+    {
+      "case_id": "SYN-12",
+      "policy_id": "LCD-IMRT",
+      "criterion_code": "CRIT-IMRT-01",
+      "tests": "abbreviation: 'Ca prostate' / 'PCa' style shorthand for prostate cancer",
+      "expected_criterion_outcome": "MET",
+      "expected_overall": "Must NOT defer for abbreviation alone on this criterion",
+      "ehr_narrative": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Radiation Oncology\nSUBJECTIVE: 66-year-old male with intermediate-risk Ca prostate (Gleason 3+4=7, PSA 7.8). No distant metastatic disease.\nOBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%). The inverse IMRT plan achieves concave dose escalation to 78 Gy while reducing rectal V70 to 14%.\nASSESSMENT & PLAN: Clinically localized Ca prostate requiring definitive radiation. Proceed with IMRT planning."
+    }
+  ]
+}
