@@ -1,5 +1,5 @@
 import os
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from fastapi import FastAPI, Depends, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -12,7 +12,7 @@ from app.db.session import engine, SessionLocal, Base, get_db
 from app.db.seed import seed_database
 from app.api.routes import api_router
 
-@asynccontextmanager
+@contextmanager
 def startup_db_lock():
     lock_file = None
     try:
