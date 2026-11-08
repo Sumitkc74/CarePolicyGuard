@@ -175,9 +175,10 @@ class MultiAgentVerificationPipeline:
             for crit in criteria_defs:
                 decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
                 assessment = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
-                # If deterministic match missed and LLM proposer is enabled, trigger runtime synonymy conversation
+                # If deterministic match missed an inclusion criterion and LLM proposer is enabled, trigger runtime synonymy conversation
                 if (
-                    assessment.status in [DeterminationStatus.INSUFFICIENT_EVIDENCE, DeterminationStatus.NOT_MET]
+                    not decl_crit.is_exclusion
+                    and assessment.status in [DeterminationStatus.INSUFFICIENT_EVIDENCE, DeterminationStatus.NOT_MET]
                     and getattr(self.llm_proposer, "enabled", False)
                     and hasattr(self.llm_proposer, "run_synonymy_conversation")
                 ):

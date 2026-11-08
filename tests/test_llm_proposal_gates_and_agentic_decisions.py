@@ -507,3 +507,97 @@ def test_agentic_pipeline_e2e_adjudication():
     assert res.llm_proposal_metadata is not None
     assert "enabled" in res.llm_proposal_metadata
     assert "model" in res.llm_proposal_metadata
+
+
+def test_gate_a_quote_exists_with_wrong_llm_offsets_passes():
+    """
+    Task 1: If local LLM returns incorrect character offsets (e.g. 0,0 or 999,1020),
+    Gate A must re-anchor to the system-located verbatim span and pass Gate A.
+    """
+    proposer = LLMProposalAgent()
+    narrative = "Clinical Progress Note: Patient has documented severe aortic stenosis with AVA 0.65 cm2."
+    crit_def = {
+        "criterion_code": "CRIT-AS-01",
+        "name": "Aortic Valve Area",
+        "keywords": "aortic stenosis, ava"
+    }
+    target_quote = "aortic stenosis"
+
+    # LLM provided completely wrong character offsets (e.g. 0, 10 or 999, 1014)
+    proposal_wrong_offsets = LLMProposedSpan(
+        criterion_code="CRIT-AS-01",
+        proposed_status=DeterminationStatus.MET,
+        claimed_text=target_quote,
+        char_start=0,
+        char_end=10,  # actual slice at 0..10 is 'Clinical P'
+        claimed_equivalence="exact match",
+        rationale="Found in narrative."
+    )
+
+    res = proposer.evaluate_proposal_through_gates(
+        proposal=proposal_wrong_offsets,
+        sanitized_ehr=narrative,
+        criterion=crit_def
+    )
+
+    # Gate A exact slice check passed because system located the true span
+    assert res.failing_gate != "GATE_A_EXACT_SLICE"
+    assert proposal_wrong_offsets.char_start == narrative.find(target_quote)
+    assert proposal_wrong_offsets.char_end == proposal_wrong_offsets.char_start + len(target_quote)
+    assert narrative[proposal_wrong_offsets.char_start:proposal_wrong_offsets.char_end] == target_quote
+
+
+def test_gate_a_hallucinated_quote_fails():
+    """
+    Task 1: If local LLM hallucinates a quote not present anywhere in the narrative,
+    Gate A must strictly reject it with GATE_A_EXACT_SLICE.
+    """
+    proposer = LLMProposalAgent()
+    narrative = "Clinical Progress Note: Patient has documented severe aortic stenosis with AVA 0.65 cm2."
+    crit_def = {
+        "criterion_code": "CRIT-AS-01",
+        "name": "Aortic Valve Area",
+        "keywords": "aortic stenosis, ava"
+    }
+
+    hallucinated_proposal = LLMProposedSpan(
+        criterion_code="CRIT-AS-01",
+        proposed_status=DeterminationStatus.MET,
+        claimed_text="patient exhibits severe mitral regurgitation grade 4",
+        char_start=0,
+        char_end=0,
+        claimed_equivalence="fabricated finding",
+        rationale="Hallucinated clinical finding."
+    )
+
+    res = proposer.evaluate_proposal_through_gates(
+        proposal=hallucinated_proposal,
+        sanitized_ehr=narrative,
+        criterion=crit_def
+    )
+
+    assert not res.passed
+    assert res.failed_gate == "GATE_A_EXACT_SLICE"
+    assert "hallucinated" in res.rejection_reason.lower()
+
+
+def test_locate_claimed_span_multiple_occurrences_deterministic():
+    """
+    Task 1: If claimed_text appears multiple times in note, locate_claimed_span
+    deterministically prefers the affirmative patient context over a negated or family context.
+    """
+    # Occurrence 1: clinically negated ("denies chest pain")
+    # Occurrence 2: affirmative patient finding ("documented severe chest pain on exertion")
+    narrative = (
+        "Review of Systems: Patient denies chest pain at rest. "
+        "Physical Exam: Patient has documented severe chest pain on exertion during treadmill testing."
+    )
+
+    claimed = "chest pain"
+    s, e = LLMProposalAgent.locate_claimed_span(narrative, claimed)
+
+    # Must select the second occurrence because the first is negated by 'denies'
+    assert narrative[s:e] == claimed
+    second_idx = narrative.rfind(claimed)
+    assert s == second_idx
+    assert e == second_idx + len(claimed)

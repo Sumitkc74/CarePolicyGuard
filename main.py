@@ -13,6 +13,28 @@ from app.db.seed import seed_database
 from app.api.routes import api_router
 
 @asynccontextmanager
+def startup_db_lock():
+    lock_file = None
+    try:
+        if os.name != "nt":
+            import fcntl
+            lock_path = "/tmp/carepolicyguard_db_init.lock"
+            lock_file = open(lock_path, "w")
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        yield
+    except Exception as lock_err:
+        print(f"[-] Startup DB lock warning: {lock_err}")
+        yield
+    finally:
+        if lock_file:
+            try:
+                import fcntl
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+                lock_file.close()
+            except Exception:
+                pass
+
+@asynccontextmanager
 async def lifespan(app: FastAPI):
     # Configure HIPAA-compliant structured JSON logging
     configure_structured_logging()
@@ -25,103 +47,116 @@ async def lifespan(app: FastAPI):
             "Generate one using: python -c 'import secrets; print(secrets.token_urlsafe(48))'"
         )
 
-    # 1. Startup: Create DB schema & seed CMS policies and demo credentials
-    print(f"[*] Initializing {settings.PROJECT_NAME} v{settings.VERSION}...")
-    Base.metadata.create_all(bind=engine)
-    
-    # Ensure SQLite columns for User model are present in existing DB files
-    try:
-        from sqlalchemy import text
-        with engine.connect() as conn:
-            res = conn.execute(text("PRAGMA table_info(users)"))
-            cols = [r[1] for r in res.fetchall()]
-            new_cols = [
-                ("full_name", "VARCHAR(150)"),
-                ("npi_number", "VARCHAR(20)"),
-                ("medical_license", "VARCHAR(50)"),
-                ("license_state", "VARCHAR(10)"),
-                ("credential_title", "VARCHAR(50)"),
-                ("specialty", "VARCHAR(100)"),
-                ("organization", "VARCHAR(150)"),
-                ("is_verified_medical_pro", "BOOLEAN DEFAULT 0"),
-                ("verification_method", "VARCHAR(100)"),
-                ("mfa_enabled_methods", "VARCHAR(100) DEFAULT 'email_otp'"),
-                ("oauth_provider", "VARCHAR(50)"),
-                ("oauth_sub", "VARCHAR(255)"),
-                ("is_demo_user", "BOOLEAN DEFAULT 0"),
-                ("is_bootstrap", "BOOLEAN DEFAULT 0"),
-                ("must_change_password", "BOOLEAN DEFAULT 0"),
-                ("must_setup_mfa", "BOOLEAN DEFAULT 0"),
-                ("provisioned_by", "VARCHAR(150)"),
-                ("verified_at", "TIMESTAMP"),
-                ("verified_by", "VARCHAR(150)"),
-                ("verification_reference", "VARCHAR(150)"),
-                ("verification_expires_at", "TIMESTAMP")
-            ]
-            for col_name, col_type in new_cols:
-                if cols and col_name not in cols:
-                    conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"))
-
-            res_adj = conn.execute(text("PRAGMA table_info(adjudication_logs)"))
-            adj_cols = [r[1] for r in res_adj.fetchall()]
-            new_adj_cols = [
-                ("determination_stage", "VARCHAR(50) DEFAULT 'PROVISIONAL'"),
-                ("is_releasable", "BOOLEAN DEFAULT 0"),
-                ("human_sign_off_status", "VARCHAR(50) DEFAULT 'PENDING_CLINICAL_SIGN_OFF'"),
-                ("signer_npi", "VARCHAR(20)"),
-                ("signer_credentials", "VARCHAR(50)"),
-                ("full_adjudication_json", "TEXT"),
-                ("full_packet_json", "TEXT"),
-                ("full_ehr_text", "TEXT"),
-                ("original_system_output_json", "TEXT")
-            ]
-            for col_name, col_type in new_adj_cols:
-                if adj_cols and col_name not in adj_cols:
-                    conn.execute(text(f"ALTER TABLE adjudication_logs ADD COLUMN {col_name} {col_type}"))
-            conn.commit()
-    except Exception as mig_err:
-        print(f"[-] SQLite migration notice: {mig_err}")
-
-    db = SessionLocal()
-    try:
-        seed_database(db)
-        print("[+] Database schema verified and Medicare policies pre-seeded successfully.")
-
-        # Task 1 & Task 4 Security Hardening & Downgrade Migrations
-        from app.core.bootstrap import (
-            audit_self_registered_admins,
-            bootstrap_production_admin,
-            is_production_admin_seeded,
-            migrate_legacy_unverified_clinicians,
-        )
-
-        # 1. Audit and suspend any legacy self-registered admin accounts
-        flagged_admins = audit_self_registered_admins(db)
-        if flagged_admins:
-            print(f"[!] Security Notice: Flagged and suspended {len(flagged_admins)} legacy self-registered Admin accounts.")
-
-        # 2. Downgrade legacy format-only and OAuth-verified clinicians to pending (unverified)
-        downgraded = migrate_legacy_unverified_clinicians(db)
-        if downgraded:
-            print(f"[*] Security Migration: Downgraded {len(downgraded)} legacy self-asserted/OAuth clinicians to unverified pending primary-source review.")
-
-        # 3. Environment-driven First-Admin Bootstrap (if configured and not already seeded)
-        if settings.BOOTSTRAP_ADMIN_EMAIL and settings.BOOTSTRAP_ADMIN_PASSWORD:
-            if not is_production_admin_seeded(db):
-                bootstrap_production_admin(
-                    db=db,
-                    email=settings.BOOTSTRAP_ADMIN_EMAIL,
-                    password=settings.BOOTSTRAP_ADMIN_PASSWORD
-                )
-                print(f"[+] Production bootstrap admin created for '{settings.BOOTSTRAP_ADMIN_EMAIL}'.")
+    # 1. Startup: Create DB schema & seed CMS policies and demo credentials with cross-process serialization
+    with startup_db_lock():
+        print(f"[*] Initializing {settings.PROJECT_NAME} v{settings.VERSION}...")
+        try:
+            Base.metadata.create_all(bind=engine)
+        except Exception as ddl_err:
+            if "already exists" in str(ddl_err).lower():
+                pass
             else:
-                print("[*] Production admin already exists; environment bootstrap is closed.")
-    except Exception as e:
-        print(f"[-] Database seeding warning: {e}")
-        if settings.SEED_DEMO_USERS:
-            raise e
-    finally:
-        db.close()
+                raise ddl_err
+        
+        # Ensure SQLite columns for User model are present in existing DB files
+        try:
+            from sqlalchemy import text
+            with engine.connect() as conn:
+                res = conn.execute(text("PRAGMA table_info(users)"))
+                cols = [r[1] for r in res.fetchall()]
+                new_cols = [
+                    ("full_name", "VARCHAR(150)"),
+                    ("npi_number", "VARCHAR(20)"),
+                    ("medical_license", "VARCHAR(50)"),
+                    ("license_state", "VARCHAR(10)"),
+                    ("credential_title", "VARCHAR(50)"),
+                    ("specialty", "VARCHAR(100)"),
+                    ("organization", "VARCHAR(150)"),
+                    ("is_verified_medical_pro", "BOOLEAN DEFAULT 0"),
+                    ("verification_method", "VARCHAR(100)"),
+                    ("mfa_enabled_methods", "VARCHAR(100) DEFAULT 'email_otp'"),
+                    ("oauth_provider", "VARCHAR(50)"),
+                    ("oauth_sub", "VARCHAR(255)"),
+                    ("is_demo_user", "BOOLEAN DEFAULT 0"),
+                    ("is_bootstrap", "BOOLEAN DEFAULT 0"),
+                    ("must_change_password", "BOOLEAN DEFAULT 0"),
+                    ("must_setup_mfa", "BOOLEAN DEFAULT 0"),
+                    ("provisioned_by", "VARCHAR(150)"),
+                    ("verified_at", "TIMESTAMP"),
+                    ("verified_by", "VARCHAR(150)"),
+                    ("verification_reference", "VARCHAR(150)"),
+                    ("verification_expires_at", "TIMESTAMP")
+                ]
+                for col_name, col_type in new_cols:
+                    if cols and col_name not in cols:
+                        try:
+                            conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"))
+                        except Exception:
+                            pass
+
+                res_adj = conn.execute(text("PRAGMA table_info(adjudication_logs)"))
+                adj_cols = [r[1] for r in res_adj.fetchall()]
+                new_adj_cols = [
+                    ("determination_stage", "VARCHAR(50) DEFAULT 'PROVISIONAL'"),
+                    ("is_releasable", "BOOLEAN DEFAULT 0"),
+                    ("human_sign_off_status", "VARCHAR(50) DEFAULT 'PENDING_CLINICAL_SIGN_OFF'"),
+                    ("signer_npi", "VARCHAR(20)"),
+                    ("signer_credentials", "VARCHAR(50)"),
+                    ("full_adjudication_json", "TEXT"),
+                    ("full_packet_json", "TEXT"),
+                    ("full_ehr_text", "TEXT"),
+                    ("original_system_output_json", "TEXT")
+                ]
+                for col_name, col_type in new_adj_cols:
+                    if adj_cols and col_name not in adj_cols:
+                        try:
+                            conn.execute(text(f"ALTER TABLE adjudication_logs ADD COLUMN {col_name} {col_type}"))
+                        except Exception:
+                            pass
+                conn.commit()
+        except Exception as mig_err:
+            print(f"[-] SQLite migration notice: {mig_err}")
+
+        db = SessionLocal()
+        try:
+            seed_database(db)
+            print("[+] Database schema verified and Medicare policies pre-seeded successfully.")
+
+            # Task 1 & Task 4 Security Hardening & Downgrade Migrations
+            from app.core.bootstrap import (
+                audit_self_registered_admins,
+                bootstrap_production_admin,
+                is_production_admin_seeded,
+                migrate_legacy_unverified_clinicians,
+            )
+
+            # 1. Audit and suspend any legacy self-registered admin accounts
+            flagged_admins = audit_self_registered_admins(db)
+            if flagged_admins:
+                print(f"[!] Security Notice: Flagged and suspended {len(flagged_admins)} legacy self-registered Admin accounts.")
+
+            # 2. Downgrade legacy format-only and OAuth-verified clinicians to pending (unverified)
+            downgraded = migrate_legacy_unverified_clinicians(db)
+            if downgraded:
+                print(f"[*] Security Migration: Downgraded {len(downgraded)} legacy self-asserted/OAuth clinicians to unverified pending primary-source review.")
+
+            # 3. Environment-driven First-Admin Bootstrap (if configured and not already seeded)
+            if settings.BOOTSTRAP_ADMIN_EMAIL and settings.BOOTSTRAP_ADMIN_PASSWORD:
+                if not is_production_admin_seeded(db):
+                    bootstrap_production_admin(
+                        db=db,
+                        email=settings.BOOTSTRAP_ADMIN_EMAIL,
+                        password=settings.BOOTSTRAP_ADMIN_PASSWORD
+                    )
+                    print(f"[+] Production bootstrap admin created for '{settings.BOOTSTRAP_ADMIN_EMAIL}'.")
+                else:
+                    print("[*] Production admin already exists; environment bootstrap is closed.")
+        except Exception as e:
+            print(f"[-] Database seeding warning: {e}")
+            if settings.SEED_DEMO_USERS:
+                raise e
+        finally:
+            db.close()
 
     yield
 

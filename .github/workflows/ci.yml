@@ -88,12 +88,12 @@ jobs:
             carepolicyguard:latest
 
           # 3. Microservice health endpoint verification with startup polling
-          for i in $(seq 1 15); do
+          for i in $(seq 1 30); do
             if curl -s -f http://localhost:8000/health > /dev/null 2>&1; then
               echo "PASS: Container healthcheck responding"
               break
             fi
-            echo "Waiting for container startup (attempt $i/15)..."
+            echo "Waiting for container startup (attempt $i/30)..."
             sleep 1
           done
 

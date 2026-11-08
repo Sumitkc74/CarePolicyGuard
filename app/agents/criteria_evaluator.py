@@ -487,7 +487,7 @@ class CriteriaEvaluationAgent:
             
             # Check for Quantified Aortic Stenosis (TAVR)
             ava_m = re.search(r'(?i)\b(?:aortic valve area|ava)\s*(?:\(ava\))?\s*(?:is|of|:)?\s*([<>]?=?\s*(\d+(?:\.\d+)?))\s*(?:cm2|cm²)?\b', ehr_text)
-            grad_m = re.search(r'(?i)\b(?:mean (?:transvalvular )?gradient)\s*(?:is|of|:)?\s*([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*mm\s*hg\b', ehr_text)
+            grad_m = re.search(r'(?i)\b(?:mean (?:transvalvular )?gradient)\s*(?:is|of|:)?\s*([<>]?=?\s*(\d{1,5}(?:\.\d+)?))\s*mm\s*hg\b', ehr_text)
             vel_m = re.search(r'(?i)\b(?:peak (?:aortic )?velocity|vmax|peak velocity)\s*(?:is|of|:)?\s*([<>]?=?\s*(\d+(?:\.\d+)?))\s*m\/s\b', ehr_text)
 
             ava_val = float(ava_m.group(2)) if ava_m else None

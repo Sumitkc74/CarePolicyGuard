@@ -226,20 +226,28 @@ class DeclarativePolicyEngine:
             # Strategy 0: Dedicated clinical score extraction for score-based scales (e.g. CHA2DS2-VASc score is 4, HAS-BLED: 3)
             score_terms = [t for t in search_terms if "cha" in t.lower() or "bled" in t.lower() or "score" in t.lower()]
             if score_terms:
-                score_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in score_terms) + r')\b(?:\s*score)?\s*(?:calculated at|is|of|:|=)?\s*(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,2}(?:\.\d+)?))(?![a-zA-Z0-9])'
+                score_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in score_terms) + r')\b(?:\s*score)?\s*(?:calculated at|is|of|:|=)?\s*(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,5}(?:\.\d+)?))(?![a-zA-Z0-9])'
                 for m_cand in re.finditer(score_pattern, ehr_text):
                     metric_candidates.append(m_cand)
 
-            # Strategy 1: Look for matches anchored to the specific target_unit (events/hr, %, mmHg, cm2, points)
+            # Strategy 0b: Prefix-number extraction where metric value immediately precedes entity keywords (e.g. "18 headache days per month", "18 headache days")
+            if not metric_candidates:
+                prefix_terms_pattern = r'(?i)(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,5}(?:\.\d+)?))\s*(?:total\s*)?\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')\b'
+                for m_cand in re.finditer(prefix_terms_pattern, ehr_text):
+                    if ClinicalNumericParser.is_date_pattern(ehr_text, m_cand.start(2), m_cand.end(2)):
+                        continue
+                    metric_candidates.append(m_cand)
+
+            # Strategy 1: Look for matches anchored to the specific target_unit (events/hr, %, mmHg, cm2, points, ms)
             if not metric_candidates and target_unit and target_unit.lower() != "points":
                 escaped_unit = re.escape(target_unit)
-                unit_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))\s*' + escaped_unit + r'(?![a-zA-Z0-9])'
+                unit_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,5}(?:\.\d+)?))\s*' + escaped_unit + r'(?![a-zA-Z0-9])'
                 for m_cand in re.finditer(unit_pattern, ehr_text):
                     metric_candidates.append(m_cand)
 
             # Strategy 2: Look for core metric tokens directly adjacent to values, skipping date patterns via ClinicalNumericParser
             if not metric_candidates and core_metrics:
-                core_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in core_metrics) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))(?![a-zA-Z0-9])'
+                core_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in core_metrics) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,5}(?:\.\d+)?))(?![a-zA-Z0-9])'
                 for m_cand in re.finditer(core_pattern, ehr_text):
                     if ClinicalNumericParser.is_date_pattern(ehr_text, m_cand.start(2), m_cand.end(2)):
                         continue
@@ -247,7 +255,7 @@ class DeclarativePolicyEngine:
 
             # Strategy 3: General fallback search across all synonyms, filtering out date-shaped numbers via ClinicalNumericParser
             if not metric_candidates:
-                fallback_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,3}(?:\.\d+)?))(?![a-zA-Z0-9])\s*([%a-zA-Z/]*)'
+                fallback_pattern = r'(?i)\b(?:' + '|'.join(re.escape(t) for t in search_terms) + r')\b[^\d\n\.]*?(?<![a-zA-Z0-9])([<>]?=?\s*(\d{1,5}(?:\.\d+)?))(?![a-zA-Z0-9])\s*([%a-zA-Z/]*)'
                 for m_cand in re.finditer(fallback_pattern, ehr_text):
                     if ClinicalNumericParser.is_date_pattern(ehr_text, m_cand.start(2), m_cand.end(2)):
                         continue
@@ -346,24 +354,25 @@ class DeclarativePolicyEngine:
                         rationale = f"Non-qualifying stage: {found_rank} not in qualifying list {allowed}."
 
         elif criterion.criterion_type == CriterionType.TEMPORAL_DURATION:
+            unit_alt = r'((?:day|week|month|year)s?)'
             search_terms = list(criterion.entity_names) + ["therapy", "treatment", "management", "care", "gdmt"] if criterion.entity_names else ["therapy", "treatment", "management", "care", "gdmt"]
             terms_alt = '|'.join(re.escape(t) for t in search_terms)
             min_req = criterion.min_duration_days or 90
             
-            # Pass 1: Stated therapy duration (e.g., "for 35 days", "35 days of wound therapy")
-            m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*(days|weeks|months|years)', ehr_text)
+            # Pass 1: Stated therapy duration (e.g., "for 35 days", "35 days of wound therapy", "for 1 year")
+            m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(?:for\s+)?(?:[><=~]+\s*)?(\d+)\s*' + unit_alt + r'\b', ehr_text)
             if not m:
-                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months|years)\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
+                m = re.search(r'(?i)\b(\d+)\s*' + unit_alt + r'\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
             
             # Pass 2: Relative-date elapsed / waiting period (e.g., "13 days post-acute MI", "3 years ago", "14 months ago", "13 days elapsed")
             if not m:
-                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months|years)\s*(?:post[- ]|after|since|elapsed|ago)\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
+                m = re.search(r'(?i)\b(\d+)\s*' + unit_alt + r'\s*(?:post[- ]|after|since|elapsed|ago)\b[^\n\.]*?\b(?:' + terms_alt + r')\b', ehr_text)
             if not m:
-                m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(\d+)\s*(days|weeks|months|years)\s*(?:post[- ]|after|since|elapsed|ago)\b', ehr_text)
+                m = re.search(r'(?i)\b(?:' + terms_alt + r')[^\n\.]*?\b(\d+)\s*' + unit_alt + r'\s*(?:post[- ]|after|since|elapsed|ago)\b', ehr_text)
             if not m:
-                m = re.search(r'(?i)\b(?:currently\s+)?(\d+)\s*(days|weeks|months|years)\s*(?:post[- ]acute|post[- ]|elapsed)\b', ehr_text)
+                m = re.search(r'(?i)\b(?:currently\s+)?(\d+)\s*' + unit_alt + r'\s*(?:post[- ]acute|post[- ]|elapsed)\b', ehr_text)
             if not m:
-                m = re.search(r'(?i)\b(\d+)\s*(days|weeks|months|years)\s*elapsed\b', ehr_text)
+                m = re.search(r'(?i)\b(\d+)\s*' + unit_alt + r'\s*elapsed\b', ehr_text)
 
             if m:
                 count = int(m.group(1))

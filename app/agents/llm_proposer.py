@@ -164,6 +164,38 @@ class LLMProposalAgent:
         with httpx.Client(timeout=self.timeout_seconds) as client:
             return client.post(self.endpoint_url, json=payload)
 
+    @staticmethod
+    def locate_claimed_span(text: str, claimed_text: str) -> Tuple[int, int]:
+        """
+        Locates a verbatim claimed substring in the clinical note deterministically.
+        If claimed_text is absent or empty: returns (-1, -1).
+        If multiple occurrences: selects the first occurrence that is NOT clinically negated
+        and has patient experiencer; if none or all match, selects the first occurrence in document order.
+        """
+        if not claimed_text or claimed_text not in text:
+            return -1, -1
+        occurrences: List[Tuple[int, int]] = []
+        pos = 0
+        while True:
+            idx = text.find(claimed_text, pos)
+            if idx == -1:
+                break
+            occurrences.append((idx, idx + len(claimed_text)))
+            pos = idx + 1
+
+        if len(occurrences) == 1:
+            return occurrences[0]
+
+        # Deterministic multi-occurrence tie-breaker:
+        # Prefer the first occurrence with affirmative patient context (not negated, PATIENT experiencer)
+        for s_idx, e_idx in occurrences:
+            scope = ClinicalScopeAnalyzer.analyze_scope(text, s_idx, e_idx)
+            if not scope.get("is_negated", False) and scope.get("experiencer", "PATIENT") == "PATIENT":
+                return s_idx, e_idx
+
+        # Deterministic fallback: document order (first occurrence)
+        return occurrences[0]
+
     def propose_spans_sync(
         self,
         sanitized_ehr: Optional[str] = None,
@@ -215,16 +247,14 @@ class LLMProposalAgent:
             f"TASK:\n"
             f"Find any verbatim substring in the clinical note that provides evidence expressing the SAME CLINICAL CONCEPT (synonym, subtype, paraphrase, abbreviation) as this criterion.\n"
             f"You must NOT claim that a different clinical condition or different organ satisfies the policy. Only wording variations for the same clinical concept.\n"
-            f"You MUST provide the exact substring and its 0-indexed character offsets (char_start, char_end).\n"
+            f"You MUST provide the exact verbatim substring (claimed_text) copied directly from the clinical note.\n"
             f"Return ONLY valid JSON matching this schema:\n"
             f"{{\n"
             f"  \"proposals\": [\n"
             f"    {{\n"
             f"      \"criterion_code\": \"{ccode}\",\n"
             f"      \"proposed_status\": \"MET\" or \"NOT_MET\",\n"
-            f"      \"claimed_text\": \"exact substring from note\",\n"
-            f"      \"char_start\": 0,\n"
-            f"      \"char_end\": 10,\n"
+            f"      \"claimed_text\": \"exact verbatim substring from note\",\n"
             f"      \"claimed_equivalence\": \"clinical relationship (e.g. adenocarcinoma is a subtype of prostate cancer)\",\n"
             f"      \"numeric_value\": float or null,\n"
             f"      \"numeric_unit\": string or null,\n"
@@ -238,7 +268,8 @@ class LLMProposalAgent:
             "model": self.model_name,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.0,
-            "response_format": {"type": "json_object"}
+            "response_format": {"type": "json_object"},
+            "max_tokens": 350
         }
 
         try:
@@ -255,7 +286,24 @@ class LLMProposalAgent:
 
             data = resp.json()
             content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
-            parsed = json.loads(content)
+            try:
+                parsed = json.loads(content)
+            except Exception:
+                import re as _re
+                m_quote = _re.search(r'"claimed_text":\s*"([^"]+)"', content)
+                m_equiv = _re.search(r'"claimed_equivalence":\s*"([^"]+)"', content)
+                m_status = _re.search(r'"proposed_status":\s*"([^"]+)"', content)
+                if m_quote:
+                    parsed = {
+                        "proposals": [{
+                            "criterion_code": ccode,
+                            "claimed_text": m_quote.group(1),
+                            "claimed_equivalence": m_equiv.group(1) if m_equiv else "",
+                            "proposed_status": m_status.group(1) if m_status else "MET"
+                        }]
+                    }
+                else:
+                    parsed = {}
             raw_proposals = parsed.get("proposals", [])
             if not raw_proposals and isinstance(parsed, dict) and "claimed_text" in parsed:
                 raw_proposals = [parsed]
@@ -263,12 +311,14 @@ class LLMProposalAgent:
             proposals = []
             for p in raw_proposals:
                 if isinstance(p, dict) and p.get("claimed_text"):
-                    claimed = str(p.get("claimed_text", ""))
-                    start = p.get("char_start")
-                    end = p.get("char_end")
-                    if start is None or end is None:
-                        start = ehr_text.find(claimed)
-                        end = start + len(claimed) if start != -1 else 0
+                    claimed = str(p.get("claimed_text", "")).strip()
+                    if not claimed:
+                        continue
+                    # Locate span in narrative via deterministic exact-substring matcher
+                    start, end = self.locate_claimed_span(ehr_text, claimed)
+                    if start == -1:
+                        # Hallucinated quote not in text: record (0, 0) so Gate A rejects
+                        start, end = 0, 0
                     proposals.append(LLMProposedSpan(
                         criterion_code=ccode,
                         proposed_status=p.get("proposed_status", "MET"),
@@ -300,8 +350,9 @@ class LLMProposalAgent:
                 logger.warning(f"LLM proposal step unavailable for {ccode}: {exc}")
                 return ProposalResult(([], "SKIPPED_UNAVAILABLE", elapsed_ms))
 
-    @staticmethod
+    @classmethod
     def evaluate_proposal_through_gates(
+        cls,
         proposal: LLMProposedSpan,
         sanitized_ehr: Optional[str] = None,
         criterion: Optional[Dict[str, Any]] = None,
@@ -311,44 +362,43 @@ class LLMProposalAgent:
     ) -> GateEvaluationResult:
         """
         Passes a proposed span through the 3 mandatory gates in strict sequential order:
-        (a) Exact character-span check (ehr_text[start:end] == claimed_text)
+        (a) Exact character-span check (system-located slice == claimed_text)
         (b) Five-dimension semantic verification (subject, timing, modality, negation, range)
-        (c) Agent 3 independent cross-examination veto
+        (c) Concept Map Equivalence and Agent 3 independent cross-examination veto
         """
         text = sanitized_ehr if sanitized_ehr is not None else (raw_narrative or "")
         crit = criterion if criterion is not None else (criterion_def or {})
 
-        s = proposal.char_start
-        e = proposal.char_end
         claimed = proposal.claimed_text
 
-        # Gate (a): Exact character-level slice check
-        if s < 0 or e > len(text) or s >= e:
+        # Gate (a): Verify verbatim quote existence in narrative
+        s = proposal.char_start
+        e = proposal.char_end
+
+        if not claimed or claimed not in text:
+            offset_clause = f"Invalid character offsets [{s}:{e}] for note of length {len(text)}. " if (s < 0 or e > len(text) or s >= e) else ""
             return GateEvaluationResult(
                 proposal=proposal,
                 passed=False,
                 failing_gate="GATE_A_EXACT_SLICE",
-                rejection_reason=f"Invalid character offsets [{s}:{e}] for note of length {len(text)}."
+                rejection_reason=f"{offset_clause}Hallucinated evidence: claimed text '{claimed[:30]}...' does not exist in EHR note."
             )
+
+        # System locates the span in the narrative with text.find(claimed_text) and records the located offsets.
+        # If the incoming proposal had wrong or uninitialized offsets, system re-anchors to the located span.
+        if s < 0 or e > len(text) or s >= e or text[s:e] != claimed:
+            s, e = cls.locate_claimed_span(text, claimed)
+            proposal.char_start = s
+            proposal.char_end = e
 
         actual_slice = text[s:e]
         if actual_slice != claimed:
-            # Check for offset drift vs outright hallucination
-            if claimed in text:
-                real_pos = text.find(claimed)
-                return GateEvaluationResult(
-                    proposal=proposal,
-                    passed=False,
-                    failing_gate="GATE_A_EXACT_SLICE",
-                    rejection_reason=f"Character slice mismatch: claimed [{s}:{e}] ('{actual_slice}'), true text at [{real_pos}:{real_pos+len(claimed)}]."
-                )
-            else:
-                return GateEvaluationResult(
-                    proposal=proposal,
-                    passed=False,
-                    failing_gate="GATE_A_EXACT_SLICE",
-                    rejection_reason=f"Hallucinated evidence: claimed text '{claimed[:30]}...' does not exist in EHR note."
-                )
+            return GateEvaluationResult(
+                proposal=proposal,
+                passed=False,
+                failing_gate="GATE_A_EXACT_SLICE",
+                rejection_reason=f"Character slice mismatch: claimed [{s}:{e}] ('{actual_slice}') vs true slice '{claimed}'."
+            )
 
         # Gate (b): 5-dimension semantic verification (subject, timing, modality, negation, range)
         scope = ClinicalScopeAnalyzer.analyze_scope(text, s, e)
