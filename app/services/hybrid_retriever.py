@@ -169,8 +169,9 @@ class HybridPolicyRetriever:
     4. Merges candidate lists using Reciprocal Rank Fusion (RRF).
     """
 
-    def __init__(self, db: Optional[Session] = None):
+    def __init__(self, db: Optional[Session] = None, use_declarative_only: bool = False):
         self.db = db
+        self.use_declarative_only = use_declarative_only
         self.bm25 = BM25Retriever()
         self.dense = DenseSemanticRetriever()
         self.chunks: List[Dict[str, Any]] = []
@@ -178,19 +179,20 @@ class HybridPolicyRetriever:
 
     def _build_index(self):
         policies = []
-        if self.db:
-            try:
-                policies = self.db.query(MedicarePolicy).all()
-            except Exception:
-                policies = []
+        if not self.use_declarative_only:
+            if self.db:
+                try:
+                    policies = self.db.query(MedicarePolicy).all()
+                except Exception:
+                    policies = []
 
-        if not policies:
-            try:
-                from app.db.session import SessionLocal
-                with SessionLocal() as session:
-                    policies = session.query(MedicarePolicy).all()
-            except Exception:
-                policies = []
+            if not policies:
+                try:
+                    from app.db.session import SessionLocal
+                    with SessionLocal() as session:
+                        policies = session.query(MedicarePolicy).all()
+                except Exception:
+                    policies = []
 
         chunks = []
         if policies:

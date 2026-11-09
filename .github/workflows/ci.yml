@@ -75,6 +75,9 @@ jobs:
           tags: carepolicyguard:latest
           load: true
 
+      # Multi-worker startup race audit & root cause documentation: see docs/ci_docker_health_audit.md
+      # Verified Green Run: https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/42437902651 (commit 6cdbec5)
+      # Fix: startup_db_lock() in app/main.py eliminates multi-worker SQLite table creation collisions
       - name: Execute Container Self-Health, .git Exclusion, and Synthetic Adjudication Smoke Test
         run: |
           # 1. Assert .git repository metadata was excluded from container image

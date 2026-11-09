@@ -7,6 +7,7 @@ and the full confusion matrix.
 """
 
 import json
+import subprocess
 import sys
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -22,7 +23,7 @@ REPORT_FILE = POLICIES_DIR / "DEVELOPMENT_EVALUATION_REPORT.md"
 from app.agents.pipeline import MultiAgentVerificationPipeline
 from app.services.hybrid_retriever import HybridPolicyRetriever
 
-def run_evaluation():
+def run_evaluation(write_report: bool = True):
     assert DEV_VIGNETTES_FILE.exists(), f"Vignettes file {DEV_VIGNETTES_FILE} does not exist"
 
     with open(DEV_VIGNETTES_FILE, "r", encoding="utf-8") as f:
@@ -30,7 +31,7 @@ def run_evaluation():
 
     print(f"[*] Loaded {len(all_vignettes)} development vignettes from {DEV_VIGNETTES_FILE.name}")
 
-    retriever = HybridPolicyRetriever(db=None)
+    retriever = HybridPolicyRetriever(db=None, use_declarative_only=True)
     pipeline = MultiAgentVerificationPipeline(db=None)
 
     total_count = len(all_vignettes)
@@ -119,6 +120,11 @@ def run_evaluation():
 
     # Generate Markdown Report
     now_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    try:
+        git_head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    except Exception:
+        git_head = "UNKNOWN"
+
     report_lines = [
         "# CarePolicyGuard: 50-Policy Development Evaluation Report",
         "",
@@ -133,6 +139,7 @@ def run_evaluation():
         "> 4. Criterion traceability for all 42 extended policies remains strictly `CLAIMED_UNVERIFIED` pending independent regulatory audit.",
         "",
         f"**Audit Execution Timestamp**: `{now_utc}`  ",
+        f"**Git Commit Head**: `{git_head}`  ",
         f"**Total Extended Policies Audited**: `42`  ",
         f"**Total Evaluation Cases**: `{total_count}`  ",
         f"**Pipeline Decision Threshold**: `tau = 0.85` (unchanged)  ",
@@ -192,10 +199,10 @@ def run_evaluation():
         "- **Status**: Development baseline only. All extended policies remain `CLAIMED_UNVERIFIED` at the criterion level."
     ])
 
-    with open(REPORT_FILE, "w", encoding="utf-8") as f:
-        f.write("\n".join(report_lines) + "\n")
-
-    print(f"[*] Development evaluation report written to {REPORT_FILE}")
+    if write_report:
+        with open(REPORT_FILE, "w", encoding="utf-8") as f:
+            f.write("\n".join(report_lines) + "\n")
+        print(f"[*] Development evaluation report written to {REPORT_FILE}")
     return {
         "total": total_count,
         "top1_correct": top1_correct,

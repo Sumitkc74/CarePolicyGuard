@@ -64,14 +64,34 @@ def test_vignettes_narratives_contain_zero_cues_or_verdict_phrases():
     assert len(violations) == 0, f"Found {len(violations)} cue violations in vignettes: {violations[:5]}"
 
 def test_evaluation_report_numbers_match_evaluation_harness_output():
-    """Asserts that the committed DEVELOPMENT_EVALUATION_REPORT.md accurately reflects harness metrics."""
+    """Asserts that the committed DEVELOPMENT_EVALUATION_REPORT.md accurately reflects harness metrics and guards against staleness."""
     assert REPORT_FILE.exists(), "DEVELOPMENT_EVALUATION_REPORT.md must exist"
     report_text = REPORT_FILE.read_text(encoding="utf-8")
 
     assert "DEVELOPMENT-ONLY" in report_text
-    assert "AUTO Retrieval Top-1 Accuracy" in report_text
-    assert "AUTO Retrieval Top-3 Accuracy" in report_text
-    assert "Adjudication Decision Accuracy" in report_text
     assert "## Confusion Matrix (AUTO Retrieval Top-1)" in report_text
     assert "## Per-Policy Development Results" in report_text
+
+    # Extract headline numbers from report table
+    top1_match = re.search(r"\|\s*\*\*AUTO Retrieval Top-1 Accuracy\*\*\s*\|\s*`(\d+)/(\d+)`\s*\|\s*\*\*([\d\.]+)%\*\*", report_text)
+    top3_match = re.search(r"\|\s*\*\*AUTO Retrieval Top-3 Accuracy\*\*\s*\|\s*`(\d+)/(\d+)`\s*\|\s*\*\*([\d\.]+)%\*\*", report_text)
+    dec_match = re.search(r"\|\s*\*\*Adjudication Decision Accuracy\*\*\s*\|\s*`(\d+)/(\d+)`\s*\|\s*\*\*([\d\.]+)%\*\*", report_text)
+
+    assert top1_match, "Failed to parse AUTO Retrieval Top-1 Accuracy from report"
+    assert top3_match, "Failed to parse AUTO Retrieval Top-3 Accuracy from report"
+    assert dec_match, "Failed to parse Adjudication Decision Accuracy from report"
+
+    report_top1 = int(top1_match.group(1))
+    report_top3 = int(top3_match.group(1))
+    report_dec = int(dec_match.group(1))
+    report_total = int(dec_match.group(2))
+
+    # Fast deterministic fresh evaluation (runs in seconds, no Ollama required)
+    from scripts.evaluate_extended_policies import run_evaluation
+    fresh = run_evaluation(write_report=False)
+
+    assert report_total == fresh["total"] == 84, f"Total vignettes mismatch: report={report_total}, fresh={fresh['total']}"
+    assert report_top1 == fresh["top1_correct"] == 73, f"Top-1 accuracy mismatch: report={report_top1}, fresh={fresh['top1_correct']}"
+    assert report_top3 == fresh["top3_correct"] == 82, f"Top-3 accuracy mismatch: report={report_top3}, fresh={fresh['top3_correct']}"
+    assert report_dec == fresh["decision_correct"] == 39, f"Adjudication decision accuracy mismatch: report={report_dec}, fresh={fresh['decision_correct']}"
 

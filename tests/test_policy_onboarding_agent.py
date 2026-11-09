@@ -121,7 +121,7 @@ def test_ambiguous_passage_flagged_needs_human_judgment():
     assert "spinal cord" in flag.question_for_human.lower()
 
 
-def test_draft_policy_excluded_from_adjudication_and_retrieval(tmp_path):
+def test_draft_policy_excluded_from_adjudication_and_retrieval(tmp_path, monkeypatch):
     """
     Asserts that DRAFT policies:
     1. Are excluded from retrieval by HybridPolicyRetriever.
@@ -142,7 +142,7 @@ def test_draft_policy_excluded_from_adjudication_and_retrieval(tmp_path):
     # Invalidate and check load
     DeclarativePolicyEngine._POLICY_CACHE.pop("LCD-TEST-DRAFT", None)
     # Direct load with allow_draft=False must return None
-    DeclarativePolicyEngine.get_policies_extended_dir = classmethod(lambda cls: tmp_path)
+    monkeypatch.setattr(DeclarativePolicyEngine, "get_policies_extended_dir", classmethod(lambda cls: tmp_path))
     loaded = DeclarativePolicyEngine.load_policy("LCD-TEST-DRAFT", allow_draft=False)
     assert loaded is None, "DRAFT policy must not load when allow_draft=False"
 
