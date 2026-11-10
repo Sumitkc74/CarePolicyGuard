@@ -196,6 +196,89 @@ class LLMProposalAgent:
         # Deterministic fallback: document order (first occurrence)
         return occurrences[0]
 
+    @classmethod
+    def build_prompt(
+        cls,
+        ehr_text: str,
+        ccode: str,
+        cname: str,
+        cdesc: str,
+        ctype: str,
+        is_excl: bool,
+        prompt_version: str = "v2_verbatim_worked_example"
+    ) -> str:
+        """
+        Builds extraction prompt for local LLM proposer.
+        prompt_version='v2_verbatim_worked_example': Production default, incorporates verbatim instructions
+        and in-context demonstration (+18.5% Gate A margin).
+        prompt_version='v1_legacy': Legacy prompt retained for backward-compatibility regression tests.
+        """
+        if prompt_version == "v1_legacy":
+            return (
+                f"You are a clinical evidence extraction assistant for Medicare coverage evaluation.\n"
+                f"CLINICAL NOTE:\n\"\"\"{ehr_text}\"\"\"\n\n"
+                f"CRITERION:\n"
+                f"- Code: {ccode}\n"
+                f"- Name: {cname}\n"
+                f"- Description: {cdesc}\n"
+                f"- Type: {ctype}\n"
+                f"- Is Exclusion: {is_excl}\n\n"
+                f"TASK:\n"
+                f"Find any verbatim substring in the clinical note that provides evidence expressing the SAME CLINICAL CONCEPT (synonym, subtype, paraphrase, abbreviation) as this criterion.\n"
+                f"You must NOT claim that a different clinical condition or different organ satisfies the policy. Only wording variations for the same clinical concept.\n"
+                f"You MUST provide the exact verbatim substring (claimed_text) copied directly from the clinical note.\n"
+                f"Return ONLY valid JSON matching this schema:\n"
+                f"{{\n"
+                f"  \"proposals\": [\n"
+                f"    {{\n"
+                f"      \"criterion_code\": \"{ccode}\",\n"
+                f"      \"proposed_status\": \"MET\" or \"NOT_MET\",\n"
+                f"      \"claimed_text\": \"exact verbatim substring from note\",\n"
+                f"      \"claimed_equivalence\": \"clinical relationship (e.g. adenocarcinoma is a subtype of prostate cancer)\",\n"
+                f"      \"numeric_value\": float or null,\n"
+                f"      \"numeric_unit\": string or null,\n"
+                f"      \"rationale\": \"brief clinical rationale\"\n"
+                f"    }}\n"
+                f"  ]\n"
+                f"}}"
+            )
+
+        # Default: v2_verbatim_worked_example
+        return (
+            f"You are a clinical evidence extraction assistant for Medicare coverage evaluation.\n"
+            f"CLINICAL NOTE:\n\"\"\"{ehr_text}\"\"\"\n\n"
+            f"CRITERION:\n"
+            f"- Code: {ccode}\n"
+            f"- Name: {cname}\n"
+            f"- Description: {cdesc}\n"
+            f"- Type: {ctype}\n"
+            f"- Is Exclusion: {is_excl}\n\n"
+            f"TASK:\n"
+            f"Find any verbatim substring in the clinical note that provides evidence expressing the SAME CLINICAL CONCEPT as this criterion.\n"
+            f"CRITICAL INSTRUCTION: You must quote the note exactly. Do NOT rephrase, do NOT summarize, do NOT correct spelling. claimed_text MUST be a character-for-character exact quote from the clinical note above.\n\n"
+            f"WORKED EXAMPLE:\n"
+            f'Note snippet: "Patient with severe dyspnea on minimal exertion, NYHA class III functional status."\n'
+            f'Criterion: "NYHA Class III or IV heart failure symptoms"\n'
+            f'Correct claimed_text: "NYHA class III functional status" (exact substring from note snippet).\n'
+            f'Incorrect claimed_text: "Patient has Class 3 symptoms" (rephrased - will be rejected).\n\n'
+            f"Return a JSON object with this exact structure:\n"
+            f"{{\n"
+            f'  "proposals": [\n'
+            f'    {{\n'
+            f'      "criterion_code": "{ccode}",\n'
+            f'      "proposed_status": "MET" or "NOT_MET",\n'
+            f'      "claimed_text": "<exact verbatim quote from note>",\n'
+            f'      "claimed_equivalence": "<canonical clinical concept from criterion>",\n'
+            f'      "numeric_value": null or number,\n'
+            f'      "numeric_unit": null or string,\n'
+            f'      "rationale": "<brief explanation>"\n'
+            f'    }}\n'
+            f'  ]\n'
+            f"}}\n"
+            f"If no relevant text exists in the note, return {{\"proposals\": []}}.\n"
+            f"Return ONLY valid JSON."
+        )
+
     def propose_spans_sync(
         self,
         sanitized_ehr: Optional[str] = None,
@@ -235,34 +318,7 @@ class LLMProposalAgent:
         ctype = crit.get("criterion_type", "FINDING_PRESENCE")
         is_excl = crit.get("is_exclusion", False)
 
-        prompt = (
-            f"You are a clinical evidence extraction assistant for Medicare coverage evaluation.\n"
-            f"CLINICAL NOTE:\n\"\"\"{ehr_text}\"\"\"\n\n"
-            f"CRITERION:\n"
-            f"- Code: {ccode}\n"
-            f"- Name: {cname}\n"
-            f"- Description: {cdesc}\n"
-            f"- Type: {ctype}\n"
-            f"- Is Exclusion: {is_excl}\n\n"
-            f"TASK:\n"
-            f"Find any verbatim substring in the clinical note that provides evidence expressing the SAME CLINICAL CONCEPT (synonym, subtype, paraphrase, abbreviation) as this criterion.\n"
-            f"You must NOT claim that a different clinical condition or different organ satisfies the policy. Only wording variations for the same clinical concept.\n"
-            f"You MUST provide the exact verbatim substring (claimed_text) copied directly from the clinical note.\n"
-            f"Return ONLY valid JSON matching this schema:\n"
-            f"{{\n"
-            f"  \"proposals\": [\n"
-            f"    {{\n"
-            f"      \"criterion_code\": \"{ccode}\",\n"
-            f"      \"proposed_status\": \"MET\" or \"NOT_MET\",\n"
-            f"      \"claimed_text\": \"exact verbatim substring from note\",\n"
-            f"      \"claimed_equivalence\": \"clinical relationship (e.g. adenocarcinoma is a subtype of prostate cancer)\",\n"
-            f"      \"numeric_value\": float or null,\n"
-            f"      \"numeric_unit\": string or null,\n"
-            f"      \"rationale\": \"brief clinical rationale\"\n"
-            f"    }}\n"
-            f"  ]\n"
-            f"}}"
-        )
+        prompt = self.build_prompt(ehr_text, ccode, cname, cdesc, ctype, is_excl)
 
         payload = {
             "model": self.model_name,

@@ -51,5 +51,22 @@
     "ungrounded_approvals": 0,
     "false_negatives_caused_by_llm": 0,
     "deterministic_override_rate": "100% invariant enforcement"
+  },
+  "larger_model_evaluation": {
+    "model_attempted": "qwen2.5:14b",
+    "status": "CANNOT_RUN_BUDGET_EXCEEDED",
+    "execution_date": "2026-11-09",
+    "environment": "Local Ollama Q4_K_M on Windows 11 host",
+    "measured_constraint": "122.06 seconds per vignette (measured on DEV-LCD-ACDF-NEG with 2 unmet criteria calls, each hitting the 60.0s safety ceiling)",
+    "projected_full_run_latency": "> 7,560 seconds (approx. 2.1 hours) across 84 dev vignettes (126 LLM calls)",
+    "budget_comparison": "Exceeds the 3-call / 30.0s per-case statutory latency budget by 306.9% per vignette; cannot complete within interactive session",
+    "findings": "Single-case sample yielded 2 calls, 0 proposals passing Gate A (timed out), 0 Gate C map rejections, 0 accepted proposals, and 0 decision changes"
+  },
+  "coverage_audit_conclusion": {
+    "status": "COMPLETED",
+    "gate_c_map_rejections": 43,
+    "proposals_accepted": 2,
+    "decision_changes": 0,
+    "finding": "Proposer is 100% redundant with deterministic engine on accepted cases and safely vetoed on unmapped policies; acts as safety net rather than decision improver"
   }
 }

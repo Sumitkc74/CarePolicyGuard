@@ -1,17 +1,23 @@
 {
+  "cases_evaluated": 19,
+  "evaluation_pairs": 27,
   "production": {
-    "calls": 25,
-    "proposals": 25,
-    "gate_a_pass": 25,
-    "gate_a_fail": 0,
-    "accepted": 0
+    "calls": 27,
+    "proposals": 27,
+    "gate_a_pass": 13,
+    "gate_a_fail": 14,
+    "accepted": 0,
+    "decision_changes": 0
   },
   "variant": {
-    "calls": 25,
-    "proposals": 25,
-    "gate_a_pass": 15,
-    "gate_a_fail": 10,
-    "accepted": 0
+    "calls": 27,
+    "proposals": 27,
+    "gate_a_pass": 18,
+    "gate_a_fail": 9,
+    "accepted": 0,
+    "decision_changes": 0
   },
-  "cases_evaluated": 19
+  "pass_rate_production_pct": 48.15,
+  "pass_rate_variant_pct": 66.67,
+  "margin_pct": 18.52
 }
