@@ -1,0 +1,34 @@
+{
+  "status": "WHAT_IF_EXPERIMENTAL_ONLY",
+  "disclosure": "What-if measurement only. Draft concepts remain PENDING in review queue; committed map remains unchanged at 12 concepts.",
+  "baseline": {
+    "calls": 126,
+    "gate_a_rejections": 79,
+    "gate_b_rejections": 2,
+    "gate_c_map_rejections": 43,
+    "proposals_accepted": 2,
+    "decision_accuracy_pct": 46.4,
+    "concordant_cases": 39,
+    "synonymy_resolved": 0
+  },
+  "what_if": {
+    "calls": 111,
+    "gate_a_rejections": 43,
+    "gate_b_rejections": 0,
+    "gate_c_map_rejections": 63,
+    "proposals_accepted": 5,
+    "concordant_cases": 39,
+    "accuracy_pct": 46.4,
+    "false_approvals": 0,
+    "false_denials": 0,
+    "deferrals": 45,
+    "synonymy_resolved_count": 1,
+    "synonymy_resolved_cases": [
+      "DEV-LCD-RAD-NIV-APP"
+    ]
+  },
+  "committed_baseline_confirmed": {
+    "accuracy": "39/84",
+    "accuracy_pct": 46.42857142857143
+  }
+}
