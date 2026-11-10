@@ -1,0 +1,59 @@
+{
+  "status": "CLEAN_CONTROLLED_COMPARISON_SESSION_MEASURED",
+  "disclosure": "Measured live in same session with identical v2 prompt, identical 84 cases, and identical counting.",
+  "arm_a_committed_map": {
+    "arm_name": "Arm A: Committed Map Only (12 concepts)",
+    "elapsed_seconds": 1674.1,
+    "total_cases": 84,
+    "calls": 111,
+    "gate_a_passes": 68,
+    "gate_a_fails": 43,
+    "gate_b_rejections": 0,
+    "gate_c_map_rejections": 68,
+    "proposals_accepted": 0,
+    "concordant_decisions": 39,
+    "accuracy_pct": 46.4,
+    "four_number_safety": {
+      "false_approvals": 0,
+      "false_denials": 0,
+      "safe_deferrals": 45,
+      "concordant_decisions": 39
+    },
+    "synonymy_resolved_count": 0,
+    "synonymy_resolved_cases": []
+  },
+  "arm_b_expanded_map": {
+    "arm_name": "Arm B: Expanded Map (12 + 120 PENDING concepts)",
+    "elapsed_seconds": 691.8,
+    "total_cases": 84,
+    "calls": 111,
+    "gate_a_passes": 67,
+    "gate_a_fails": 44,
+    "gate_b_rejections": 0,
+    "gate_c_map_rejections": 62,
+    "proposals_accepted": 5,
+    "concordant_decisions": 39,
+    "accuracy_pct": 46.4,
+    "four_number_safety": {
+      "false_approvals": 0,
+      "false_denials": 0,
+      "safe_deferrals": 45,
+      "concordant_decisions": 39
+    },
+    "synonymy_resolved_count": 1,
+    "synonymy_resolved_cases": [
+      "DEV-LCD-RAD-NIV-APP"
+    ]
+  },
+  "true_map_delta": {
+    "calls_delta": 0,
+    "gate_a_fail_delta": 1,
+    "gate_b_fail_delta": 0,
+    "gate_c_map_rejections_delta": -6,
+    "proposals_accepted_delta": 5,
+    "concordant_decisions_delta": 0,
+    "accuracy_pct_delta": 0.0,
+    "synonymy_resolved_delta": 1,
+    "false_approvals_delta": 0
+  }
+}

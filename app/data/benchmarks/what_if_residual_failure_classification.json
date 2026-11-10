@@ -1,0 +1,1501 @@
+{
+  "task2_gate_a_classification": {
+    "total_failures": 44,
+    "counts_by_class": {
+      "paraphrase of a real span": 26,
+      "hallucination": 18,
+      "wrong span": 0,
+      "other": 0
+    },
+    "classified_cases": [
+      {
+        "vignette_id": "DEV-LCD-ACDF-NEG",
+        "policy_id": "LCD-ACDF",
+        "criterion_code": "CRIT-ACDF-02",
+        "criterion_name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+        "claimed_text": "conservative management tried for only 1 week",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Conservative management tried for only 1 week.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (6/6 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-ESI-NEG",
+        "policy_id": "LCD-ESI",
+        "criterion_code": "CRIT-ESI-02",
+        "criterion_name": "Conservative Therapy Trial Failure (>= 4 Weeks)",
+        "claimed_text": "Trial and failure of >= 4 weeks of non-invasive conservative treatment (medications, physical therapy, activity modification).",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'Trial and failure of >= 4 weeks of non-invasive conservative treatment (medications, physical therapy, activity modification).' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-FACET-NEG",
+        "policy_id": "LCD-FACET",
+        "criterion_code": "CRIT-FACET-02",
+        "criterion_name": "Chronic Axial Pain Duration (>= 3 Months)",
+        "claimed_text": "Chronic Axial Pain Duration (>= 3 Months)",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'Chronic Axial Pain Duration (>= 3 Months)' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-HALLUX-NEG",
+        "policy_id": "LCD-HALLUX",
+        "criterion_code": "CRIT-HAL-02",
+        "criterion_name": "Conservative Footwear and Orthotic Trial Failure (>= 3 Months)",
+        "claimed_text": "no conservative shoe modifications attempted",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "No conservative shoe modifications attempted.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (4/4 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-HIP-ARTHRO-NEG",
+        "policy_id": "LCD-HIP-ARTHRO",
+        "criterion_code": "CRIT-HIP-01",
+        "criterion_name": "Advanced Radiographic Hip Osteoarthritis",
+        "claimed_text": "Advanced Radiographic Hip Osteoarthritis",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'Advanced Radiographic Hip Osteoarthritis' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-HIP-SCOOP-NEG",
+        "policy_id": "LCD-HIP-SCOOP",
+        "criterion_code": "CRIT-FAI-01",
+        "criterion_name": "Cam/Pincer Impingement on Radiographs (Alpha Angle > 55 deg)",
+        "claimed_text": "Cam/Pincer Impingement on Radiographs (Alpha Angle > 55 deg)",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'Cam/Pincer Impingement on Radiographs (Alpha Angle > 55 deg)' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-KNEE-ARTHRO-NEG",
+        "policy_id": "LCD-KNEE-ARTHRO",
+        "criterion_code": "CRIT-KART-02",
+        "criterion_name": "Unstable Meniscal Tear Confirmed on MRI",
+        "claimed_text": "Unstable Meniscal Tear Confirmed on MRI",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "No clinical keywords from claimed text exist anywhere in the clinical note."
+      },
+      {
+        "vignette_id": "DEV-LCD-KYPHO-APP",
+        "policy_id": "LCD-KYPHO",
+        "criterion_code": "CRIT-KYPHO-02",
+        "criterion_name": "Acute Edema on MRI Confirming Recent Compression Fracture",
+        "claimed_text": "STIR or T2 MRI demonstrating hyperintense bone marrow edema confirming an acute/subacute fracture of the target vertebral body (or positive bone scan).",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (10/17 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-KYPHO-NEG",
+        "policy_id": "LCD-KYPHO",
+        "criterion_code": "CRIT-KYPHO-02",
+        "criterion_name": "Acute Edema on MRI Confirming Recent Compression Fracture",
+        "claimed_text": "Acute Edema on MRI Confirming Recent Compression Fracture",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Contrast MRI reveals T8-T9 vertebral endplate destruction with disc space fluid collection and epidural phlegmon consistent with infectious spondylodiscitis and osteomyelitis.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (2/7 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-LUMBAR-DECOMP-NEG",
+        "policy_id": "LCD-LUMBAR-DECOMP",
+        "criterion_code": "CRIT-LDEC-01",
+        "criterion_name": "Severe Central or Foraminal Stenosis on MRI/CT",
+        "claimed_text": "Severe Central or Foraminal Stenosis on MRI/CT",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Lumbar MRI confirms a widely patent central canal with no spinal canal stenosis or neural impingement.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (3/5 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-LUMBAR-FUSION-NEG",
+        "policy_id": "LCD-LUMBAR-FUSION",
+        "criterion_code": "CRIT-LUMB-02",
+        "criterion_name": "Conservative Non-Operative Care Trial (>= 90 Days)",
+        "claimed_text": "Patient completed at least 3 months (90 days) of active non-operative management including physical therapy, analgesics, or epidural injections without adequate relief.",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Orthopedic Spine Surgery\nSUBJECTIVE: 35-year-old presenting with acute right sciatica for 3 weeks following heavy lifting.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (2/18 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
+        "policy_id": "LCD-MRI-LUMBAR",
+        "criterion_code": "CRIT-MRIL-02",
+        "criterion_name": "Preceding Plain Lumbar Radiograph Evaluation",
+        "claimed_text": "Recent plain radiographs of the lumbar spine performed prior to or in conjunction with advanced imaging request (unless red flag).",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Plan: Magnetic resonance imaging of the lumbar spine without contrast.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (6/16 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-LUMBAR-NEG",
+        "policy_id": "LCD-MRI-LUMBAR",
+        "criterion_code": "CRIT-MRIL-02",
+        "criterion_name": "Preceding Plain Lumbar Radiograph Evaluation",
+        "claimed_text": "Recent plain radiographs of the lumbar spine performed prior to or in conjunction with advanced imaging request (unless red flag).",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Advanced lumbar MRI imaging is not indicated during the initial acute conservative phase.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (5/16 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+        "policy_id": "LCD-PAD-ATHERO",
+        "criterion_code": "CRIT-PAD-01",
+        "criterion_name": "Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6)",
+        "claimed_text": "severe claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Vascular Surgery Clinic\nSUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3).",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (12/12 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+        "policy_id": "LCD-PAD-ATHERO",
+        "criterion_code": "CRIT-PAD-02",
+        "criterion_name": "Arterial Hemodynamic Stenosis (>= 70% on Angiography or ABI <= 0.70)",
+        "claimed_text": "Ankle-Brachial Index (ABI) <= 0.70 and angiography/duplex showing >= 70% stenosis of target lower extremity artery.",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "OBJECTIVE: Right lower extremity pulses absent at popliteal and pedal levels.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (9/13 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-PAD-ATHERO-NEG",
+        "policy_id": "LCD-PAD-ATHERO",
+        "criterion_code": "CRIT-PAD-02",
+        "criterion_name": "Arterial Hemodynamic Stenosis (>= 70% on Angiography or ABI <= 0.70)",
+        "claimed_text": "ABI <= 0.70 and angiography/duplex showing >= 70% stenosis of target lower extremity artery.",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'ABI <= 0.70 and angiography/duplex showing >= 70% stenosis of target lower extremity artery.' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-POWER-WC-APP",
+        "policy_id": "LCD-POWER-WC",
+        "criterion_code": "CRIT-PWC-02",
+        "criterion_name": "Specialty Evaluation by Licensed PT/OT and Certified ATP",
+        "claimed_text": "Specialty evaluation by licensed PT/OT and Certified ATP",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (6/6 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-LCD-POWER-WC-NEG",
+        "policy_id": "LCD-POWER-WC",
+        "criterion_code": "CRIT-PWC-02",
+        "criterion_name": "Specialty Evaluation by Licensed PT/OT and Certified ATP",
+        "claimed_text": "Specialty Evaluation by Licensed PT/OT and Certified ATP",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'Specialty Evaluation by Licensed PT/OT and Certified ATP' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-PROTON-NEG",
+        "policy_id": "LCD-PROTON",
+        "criterion_code": "CRIT-PBT-01",
+        "criterion_name": "Skull Base, Spine Chordoma, or Critical Structure Proximity",
+        "claimed_text": "Skull Base, Spine Chordoma, or Critical Structure Proximity",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "No clinical keywords from claimed text exist anywhere in the clinical note."
+      },
+      {
+        "vignette_id": "DEV-LCD-ROTATOR-CUFF-NEG",
+        "policy_id": "LCD-ROTATOR-CUFF",
+        "criterion_code": "CRIT-RC-01",
+        "criterion_name": "Full-Thickness or High-Grade Rotator Cuff Tear on MRI",
+        "claimed_text": "high-grade partial thickness tear > 50% depth",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'high-grade partial thickness tear > 50% depth' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-NEG",
+        "policy_id": "LCD-SHOULDER-ARTHRO",
+        "criterion_code": "CRIT-SHLD-01",
+        "criterion_name": "Advanced Glenohumeral Arthropathy or Cuff Tear Arthropathy",
+        "claimed_text": "Advanced Glenohumeral Arthropathy or Cuff Tear Arthropathy",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'Advanced Glenohumeral Arthropathy or Cuff Tear Arthropathy' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-LCD-WOUND-VAC-NEG",
+        "policy_id": "LCD-WOUND-VAC",
+        "criterion_code": "CRIT-VAC-01",
+        "criterion_name": "Stage III/IV Pressure Ulcer, Diabetic Ulcer, or Dehisced Wound",
+        "claimed_text": "Stage III or IV pressure ulcer",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "ASSESSMENT & PLAN: Unstageable necrotic pressure wound.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (3/4 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-CARDIAC-REHAB-NEG",
+        "policy_id": "NCD-CARDIAC-REHAB",
+        "criterion_code": "CRIT-CREH-01",
+        "criterion_name": "Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%)",
+        "claimed_text": "acute decompensated heart failure and unstable angina",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "ASSESSMENT & PLAN: Acute decompensated heart failure and unstable angina.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (7/7 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-CATARACT-APP",
+        "policy_id": "NCD-CATARACT",
+        "criterion_code": "CRIT-CAT-01",
+        "criterion_name": "Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare",
+        "claimed_text": "20/50 in the right eye",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "OBJECTIVE: Best corrected visual acuity is 20/60 in the right eye and 20/50 in the left eye.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (3/3 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-CATARACT-APP",
+        "policy_id": "NCD-CATARACT",
+        "criterion_code": "CRIT-CAT-02",
+        "criterion_name": "Documented Impairment in Activities of Daily Living (ADLs)",
+        "claimed_text": "Patient presenting with 14 months of progressive blurring and severe glare while driving at night. Patient is no longer able to read standard book print even with updated bifocal glasses, creating significant difficulty with daily activities.",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Patient is no longer able to read standard book print even with updated bifocal glasses, creating significant difficulty with daily activities.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (27/27 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-CCTA-APP",
+        "policy_id": "NCD-CCTA",
+        "criterion_code": "CRIT-CCTA-01",
+        "criterion_name": "Intermediate CAD Probability and Target Heart Rate (< 65 bpm)",
+        "claimed_text": "Intermediate pre-test probability of obstructive CAD",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Pre-test probability for obstructive coronary artery disease is intermediate (35%).",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (5/6 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-CCTA-NEG",
+        "policy_id": "NCD-CCTA",
+        "criterion_code": "CRIT-CCTA-01",
+        "criterion_name": "Intermediate CAD Probability and Target Heart Rate (< 65 bpm)",
+        "claimed_text": "target heart rate < 65 bpm achievable for high image quality",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'target heart rate < 65 bpm achievable for high image quality' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-NCD-CCTA-NEG",
+        "policy_id": "NCD-CCTA",
+        "criterion_code": "CRIT-CCTA-02",
+        "criterion_name": "Inconclusive Prior Stress Testing or Equivocal Biomarkers",
+        "claimed_text": "Inconclusive Prior Stress Testing or Equivocal Biomarkers",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "No clinical keywords from claimed text exist anywhere in the clinical note."
+      },
+      {
+        "vignette_id": "DEV-NCD-MPI-PET-NEG",
+        "policy_id": "NCD-MPI-PET",
+        "criterion_code": "CRIT-PETM-01",
+        "criterion_name": "Intermediate-to-High Pre-Test CAD Probability",
+        "claimed_text": "Intermediate-to-High Pre-Test CAD Probability",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "[SYNTHETIC TEST DATA - NOT A REAL PATIENT RECORD]\nCLINICAL PROGRESS NOTE: Advanced Cardiovascular Imaging\nSUBJECTIVE: 36-year-old asymptomatic executive requesting comprehensive full-body cardiovascular scan.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (3/6 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-PACEMAKER-APP",
+        "policy_id": "NCD-PACEMAKER",
+        "criterion_code": "CRIT-PACE-02",
+        "criterion_name": "Absence of Reversible Etiologies",
+        "claimed_text": "absent reversible causes",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "ASSESSMENT & PLAN: Symptomatic high-grade third-degree atrioventricular heart block in the absence of reversible causes.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (2/3 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-PACEMAKER-NEG",
+        "policy_id": "NCD-PACEMAKER",
+        "criterion_code": "CRIT-PACE-01",
+        "criterion_name": "High-Grade AV Block or Symptomatic Sinus Pauses (>= 3.0 Seconds)",
+        "claimed_text": "sinus pauses >= 3.0 seconds",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'sinus pauses >= 3.0 seconds' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-NCD-PACEMAKER-NEG",
+        "policy_id": "NCD-PACEMAKER",
+        "criterion_code": "CRIT-PACE-02",
+        "criterion_name": "Absence of Reversible Etiologies",
+        "claimed_text": "transient drug-induced bradycardia due to medication toxicity",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "ASSESSMENT & PLAN: Transient drug-induced bradycardia due to medication toxicity.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (7/7 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-PET-ONC-APP",
+        "policy_id": "NCD-PET-ONC",
+        "criterion_code": "CRIT-PTONC-01",
+        "criterion_name": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+        "claimed_text": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "No clinical keywords from claimed text exist anywhere in the clinical note."
+      },
+      {
+        "vignette_id": "DEV-NCD-PET-ONC-NEG",
+        "policy_id": "NCD-PET-ONC",
+        "criterion_code": "CRIT-PTONC-01",
+        "criterion_name": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+        "claimed_text": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "No clinical keywords from claimed text exist anywhere in the clinical note."
+      },
+      {
+        "vignette_id": "DEV-NCD-PUMP-NEG",
+        "policy_id": "NCD-PUMP",
+        "criterion_code": "CRIT-PUMP-01",
+        "criterion_name": "Successful Intrathecal Preliminary Trial Response",
+        "claimed_text": "implantation of foreign intrathecal pump hardware is strictly contraindicated in the presence of active sepsis.",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Implantation of foreign intrathecal pump hardware is strictly contraindicated in the presence of active sepsis.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (11/11 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-PUMP-NEG",
+        "policy_id": "NCD-PUMP",
+        "criterion_code": "CRIT-PUMP-02",
+        "criterion_name": "Intolerable Side Effects or Failure of Systemic Analgesics",
+        "claimed_text": "Intolerable Side Effects or Failure of Systemic Analgesics",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "ASSESSMENT & PLAN: Active systemic bacteremia and paraspinal soft tissue infection.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (1/6 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-SCS-APP",
+        "policy_id": "NCD-SCS",
+        "criterion_code": "CRIT-SCS-02",
+        "criterion_name": "Formal Psychological Evaluation Clearance",
+        "claimed_text": "Formal psychological evaluation completed and cleared with no unresolved behavioral contraindications.",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "OBJECTIVE: Pre-procedure psychological evaluation completed and cleared with no unresolved behavioral contraindications.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (9/10 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-NCD-SCS-NEG",
+        "policy_id": "NCD-SCS",
+        "criterion_code": "CRIT-SCS-02",
+        "criterion_name": "Formal Psychological Evaluation Clearance",
+        "claimed_text": "Documented formal pre-implant psychological evaluation by a licensed mental health professional certifying patient suitability and absence of untreated major psychiatric contraindications.",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'Documented formal pre-implant psychological evaluation by a licensed mental health professional certifying patient suitability and absence of untreated major psychiatric contraindications.' is not substantiated by the note."
+      },
+      {
+        "vignette_id": "DEV-NCD-SGD-APP",
+        "policy_id": "NCD-SGD",
+        "criterion_code": "CRIT-SGD-02",
+        "criterion_name": "Formal Evaluation by Licensed Speech-Language Pathologist (SLP)",
+        "claimed_text": "Formal evaluation by licensed speech-language pathologist (SLP) documenting profound anarthria with severe oral-motor dyspraxia. Receptive language and cognition remain intact. SLP completed formal device trial with dedicated eye-gaze speech-generating system; patient achieved 95% message accuracy. Device requested is a dedicated augmentative communication device.",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "SLP completed formal device trial with dedicated eye-gaze speech-generating system; patient achieved 95% message accuracy.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (33/35 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-OPD-PANNI-NEG",
+        "policy_id": "OPD-PANNI",
+        "criterion_code": "CRIT-PANNI-02",
+        "criterion_name": "Refractory Intertrigo / Dermatitis (>= 3 Months Medical Therapy)",
+        "claimed_text": "Refractory Intertrigo / Dermatitis (>= 3 Months Medical Therapy)",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "No clinical keywords from claimed text exist anywhere in the clinical note."
+      },
+      {
+        "vignette_id": "DEV-OPD-RHINO-NEG",
+        "policy_id": "OPD-RHINO",
+        "criterion_code": "CRIT-RHINO-02",
+        "criterion_name": "Conservative Medical Therapy Trial Failure (>= 4 Weeks)",
+        "claimed_text": "completely patent functional nasal airway",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "ASSESSMENT & PLAN: Completely patent functional nasal airway; presentation is for cosmetic nasal reshaping.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (5/5 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-OPD-SI-FUSION-NEG",
+        "policy_id": "OPD-SI-FUSION",
+        "criterion_code": "CRIT-SI-02",
+        "criterion_name": "Positive SI Joint Provocation Tests (>= 3 Tests)",
+        "claimed_text": "Positive SI Joint Provocation Tests (>= 3 Tests)",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "OBJECTIVE: Sacroiliac provocation testing is negative across all maneuvers (negative FABER, negative compression).",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (2/4 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-OPD-VEIN-NEG",
+        "policy_id": "OPD-VEIN",
+        "criterion_code": "CRIT-VEIN-01",
+        "criterion_name": "Venous Reflux Duration (>= 500 ms on Duplex Ultrasound)",
+        "claimed_text": "Duplex ultrasound demonstrates normal valvular competence with venous reflux under 150 ms in all deep and superficial veins.",
+        "assigned_class": "paraphrase of a real span",
+        "evidence_note_span": "Bilateral standing duplex ultrasound demonstrates normal valvular competence with venous reflux under 150 ms in all deep and superficial veins.",
+        "classification_rationale": "Clinical concept is present in the note, but LLM paraphrased or summarized instead of quoting character-for-character (16/16 keywords matched)."
+      },
+      {
+        "vignette_id": "DEV-OPD-VEIN-NEG",
+        "policy_id": "OPD-VEIN",
+        "criterion_code": "CRIT-VEIN-02",
+        "criterion_name": "Graduated Compression Stocking Trial (>= 3 Months)",
+        "claimed_text": "persistent pain, edema, or stasis dermatitis",
+        "assigned_class": "hallucination",
+        "evidence_note_span": "[NOT PRESENT IN NOTE]",
+        "classification_rationale": "Only incidental words matched; clinical finding 'persistent pain, edema, or stasis dermatitis' is not substantiated by the note."
+      }
+    ]
+  },
+  "task2_gate_c_classification": {
+    "total_vetoes": 62,
+    "counts_by_class": {
+      "claimed concept absent from the expanded map": 54,
+      "claimed concept present in the map but the claimed equivalence is wrong": 8,
+      "other": 0
+    },
+    "top_missing_concepts": [
+      [
+        "Dosimetric Proof of 3D Conformal Inadequacy",
+        2
+      ],
+      [
+        "Documented Objective Knee Laxity or Ligamentous Deficiency",
+        2
+      ],
+      [
+        "Medical Justification for Custom vs Prefabricated Device",
+        2
+      ],
+      [
+        "Severe Vertebral Pain",
+        2
+      ],
+      [
+        "Progressive Headache with Red Flags",
+        2
+      ],
+      [
+        "Epicardial Coronary Stenosis >= 70%",
+        2
+      ],
+      [
+        "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
+        2
+      ],
+      [
+        "Rigid Immobilization and Organ Motion Management Plan",
+        2
+      ],
+      [
+        "Physician-Prescribed Individualized Exercise Treatment Plan",
+        2
+      ],
+      [
+        "Clinical Staging Impact on Intended Treatment Strategy",
+        2
+      ],
+      [
+        "Temporary SCS Trial Pain Relief",
+        2
+      ],
+      [
+        "Diagnostic SI Block Pain Relief (>= 75%)",
+        2
+      ],
+      [
+        "Focal Chondral Defect Surface Area (1.5 to 10.0 cm2)",
+        1
+      ],
+      [
+        "Prior Debridement or Marrow Stimulation Failure",
+        1
+      ],
+      [
+        "Solitary Nodule > 6 mm or Mass",
+        1
+      ],
+      [
+        "Hemoptysis or Interstitial Lung Disease Evaluation",
+        1
+      ],
+      [
+        "Facet Pain Relief",
+        1
+      ],
+      [
+        "Rotator Cuff Conservative Therapy Failure",
+        1
+      ],
+      [
+        "Malignancy Near Critical Organs",
+        1
+      ],
+      [
+        "Documented Mechanical Symptoms (Locking or Catching)",
+        1
+      ],
+      [
+        "Moderate to Severe Lumbar Stenosis",
+        1
+      ],
+      [
+        "Cervical Conservative Therapy Failure",
+        1
+      ],
+      [
+        "Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm)",
+        1
+      ],
+      [
+        "Neurological Deficit or Seizure",
+        1
+      ],
+      [
+        "Radicular Deficit After 6 Weeks Conservative Care or Red Flag",
+        1
+      ],
+      [
+        "Severe Claudication or Critical Limb Ischemia",
+        1
+      ],
+      [
+        "Refractory Angina Despite Medical Therapy",
+        1
+      ],
+      [
+        "Severe Mobility Limitation Due to Neurologic or Myopathic Condition",
+        1
+      ],
+      [
+        "Conservative Therapy Trial Failure for Shoulder Arthroplasty",
+        1
+      ],
+      [
+        "Wound Care Failure",
+        1
+      ],
+      [
+        "Left Ventricular Ejection Fraction and Systolic Heart Failure",
+        1
+      ],
+      [
+        "Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare",
+        1
+      ],
+      [
+        "Documented Impairment in Activities of Daily Living (ADLs)",
+        1
+      ],
+      [
+        "Inconclusive or equivocal prior stress testing",
+        1
+      ],
+      [
+        "Intermediate-to-High Pre-Test CAD Probability",
+        1
+      ],
+      [
+        "Successful Intrathecal Preliminary Trial Response",
+        1
+      ],
+      [
+        "Severe Expressive Speech Impairment Precluding Daily Communication",
+        1
+      ],
+      [
+        "Formal Evaluation by Licensed Speech-Language Pathologist (SLP)",
+        1
+      ],
+      [
+        "Visual Field Restriction",
+        1
+      ],
+      [
+        "Oral Prophylactic Medication Trial Failure (>= 2 Classes)",
+        1
+      ],
+      [
+        "Lumbar Radicular Pain",
+        1
+      ],
+      [
+        "Chronic Nasal Airway Obstruction",
+        1
+      ]
+    ],
+    "classified_cases": [
+      {
+        "vignette_id": "DEV-LCD-ACI-NEG",
+        "policy_id": "LCD-ACI",
+        "criterion_code": "CRIT-ACI-01",
+        "criterion_name": "Focal Chondral Defect Surface Area (1.5 to 10.0 cm2)",
+        "claimed_text": "Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease",
+        "claimed_equivalence": "Focal chondral defect Surface Area (1.5 to 10.0 cm2)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Focal Chondral Defect Surface Area (1.5 to 10.0 cm2) vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Focal Chondral Defect Surface Area (1.5 to 10.0 cm2)' is not indexed in concept map. | cartilage defect area vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' has no entry in concept map. | focal chondral defect size vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' has no entry in concept map. | outerbridge grade iv lesion area vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Focal Chondral Defect Surface Area (1.5 to 10.0 cm2)' nor proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-ACI-NEG",
+        "policy_id": "LCD-ACI",
+        "criterion_code": "CRIT-ACI-02",
+        "criterion_name": "Prior Debridement or Marrow Stimulation Failure",
+        "claimed_text": "Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.",
+        "claimed_equivalence": "Prior Debridement or Marrow Stimulation Failure",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Prior Debridement or Marrow Stimulation Failure vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Prior Debridement or Marrow Stimulation Failure' is not indexed in concept map. | prior microfracture failure vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' has no entry in concept map. | failed marrow stimulation vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' has no entry in concept map. | prior knee debridement failure vs 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Prior Debridement or Marrow Stimulation Failure' nor proposed term 'Focal chondrocyte implantation is contraindicated in setting of generalized degenerative joint disease.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-CT-CHEST-NEG",
+        "policy_id": "LCD-CT-CHEST",
+        "criterion_code": "CRIT-CTCH-01",
+        "criterion_name": "Abnormal Chest Radiograph (Solitary Nodule > 6 mm or Mass)",
+        "claimed_text": "No hemoptysis.",
+        "claimed_equivalence": "Abnormal Chest Radiograph (Solitary Nodule > 6 mm or Mass)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Abnormal Chest Radiograph (Solitary Nodule > 6 mm or Mass) vs 'No hemoptysis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis.' has no entry in concept map. | solitary pulmonary nodule > 6mm vs 'No hemoptysis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis.' has no entry in concept map. | lung nodule on chest x-ray vs 'No hemoptysis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis.' has no entry in concept map. | mediastinal mass vs 'No hemoptysis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis.' has no entry in concept map. | hilar lymphadenopathy vs 'No hemoptysis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis.' has no entry in concept map. | unresolved infiltrate vs 'No hemoptysis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Abnormal Chest Radiograph (Solitary Nodule > 6 mm or Mass)' is in concept CONCEPT-CT-CHEST-CTCH-01, but proposed term 'No hemoptysis.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-CT-CHEST-NEG",
+        "policy_id": "LCD-CT-CHEST",
+        "criterion_code": "CRIT-CTCH-02",
+        "criterion_name": "Unexplained Hemoptysis or Interstitial Lung Disease Evaluation",
+        "claimed_text": "No hemoptysis",
+        "claimed_equivalence": "Unexplained Hemoptysis or Interstitial Lung Disease Evaluation",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Unexplained Hemoptysis or Interstitial Lung Disease Evaluation vs 'No hemoptysis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis' has no entry in concept map. | unexplained hemoptysis vs 'No hemoptysis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis' has no entry in concept map. | interstitial lung disease vs 'No hemoptysis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis' has no entry in concept map. | pulmonary fibrosis evaluation vs 'No hemoptysis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No hemoptysis' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Unexplained Hemoptysis or Interstitial Lung Disease Evaluation' is in concept CONCEPT-CT-CHEST-CTCH-02, but proposed term 'No hemoptysis' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-EVAR-NEG",
+        "policy_id": "LCD-EVAR",
+        "criterion_code": "CRIT-EVAR-01",
+        "criterion_name": "Abdominal Aortic Aneurysm Diameter (>= 5.5 cm in Men / >= 5.0 cm in Women)",
+        "claimed_text": "Computed tomography angiography demonstrates small stable aneurysm measuring maximum diameter 3.8 cm, unchanged from imaging 12 months ago.",
+        "claimed_equivalence": "Abdominal Aortic Aneurysm Diameter (>= 5.5 cm in Men / >= 5.0 cm in Women)",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Abdominal Aortic Aneurysm Diameter (>= 5.5 cm in Men / >= 5.0 cm in Women) vs 'Computed tomography angiography demonstrates small stable aneurysm measuring maximum diameter 3.8 cm, unchanged from imaging 12 months ago.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Abdominal Aortic Aneurysm Diameter >= 5.5 cm in Men or >= 5.0 cm in Women' vs 'Small Stable AAA'). | aaa diameter vs 'Computed tomography angiography demonstrates small stable aneurysm measuring maximum diameter 3.8 cm, unchanged from imaging 12 months ago.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Abdominal Aortic Aneurysm Diameter >= 5.5 cm in Men or >= 5.0 cm in Women' vs 'Small Stable AAA'). | aneurysm diameter vs 'Computed tomography angiography demonstrates small stable aneurysm measuring maximum diameter 3.8 cm, unchanged from imaging 12 months ago.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Abdominal Aortic Aneurysm Diameter >= 5.5 cm in Men or >= 5.0 cm in Women' vs 'Small Stable AAA'). | abdominal aortic aneurysm diameter vs 'Computed tomography angiography demonstrates small stable aneurysm measuring maximum diameter 3.8 cm, unchanged from imaging 12 months ago.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Abdominal Aortic Aneurysm Diameter >= 5.5 cm in Men or >= 5.0 cm in Women' vs 'Small Stable AAA').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Abdominal Aortic Aneurysm Diameter >= 5.5 cm in Men or >= 5.0 cm in Women' (CONCEPT-EVAR-EVAR-01) while proposed is in 'Small Stable AAA' (CONCEPT-EVAR-EVAR-EXCL-01)."
+      },
+      {
+        "vignette_id": "DEV-LCD-FACET-NEG",
+        "policy_id": "LCD-FACET",
+        "criterion_code": "CRIT-FACET-01",
+        "criterion_name": "Diagnostic Medial Branch Block Relief (>= 80%)",
+        "claimed_text": "Diagnostic medial branch block produced only 15% pain reduction.",
+        "claimed_equivalence": "Diagnostic Medial Branch Block Relief (>= 80%)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Diagnostic Medial Branch Block Relief (>= 80%) vs 'Diagnostic medial branch block produced only 15% pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Diagnostic medial branch block produced only 15% pain reduction.' has no entry in concept map. | medial branch block relief vs 'Diagnostic medial branch block produced only 15% pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Diagnostic medial branch block produced only 15% pain reduction.' has no entry in concept map. | diagnostic mbb relief vs 'Diagnostic medial branch block produced only 15% pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Diagnostic medial branch block produced only 15% pain reduction.' has no entry in concept map. | facet block pain reduction vs 'Diagnostic medial branch block produced only 15% pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Diagnostic medial branch block produced only 15% pain reduction.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Diagnostic Medial Branch Block Relief (>= 80%)' is in concept CONCEPT-FACET-FACET-01, but proposed term 'Diagnostic medial branch block produced only 15% pain reduction.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-HIP-ARTHRO-NEG",
+        "policy_id": "LCD-HIP-ARTHRO",
+        "criterion_code": "CRIT-HIP-02",
+        "criterion_name": "Conservative Non-Surgical Management Trial (>= 3 Months)",
+        "claimed_text": "Mild trochanteric bursitis complicated by active soft tissue infection.",
+        "claimed_equivalence": "Conservative Non-Surgical Management Trial (>= 3 Months)",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Conservative Non-Surgical Management Trial (>= 3 Months) vs 'Mild trochanteric bursitis complicated by active soft tissue infection.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Therapy Trial Failure' vs 'Active Systemic Infection'). | conservative hip therapy vs 'Mild trochanteric bursitis complicated by active soft tissue infection.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Hip Therapy Trial' vs 'Active Systemic Infection'). | physical therapy trial vs 'Mild trochanteric bursitis complicated by active soft tissue infection.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Rotator Cuff Conservative Therapy Failure' vs 'Active Systemic Infection'). | hip injection trial vs 'Mild trochanteric bursitis complicated by active soft tissue infection.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Hip Therapy Trial' vs 'Active Systemic Infection'). | 90 days conservative care vs 'Mild trochanteric bursitis complicated by active soft tissue infection.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Hip Therapy Trial' vs 'Active Systemic Infection').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Conservative Therapy Trial Failure' (CONCEPT-ACDF-ACDF-02) while proposed is in 'Active Systemic Infection' (CONCEPT-PUMP-PUMP-EXCL-01)."
+      },
+      {
+        "vignette_id": "DEV-LCD-HIP-SCOOP-NEG",
+        "policy_id": "LCD-HIP-SCOOP",
+        "criterion_code": "CRIT-FAI-02",
+        "criterion_name": "Conservative Physical Therapy Trial Failure (>= 3 Months)",
+        "claimed_text": "Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.",
+        "claimed_equivalence": "Conservative Physical Therapy Trial Failure (>= 3 Months)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Conservative Physical Therapy Trial Failure (>= 3 Months) vs 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' has no entry in concept map. | conservative physical therapy vs 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' has no entry in concept map. | intra-articular hip injection vs 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' has no entry in concept map. | three months conservative therapy vs 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Conservative Physical Therapy Trial Failure (>= 3 Months)' is in concept CONCEPT-ROTATOR-CUFF-RC-02, but proposed term 'Severe degenerative joint disease of the hip. Arthroscopic joint debridement is ineffective and contraindicated in advanced osteoarthritis.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-IMRT-APP",
+        "policy_id": "LCD-IMRT",
+        "criterion_code": "CRIT-IMRT-02",
+        "criterion_name": "Dosimetric Proof of 3D Conformal Inadequacy",
+        "claimed_text": "3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).",
+        "claimed_equivalence": "Dosimetric Proof of 3D Conformal Inadequacy",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Dosimetric Proof of 3D Conformal Inadequacy vs '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Dosimetric Proof of 3D Conformal Inadequacy' is not indexed in concept map. | 3d conformal exceeds tolerance vs '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' -> NO_CONCEPT_MAP_ENTRY: Proposed term '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' has no entry in concept map. | dosimetric normal tissue constraint vs '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' -> NO_CONCEPT_MAP_ENTRY: Proposed term '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' has no entry in concept map. | imrt necessary for organ sparing vs '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' -> NO_CONCEPT_MAP_ENTRY: Proposed term '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Dosimetric Proof of 3D Conformal Inadequacy' nor proposed term '3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-IMRT-NEG",
+        "policy_id": "LCD-IMRT",
+        "criterion_code": "CRIT-IMRT-01",
+        "criterion_name": "Head and Neck, Prostate, or CNS Malignancy Near Critical Organs",
+        "claimed_text": "Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.",
+        "claimed_equivalence": "Head and Neck, Prostate, or CNS Malignancy Near Critical Organs",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Head and Neck, Prostate, or CNS Malignancy Near Critical Organs vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | head and neck cancer vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | prostate cancer vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | prostate adenocarcinoma vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | cns tumor vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'cns tumor' is not indexed in concept map. | spinal cord vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | adjacent to spinal cord vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | brainstem vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | salivary gland sparing needed vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | salivary gland vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | parotid gland vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'parotid gland' is not indexed in concept map. | optic nerve vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'optic nerve' is not indexed in concept map. | optic chiasm vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Head and Neck, Prostate, or CNS Malignancy Near Critical Organs' is in concept CONCEPT-IMRT-IMRT-01, but proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-IMRT-NEG",
+        "policy_id": "LCD-IMRT",
+        "criterion_code": "CRIT-IMRT-02",
+        "criterion_name": "Dosimetric Proof of 3D Conformal Inadequacy",
+        "claimed_text": "Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.",
+        "claimed_equivalence": "Dosimetric Proof of 3D Conformal Inadequacy",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Dosimetric Proof of 3D Conformal Inadequacy vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Dosimetric Proof of 3D Conformal Inadequacy' is not indexed in concept map. | 3d conformal exceeds tolerance vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | dosimetric normal tissue constraint vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map. | imrt necessary for organ sparing vs 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Dosimetric Proof of 3D Conformal Inadequacy' nor proposed term 'Widespread metastatic disease requiring short-course pain relief. Complex inverse intensity-modulated delivery is not indicated; simple palliative treatment of bone metastasis with standard 3D field is appropriate.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-KNEE-ARTHRO-NEG",
+        "policy_id": "LCD-KNEE-ARTHRO",
+        "criterion_code": "CRIT-KART-01",
+        "criterion_name": "Documented Mechanical Symptoms (Locking or Catching)",
+        "claimed_text": "No mechanical locking or acute injury.",
+        "claimed_equivalence": "Documented Mechanical Symptoms (Locking or Catching)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Documented Mechanical Symptoms (Locking or Catching) vs 'No mechanical locking or acute injury.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Documented Mechanical Symptoms (Locking or Catching)' is not indexed in concept map. | true knee locking vs 'No mechanical locking or acute injury.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No mechanical locking or acute injury.' has no entry in concept map. | joint catching vs 'No mechanical locking or acute injury.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No mechanical locking or acute injury.' has no entry in concept map. | mechanical knee symptoms vs 'No mechanical locking or acute injury.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No mechanical locking or acute injury.' has no entry in concept map. | positive mcmurray test vs 'No mechanical locking or acute injury.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No mechanical locking or acute injury.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Documented Mechanical Symptoms (Locking or Catching)' nor proposed term 'No mechanical locking or acute injury.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
+        "policy_id": "LCD-KNEE-ORTHOSIS",
+        "criterion_code": "CRIT-KORTH-01",
+        "criterion_name": "Documented Objective Knee Laxity or Ligamentous Deficiency",
+        "claimed_text": "3+ anterior drawer, grade III Lachman, and pivot shift",
+        "claimed_equivalence": "Documented Objective Knee Laxity or Ligamentous Deficiency",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Documented Objective Knee Laxity or Ligamentous Deficiency vs '3+ anterior drawer, grade III Lachman, and pivot shift' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Documented Objective Knee Laxity or Ligamentous Deficiency' is not indexed in concept map. | positive lachman test vs '3+ anterior drawer, grade III Lachman, and pivot shift' -> NO_CONCEPT_MAP_ENTRY: Proposed term '3+ anterior drawer, grade III Lachman, and pivot shift' has no entry in concept map. | grade 2 ligamentous instability vs '3+ anterior drawer, grade III Lachman, and pivot shift' -> NO_CONCEPT_MAP_ENTRY: Proposed term '3+ anterior drawer, grade III Lachman, and pivot shift' has no entry in concept map. | acl tear with instability vs '3+ anterior drawer, grade III Lachman, and pivot shift' -> NO_CONCEPT_MAP_ENTRY: Proposed term '3+ anterior drawer, grade III Lachman, and pivot shift' has no entry in concept map. | abnormal pivot shift vs '3+ anterior drawer, grade III Lachman, and pivot shift' -> NO_CONCEPT_MAP_ENTRY: Proposed term '3+ anterior drawer, grade III Lachman, and pivot shift' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Documented Objective Knee Laxity or Ligamentous Deficiency' nor proposed term '3+ anterior drawer, grade III Lachman, and pivot shift' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
+        "policy_id": "LCD-KNEE-ORTHOSIS",
+        "criterion_code": "CRIT-KORTH-02",
+        "criterion_name": "Medical Justification for Custom vs Prefabricated Device",
+        "claimed_text": "conical thigh geometry",
+        "claimed_equivalence": "Anatomical justification why an off-the-shelf prefabricated brace cannot fit (e.g. disproportionate thigh/calf circumference, severe angular deformity > 15 degrees).",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Medical Justification for Custom vs Prefabricated Device vs 'conical thigh geometry' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Medical Justification for Custom vs Prefabricated Device' is not indexed in concept map. | prefabricated brace cannot fit vs 'conical thigh geometry' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'conical thigh geometry' has no entry in concept map. | disproportionate limb circumference vs 'conical thigh geometry' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'conical thigh geometry' has no entry in concept map. | severe varus deformity > 15 degrees vs 'conical thigh geometry' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'conical thigh geometry' has no entry in concept map. | custom brace justification vs 'conical thigh geometry' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'conical thigh geometry' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Medical Justification for Custom vs Prefabricated Device' nor proposed term 'conical thigh geometry' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
+        "policy_id": "LCD-KNEE-ORTHOSIS",
+        "criterion_code": "CRIT-KORTH-01",
+        "criterion_name": "Documented Objective Knee Laxity or Ligamentous Deficiency",
+        "claimed_text": "negative Lachman and firm end-point",
+        "claimed_equivalence": "Documented Objective Knee Laxity or Ligamentous Deficiency",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Documented Objective Knee Laxity or Ligamentous Deficiency vs 'negative Lachman and firm end-point' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Documented Objective Knee Laxity or Ligamentous Deficiency' is not indexed in concept map. | positive lachman test vs 'negative Lachman and firm end-point' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'negative Lachman and firm end-point' has no entry in concept map. | grade 2 ligamentous instability vs 'negative Lachman and firm end-point' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'negative Lachman and firm end-point' has no entry in concept map. | acl tear with instability vs 'negative Lachman and firm end-point' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'negative Lachman and firm end-point' has no entry in concept map. | abnormal pivot shift vs 'negative Lachman and firm end-point' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'negative Lachman and firm end-point' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Documented Objective Knee Laxity or Ligamentous Deficiency' nor proposed term 'negative Lachman and firm end-point' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
+        "policy_id": "LCD-KNEE-ORTHOSIS",
+        "criterion_code": "CRIT-KORTH-02",
+        "criterion_name": "Medical Justification for Custom vs Prefabricated Device",
+        "claimed_text": "Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.",
+        "claimed_equivalence": "Medical Justification for Custom vs Prefabricated Device",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Medical Justification for Custom vs Prefabricated Device vs 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Medical Justification for Custom vs Prefabricated Device' is not indexed in concept map. | prefabricated brace cannot fit vs 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' has no entry in concept map. | disproportionate limb circumference vs 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' has no entry in concept map. | severe varus deformity > 15 degrees vs 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' has no entry in concept map. | custom brace justification vs 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Medical Justification for Custom vs Prefabricated Device' nor proposed term 'Rigid custom-molded knee bracing is not indicated for simple temporary postoperative bracing; standard elastic sleeve is sufficient.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-KYPHO-APP",
+        "policy_id": "LCD-KYPHO",
+        "criterion_code": "CRIT-KYPHO-01",
+        "criterion_name": "Severe Pain Score (NRS/VAS >= 6/10)",
+        "claimed_text": "Pain rating is 8/10 on visual analog scale.",
+        "claimed_equivalence": "Severe Pain Score (NRS/VAS >= 6/10)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Severe Pain Score (NRS/VAS >= 6/10) vs 'Pain rating is 8/10 on visual analog scale.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Pain rating is 8/10 on visual analog scale.' has no entry in concept map. | pain score vs 'Pain rating is 8/10 on visual analog scale.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Pain rating is 8/10 on visual analog scale.' has no entry in concept map. | numeric rating scale vs 'Pain rating is 8/10 on visual analog scale.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Pain rating is 8/10 on visual analog scale.' has no entry in concept map. | vas score vs 'Pain rating is 8/10 on visual analog scale.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Pain rating is 8/10 on visual analog scale.' has no entry in concept map. | nrs pain score vs 'Pain rating is 8/10 on visual analog scale.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Pain rating is 8/10 on visual analog scale.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Severe Pain Score (NRS/VAS >= 6/10)' is in concept CONCEPT-KYPHO-KYPHO-01, but proposed term 'Pain rating is 8/10 on visual analog scale.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-KYPHO-NEG",
+        "policy_id": "LCD-KYPHO",
+        "criterion_code": "CRIT-KYPHO-01",
+        "criterion_name": "Severe Pain Score (NRS/VAS >= 6/10)",
+        "claimed_text": "unremitting back pain",
+        "claimed_equivalence": "Severe debilitating focal vertebral pain with pain score >= 6 on 0-10 numeric rating scale (NRS).",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Severe Pain Score (NRS/VAS >= 6/10) vs 'unremitting back pain' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'unremitting back pain' has no entry in concept map. | pain score vs 'unremitting back pain' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'unremitting back pain' has no entry in concept map. | numeric rating scale vs 'unremitting back pain' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'unremitting back pain' has no entry in concept map. | vas score vs 'unremitting back pain' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'unremitting back pain' has no entry in concept map. | nrs pain score vs 'unremitting back pain' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'unremitting back pain' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Severe Pain Score (NRS/VAS >= 6/10)' is in concept CONCEPT-KYPHO-KYPHO-01, but proposed term 'unremitting back pain' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
+        "policy_id": "LCD-LUMBAR-DECOMP",
+        "criterion_code": "CRIT-LDEC-01",
+        "criterion_name": "Severe Central or Foraminal Stenosis on MRI/CT",
+        "claimed_text": "severe lumbar spinal stenosis",
+        "claimed_equivalence": "Severe Central or Foraminal Stenosis on MRI/CT",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Severe Central or Foraminal Stenosis on MRI/CT vs 'severe lumbar spinal stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'severe lumbar spinal stenosis' has no entry in concept map. | central canal stenosis vs 'severe lumbar spinal stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'severe lumbar spinal stenosis' has no entry in concept map. | severe lumbar stenosis vs 'severe lumbar spinal stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'severe lumbar spinal stenosis' has no entry in concept map. | foraminal stenosis vs 'severe lumbar spinal stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'severe lumbar spinal stenosis' has no entry in concept map. | moderate to severe stenosis on mri vs 'severe lumbar spinal stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'severe lumbar spinal stenosis' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Severe Central or Foraminal Stenosis on MRI/CT' is in concept CONCEPT-LUMBAR-DECOMP-LDEC-01, but proposed term 'severe lumbar spinal stenosis' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-LUMBAR-DECOMP-NEG",
+        "policy_id": "LCD-LUMBAR-DECOMP",
+        "criterion_code": "CRIT-LDEC-02",
+        "criterion_name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+        "claimed_text": "Lumbar decompressive laminectomy is not clinically indicated",
+        "claimed_equivalence": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Conservative Therapy Trial Failure (>= 6 Weeks) vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no entry in concept map. | conservative therapy vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no entry in concept map. | physical therapy vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no entry in concept map. | activity modification vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no entry in concept map. | nsaids vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no entry in concept map. | analgesics vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no entry in concept map. | pharmacotherapy vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'pharmacotherapy' is not indexed in concept map. | chiropractic care vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'chiropractic care' is not indexed in concept map. | home exercise vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'home exercise' is not indexed in concept map. | six weeks conservative therapy vs 'Lumbar decompressive laminectomy is not clinically indicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Conservative Therapy Trial Failure (>= 6 Weeks)' is in concept CONCEPT-CERV-DISC-CERV-02, but proposed term 'Lumbar decompressive laminectomy is not clinically indicated' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-LUMBAR-FUSION-NEG",
+        "policy_id": "LCD-LUMBAR-FUSION",
+        "criterion_code": "CRIT-LUMB-01",
+        "criterion_name": "Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm)",
+        "claimed_text": "Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.",
+        "claimed_equivalence": "Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm) vs 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm)' is not indexed in concept map. | degenerative spondylolisthesis vs 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' has no entry in concept map. | grade 1 spondylolisthesis vs 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' has no entry in concept map. | lumbar instability vs 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' has no entry in concept map. | dynamic translation > 3mm vs 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm)' nor proposed term 'Segmental spinal arthrodesis fusion is contraindicated for uncomplicated disc protrusion lacking instability.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
+        "policy_id": "LCD-MRI-BRAIN",
+        "criterion_code": "CRIT-MRIB-02",
+        "criterion_name": "Progressive Headache with Red Flags or Abnormal Exam",
+        "claimed_text": "progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness",
+        "claimed_equivalence": "Progressive Headache with Red Flags or Abnormal Exam",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Progressive Headache with Red Flags or Abnormal Exam vs 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' has no entry in concept map. | headache with papilledema vs 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' has no entry in concept map. | valsalva worsening headache vs 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' has no entry in concept map. | progressive severe headache vs 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' has no entry in concept map. | headache with focal signs vs 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Progressive Headache with Red Flags or Abnormal Exam' is in concept CONCEPT-MRI-BRAIN-MRIB-02, but proposed term 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-BRAIN-NEG",
+        "policy_id": "LCD-MRI-BRAIN",
+        "criterion_code": "CRIT-MRIB-01",
+        "criterion_name": "Focal Neurological Deficit or New Onset Seizure",
+        "claimed_text": "Classic uncomplicated tension headache with entirely normal neurological examination.",
+        "claimed_equivalence": "Focal Neurological Deficit or New Onset Seizure",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Focal Neurological Deficit or New Onset Seizure vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | focal neurological deficit vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | new onset seizure vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | cranial nerve palsy vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | hemiparesis vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | suspected stroke vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Focal Neurological Deficit or New Onset Seizure' is in concept CONCEPT-MRI-BRAIN-MRIB-01, but proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-BRAIN-NEG",
+        "policy_id": "LCD-MRI-BRAIN",
+        "criterion_code": "CRIT-MRIB-02",
+        "criterion_name": "Progressive Headache with Red Flags or Abnormal Exam",
+        "claimed_text": "Classic uncomplicated tension headache with entirely normal neurological examination.",
+        "claimed_equivalence": "Progressive Headache with Red Flags or Abnormal Exam",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Progressive Headache with Red Flags or Abnormal Exam vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | headache with papilledema vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | valsalva worsening headache vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | progressive severe headache vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map. | headache with focal signs vs 'Classic uncomplicated tension headache with entirely normal neurological examination.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Progressive Headache with Red Flags or Abnormal Exam' is in concept CONCEPT-MRI-BRAIN-MRIB-02, but proposed term 'Classic uncomplicated tension headache with entirely normal neurological examination.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-LUMBAR-NEG",
+        "policy_id": "LCD-MRI-LUMBAR",
+        "criterion_code": "CRIT-MRIL-01",
+        "criterion_name": "Radicular Deficit After 6 Weeks Conservative Care or Red Flag",
+        "claimed_text": "No pain radiating into the buttocks or legs.",
+        "claimed_equivalence": "Radicular Deficit After 6 Weeks Conservative Care or Red Flag",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Radicular Deficit After 6 Weeks Conservative Care or Red Flag vs 'No pain radiating into the buttocks or legs.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Radicular Deficit After 6 Weeks Conservative Care or Red Flag' is not indexed in concept map. | failed 6 weeks conservative therapy vs 'No pain radiating into the buttocks or legs.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No pain radiating into the buttocks or legs.' has no entry in concept map. | lumbar radiculopathy vs 'No pain radiating into the buttocks or legs.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No pain radiating into the buttocks or legs.' has no entry in concept map. | progressive motor deficit vs 'No pain radiating into the buttocks or legs.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No pain radiating into the buttocks or legs.' has no entry in concept map. | red flag symptoms vs 'No pain radiating into the buttocks or legs.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No pain radiating into the buttocks or legs.' has no entry in concept map. | history of cancer vs 'No pain radiating into the buttocks or legs.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'No pain radiating into the buttocks or legs.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Radicular Deficit After 6 Weeks Conservative Care or Red Flag' nor proposed term 'No pain radiating into the buttocks or legs.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-PAD-ATHERO-NEG",
+        "policy_id": "LCD-PAD-ATHERO",
+        "criterion_code": "CRIT-PAD-01",
+        "criterion_name": "Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6)",
+        "claimed_text": "Asymptomatic mild peripheral artery disease.",
+        "claimed_equivalence": "Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6) vs 'Asymptomatic mild peripheral artery disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Asymptomatic mild peripheral artery disease.' has no entry in concept map. | rutherford category 3 vs 'Asymptomatic mild peripheral artery disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Asymptomatic mild peripheral artery disease.' has no entry in concept map. | severe claudication vs 'Asymptomatic mild peripheral artery disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Asymptomatic mild peripheral artery disease.' has no entry in concept map. | critical limb ischemia vs 'Asymptomatic mild peripheral artery disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Asymptomatic mild peripheral artery disease.' has no entry in concept map. | ischemic rest pain vs 'Asymptomatic mild peripheral artery disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Asymptomatic mild peripheral artery disease.' has no entry in concept map. | arterial ulcer vs 'Asymptomatic mild peripheral artery disease.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Asymptomatic mild peripheral artery disease.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6)' is in concept CONCEPT-PAD-ATHERO-PAD-01, but proposed term 'Asymptomatic mild peripheral artery disease.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-PCI-APP",
+        "policy_id": "LCD-PCI",
+        "criterion_code": "CRIT-PCI-01",
+        "criterion_name": "Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80)",
+        "claimed_text": "85% in the proximal left anterior descending artery",
+        "claimed_equivalence": "Medically refractory symptomatic ischemic heart disease with high-grade proximal LAD stenosis",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80) vs '85% in the proximal left anterior descending artery' -> NO_CONCEPT_MAP_ENTRY: Proposed term '85% in the proximal left anterior descending artery' has no entry in concept map. | coronary stenosis vs '85% in the proximal left anterior descending artery' -> NO_CONCEPT_MAP_ENTRY: Proposed term '85% in the proximal left anterior descending artery' has no entry in concept map. | luminal diameter stenosis vs '85% in the proximal left anterior descending artery' -> NO_CONCEPT_MAP_ENTRY: Proposed term '85% in the proximal left anterior descending artery' has no entry in concept map. | angiographic stenosis vs '85% in the proximal left anterior descending artery' -> NO_CONCEPT_MAP_ENTRY: Proposed term '85% in the proximal left anterior descending artery' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80)' is in concept CONCEPT-PCI-PCI-01, but proposed term '85% in the proximal left anterior descending artery' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-PCI-NEG",
+        "policy_id": "LCD-PCI",
+        "criterion_code": "CRIT-PCI-01",
+        "criterion_name": "Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80)",
+        "claimed_text": "30% non-hemodynamic mild stenosis",
+        "claimed_equivalence": "Non-obstructive coronary artery disease without demonstrable myocardial ischemia",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80) vs '30% non-hemodynamic mild stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term '30% non-hemodynamic mild stenosis' has no entry in concept map. | coronary stenosis vs '30% non-hemodynamic mild stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term '30% non-hemodynamic mild stenosis' has no entry in concept map. | luminal diameter stenosis vs '30% non-hemodynamic mild stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term '30% non-hemodynamic mild stenosis' has no entry in concept map. | angiographic stenosis vs '30% non-hemodynamic mild stenosis' -> NO_CONCEPT_MAP_ENTRY: Proposed term '30% non-hemodynamic mild stenosis' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80)' is in concept CONCEPT-PCI-PCI-01, but proposed term '30% non-hemodynamic mild stenosis' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-PCI-NEG",
+        "policy_id": "LCD-PCI",
+        "criterion_code": "CRIT-PCI-02",
+        "criterion_name": "Refractory Angina Despite Optimal Medical Therapy (GDMT)",
+        "claimed_text": "Non-obstructive coronary artery disease without demonstrable myocardial ischemia.",
+        "claimed_equivalence": "Refractory Angina Despite Optimal Medical Therapy (GDMT)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Refractory Angina Despite Optimal Medical Therapy (GDMT) vs 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' has no entry in concept map. | refractory angina vs 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' has no entry in concept map. | ccs class ii angina vs 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' has no entry in concept map. | ccs class iii angina vs 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' has no entry in concept map. | angina despite medical therapy vs 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Refractory Angina Despite Optimal Medical Therapy (GDMT)' is in concept CONCEPT-PCI-PCI-02, but proposed term 'Non-obstructive coronary artery disease without demonstrable myocardial ischemia.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-POWER-WC-NEG",
+        "policy_id": "LCD-POWER-WC",
+        "criterion_code": "CRIT-PWC-01",
+        "criterion_name": "Severe Neurologic or Myopathic Mobility Limitation (MRADLs)",
+        "claimed_text": "Mild mobility deficit",
+        "claimed_equivalence": "Severe Neurologic or Myopathic Mobility Limitation (MRADLs)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Severe Neurologic or Myopathic Mobility Limitation (MRADLs) vs 'Mild mobility deficit' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild mobility deficit' has no entry in concept map. | unable to perform mradls vs 'Mild mobility deficit' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild mobility deficit' has no entry in concept map. | quadriplegia vs 'Mild mobility deficit' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild mobility deficit' has no entry in concept map. | amyotrophic lateral sclerosis vs 'Mild mobility deficit' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild mobility deficit' has no entry in concept map. | severe multiple sclerosis vs 'Mild mobility deficit' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild mobility deficit' has no entry in concept map. | muscular dystrophy vs 'Mild mobility deficit' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild mobility deficit' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Severe Neurologic or Myopathic Mobility Limitation (MRADLs)' is in concept CONCEPT-POWER-WC-PWC-01, but proposed term 'Mild mobility deficit' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-PROTON-APP",
+        "policy_id": "LCD-PROTON",
+        "criterion_code": "CRIT-PBT-02",
+        "criterion_name": "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
+        "claimed_text": "Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).",
+        "claimed_equivalence": "Comparative dosimetric planning demonstrating that conventional photon IMRT cannot deliver target curative dose without exceeding normal tissue tolerance.",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Comparative Dosimetric Treatment Plan Demonstrating Sparing vs 'Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Comparative Dosimetric Treatment Plan Demonstrating Sparing' is not indexed in concept map. | comparative dosimetric plan vs 'Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Proton Beam Radiotherapy Dosimetric Comparison' vs 'Skull Base, Spine, or Critical Structure Proximity'). | photon tolerance exceeded vs 'Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Proton Beam Radiotherapy Dosimetric Comparison' vs 'Skull Base, Spine, or Critical Structure Proximity'). | dosimetric comparison completed vs 'Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Proton Beam Radiotherapy Dosimetric Comparison' vs 'Skull Base, Spine, or Critical Structure Proximity').",
+        "classification_rationale": "Proposed term 'Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).' is indexed in CONCEPT-PROTON-PBT-01, but criterion 'Comparative Dosimetric Treatment Plan Demonstrating Sparing' is not indexed in the map."
+      },
+      {
+        "vignette_id": "DEV-LCD-PROTON-NEG",
+        "policy_id": "LCD-PROTON",
+        "criterion_code": "CRIT-PBT-02",
+        "criterion_name": "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
+        "claimed_text": "Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.",
+        "claimed_equivalence": "Comparative dosimetric treatment plan demonstrating sparing of normal tissue without exceeding normal tissue tolerance.",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Comparative Dosimetric Treatment Plan Demonstrating Sparing vs 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Comparative Dosimetric Treatment Plan Demonstrating Sparing' is not indexed in concept map. | comparative dosimetric plan vs 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' has no entry in concept map. | photon tolerance exceeded vs 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' has no entry in concept map. | dosimetric comparison completed vs 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Comparative Dosimetric Treatment Plan Demonstrating Sparing' nor proposed term 'Specialized proton beam therapy is not clinically indicated for widespread metastatic disease where systemic therapy and conventional palliation are standard.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-RAD-NIV-NEG",
+        "policy_id": "LCD-RAD-NIV",
+        "criterion_code": "CRIT-NIV-02",
+        "criterion_name": "Prior CPAP Trial Failure or Severe Hypoventilation Syndrome",
+        "claimed_text": "Moderate obstructive sleep apnea without respiratory failure. Advanced non-invasive ventilator with backup rate is contraindicated for uncomplicated sleep apnea; standard CPAP is indicated.",
+        "claimed_equivalence": "Prior CPAP Trial Failure or Severe Hypoventilation Syndrome",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Prior CPAP Trial Failure or Severe Hypoventilation Syndrome vs 'Moderate obstructive sleep apnea without respiratory failure. Advanced non-invasive ventilator with backup rate is contraindicated for uncomplicated sleep apnea; standard CPAP is indicated.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Non-Invasive Ventilation Failure' vs 'Obstructive Sleep Apnea'). | cpap trial failure vs 'Moderate obstructive sleep apnea without respiratory failure. Advanced non-invasive ventilator with backup rate is contraindicated for uncomplicated sleep apnea; standard CPAP is indicated.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Non-Invasive Ventilation Failure' vs 'Obstructive Sleep Apnea'). | obesity hypoventilation syndrome vs 'Moderate obstructive sleep apnea without respiratory failure. Advanced non-invasive ventilator with backup rate is contraindicated for uncomplicated sleep apnea; standard CPAP is indicated.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Non-Invasive Ventilation Failure' vs 'Obstructive Sleep Apnea'). | als ventilatory support vs 'Moderate obstructive sleep apnea without respiratory failure. Advanced non-invasive ventilator with backup rate is contraindicated for uncomplicated sleep apnea; standard CPAP is indicated.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Non-Invasive Ventilation Failure' vs 'Obstructive Sleep Apnea'). | thoracic restrictive disease vs 'Moderate obstructive sleep apnea without respiratory failure. Advanced non-invasive ventilator with backup rate is contraindicated for uncomplicated sleep apnea; standard CPAP is indicated.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Non-Invasive Ventilation Failure' vs 'Obstructive Sleep Apnea').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Non-Invasive Ventilation Failure' (CONCEPT-RAD-NIV-NIV-02) while proposed is in 'Obstructive Sleep Apnea' (CONCEPT-SLEEP-APNEA)."
+      },
+      {
+        "vignette_id": "DEV-LCD-ROTATOR-CUFF-NEG",
+        "policy_id": "LCD-ROTATOR-CUFF",
+        "criterion_code": "CRIT-RC-02",
+        "criterion_name": "Conservative Therapy Trial Failure (>= 3 Months)",
+        "claimed_text": "Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.",
+        "claimed_equivalence": "Conservative Therapy Trial Failure (>= 3 Months)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Conservative Therapy Trial Failure (>= 3 Months) vs 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' has no entry in concept map. | physical therapy trial vs 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' has no entry in concept map. | subacromial injection vs 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' has no entry in concept map. | conservative care trial vs 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' has no entry in concept map. | 90 days conservative therapy vs 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Conservative Therapy Trial Failure (>= 3 Months)' is in concept CONCEPT-SHOULDER-ARTHRO-SHLD-02, but proposed term 'Isolated soft tissue rotator cuff repair is ineffective and contraindicated in the setting of severe glenohumeral arthritis.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-LCD-SBRT-APP",
+        "policy_id": "LCD-SBRT",
+        "criterion_code": "CRIT-SBRT-02",
+        "criterion_name": "Rigid Immobilization and Organ Motion Management Plan",
+        "claimed_text": "Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.",
+        "claimed_equivalence": "Rigid Immobilization and Organ Motion Management Plan",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Rigid Immobilization and Organ Motion Management Plan vs 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Rigid Immobilization and Organ Motion Management Plan' is not indexed in concept map. | 4d ct motion management vs 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' has no entry in concept map. | stereotactic immobilization vs 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' has no entry in concept map. | respiratory gating plan vs 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Rigid Immobilization and Organ Motion Management Plan' nor proposed term 'Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-LCD-SBRT-NEG",
+        "policy_id": "LCD-SBRT",
+        "criterion_code": "CRIT-SBRT-01",
+        "criterion_name": "Early-Stage NSCLC (T1-T2N0M0) or Oligometastases (<= 3 Lesions)",
+        "claimed_text": "Widely metastatic disseminated malignancy. Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.",
+        "claimed_equivalence": "Early-Stage NSCLC (T1-T2N0M0) or Oligometastases (<= 3 Lesions)",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Early-Stage NSCLC (T1-T2N0M0) or Oligometastases (<= 3 Lesions) vs 'Widely metastatic disseminated malignancy. Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Lung Malignancy' vs 'Polymetastatic Disease > 3 Lesions'). | stage i nsclc vs 'Widely metastatic disseminated malignancy. Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Early-Stage NSCLC or Oligometastases' vs 'Polymetastatic Disease > 3 Lesions'). | medically inoperable lung cancer vs 'Widely metastatic disseminated malignancy. Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Early-Stage NSCLC or Oligometastases' vs 'Polymetastatic Disease > 3 Lesions'). | oligometastatic disease <= 3 lesions vs 'Widely metastatic disseminated malignancy. Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Early-Stage NSCLC or Oligometastases' vs 'Polymetastatic Disease > 3 Lesions'). | t1n0m0 lung cancer vs 'Widely metastatic disseminated malignancy. Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Early-Stage NSCLC or Oligometastases' vs 'Polymetastatic Disease > 3 Lesions').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Lung Malignancy' (CONCEPT-LUNG-CANCER) while proposed is in 'Polymetastatic Disease > 3 Lesions' (CONCEPT-SBRT-SBRT-EXCL-01)."
+      },
+      {
+        "vignette_id": "DEV-LCD-SBRT-NEG",
+        "policy_id": "LCD-SBRT",
+        "criterion_code": "CRIT-SBRT-02",
+        "criterion_name": "Rigid Immobilization and Organ Motion Management Plan",
+        "claimed_text": "Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.",
+        "claimed_equivalence": "Rigid Immobilization and Organ Motion Management Plan",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Rigid Immobilization and Organ Motion Management Plan vs 'Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Rigid Immobilization and Organ Motion Management Plan' is not indexed in concept map. | 4d ct motion management vs 'Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Stereotactic Body Radiation Therapy Immobilization and Motion Management Plan' vs 'Polymetastatic Disease > 3 Lesions'). | stereotactic immobilization vs 'Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Stereotactic Body Radiation Therapy Immobilization and Motion Management Plan' vs 'Polymetastatic Disease > 3 Lesions'). | respiratory gating plan vs 'Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Stereotactic Body Radiation Therapy Immobilization and Motion Management Plan' vs 'Polymetastatic Disease > 3 Lesions').",
+        "classification_rationale": "Proposed term 'Focused stereotactic body radiation therapy is contraindicated in widespread polymetastatic disease.' is indexed in CONCEPT-SBRT-SBRT-EXCL-01, but criterion 'Rigid Immobilization and Organ Motion Management Plan' is not indexed in the map."
+      },
+      {
+        "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-NEG",
+        "policy_id": "LCD-SHOULDER-ARTHRO",
+        "criterion_code": "CRIT-SHLD-02",
+        "criterion_name": "Conservative Therapy Trial Failure (>= 3 Months)",
+        "claimed_text": "Prosthetic total joint arthroplasty is strictly contraindicated in the presence of active sepsis.",
+        "claimed_equivalence": "Conservative Therapy Trial Failure (>= 3 Months)",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Conservative Therapy Trial Failure (>= 3 Months) vs 'Prosthetic total joint arthroplasty is strictly contraindicated in the presence of active sepsis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Therapy Trial Failure for Shoulder Arthroplasty' vs 'Active Systemic Infection'). | shoulder physical therapy vs 'Prosthetic total joint arthroplasty is strictly contraindicated in the presence of active sepsis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Therapy Trial Failure for Shoulder Arthroplasty' vs 'Active Systemic Infection'). | conservative treatment trial vs 'Prosthetic total joint arthroplasty is strictly contraindicated in the presence of active sepsis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Therapy Trial Failure for Shoulder Arthroplasty' vs 'Active Systemic Infection'). | corticosteroid injection trial vs 'Prosthetic total joint arthroplasty is strictly contraindicated in the presence of active sepsis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Therapy Trial Failure for Shoulder Arthroplasty' vs 'Active Systemic Infection'). | three months conservative therapy vs 'Prosthetic total joint arthroplasty is strictly contraindicated in the presence of active sepsis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Therapy Trial Failure for Shoulder Arthroplasty' vs 'Active Systemic Infection').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Conservative Therapy Trial Failure for Shoulder Arthroplasty' (CONCEPT-SHOULDER-ARTHRO-SHLD-02) while proposed is in 'Active Systemic Infection' (CONCEPT-PUMP-PUMP-EXCL-01)."
+      },
+      {
+        "vignette_id": "DEV-LCD-WOUND-VAC-NEG",
+        "policy_id": "LCD-WOUND-VAC",
+        "criterion_code": "CRIT-VAC-02",
+        "criterion_name": "Conventional Wound Care Trial Failure (>= 30 Days)",
+        "claimed_text": "Unstageable necrotic pressure wound.",
+        "claimed_equivalence": "Conventional Wound Care Trial Failure (>= 30 Days)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Conventional Wound Care Trial Failure (>= 30 Days) vs 'Unstageable necrotic pressure wound.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Unstageable necrotic pressure wound.' has no entry in concept map. | conventional wound care trial vs 'Unstageable necrotic pressure wound.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Unstageable necrotic pressure wound.' has no entry in concept map. | 30 days standard wound care vs 'Unstageable necrotic pressure wound.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Unstageable necrotic pressure wound.' has no entry in concept map. | dressing changes for 30 days vs 'Unstageable necrotic pressure wound.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Unstageable necrotic pressure wound.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Conventional Wound Care Trial Failure (>= 30 Days)' is in concept CONCEPT-WOUND-VAC-VAC-02, but proposed term 'Unstageable necrotic pressure wound.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
+        "policy_id": "NCD-CARDIAC-REHAB",
+        "criterion_code": "CRIT-CREH-01",
+        "criterion_name": "Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%)",
+        "claimed_text": "Recent surgical revascularization for ischemic heart disease in stable clinical condition.",
+        "claimed_equivalence": "Qualifying diagnosis: acute MI within past 12 months, CABG, heart valve surgery, PCI/stent, stable angina, or chronic heart failure with LVEF <= 35%",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%) vs 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' has no entry in concept map. | acute myocardial infarction within 12 months vs 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' has no entry in concept map. | post cabg vs 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' has no entry in concept map. | valve surgery vs 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' has no entry in concept map. | chronic heart failure lvef <= 35% vs 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' has no entry in concept map. | coronary stent within 12 months vs 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%)' is in concept CONCEPT-LVEF-HEART-FAILURE, but proposed term 'Recent surgical revascularization for ischemic heart disease in stable clinical condition.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
+        "policy_id": "NCD-CARDIAC-REHAB",
+        "criterion_code": "CRIT-CREH-02",
+        "criterion_name": "Physician-Prescribed Individualized Exercise Treatment Plan",
+        "claimed_text": "individualized aerobic exercise plan",
+        "claimed_equivalence": "Physician-Prescribed Individualized Exercise Treatment Plan",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Physician-Prescribed Individualized Exercise Treatment Plan vs 'individualized aerobic exercise plan' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Physician-Prescribed Individualized Exercise Treatment Plan' is not indexed in concept map. | individualized treatment plan vs 'individualized aerobic exercise plan' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'individualized aerobic exercise plan' has no entry in concept map. | cardiac rehab prescription vs 'individualized aerobic exercise plan' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'individualized aerobic exercise plan' has no entry in concept map. | physician-directed exercise plan vs 'individualized aerobic exercise plan' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'individualized aerobic exercise plan' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Physician-Prescribed Individualized Exercise Treatment Plan' nor proposed term 'individualized aerobic exercise plan' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-CARDIAC-REHAB-NEG",
+        "policy_id": "NCD-CARDIAC-REHAB",
+        "criterion_code": "CRIT-CREH-02",
+        "criterion_name": "Physician-Prescribed Individualized Exercise Treatment Plan",
+        "claimed_text": "Exercise rehabilitation is strictly contraindicated",
+        "claimed_equivalence": "Physician-Prescribed Individualized Exercise Treatment Plan",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Physician-Prescribed Individualized Exercise Treatment Plan vs 'Exercise rehabilitation is strictly contraindicated' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Physician-Prescribed Individualized Exercise Treatment Plan' is not indexed in concept map. | individualized treatment plan vs 'Exercise rehabilitation is strictly contraindicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Exercise rehabilitation is strictly contraindicated' has no entry in concept map. | cardiac rehab prescription vs 'Exercise rehabilitation is strictly contraindicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Exercise rehabilitation is strictly contraindicated' has no entry in concept map. | physician-directed exercise plan vs 'Exercise rehabilitation is strictly contraindicated' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Exercise rehabilitation is strictly contraindicated' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Physician-Prescribed Individualized Exercise Treatment Plan' nor proposed term 'Exercise rehabilitation is strictly contraindicated' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-CATARACT-NEG",
+        "policy_id": "NCD-CATARACT",
+        "criterion_code": "CRIT-CAT-01",
+        "criterion_name": "Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare",
+        "claimed_text": "20/25",
+        "claimed_equivalence": "Best corrected visual acuity of 20/25 or worse in affected eye",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare vs '20/25' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare' is not indexed in concept map. | visual acuity 20/50 or worse vs '20/25' -> NO_CONCEPT_MAP_ENTRY: Proposed term '20/25' has no entry in concept map. | snellen 20/50 vs '20/25' -> NO_CONCEPT_MAP_ENTRY: Proposed term '20/25' has no entry in concept map. | snellen 20/60 vs '20/25' -> NO_CONCEPT_MAP_ENTRY: Proposed term '20/25' has no entry in concept map. | snellen 20/70 vs '20/25' -> NO_CONCEPT_MAP_ENTRY: Proposed term '20/25' has no entry in concept map. | severe disabling glare vs '20/25' -> NO_CONCEPT_MAP_ENTRY: Proposed term '20/25' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare' nor proposed term '20/25' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-CATARACT-NEG",
+        "policy_id": "NCD-CATARACT",
+        "criterion_code": "CRIT-CAT-02",
+        "criterion_name": "Documented Impairment in Activities of Daily Living (ADLs)",
+        "claimed_text": "zero subjective visual complaints",
+        "claimed_equivalence": "Patient reports that visual impairment significantly interferes with essential daily activities (driving, reading, navigating steps, personal safety).",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Documented Impairment in Activities of Daily Living (ADLs) vs 'zero subjective visual complaints' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Documented Impairment in Activities of Daily Living (ADLs)' is not indexed in concept map. | difficulty driving due to vision vs 'zero subjective visual complaints' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero subjective visual complaints' has no entry in concept map. | impaired reading vs 'zero subjective visual complaints' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero subjective visual complaints' has no entry in concept map. | visual impairment limiting adls vs 'zero subjective visual complaints' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero subjective visual complaints' has no entry in concept map. | difficulty seeing steps vs 'zero subjective visual complaints' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero subjective visual complaints' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Documented Impairment in Activities of Daily Living (ADLs)' nor proposed term 'zero subjective visual complaints' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-CCTA-APP",
+        "policy_id": "NCD-CCTA",
+        "criterion_code": "CRIT-CCTA-02",
+        "criterion_name": "Inconclusive Prior Stress Testing or Equivocal Biomarkers",
+        "claimed_text": "Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.",
+        "claimed_equivalence": "Inconclusive Prior Stress Testing or Equivocal Biomarkers",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Inconclusive Prior Stress Testing or Equivocal Biomarkers vs 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' has no entry in concept map. | inconclusive stress test vs 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' has no entry in concept map. | equivocal stress echo vs 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' has no entry in concept map. | unable to exercise vs 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Inconclusive Prior Stress Testing or Equivocal Biomarkers' is in concept CONCEPT-CCTA-CCTA-02, but proposed term 'Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-NCD-MPI-PET-APP",
+        "policy_id": "NCD-MPI-PET",
+        "criterion_code": "CRIT-PETM-01",
+        "criterion_name": "Intermediate-to-High Pre-Test CAD Probability",
+        "claimed_text": "Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.",
+        "claimed_equivalence": "Intermediate-to-High Pre-Test CAD Probability",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Intermediate-to-High Pre-Test CAD Probability vs 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Intermediate-to-High Pre-Test CAD Probability' is not indexed in concept map. | intermediate cad risk vs 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' has no entry in concept map. | high cad risk vs 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' has no entry in concept map. | anginal chest pain vs 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' has no entry in concept map. | known coronary artery disease vs 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Intermediate-to-High Pre-Test CAD Probability' nor proposed term 'Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-MPI-PET-NEG",
+        "policy_id": "NCD-MPI-PET",
+        "criterion_code": "CRIT-PETM-02",
+        "criterion_name": "Suboptimal SPECT Imaging or Severe Obesity (BMI >= 35 kg/m2)",
+        "claimed_text": "Diagnostic cardiac PET myocardial perfusion scanning is contraindicated for routine asymptomatic screening.",
+        "claimed_equivalence": "Suboptimal SPECT Imaging or Severe Obesity (BMI >= 35 kg/m2)",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Suboptimal SPECT Imaging or Severe Obesity (BMI >= 35 kg/m2) vs 'Diagnostic cardiac PET myocardial perfusion scanning is contraindicated for routine asymptomatic screening.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Suboptimal SPECT or Severe Obesity' vs 'Low Risk Asymptomatic Cardiac PET Screening'). | body mass index vs 'Diagnostic cardiac PET myocardial perfusion scanning is contraindicated for routine asymptomatic screening.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Suboptimal SPECT or Severe Obesity' vs 'Low Risk Asymptomatic Cardiac PET Screening'). | bmi vs 'Diagnostic cardiac PET myocardial perfusion scanning is contraindicated for routine asymptomatic screening.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Suboptimal SPECT or Severe Obesity' vs 'Low Risk Asymptomatic Cardiac PET Screening'). | obesity attenuation artifact vs 'Diagnostic cardiac PET myocardial perfusion scanning is contraindicated for routine asymptomatic screening.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Suboptimal SPECT or Severe Obesity' vs 'Low Risk Asymptomatic Cardiac PET Screening').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Suboptimal SPECT or Severe Obesity' (CONCEPT-MPI-PET-PETM-02) while proposed is in 'Low Risk Asymptomatic Cardiac PET Screening' (CONCEPT-MPI-PET-PETM-EXCL-01)."
+      },
+      {
+        "vignette_id": "DEV-NCD-PET-ONC-APP",
+        "policy_id": "NCD-PET-ONC",
+        "criterion_code": "CRIT-PTONC-02",
+        "criterion_name": "Clinical Staging Impact on Intended Treatment Strategy",
+        "claimed_text": "Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.",
+        "claimed_equivalence": "Clinical Staging Impact on Intended Treatment Strategy",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Clinical Staging Impact on Intended Treatment Strategy vs 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Clinical Staging Impact on Intended Treatment Strategy' is not indexed in concept map. | impact on treatment plan vs 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' has no entry in concept map. | determine surgical resectability vs 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' has no entry in concept map. | radiation therapy planning vs 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' has no entry in concept map. | evaluating treatment response vs 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Clinical Staging Impact on Intended Treatment Strategy' nor proposed term 'Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-PET-ONC-NEG",
+        "policy_id": "NCD-PET-ONC",
+        "criterion_code": "CRIT-PTONC-02",
+        "criterion_name": "Clinical Staging Impact on Intended Treatment Strategy",
+        "claimed_text": "Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.",
+        "claimed_equivalence": "Clinical Staging Impact on Intended Treatment Strategy",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Clinical Staging Impact on Intended Treatment Strategy vs 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Clinical Staging Impact on Intended Treatment Strategy' is not indexed in concept map. | impact on treatment plan vs 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' has no entry in concept map. | determine surgical resectability vs 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' has no entry in concept map. | radiation therapy planning vs 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' has no entry in concept map. | evaluating treatment response vs 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Clinical Staging Impact on Intended Treatment Strategy' nor proposed term 'Routine surveillance whole-body PET-CT scanning is not recommended in asymptomatic early-stage survivors.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-PUMP-APP",
+        "policy_id": "NCD-PUMP",
+        "criterion_code": "CRIT-PUMP-01",
+        "criterion_name": "Successful Intrathecal Preliminary Trial Response",
+        "claimed_text": "75% pain reduction",
+        "claimed_equivalence": "Successful Intrathecal Preliminary Trial Response",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Successful Intrathecal Preliminary Trial Response vs '75% pain reduction' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Successful Intrathecal Preliminary Trial Response' is not indexed in concept map. | intrathecal trial response vs '75% pain reduction' -> NO_CONCEPT_MAP_ENTRY: Proposed term '75% pain reduction' has no entry in concept map. | successful trial injection vs '75% pain reduction' -> NO_CONCEPT_MAP_ENTRY: Proposed term '75% pain reduction' has no entry in concept map. | trial pain relief vs '75% pain reduction' -> NO_CONCEPT_MAP_ENTRY: Proposed term '75% pain reduction' has no entry in concept map. | positive intrathecal trial vs '75% pain reduction' -> NO_CONCEPT_MAP_ENTRY: Proposed term '75% pain reduction' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Successful Intrathecal Preliminary Trial Response' nor proposed term '75% pain reduction' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-PUMP-APP",
+        "policy_id": "NCD-PUMP",
+        "criterion_code": "CRIT-PUMP-02",
+        "criterion_name": "Intolerable Side Effects or Failure of Systemic Analgesics",
+        "claimed_text": "Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.",
+        "claimed_equivalence": "Intolerable Side Effects or Failure of Systemic Analgesics",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Intolerable Side Effects or Failure of Systemic Analgesics vs 'Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Conservative Therapy Trial Failure' vs 'Chronic Intertrigo and Maceration'). | failed systemic analgesics vs 'Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Intractable Pain Unresponsive to Systemic Analgesics' vs 'Chronic Intertrigo and Maceration'). | dose-limiting opioid toxicity vs 'Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Intractable Pain Unresponsive to Systemic Analgesics' vs 'Chronic Intertrigo and Maceration'). | intractable chronic pain vs 'Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Intractable Pain Unresponsive to Systemic Analgesics' vs 'Chronic Intertrigo and Maceration'). | failure of oral opioids vs 'Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Intractable Pain Unresponsive to Systemic Analgesics' vs 'Chronic Intertrigo and Maceration').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Conservative Therapy Trial Failure' (CONCEPT-LUMBAR-DECOMP-LDEC-02) while proposed is in 'Chronic Intertrigo and Maceration' (CONCEPT-PANNI-PANNI-02)."
+      },
+      {
+        "vignette_id": "DEV-NCD-SCS-APP",
+        "policy_id": "NCD-SCS",
+        "criterion_code": "CRIT-SCS-01",
+        "criterion_name": "Temporary Trial Pain Reduction (>= 50%)",
+        "claimed_text": "80% pain relief",
+        "claimed_equivalence": "Temporary Trial Pain Reduction (>= 50%)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Temporary Trial Pain Reduction (>= 50%) vs '80% pain relief' -> NO_CONCEPT_MAP_ENTRY: Proposed term '80% pain relief' has no entry in concept map. | scs trial relief vs '80% pain relief' -> NO_CONCEPT_MAP_ENTRY: Proposed term '80% pain relief' has no entry in concept map. | trial pain reduction vs '80% pain relief' -> NO_CONCEPT_MAP_ENTRY: Proposed term '80% pain relief' has no entry in concept map. | temporary stimulation relief vs '80% pain relief' -> NO_CONCEPT_MAP_ENTRY: Proposed term '80% pain relief' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Temporary Trial Pain Reduction (>= 50%)' is in concept CONCEPT-SCS-SCS-01, but proposed term '80% pain relief' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-NCD-SCS-NEG",
+        "policy_id": "NCD-SCS",
+        "criterion_code": "CRIT-SCS-01",
+        "criterion_name": "Temporary Trial Pain Reduction (>= 50%)",
+        "claimed_text": "44-year-old presenting following a 4-day temporary percutaneous stimulation trial.",
+        "claimed_equivalence": "Temporary Trial Pain Reduction (>= 50%)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Temporary Trial Pain Reduction (>= 50%) vs '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' has no entry in concept map. | scs trial relief vs '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' has no entry in concept map. | trial pain reduction vs '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' has no entry in concept map. | temporary stimulation relief vs '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Temporary Trial Pain Reduction (>= 50%)' is in concept CONCEPT-SCS-SCS-01, but proposed term '44-year-old presenting following a 4-day temporary percutaneous stimulation trial.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-NCD-SGD-NEG",
+        "policy_id": "NCD-SGD",
+        "criterion_code": "CRIT-SGD-01",
+        "criterion_name": "Severe Expressive Speech Impairment Precluding Daily Communication",
+        "claimed_text": "Mild transient dysarthria without profound expressive impairment",
+        "claimed_equivalence": "Severe Expressive Speech Impairment Precluding Daily Communication",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Severe Expressive Speech Impairment Precluding Daily Communication vs 'Mild transient dysarthria without profound expressive impairment' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Severe Expressive Speech Impairment Precluding Daily Communication' is not indexed in concept map. | severe expressive aphasia vs 'Mild transient dysarthria without profound expressive impairment' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild transient dysarthria without profound expressive impairment' has no entry in concept map. | severe dysarthria vs 'Mild transient dysarthria without profound expressive impairment' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild transient dysarthria without profound expressive impairment' has no entry in concept map. | anarthria vs 'Mild transient dysarthria without profound expressive impairment' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild transient dysarthria without profound expressive impairment' has no entry in concept map. | total laryngectomy vs 'Mild transient dysarthria without profound expressive impairment' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild transient dysarthria without profound expressive impairment' has no entry in concept map. | unable to communicate verbally vs 'Mild transient dysarthria without profound expressive impairment' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Mild transient dysarthria without profound expressive impairment' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Severe Expressive Speech Impairment Precluding Daily Communication' nor proposed term 'Mild transient dysarthria without profound expressive impairment' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-NCD-SGD-NEG",
+        "policy_id": "NCD-SGD",
+        "criterion_code": "CRIT-SGD-02",
+        "criterion_name": "Formal Evaluation by Licensed Speech-Language Pathologist (SLP)",
+        "claimed_text": "Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.",
+        "claimed_equivalence": "Formal written assessment by a licensed Speech-Language Pathologist (SLP) recommending the specific device and detailing trial results with AAC systems.",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Formal Evaluation by Licensed Speech-Language Pathologist (SLP) vs 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Formal Evaluation by Licensed Speech-Language Pathologist (SLP)' is not indexed in concept map. | speech-language pathologist evaluation vs 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' has no entry in concept map. | slp assessment completed vs 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' has no entry in concept map. | aac device trial completed vs 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Formal Evaluation by Licensed Speech-Language Pathologist (SLP)' nor proposed term 'Formal SLP evaluation indicates speech intelligibility is 88% with natural speech techniques. The requested hardware is an unlocked standard commercial retail tablet without communication software.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-OPD-BLEPH-NEG",
+        "policy_id": "OPD-BLEPH",
+        "criterion_code": "CRIT-BLEPH-01",
+        "criterion_name": "Visual Field Restriction (>= 30% or 12 Degrees)",
+        "claimed_text": "zero superior field restriction (loss < 5%)",
+        "claimed_equivalence": "Visual Field Restriction (>= 30% or 12 Degrees)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Visual Field Restriction (>= 30% or 12 Degrees) vs 'zero superior field restriction (loss < 5%)' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero superior field restriction (loss < 5%)' has no entry in concept map. | visual field vs 'zero superior field restriction (loss < 5%)' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero superior field restriction (loss < 5%)' has no entry in concept map. | superior visual field restriction vs 'zero superior field restriction (loss < 5%)' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero superior field restriction (loss < 5%)' has no entry in concept map. | field loss vs 'zero superior field restriction (loss < 5%)' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero superior field restriction (loss < 5%)' has no entry in concept map. | visual field deficit vs 'zero superior field restriction (loss < 5%)' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'zero superior field restriction (loss < 5%)' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Visual Field Restriction (>= 30% or 12 Degrees)' is in concept CONCEPT-BLEPH-BLEPH-01, but proposed term 'zero superior field restriction (loss < 5%)' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-OPD-BOTOX-NEG",
+        "policy_id": "OPD-BOTOX",
+        "criterion_code": "CRIT-BOTOX-02",
+        "criterion_name": "Oral Prophylactic Medication Trial Failure (>= 2 Classes)",
+        "claimed_text": "Patient has not trialed any daily preventive medications.",
+        "claimed_equivalence": "Oral Prophylactic Medication Trial Failure (>= 2 Classes)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Oral Prophylactic Medication Trial Failure (>= 2 Classes) vs 'Patient has not trialed any daily preventive medications.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Oral Prophylactic Medication Trial Failure (>= 2 Classes)' is not indexed in concept map. | oral prophylactic failure vs 'Patient has not trialed any daily preventive medications.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Patient has not trialed any daily preventive medications.' has no entry in concept map. | failed preventive medication vs 'Patient has not trialed any daily preventive medications.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Patient has not trialed any daily preventive medications.' has no entry in concept map. | topiramate vs 'Patient has not trialed any daily preventive medications.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Patient has not trialed any daily preventive medications.' has no entry in concept map. | propranolol vs 'Patient has not trialed any daily preventive medications.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Patient has not trialed any daily preventive medications.' has no entry in concept map. | amitriptyline vs 'Patient has not trialed any daily preventive medications.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Patient has not trialed any daily preventive medications.' has no entry in concept map. | preventive drug trial vs 'Patient has not trialed any daily preventive medications.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Patient has not trialed any daily preventive medications.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Oral Prophylactic Medication Trial Failure (>= 2 Classes)' nor proposed term 'Patient has not trialed any daily preventive medications.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-OPD-CERV-DISC-NEG",
+        "policy_id": "OPD-CERV-DISC",
+        "criterion_code": "CRIT-CERV-01",
+        "criterion_name": "Symptomatic Cervical Radiculopathy or Myelopathy",
+        "claimed_text": "67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.",
+        "claimed_equivalence": "Symptomatic Cervical Radiculopathy or Myelopathy",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Symptomatic Cervical Radiculopathy or Myelopathy vs '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' has no entry in concept map. | cervical radiculopathy vs '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' has no entry in concept map. | cervical myelopathy vs '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' has no entry in concept map. | nerve root compression vs '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' has no entry in concept map. | cervical disc herniation on mri vs '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' -> NO_CONCEPT_MAP_ENTRY: Proposed term '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Symptomatic Cervical Radiculopathy or Myelopathy' is in concept CONCEPT-ESI-ESI-01, but proposed term '67-year-old presenting with chronic neck stiffness and bilateral shoulder pain.' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-OPD-CERV-DISC-NEG",
+        "policy_id": "OPD-CERV-DISC",
+        "criterion_code": "CRIT-CERV-02",
+        "criterion_name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+        "claimed_text": "Multilevel degenerative disc disease with severe facet arthrosis and cervical instability. Motion-sparing artificial disc arthroplasty is contraindicated in the presence of facet spondylosis.",
+        "claimed_equivalence": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+        "assigned_class": "claimed concept present in the map but the claimed equivalence is wrong",
+        "evidence_lookup_detail": "Conservative Therapy Trial Failure (>= 6 Weeks) vs 'Multilevel degenerative disc disease with severe facet arthrosis and cervical instability. Motion-sparing artificial disc arthroplasty is contraindicated in the presence of facet spondylosis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Cervical Conservative Therapy Failure' vs 'Severe Cervical Facet Degeneration'). | conservative physical therapy vs 'Multilevel degenerative disc disease with severe facet arthrosis and cervical instability. Motion-sparing artificial disc arthroplasty is contraindicated in the presence of facet spondylosis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Cervical Conservative Therapy Failure' vs 'Severe Cervical Facet Degeneration'). | cervical physical therapy vs 'Multilevel degenerative disc disease with severe facet arthrosis and cervical instability. Motion-sparing artificial disc arthroplasty is contraindicated in the presence of facet spondylosis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Cervical Conservative Therapy Failure' vs 'Severe Cervical Facet Degeneration'). | conservative therapy trial vs 'Multilevel degenerative disc disease with severe facet arthrosis and cervical instability. Motion-sparing artificial disc arthroplasty is contraindicated in the presence of facet spondylosis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Cervical Conservative Therapy Failure' vs 'Severe Cervical Facet Degeneration'). | analgesic trial vs 'Multilevel degenerative disc disease with severe facet arthrosis and cervical instability. Motion-sparing artificial disc arthroplasty is contraindicated in the presence of facet spondylosis.' -> NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Cervical Conservative Therapy Failure' vs 'Severe Cervical Facet Degeneration').",
+        "classification_rationale": "Both terms are indexed, but belong to disjoint concepts: criterion is in 'Cervical Conservative Therapy Failure' (CONCEPT-CERV-DISC-CERV-02) while proposed is in 'Severe Cervical Facet Degeneration' (CONCEPT-CERV-DISC-CERV-EXCL-01)."
+      },
+      {
+        "vignette_id": "DEV-OPD-RHINO-NEG",
+        "policy_id": "OPD-RHINO",
+        "criterion_code": "CRIT-RHINO-01",
+        "criterion_name": "Chronic Nasal Airway Obstruction (>= 6 Months)",
+        "claimed_text": "presentation is for cosmetic nasal reshaping",
+        "claimed_equivalence": "Chronic Nasal Airway Obstruction (>= 6 Months)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Chronic Nasal Airway Obstruction (>= 6 Months) vs 'presentation is for cosmetic nasal reshaping' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'presentation is for cosmetic nasal reshaping' has no entry in concept map. | nasal obstruction vs 'presentation is for cosmetic nasal reshaping' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'presentation is for cosmetic nasal reshaping' has no entry in concept map. | nasal airway obstruction vs 'presentation is for cosmetic nasal reshaping' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'presentation is for cosmetic nasal reshaping' has no entry in concept map. | chronic nasal obstruction vs 'presentation is for cosmetic nasal reshaping' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'presentation is for cosmetic nasal reshaping' has no entry in concept map. | difficulty nasal breathing vs 'presentation is for cosmetic nasal reshaping' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'presentation is for cosmetic nasal reshaping' has no entry in concept map.",
+        "classification_rationale": "Criterion 'Chronic Nasal Airway Obstruction (>= 6 Months)' is in concept CONCEPT-RHINO-RHINO-01, but proposed term 'presentation is for cosmetic nasal reshaping' has no accepted entry in that or any concept."
+      },
+      {
+        "vignette_id": "DEV-OPD-SI-FUSION-APP",
+        "policy_id": "OPD-SI-FUSION",
+        "criterion_code": "CRIT-SI-01",
+        "criterion_name": "Diagnostic SI Block Pain Relief (>= 75%)",
+        "claimed_text": "Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.",
+        "claimed_equivalence": "Diagnostic SI Block Pain Relief (>= 75%)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Diagnostic SI Block Pain Relief (>= 75%) vs 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Diagnostic SI Block Pain Relief (>= 75%)' is not indexed in concept map. | diagnostic si block relief vs 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' has no entry in concept map. | si joint injection relief vs 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' has no entry in concept map. | sacroiliac block pain reduction vs 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Diagnostic SI Block Pain Relief (>= 75%)' nor proposed term 'Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.' is indexed in the expanded map."
+      },
+      {
+        "vignette_id": "DEV-OPD-SI-FUSION-NEG",
+        "policy_id": "OPD-SI-FUSION",
+        "criterion_code": "CRIT-SI-01",
+        "criterion_name": "Diagnostic SI Block Pain Relief (>= 75%)",
+        "claimed_text": "Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.",
+        "claimed_equivalence": "Diagnostic SI Block Pain Relief (>= 75%)",
+        "assigned_class": "claimed concept absent from the expanded map",
+        "evidence_lookup_detail": "Diagnostic SI Block Pain Relief (>= 75%) vs 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Criterion term 'Diagnostic SI Block Pain Relief (>= 75%)' is not indexed in concept map. | diagnostic si block relief vs 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' has no entry in concept map. | si joint injection relief vs 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' has no entry in concept map. | sacroiliac block pain reduction vs 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' -> NO_CONCEPT_MAP_ENTRY: Proposed term 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' has no entry in concept map.",
+        "classification_rationale": "Neither criterion 'Diagnostic SI Block Pain Relief (>= 75%)' nor proposed term 'Diagnostic SI joint injection performed under fluoroscopy produced zero percent pain reduction.' is indexed in the expanded map."
+      }
+    ]
+  },
+  "task3_ceiling_analysis": {
+    "total_synonymy_deferrals": 19,
+    "resolved_in_what_if_arm_b": 1,
+    "theoretical_ceiling_resolvable_count": 19,
+    "case_details": [
+      {
+        "vignette_id": "DEV-LCD-IMRT-APP",
+        "policy_id": "LCD-IMRT",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-IMRT-02: Gate C map veto on '3D-CRT plan exceeds rectal wal' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
+        "policy_id": "LCD-KNEE-ORTHOSIS",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-KORTH-01: Gate C map veto on '3+ anterior drawer, grade III ' (needs map coverage).",
+          "CRIT-KORTH-02: Gate C map veto on 'conical thigh geometry' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-KYPHO-APP",
+        "policy_id": "LCD-KYPHO",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-KYPHO-01: Gate C map veto on 'Pain rating is 8/10 on visual ' (needs map coverage).",
+          "CRIT-KYPHO-02: Gate A failure on 'STIR or T2 MRI demonstrating h' (needs perfect quoting)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
+        "policy_id": "LCD-LUMBAR-DECOMP",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-LDEC-01: Gate C map veto on 'severe lumbar spinal stenosis' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
+        "policy_id": "LCD-MRI-BRAIN",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-MRIB-02: Gate C map veto on 'progressive right upper extrem' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
+        "policy_id": "LCD-MRI-LUMBAR",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-MRIL-02: Gate A failure on 'Recent plain radiographs of th' (needs perfect quoting)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+        "policy_id": "LCD-PAD-ATHERO",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-PAD-01: Gate A failure on 'severe claudication occurring ' (needs perfect quoting).",
+          "CRIT-PAD-02: Gate A failure on 'Ankle-Brachial Index (ABI) <= ' (needs perfect quoting)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-POWER-WC-APP",
+        "policy_id": "LCD-POWER-WC",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-PWC-02: Gate A failure on 'Specialty evaluation by licens' (needs perfect quoting)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-PROTON-APP",
+        "policy_id": "LCD-PROTON",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-PBT-02: Gate C map veto on 'Comparative planning demonstra' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-RAD-NIV-APP",
+        "policy_id": "LCD-RAD-NIV",
+        "resolved_in_arm_b": true,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "Already resolved in Arm B (what-if)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-LCD-SBRT-APP",
+        "policy_id": "LCD-SBRT",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-SBRT-01: Proposal accepted, but other criteria or policy rules prevented APPROVED.",
+          "CRIT-SBRT-02: Gate C map veto on 'Stereotactic body radiation th' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
+        "policy_id": "NCD-CARDIAC-REHAB",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-CREH-01: Gate C map veto on 'Recent surgical revascularizat' (needs map coverage).",
+          "CRIT-CREH-02: Gate C map veto on 'individualized aerobic exercis' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-NCD-CCTA-APP",
+        "policy_id": "NCD-CCTA",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-CCTA-01: Gate A failure on 'Intermediate pre-test probabil' (needs perfect quoting).",
+          "CRIT-CCTA-02: Gate C map veto on 'Atypical chest discomfort in i' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-NCD-MPI-PET-APP",
+        "policy_id": "NCD-MPI-PET",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-PETM-01: Gate C map veto on 'Severe coronary disease and is' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-NCD-PACEMAKER-APP",
+        "policy_id": "NCD-PACEMAKER",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-PACE-02: Gate A failure on 'absent reversible causes' (needs perfect quoting)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-NCD-PET-ONC-APP",
+        "policy_id": "NCD-PET-ONC",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-PTONC-01: Gate A failure on 'Histologically Confirmed Malig' (needs perfect quoting).",
+          "CRIT-PTONC-02: Gate C map veto on 'Whole-body 18F-FDG positron em' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-NCD-PUMP-APP",
+        "policy_id": "NCD-PUMP",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-PUMP-01: Gate C map veto on '75% pain reduction' (needs map coverage).",
+          "CRIT-PUMP-02: Gate C map veto on 'Intractable pelvic pain refrac' (needs map coverage)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-NCD-SGD-APP",
+        "policy_id": "NCD-SGD",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-SGD-02: Gate A failure on 'Formal evaluation by licensed ' (needs perfect quoting)."
+        ]
+      },
+      {
+        "vignette_id": "DEV-OPD-SI-FUSION-APP",
+        "policy_id": "OPD-SI-FUSION",
+        "resolved_in_arm_b": false,
+        "potential_resolvable_under_ceiling": true,
+        "blocker_details": [
+          "CRIT-SI-01: Gate C map veto on 'Severe chronic right sacroilia' (needs map coverage)."
+        ]
+      }
+    ]
+  }
+}
