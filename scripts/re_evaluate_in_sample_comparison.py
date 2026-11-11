@@ -44,19 +44,18 @@ SYNONYMY_VIGNETTE_IDS = [
 
 def build_in_sample_concept_map() -> Tuple[ConceptMap, int, int, int]:
     """
-    Builds the in-sample test-only concept map:
-    12 committed + 120 v27 policy drafts + 15 v29 attested drafts = 147 total.
+    Builds the in-sample test-only concept map using unified merged draft entries:
+    12 committed + 119 unified merged draft concepts (1 concept per criterion).
     """
     exp_map = ConceptMap()
     committed_count = exp_map.total_concepts
 
-    # 1. Load v27 drafts
-    draft_v27_file = ROOT_DIR / "app" / "data" / "concept_map" / "draft_concept_entries.json"
-    added_v27 = 0
-    if draft_v27_file.exists():
-        with open(draft_v27_file, "r", encoding="utf-8") as f:
-            drafts_v27 = json.load(f)
-        for d in drafts_v27:
+    draft_file = ROOT_DIR / "app" / "data" / "concept_map" / "draft_concept_entries.json"
+    added_unified = 0
+    if draft_file.exists():
+        with open(draft_file, "r", encoding="utf-8") as f:
+            drafts = json.load(f)
+        for d in drafts:
             if d.get("governing_rule_check") == "PASS_EQUIVALENCE":
                 cdef = ConceptDefinition(
                     concept_id=d["concept_id"],
@@ -65,33 +64,13 @@ def build_in_sample_concept_map() -> Tuple[ConceptMap, int, int, int]:
                     accepted_terms=d["accepted_terms"],
                     prohibited_near_misses=d.get("prohibited_near_misses", []),
                     source=ConceptSource.TASK1_ADJUDICATION_EXPANSION,
-                    source_reason=f"What-if v27: {d['governing_rule_rationale']}"
+                    source_reason=f"Unified draft: {d.get('governing_rule_rationale', '')}"
                 )
                 exp_map.register_concept(cdef)
-                added_v27 += 1
+                added_unified += 1
 
-    # 2. Load v29 attested drafts
-    draft_v29_file = ROOT_DIR / "app" / "data" / "concept_map" / "draft_attested_concept_entries.json"
-    added_v29 = 0
-    if draft_v29_file.exists():
-        with open(draft_v29_file, "r", encoding="utf-8") as f:
-            drafts_v29 = json.load(f)
-        for d in drafts_v29.get("entries", []):
-            if d.get("governing_rule_check") == "PASS_EQUIVALENCE":
-                cdef = ConceptDefinition(
-                    concept_id=d["concept_id"],
-                    canonical_name=d["canonical_name"],
-                    domain=d["domain"],
-                    accepted_terms=d["accepted_terms"],
-                    prohibited_near_misses=d.get("prohibited_near_misses", []),
-                    source=ConceptSource.TASK1_ADJUDICATION_EXPANSION,
-                    source_reason=f"In-sample v29: {d['governing_rule_rationale']}"
-                )
-                exp_map.register_concept(cdef)
-                added_v29 += 1
-
-    print(f"[*] In-Sample ConceptMap assembled: {committed_count} committed + {added_v27} v27 drafts + {added_v29} v29 attested drafts = {exp_map.total_concepts} total concepts.")
-    return exp_map, committed_count, added_v27, added_v29
+    print(f"[*] In-Sample ConceptMap assembled: {committed_count} committed + {added_unified} unified draft concepts = {exp_map.total_concepts} total concepts.")
+    return exp_map, committed_count, added_unified, 0
 
 
 def run_clean_arm(

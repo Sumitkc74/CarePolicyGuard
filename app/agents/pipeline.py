@@ -220,6 +220,322 @@ class MultiAgentVerificationPipeline:
                 abstention_reason,
                 clinician_action_notes
             ) = gate.evaluate(criteria_assessments, verification_audits)
+        elif execution_mode == "agentic":
+            # Communicating Multi-Agent Adjudication Architecture (Tasks 1, 2, 3)
+            from app.schemas.message_board import CaseMessageBoard, BoardMessageType
+            from app.core.candidate_span_extractor import CandidateSpanExtractor
+            from app.core.llm_judge import ClinicalEquivalenceJudge, EquivalenceVerdict
+            from app.core.agentic_guardrails import AgenticGuardrails, GuardrailViolationError, BudgetExhaustionHalt
+            from app.services.declarative_engine import DeclarativePolicyEngine
+
+            board = CaseMessageBoard(case_id=case_id)
+            judge = ClinicalEquivalenceJudge()
+            if getattr(self.llm_proposer, "timeout_seconds", None):
+                judge.timeout_seconds = max(self.llm_proposer.timeout_seconds, 15.0)
+            judge.reset_case_budget()
+
+            # Task 1 & 2: Agent 1 posts POLICY_SELECTED with score and margin to runner-up
+            top_score = 1.0
+            margin_to_runner_up = 1.0
+            if retrieval_insights and retrieval_insights.get("candidates"):
+                cands = retrieval_insights["candidates"]
+                top_score = cands[0].get("score", 1.0)
+                if len(cands) > 1:
+                    margin_to_runner_up = round(top_score - cands[1].get("score", 0.0), 3)
+
+            p_selected_content = (
+                f"Selected policy {policy_id} ('{policy_title}') with retrieval score {top_score:.3f} "
+                f"(margin to runner-up: {margin_to_runner_up:.3f})."
+            )
+            if margin_to_runner_up < 0.10:
+                p_selected_content += f" WARNING: Margin to runner-up ({margin_to_runner_up:.3f}) < 0.10; policy retrieval uncertainty noted."
+
+            board.post(
+                agent="Agent 1: Policy Retrieval",
+                message_type=BoardMessageType.POLICY_SELECTED,
+                content=p_selected_content,
+                metadata={
+                    "policy_id": policy_id,
+                    "retrieval_score": top_score,
+                    "margin_to_runner_up": margin_to_runner_up,
+                    "uncertainty_flag": (margin_to_runner_up < 0.10)
+                }
+            )
+
+            # Task 2: Agent 2 Autonomous Deliberation & Dynamic Tool Selection
+            # Agent 2 orders criteria dynamically: check exclusions first
+            ordered_criteria = sorted(criteria_defs, key=lambda c: 0 if c.get("is_exclusion", False) else 1)
+            criteria_assessments = []
+            agent2_tool_decisions = []
+            short_circuit_denial = False
+            budget_halt = False
+            denial_reason = ""
+            total_agent_turns = 1  # Agent 1 was turn 1
+            verification_audits = []
+            agent3_debate_rounds = []
+
+            for crit in ordered_criteria:
+                ccode = crit.get("criterion_code", "UNKNOWN")
+                is_excl = crit.get("is_exclusion", False)
+                total_agent_turns += 1
+
+                # 1. Deterministic extraction first
+                decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
+                assessment = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
+
+                if is_excl:
+                    if assessment.status == DeterminationStatus.MET:
+                        # Statutory exclusion met -> proven contraindication
+                        short_circuit_denial = True
+                        denial_reason = f"Statutory exclusion {ccode} triggered: '{assessment.clinical_rationale}'"
+                        board.post(
+                            agent="Agent 2: Clinical Evaluator",
+                            message_type=BoardMessageType.ASSESSMENT_PROPOSED,
+                            content=f"Statutory exclusion {ccode} MET: Disqualifying condition proven in note: '{assessment.clinical_rationale}'. Short-circuiting to DENIAL.",
+                            criterion_code=ccode,
+                            evidence=(assessment.verified_spans[0] if assessment.verified_spans else None),
+                            metadata={"is_exclusion": True, "status": "MET", "short_circuit": True}
+                        )
+                        criteria_assessments.append(assessment)
+                        break
+                    else:
+                        board.post(
+                            agent="Agent 2: Clinical Evaluator",
+                            message_type=BoardMessageType.ASSESSMENT_PROPOSED,
+                            content=f"Statutory exclusion {ccode} ruled out: no disqualifying condition documented in note.",
+                            criterion_code=ccode,
+                            metadata={"is_exclusion": True, "status": "NOT_MET"}
+                        )
+                        criteria_assessments.append(assessment)
+                        continue
+
+                # For inclusion criteria:
+                if assessment.status == DeterminationStatus.MET:
+                    sp = assessment.verified_spans[0] if assessment.verified_spans else None
+                    sp_text = sp.source_text if sp else "Exact phrase"
+                    board.post(
+                        agent="Agent 2: Clinical Evaluator",
+                        message_type=BoardMessageType.ASSESSMENT_PROPOSED,
+                        content=f"Inclusion criterion {ccode} satisfied deterministically: '{sp_text}' (Raw confidence: {assessment.raw_confidence:.2f}).",
+                        criterion_code=ccode,
+                        evidence=sp,
+                        metadata={"deterministic": True, "raw_confidence": assessment.raw_confidence}
+                    )
+                    criteria_assessments.append(assessment)
+                    continue
+
+                if assessment.status == DeterminationStatus.NOT_MET:
+                    # Reconciliation Invariant: Proven negative is never overturned by an LLM
+                    board.post(
+                        agent="Agent 2: Clinical Evaluator",
+                        message_type=BoardMessageType.ASSESSMENT_PROPOSED,
+                        content=f"Inclusion criterion {ccode} evaluated NOT_MET deterministically. Grounded negative reconciliation rule applies: LLM cannot overturn proven negative.",
+                        criterion_code=ccode,
+                        metadata={"deterministic": True, "reconciliation_locked": True}
+                    )
+                    criteria_assessments.append(assessment)
+                    continue
+
+                # INSUFFICIENT_EVIDENCE: Deterministic extraction missed
+                # Deterministic engine extracts verbatim candidate slices with exact note offsets
+                candidate_spans = CandidateSpanExtractor.extract_candidates(
+                    ehr_narrative=sanitized_ehr,
+                    criterion=crit,
+                    max_candidates=3
+                )
+
+                if not candidate_spans:
+                    board.post(
+                        agent="Agent 2: Clinical Evaluator",
+                        message_type=BoardMessageType.ASSESSMENT_PROPOSED,
+                        content=f"Zero candidate evidence spans found in narrative for {ccode}; status remains INSUFFICIENT_EVIDENCE.",
+                        criterion_code=ccode,
+                        metadata={"candidate_count": 0}
+                    )
+                    criteria_assessments.append(assessment)
+                    continue
+
+                # Evaluate top candidate spans with LLM Judge under operational budgets
+                promoted = False
+                budget_halt = False
+                for cand in candidate_spans:
+                    try:
+                        if judge.case_call_count >= AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
+                            raise BudgetExhaustionHalt("LLM_CALLS", AgenticGuardrails.MAX_LLM_CALLS_PER_CASE, judge.case_call_count)
+                        AgenticGuardrails.check_budgets(
+                            llm_calls=judge.case_call_count,
+                            elapsed_seconds=judge.case_elapsed_ms / 1000.0,
+                            agent_turns=total_agent_turns,
+                            criterion_debate_rounds=0
+                        )
+                    except BudgetExhaustionHalt as bh:
+                        board.post(
+                            agent="Agent 4: Abstention Gate",
+                            message_type=BoardMessageType.HALT,
+                            content=f"HALT triggered: {bh}. Execution bounds reached; case defers to human clinician.",
+                            criterion_code=ccode,
+                            metadata={"resource": bh.resource, "limit": bh.limit}
+                        )
+                        budget_halt = True
+                        break
+
+                    total_agent_turns += 1
+                    judge_res = judge.judge_equivalence_sync(
+                        criterion=crit,
+                        candidate_span_text=cand.source_text
+                    )
+                    board.post(
+                        agent="Agent 2: Clinical Evaluator",
+                        message_type=BoardMessageType.VERDICT,
+                        content=f"LLM Judge evaluated candidate span '{cand.source_text}': verdict={judge_res.verdict.value} (Rationale: {judge_res.rationale}).",
+                        criterion_code=ccode,
+                        evidence={"source_text": cand.source_text, "start_char": cand.start_char, "end_char": cand.end_char},
+                        metadata={"verdict": judge_res.verdict.value, "latency_ms": judge_res.elapsed_ms}
+                    )
+
+                    if judge_res.verdict == EquivalenceVerdict.EQUIVALENT:
+                        ev_span = cand.to_evidence_span(confidence=0.95)
+
+                        # Sequential Gate Chain: Gate B (semantics) + Gate C (ConceptMap) + Agent 3 cross-examination
+                        gate_res = AgenticGuardrails.evaluate_gate_chain(
+                            candidate_span=ev_span,
+                            criterion=crit,
+                            ehr_narrative=sanitized_ehr,
+                            verifier_agent=self.verifier_agent
+                        )
+
+                        if gate_res["passed"]:
+                            assessment.status = DeterminationStatus.MET
+                            assessment.verified_spans = [ev_span]
+                            assessment.raw_confidence = 0.95
+                            assessment.clinical_rationale = f"Semantic equivalence verified: '{cand.source_text}' ({gate_res['reason']})."
+
+                            board.post(
+                                agent="Agent 2: Clinical Evaluator",
+                                message_type=BoardMessageType.DEFENSE,
+                                content=f"Candidate span passed Gate B, Gate C, and Agent 3 verification. Promoting {ccode} to MET with verified grounding [{cand.start_char}:{cand.end_char}].",
+                                criterion_code=ccode,
+                                evidence=ev_span,
+                                metadata={"gate_chain_passed": True, "verbatim_grounded": True}
+                            )
+                            promoted = True
+                            break
+                        else:
+                            failing_gate = gate_res["failing_gate"]
+                            reason = gate_res["reason"]
+                            board.post(
+                                agent="Agent 3: Adversarial Verifier",
+                                message_type=BoardMessageType.CHALLENGE,
+                                content=f"Challenge on {ccode} candidate span '{cand.source_text}': Rejected by {failing_gate} ({reason}).",
+                                criterion_code=ccode,
+                                evidence=ev_span,
+                                metadata={"failing_gate": failing_gate}
+                            )
+                            board.post(
+                                agent="Agent 2: Clinical Evaluator",
+                                message_type=BoardMessageType.CONCEDE,
+                                content=f"Conceding challenge on {ccode} candidate span '{cand.source_text}': gate failure acknowledged; withdrawing candidate.",
+                                criterion_code=ccode
+                            )
+
+                criteria_assessments.append(assessment)
+                if budget_halt:
+                    break
+
+            # Task 2: Agent 3 Independent Adversarial Audit & Multi-Round Debate on final assessments
+            if not short_circuit_denial and not budget_halt:
+                for ca in criteria_assessments:
+                    crit_dict = next((c for c in criteria_defs if c.get("criterion_code") == ca.criterion_code), {})
+                    audit = self.verifier_agent.audit_assessment(ca, crit_dict, sanitized_ehr)
+                    verification_audits.append(audit)
+
+                    if ca.status == DeterminationStatus.MET and not ca.is_exclusion:
+                        if audit.hallucination_flag or not audit.grounding_status or getattr(audit, "contradiction_detected", False):
+                            # Round 1 Challenge
+                            board.post(
+                                agent="Agent 3: Adversarial Verifier",
+                                message_type=BoardMessageType.CHALLENGE,
+                                content=f"Challenge on {ca.criterion_code}: {audit.audit_notes}",
+                                criterion_code=ca.criterion_code
+                            )
+                            # Agent 2 Defense or Concede
+                            can_defend = len(ca.verified_spans) > 0 and AgenticGuardrails.verify_verbatim_grounding(sanitized_ehr, ca)
+                            if can_defend:
+                                board.post(
+                                    agent="Agent 2: Clinical Evaluator",
+                                    message_type=BoardMessageType.DEFENSE,
+                                    content=f"Defense of {ca.criterion_code}: Verbatim character grounding verified at [{ca.verified_spans[0].start_char}:{ca.verified_spans[0].end_char}].",
+                                    criterion_code=ca.criterion_code
+                                )
+                                # Round 2 Challenge
+                                if audit.hallucination_flag or not audit.grounding_status:
+                                    board.post(
+                                        agent="Agent 3: Adversarial Verifier",
+                                        message_type=BoardMessageType.CHALLENGE,
+                                        content=f"Reiterating challenge on {ca.criterion_code}: Verification flaw persists after round 1 defense.",
+                                        criterion_code=ca.criterion_code
+                                    )
+                                    board.post(
+                                        agent="Agent 2: Clinical Evaluator",
+                                        message_type=BoardMessageType.CONCEDE,
+                                        content=f"Conceding {ca.criterion_code} after 2 rounds of debate; reverting to INSUFFICIENT_EVIDENCE.",
+                                        criterion_code=ca.criterion_code
+                                    )
+                                    ca.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                                    ca.raw_confidence = 0.50
+                            else:
+                                board.post(
+                                    agent="Agent 2: Clinical Evaluator",
+                                    message_type=BoardMessageType.CONCEDE,
+                                    content=f"Conceding challenge on {ca.criterion_code}: Grounding deficit acknowledged.",
+                                    criterion_code=ca.criterion_code
+                                )
+                                ca.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                                ca.raw_confidence = 0.50
+
+            # Task 2: Agent 4 Calibrated Abstention Gate & Decisions
+            if budget_halt:
+                decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+                abstention_status = True
+                raw_aggregate_conf = 0.50
+                calibrated_aggregate_conf = 0.50
+                abstention_reason = "Operational budget exhausted: Execution bounds reached; case deferred to human review."
+                clinician_action_notes = "Case halted due to operational budget exhaustion. Review remaining criteria."
+            else:
+                gate = CalibratedAbstentionGate(tau=gate_tau)
+                (
+                    decision,
+                    abstention_status,
+                    raw_aggregate_conf,
+                    calibrated_aggregate_conf,
+                    abstention_reason,
+                    clinician_action_notes
+                ) = gate.evaluate(criteria_assessments, verification_audits)
+
+            if short_circuit_denial:
+                decision = AdjudicationDecision.DENIED
+                abstention_status = False
+                abstention_reason = denial_reason
+                board.post(
+                    agent="Agent 4: Abstention Gate",
+                    message_type=BoardMessageType.DECISION,
+                    content=f"Final Determination: DENIED. Statutory exclusion condition verified present in clinical record.",
+                    metadata={"decision": "DENIED", "statutory_exclusion": True}
+                )
+            elif abstention_status:
+                board.post(
+                    agent="Agent 4: Abstention Gate",
+                    message_type=BoardMessageType.HALT,
+                    content=f"HALT: Case deferred to human clinician. Trigger reason: {abstention_reason}",
+                    metadata={"tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
+                )
+            else:
+                board.post(
+                    agent="Agent 4: Abstention Gate",
+                    message_type=BoardMessageType.DECISION,
+                    content=f"Final Determination: {decision.value}. All statutory coverage requirements satisfied with aggregate calibrated sufficiency {calibrated_aggregate_conf:.3f} >= tau ({gate_tau:.2f}).",
+                    metadata={"decision": decision.value, "sufficiency_score": calibrated_aggregate_conf}
+                )
         else:
             # 3. Agent 2: Criteria Evaluation (Agentic Tool Selection)
             criteria_assessments = []
@@ -395,6 +711,9 @@ class MultiAgentVerificationPipeline:
                 "sufficiency_score": calibrated_aggregate_conf
             }
         }
+        if 'board' in locals() and board:
+            agentic_audit_trail["message_board"] = board.to_records()
+            agentic_audit_trail["message_board_transcript"] = board.render_transcript()
 
         llm_telemetry = self.llm_proposer.telemetry
         llm_proposal_metadata = {
@@ -470,7 +789,8 @@ class MultiAgentVerificationPipeline:
             action_required_questions=action_required_questions,
             llm_proposal_metadata=llm_proposal_metadata,
             agentic_audit_trail=agentic_audit_trail,
-            candidate_tau_analysis=candidate_tau_analysis
+            candidate_tau_analysis=candidate_tau_analysis,
+            message_board=board.to_records() if 'board' in locals() and board else None
         )
 
         # 7. Persistence (Zero-Retention Medical Privacy Safe Harbor)

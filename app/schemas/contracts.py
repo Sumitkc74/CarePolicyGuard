@@ -200,6 +200,7 @@ class FinalAdjudication(BaseModel):
     llm_proposal_metadata: dict[str, Any] | None = Field(default=None, description="LLM proposal runtime audit: enabled flag, model, timeout, proposal counts, gate outcomes")
     agentic_audit_trail: dict[str, Any] | None = Field(default=None, description="Autonomous agentic decisions: Agent 2 tool selections, Agent 3 multi-round debates, Agent 4 queue priority")
     candidate_tau_analysis: dict[str, Any] | None = Field(default=None, description="Agent 4 candidate tau derived on development data reported alongside operative 0.85")
+    message_board: list[dict[str, Any]] | None = Field(default=None, description="Task 1: Shared chronological message board recording all agent communication")
 
 # Request / Response DTOs
 class PolicyMatchSummary(BaseModel):

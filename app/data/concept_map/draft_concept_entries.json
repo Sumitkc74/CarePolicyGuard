@@ -977,7 +977,12 @@
       "Radiation Exceeds Tolerance",
       "3d conformal exceeds tolerance",
       "dosimetric normal tissue constraint",
-      "imrt necessary for organ sparing"
+      "imrt necessary for organ sparing",
+      "3d-crt plan exceeds rectal wall tolerance",
+      "3d-crt plan exceeds rectal wall tolerance constraints",
+      "rectal v70 > 25%",
+      "exceeds rectal wall tolerance constraints",
+      "3d conformal radiation exceeds safe dose constraints to rectum"
     ],
     "prohibited_near_misses": [
       "3D Conformal Radiation Suffices",
@@ -991,7 +996,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:23:10 UTC"
+    "created_at": "2026-11-10 07:23:10 UTC",
+    "attested_note_phrasing": "3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).",
+    "vignette_id": "DEV-LCD-IMRT-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-IMRT-IMRT-EXCL-01",
@@ -1139,7 +1146,13 @@
       "ACL tear with instability",
       "abnormal pivot shift",
       "positive lachman test",
-      "acl tear with instability"
+      "acl tear with instability",
+      "3+ anterior drawer, grade iii lachman, and pivot shift",
+      "grade iii lachman",
+      "3+ anterior drawer",
+      "pivot shift demonstrating severe knee joint laxity",
+      "severe knee joint laxity",
+      "combined cruciate ligament insufficiency"
     ],
     "prohibited_near_misses": [
       "positive lachman test",
@@ -1155,7 +1168,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:24:20 UTC"
+    "created_at": "2026-11-10 07:24:20 UTC",
+    "attested_note_phrasing": "3+ anterior drawer, grade III Lachman, and pivot shift",
+    "vignette_id": "DEV-KNEE-ORTHOSIS-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-KNEE-ORTHOSIS-KORTH-02",
@@ -1175,7 +1190,11 @@
       "prefabricated brace cannot fit",
       "disproportionate limb circumference",
       "severe varus deformity > 15 degrees",
-      "custom brace justification"
+      "custom brace justification",
+      "conical thigh geometry",
+      "atypical lower extremity anthropometry (conical thigh geometry)",
+      "atypical lower extremity anthropometry",
+      "conical thigh circumference"
     ],
     "prohibited_near_misses": [
       "Prefabricated Brace Fit",
@@ -1189,7 +1208,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:24:34 UTC"
+    "created_at": "2026-11-10 07:24:34 UTC",
+    "attested_note_phrasing": "conical thigh geometry",
+    "vignette_id": "DEV-KNEE-ORTHOSIS-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-KNEE-ORTHOSIS-KORTH-EXCL-01",
@@ -1242,7 +1263,11 @@
       "pain score",
       "numeric rating scale",
       "vas score",
-      "nrs pain score"
+      "nrs pain score",
+      "pain rating is 8/10 on visual analog scale",
+      "8/10 on visual analog scale",
+      "pain rating 8/10 on visual analog scale",
+      "visual analog scale 8/10"
     ],
     "prohibited_near_misses": [
       "Severe Headache",
@@ -1256,7 +1281,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:25:03 UTC"
+    "created_at": "2026-11-10 07:25:03 UTC",
+    "attested_note_phrasing": "Pain rating is 8/10 on visual analog scale.",
+    "vignette_id": "DEV-LCD-KYPHO-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-KYPHO-KYPHO-02",
@@ -1348,7 +1375,11 @@
       "central canal stenosis",
       "severe lumbar stenosis",
       "foraminal stenosis",
-      "moderate to severe stenosis on mri"
+      "moderate to severe stenosis on mri",
+      "severe lumbar spinal stenosis",
+      "severe lumbar spinal stenosis at l4-l5",
+      "thecal sac cross-sectional area < 60 mm2",
+      "critical central stenosis"
     ],
     "prohibited_near_misses": [
       "Moderate to Severe Spinal Stenosis",
@@ -1363,7 +1394,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:25:49 UTC"
+    "created_at": "2026-11-10 07:25:49 UTC",
+    "attested_note_phrasing": "severe lumbar spinal stenosis",
+    "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-LUMBAR-DECOMP-LDEC-02",
@@ -1586,21 +1619,25 @@
       "headache with papilledema",
       "valsalva worsening headache",
       "progressive severe headache",
-      "headache with focal signs"
+      "headache with focal signs",
+      "progressive right upper extremity clumsiness",
+      "progressive focal neurological deficit"
     ],
     "prohibited_near_misses": [
       "Headache with Focal Signs",
       "Headache with Hypercapnic Failure"
     ],
     "drafting_model": "qwen2.5:3b",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "The clinical concept of 'Progressive Headache with Red Flags' is equivalent to the given criterion description. No anatomical organ, diagnostic modality, or clinical trade-off is involved.",
+    "governing_rule_check": "NEEDS_HUMAN_JUDGMENT",
+    "governing_rule_rationale": "Focal motor weakness, clumsiness, and dysphasia in a patient without headache cannot be treated as a wording equivalent for 'Progressive Headache with Red Flags'. Substituting focal signs for headache criteria is a policy coverage judgment that must defer to human clinical review.",
     "status": "PENDING_HUMAN_REVIEW",
     "reviewer_decision": null,
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:27:29 UTC"
+    "created_at": "2026-11-10 07:27:29 UTC",
+    "attested_note_phrasing": "progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness",
+    "vignette_id": "DEV-LCD-MRI-BRAIN-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-MRI-BRAIN-MRIB-EXCL-01",
@@ -2109,7 +2146,11 @@
       "Proton Beam vs Photon IMRT",
       "comparative dosimetric plan",
       "photon tolerance exceeded",
-      "dosimetric comparison completed"
+      "dosimetric comparison completed",
+      "comparative planning demonstrates that conventional photon vmat delivers unacceptable toxic doses",
+      "photon vmat delivers unacceptable toxic doses",
+      "conventional photon vmat delivers unacceptable toxic doses (brainstem max dose 62 gy)",
+      "constraining brainstem dose to 48 gy"
     ],
     "prohibited_near_misses": [
       "Photon Beam Radiotherapy Dosimetric Comparison",
@@ -2124,7 +2165,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:31:09 UTC"
+    "created_at": "2026-11-10 07:31:09 UTC",
+    "attested_note_phrasing": "Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).",
+    "vignette_id": "DEV-LCD-PROTON-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-PROTON-PBT-EXCL-01",
@@ -2428,7 +2471,11 @@
       "SBRT motion management plan",
       "4d ct motion management",
       "stereotactic immobilization",
-      "respiratory gating plan"
+      "respiratory gating plan",
+      "respiratory motion tracking",
+      "sbrt delivering 50 gy in 4 fractions with respiratory motion tracking",
+      "stereotactic body radiation therapy with respiratory motion tracking",
+      "motion tracking delivery"
     ],
     "prohibited_near_misses": [
       "rectal sparing plan",
@@ -2442,7 +2489,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:33:21 UTC"
+    "created_at": "2026-11-10 07:33:21 UTC",
+    "attested_note_phrasing": "Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.",
+    "vignette_id": "DEV-LCD-SBRT-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-SBRT-SBRT-EXCL-01",
@@ -2692,7 +2741,11 @@
       "post cabg",
       "valve surgery",
       "chronic heart failure lvef <= 35%",
-      "coronary stent within 12 months"
+      "coronary stent within 12 months",
+      "recent surgical revascularization for ischemic heart disease",
+      "surgical revascularization for ischemic heart disease",
+      "surgical revascularization for ischemic heart disease in stable clinical condition",
+      "three-vessel coronary artery bypass graft surgery"
     ],
     "prohibited_near_misses": [],
     "drafting_model": "qwen2.5:3b",
@@ -2703,7 +2756,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:35:41 UTC"
+    "created_at": "2026-11-10 07:35:41 UTC",
+    "attested_note_phrasing": "Recent surgical revascularization for ischemic heart disease in stable clinical condition.",
+    "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-CARDIAC-REHAB-CREH-02",
@@ -2722,7 +2777,10 @@
       "Exercise Prescription",
       "individualized treatment plan",
       "cardiac rehab prescription",
-      "physician-directed exercise plan"
+      "physician-directed exercise plan",
+      "individualized aerobic exercise plan",
+      "prescribed individualized aerobic exercise plan",
+      "cardiologist prescribed individualized aerobic exercise plan"
     ],
     "prohibited_near_misses": [
       "Individualized Treatment Plan",
@@ -2737,7 +2795,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:35:53 UTC"
+    "created_at": "2026-11-10 07:35:53 UTC",
+    "attested_note_phrasing": "individualized aerobic exercise plan",
+    "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-CARDIAC-REHAB-CREH-EXCL-01",
@@ -2919,7 +2979,11 @@
       "equivocal stress echo",
       "unable to exercise",
       "inconclusive prior stress test",
-      "equivocal prior stress test"
+      "equivocal prior stress test",
+      "equivocal baseline electrocardiogram",
+      "equivocal baseline ecg",
+      "render exercise ecg stress testing non-diagnostic",
+      "non-specific st-t wave abnormalities that render exercise ecg stress testing non-diagnostic"
     ],
     "prohibited_near_misses": [
       "inconclusive physical exercise test",
@@ -2934,7 +2998,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:37:19 UTC"
+    "created_at": "2026-11-10 07:37:19 UTC",
+    "attested_note_phrasing": "Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.",
+    "vignette_id": "DEV-NCD-CCTA-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-CCTA-CCTA-EXCL-01",
@@ -2989,7 +3055,11 @@
       "intermediate cad risk",
       "high cad risk",
       "anginal chest pain",
-      "known coronary artery disease"
+      "known coronary artery disease",
+      "severe coronary disease and ischemic systolic dysfunction",
+      "severe coronary disease and ischemic systolic dysfunction with inconclusive spect",
+      "ischemic systolic dysfunction with inconclusive spect",
+      "established cad with ischemic systolic dysfunction"
     ],
     "prohibited_near_misses": [
       "Anginal Chest Pain",
@@ -3003,7 +3073,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:37:49 UTC"
+    "created_at": "2026-11-10 07:37:49 UTC",
+    "attested_note_phrasing": "Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.",
+    "vignette_id": "DEV-NCD-MPI-PET-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-MPI-PET-PETM-02",
@@ -3232,7 +3304,11 @@
       "impact on treatment plan",
       "determine surgical resectability",
       "radiation therapy planning",
-      "evaluating treatment response"
+      "evaluating treatment response",
+      "pet-ct for initial oncologic staging",
+      "initial oncologic staging to determine resectability",
+      "initial systemic staging required to determine resectability",
+      "whole-body 18f-fdg positron emission tomography with computed tomography (pet-ct) for initial oncologic staging"
     ],
     "prohibited_near_misses": [
       "PET-CT findings impact surgery",
@@ -3247,7 +3323,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:39:31 UTC"
+    "created_at": "2026-11-10 07:39:31 UTC",
+    "attested_note_phrasing": "Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.",
+    "vignette_id": "DEV-NCD-PET-ONC-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-PET-ONC-PTONC-EXCL-01",
@@ -3300,7 +3378,11 @@
       "intrathecal trial response",
       "successful trial injection",
       "trial pain relief",
-      "positive intrathecal trial"
+      "positive intrathecal trial",
+      "75% pain reduction",
+      "documented 75% pain reduction",
+      "preliminary trial producing documented 75% pain reduction",
+      "successful preliminary intrathecal screening trial"
     ],
     "prohibited_near_misses": [
       "Rectal Sparing",
@@ -3314,7 +3396,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:39:58 UTC"
+    "created_at": "2026-11-10 07:39:58 UTC",
+    "attested_note_phrasing": "75% pain reduction",
+    "vignette_id": "DEV-NCD-PUMP-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-PUMP-PUMP-02",
@@ -3334,7 +3418,11 @@
       "failed systemic analgesics",
       "dose-limiting opioid toxicity",
       "intractable chronic pain",
-      "failure of oral opioids"
+      "failure of oral opioids",
+      "intractable pelvic pain refractory to systemic medical therapy",
+      "refractory to systemic medical therapy",
+      "refractory to oral opioids and neuropathic agents due to intolerable sedation",
+      "intolerable sedation from systemic opioids"
     ],
     "prohibited_near_misses": [
       "Failed Systemic Analgesics - Rectal Sparing",
@@ -3348,7 +3436,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:40:12 UTC"
+    "created_at": "2026-11-10 07:40:12 UTC",
+    "attested_note_phrasing": "Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.",
+    "vignette_id": "DEV-NCD-PUMP-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-PUMP-PUMP-EXCL-01",
@@ -4118,7 +4208,11 @@
       "Local Anesthetic Injection Relief",
       "diagnostic si block relief",
       "si joint injection relief",
-      "sacroiliac block pain reduction"
+      "sacroiliac block pain reduction",
+      "> 75% relief on diagnostic intra-articular block",
+      "85% relief of baseline pain during the anesthetic window",
+      "greater than 75% relief on diagnostic intra-articular block",
+      "relief on diagnostic intra-articular block"
     ],
     "prohibited_near_misses": [
       "Rectal Sparing",
@@ -4132,7 +4226,9 @@
     "reviewer_notes": null,
     "reviewed_by": null,
     "reviewed_at": null,
-    "created_at": "2026-11-10 07:45:36 UTC"
+    "created_at": "2026-11-10 07:45:36 UTC",
+    "attested_note_phrasing": "Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.",
+    "vignette_id": "DEV-OPD-SI-FUSION-APP"
   },
   {
     "entry_id": "DRAFT-CONCEPT-SI-FUSION-SI-02",
@@ -4297,501 +4393,5 @@
     "reviewed_by": null,
     "reviewed_at": null,
     "created_at": "2026-11-10 07:46:48 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-IMRT-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-IMRT-02",
-    "canonical_name": "Dosimetric Proof of 3D Conformal Inadequacy (Rectal Tolerance)",
-    "domain": "radiation_oncology",
-    "policy_id": "LCD-IMRT",
-    "criterion_code": "CRIT-IMRT-02",
-    "criterion_name": "Dosimetric Proof of 3D Conformal Inadequacy (Rectal Tolerance)",
-    "vignette_id": "DEV-LCD-IMRT-APP",
-    "grounding_quote": "Documented comparison confirming 3D conformal radiation would exceed safe dose constraints to parotid glands, rectum/bladder, spinal cord, or other adjacent critical normal tissues.",
-    "attested_note_phrasing": "3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).",
-    "accepted_terms": [
-      "3d-crt plan exceeds rectal wall tolerance",
-      "3d-crt plan exceeds rectal wall tolerance constraints",
-      "rectal v70 > 25%",
-      "exceeds rectal wall tolerance constraints",
-      "3d conformal radiation exceeds safe dose constraints to rectum"
-    ],
-    "prohibited_near_misses": [
-      "rectal sparing alone without dosimetric comparison",
-      "imrt requested for simple palliative bone metastases"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Rectum is explicitly enumerated in the policy criterion text as a critical organ at risk. Demonstrating 3D-CRT plan exceeds rectal wall tolerance constraints is a direct factual instantiation of the criterion requirement.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-KORTH-01",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-KORTH-01",
-    "canonical_name": "Documented Objective Knee Laxity or Ligamentous Deficiency",
-    "domain": "orthotics_and_prosthetics",
-    "policy_id": "LCD-KNEE-ORTHOSIS",
-    "criterion_code": "CRIT-KORTH-01",
-    "criterion_name": "Documented Objective Knee Laxity or Ligamentous Deficiency",
-    "vignette_id": "DEV-KNEE-ORTHOSIS-APP",
-    "grounding_quote": "Physical examination documenting Grade II or III ligamentous instability on anterior drawer, Lachman, pivot shift, or varus/valgus stress test.",
-    "attested_note_phrasing": "3+ anterior drawer, grade III Lachman, and pivot shift",
-    "accepted_terms": [
-      "3+ anterior drawer, grade iii lachman, and pivot shift",
-      "grade iii lachman",
-      "3+ anterior drawer",
-      "pivot shift demonstrating severe knee joint laxity",
-      "severe knee joint laxity",
-      "combined cruciate ligament insufficiency"
-    ],
-    "prohibited_near_misses": [
-      "grade i laxity",
-      "subjective knee giving way without objective physical exam signs"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Criterion text explicitly specifies Grade II/III instability on anterior drawer, Lachman, or pivot shift. The attested clinical exam findings are direct textbook clinical equivalences.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-KORTH-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-KORTH-02",
-    "canonical_name": "Medical Justification for Custom vs Prefabricated Device",
-    "domain": "orthotics_and_prosthetics",
-    "policy_id": "LCD-KNEE-ORTHOSIS",
-    "criterion_code": "CRIT-KORTH-02",
-    "criterion_name": "Medical Justification for Custom vs Prefabricated Device",
-    "vignette_id": "DEV-KNEE-ORTHOSIS-APP",
-    "grounding_quote": "Documented anatomical justification why an off-the-shelf prefabricated brace cannot fit (e.g. disproportionate thigh/calf circumference, severe angular deformity > 15 degrees, abnormal limb contour).",
-    "attested_note_phrasing": "conical thigh geometry",
-    "accepted_terms": [
-      "conical thigh geometry",
-      "atypical lower extremity anthropometry (conical thigh geometry)",
-      "atypical lower extremity anthropometry",
-      "conical thigh circumference"
-    ],
-    "prohibited_near_misses": [
-      "prefabricated brace preferred",
-      "patient preference for custom brace without anatomical abnormality"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Conical thigh geometry is an atypical limb contour and disproportionate circumference preventing fit and retention of cylindrical off-the-shelf braces. Direct anatomical subtype of policy criterion.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-LDEC-01",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-LDEC-01",
-    "canonical_name": "Severe Central or Foraminal Stenosis on MRI/CT",
-    "domain": "spine_surgery",
-    "policy_id": "LCD-LUMBAR-DECOMP",
-    "criterion_code": "CRIT-LDEC-01",
-    "criterion_name": "Severe Central or Foraminal Stenosis on MRI/CT",
-    "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
-    "grounding_quote": "Diagnostic MRI or CT confirming moderate to severe lumbar central canal, subarticular, or neural foraminal stenosis correlating with symptoms.",
-    "attested_note_phrasing": "severe lumbar spinal stenosis",
-    "accepted_terms": [
-      "severe lumbar spinal stenosis",
-      "severe lumbar spinal stenosis at l4-l5",
-      "thecal sac cross-sectional area < 60 mm2",
-      "critical central stenosis"
-    ],
-    "prohibited_near_misses": [
-      "mild central canal narrowing",
-      "incidental radiologic stenosis without claudication"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "'severe lumbar spinal stenosis' directly matches canonical severe central canal stenosis.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-MRIB-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-MRIB-02",
-    "canonical_name": "Progressive Neurological Clumsiness (Non-Headache Deficit)",
-    "domain": "neurology",
-    "policy_id": "LCD-MRI-BRAIN",
-    "criterion_code": "CRIT-MRIB-02",
-    "criterion_name": "Progressive Neurological Clumsiness (Non-Headache Deficit)",
-    "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
-    "grounding_quote": "Headache with progressive severity, nocturnal awakening, papilledema on fundoscopy, or worsening with Valsalva maneuver.",
-    "attested_note_phrasing": "progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness",
-    "accepted_terms": [
-      "progressive right upper extremity clumsiness",
-      "progressive focal neurological deficit"
-    ],
-    "prohibited_near_misses": [
-      "tension-type headache",
-      "migraine without aura"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "NEEDS_HUMAN_JUDGMENT",
-    "governing_rule_rationale": "Focal motor weakness, clumsiness, and dysphasia in a patient without headache cannot be treated as a wording equivalent for 'Progressive Headache with Red Flags'. Substituting focal signs for headache criteria is a policy coverage judgment that must defer to human clinical review.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-PBT-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-PBT-02",
-    "canonical_name": "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
-    "domain": "radiation_oncology",
-    "policy_id": "LCD-PROTON",
-    "criterion_code": "CRIT-PBT-02",
-    "criterion_name": "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
-    "vignette_id": "DEV-LCD-PROTON-APP",
-    "grounding_quote": "Comparative dosimetric planning demonstrating that conventional photon IMRT cannot deliver target curative dose without exceeding normal tissue tolerance.",
-    "attested_note_phrasing": "Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).",
-    "accepted_terms": [
-      "comparative planning demonstrates that conventional photon vmat delivers unacceptable toxic doses",
-      "photon vmat delivers unacceptable toxic doses",
-      "conventional photon vmat delivers unacceptable toxic doses (brainstem max dose 62 gy)",
-      "constraining brainstem dose to 48 gy"
-    ],
-    "prohibited_near_misses": [
-      "proton therapy requested without comparative photon dosimetric plan",
-      "photon plan achieves safe normal tissue constraints"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Photon VMAT is rotational photon IMRT. Demonstrating photon VMAT delivers toxic doses to adjacent brainstem while protons constrain dose to 48 Gy is an exact factual instantiation of comparative dosimetric sparing.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-SBRT-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-SBRT-02",
-    "canonical_name": "Rigid Immobilization and Organ Motion Management Plan",
-    "domain": "radiation_oncology",
-    "policy_id": "LCD-SBRT",
-    "criterion_code": "CRIT-SBRT-02",
-    "criterion_name": "Rigid Immobilization and Organ Motion Management Plan",
-    "vignette_id": "DEV-LCD-SBRT-APP",
-    "grounding_quote": "Rigid stereotactic body immobilization and documented organ motion management plan (e.g. 4D-CT respiratory gating, breath-hold, abdominal compression, fiducial tracking).",
-    "attested_note_phrasing": "Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.",
-    "accepted_terms": [
-      "respiratory motion tracking",
-      "sbrt delivering 50 gy in 4 fractions with respiratory motion tracking",
-      "stereotactic body radiation therapy with respiratory motion tracking",
-      "motion tracking delivery"
-    ],
-    "prohibited_near_misses": [
-      "free breathing delivery without motion management",
-      "conventional fractionation without stereotactic tracking"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Respiratory motion tracking is a recognized modality of organ motion management in stereotactic body radiotherapy, directly satisfying the criterion requirement.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-CREH-01",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-CREH-01",
-    "canonical_name": "Qualifying Cardiac Event (Post-CABG Revascularization)",
-    "domain": "cardiology",
-    "policy_id": "NCD-CARDIAC-REHAB",
-    "criterion_code": "CRIT-CREH-01",
-    "criterion_name": "Qualifying Cardiac Event (Post-CABG Revascularization)",
-    "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
-    "grounding_quote": "Qualifying diagnosis: acute MI within past 12 months, CABG, heart valve surgery, PCI/stent, stable angina, or chronic heart failure with LVEF <= 35%.",
-    "attested_note_phrasing": "Recent surgical revascularization for ischemic heart disease in stable clinical condition.",
-    "accepted_terms": [
-      "recent surgical revascularization for ischemic heart disease",
-      "surgical revascularization for ischemic heart disease",
-      "surgical revascularization for ischemic heart disease in stable clinical condition",
-      "three-vessel coronary artery bypass graft surgery"
-    ],
-    "prohibited_near_misses": [
-      "unstable angina",
-      "acute decompensated heart failure precluding exercise"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Coronary artery bypass graft (CABG) surgery is defined medically as surgical revascularization for ischemic heart disease. Direct clinical synonym.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-CREH-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-CREH-02",
-    "canonical_name": "Physician-Prescribed Individualized Exercise Treatment Plan",
-    "domain": "cardiology",
-    "policy_id": "NCD-CARDIAC-REHAB",
-    "criterion_code": "CRIT-CREH-02",
-    "criterion_name": "Physician-Prescribed Individualized Exercise Treatment Plan",
-    "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
-    "grounding_quote": "Written physician-prescribed individualized exercise treatment plan detailing modality, frequency, duration, and target heart rates.",
-    "attested_note_phrasing": "individualized aerobic exercise plan",
-    "accepted_terms": [
-      "individualized aerobic exercise plan",
-      "prescribed individualized aerobic exercise plan",
-      "cardiologist prescribed individualized aerobic exercise plan"
-    ],
-    "prohibited_near_misses": [
-      "unsupervised home walking recommendation",
-      "general physical activity advice without prescription"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Cardiologist-prescribed individualized aerobic exercise plan verbatim satisfies individualized exercise treatment plan.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-PETM-01",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-PETM-01",
-    "canonical_name": "Intermediate-to-High Pre-Test CAD Probability (Established Ischemic CAD)",
-    "domain": "cardiology",
-    "policy_id": "NCD-MPI-PET",
-    "criterion_code": "CRIT-PETM-01",
-    "criterion_name": "Intermediate-to-High Pre-Test CAD Probability (Established Ischemic CAD)",
-    "vignette_id": "DEV-NCD-MPI-PET-APP",
-    "grounding_quote": "Documented intermediate-to-high pre-test probability of coronary artery disease, or established CAD with new/worsening anginal symptoms or ischemic equivalents.",
-    "attested_note_phrasing": "Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.",
-    "accepted_terms": [
-      "severe coronary disease and ischemic systolic dysfunction",
-      "severe coronary disease and ischemic systolic dysfunction with inconclusive spect",
-      "ischemic systolic dysfunction with inconclusive spect",
-      "established cad with ischemic systolic dysfunction"
-    ],
-    "prohibited_near_misses": [
-      "low pre-test probability cad",
-      "non-ischemic dilated cardiomyopathy"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT is an established high-probability ischemic CAD condition.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-PUMP-01",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-PUMP-01",
-    "canonical_name": "Successful Intrathecal Preliminary Trial Response",
-    "domain": "pain_management",
-    "policy_id": "NCD-PUMP",
-    "criterion_code": "CRIT-PUMP-01",
-    "criterion_name": "Successful Intrathecal Preliminary Trial Response",
-    "vignette_id": "DEV-NCD-PUMP-APP",
-    "grounding_quote": "Preliminary trial of intrathecal drug administration demonstrating >= 50% reduction in pain score or severe intractable spasticity relief.",
-    "attested_note_phrasing": "75% pain reduction",
-    "accepted_terms": [
-      "75% pain reduction",
-      "documented 75% pain reduction",
-      "preliminary trial producing documented 75% pain reduction",
-      "successful preliminary intrathecal screening trial"
-    ],
-    "prohibited_near_misses": [
-      "pain reduction < 50%",
-      "trial without documented pain relief"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "75% pain reduction on preliminary trial exceeds the >= 50% pain relief requirement. Direct clinical satisfaction.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-PUMP-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-PUMP-02",
-    "canonical_name": "Intolerable Side Effects or Failure of Systemic Analgesics",
-    "domain": "pain_management",
-    "policy_id": "NCD-PUMP",
-    "criterion_code": "CRIT-PUMP-02",
-    "criterion_name": "Intolerable Side Effects or Failure of Systemic Analgesics",
-    "vignette_id": "DEV-NCD-PUMP-APP",
-    "grounding_quote": "Documented failure of or intolerable adverse effects from conventional oral/systemic analgesics (including opioids) managed by pain specialist.",
-    "attested_note_phrasing": "Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.",
-    "accepted_terms": [
-      "intractable pelvic pain refractory to systemic medical therapy",
-      "refractory to systemic medical therapy",
-      "refractory to oral opioids and neuropathic agents due to intolerable sedation",
-      "intolerable sedation from systemic opioids"
-    ],
-    "prohibited_near_misses": [
-      "systemic analgesics not attempted",
-      "mild pain responsive to oral nsaids"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Intractable pelvic pain refractory to systemic medical therapy and oral opioids due to intolerable sedation is an exact clinical equivalent.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-SI-01",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-SI-01",
-    "canonical_name": "Diagnostic SI Block Pain Relief (>= 75%)",
-    "domain": "interventional_spine",
-    "policy_id": "OPD-SI-FUSION",
-    "criterion_code": "CRIT-SI-01",
-    "criterion_name": "Diagnostic SI Block Pain Relief (>= 75%)",
-    "vignette_id": "DEV-OPD-SI-FUSION-APP",
-    "grounding_quote": "Documented >= 75% pain relief following at least one (or two) image-guided diagnostic sacroiliac joint injections.",
-    "attested_note_phrasing": "Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.",
-    "accepted_terms": [
-      "> 75% relief on diagnostic intra-articular block",
-      "85% relief of baseline pain during the anesthetic window",
-      "greater than 75% relief on diagnostic intra-articular block",
-      "relief on diagnostic intra-articular block"
-    ],
-    "prohibited_near_misses": [
-      "relief < 75%",
-      "non-image-guided blind injection"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "> 75% relief on diagnostic intra-articular block verbatim matches the statutory criterion.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-KYPHO-01",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-KYPHO-01",
-    "canonical_name": "Severe Pain Score (NRS/VAS >= 6/10)",
-    "domain": "interventional_spine",
-    "policy_id": "LCD-KYPHO",
-    "criterion_code": "CRIT-KYPHO-01",
-    "criterion_name": "Severe Pain Score (NRS/VAS >= 6/10)",
-    "vignette_id": "DEV-LCD-KYPHO-APP",
-    "grounding_quote": "Severe debilitating focal vertebral pain with pain score >= 6 on 0-10 numeric rating scale (NRS) or visual analog scale (VAS).",
-    "attested_note_phrasing": "Pain rating is 8/10 on visual analog scale.",
-    "accepted_terms": [
-      "pain rating is 8/10 on visual analog scale",
-      "8/10 on visual analog scale",
-      "pain rating 8/10 on visual analog scale",
-      "visual analog scale 8/10"
-    ],
-    "prohibited_near_misses": [
-      "pain score < 6",
-      "mild back ache"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Pain rating 8/10 on visual analog scale directly satisfies VAS >= 6/10 threshold.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-CCTA-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-CCTA-02",
-    "canonical_name": "Inconclusive Prior Stress Testing or Equivocal Baseline ECG",
-    "domain": "cardiology",
-    "policy_id": "NCD-CCTA",
-    "criterion_code": "CRIT-CCTA-02",
-    "criterion_name": "Inconclusive Prior Stress Testing or Equivocal Baseline ECG",
-    "vignette_id": "DEV-NCD-CCTA-APP",
-    "grounding_quote": "Documented equivocal, inconclusive, or discordant prior stress ECG / stress echocardiogram, or inability to perform physical stress testing due to baseline ECG abnormalities.",
-    "attested_note_phrasing": "Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.",
-    "accepted_terms": [
-      "equivocal baseline electrocardiogram",
-      "equivocal baseline ecg",
-      "render exercise ecg stress testing non-diagnostic",
-      "non-specific st-t wave abnormalities that render exercise ecg stress testing non-diagnostic"
-    ],
-    "prohibited_near_misses": [
-      "normal diagnostic stress test",
-      "high-risk positive stress test indicating urgent catheterization"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Equivocal baseline electrocardiogram rendering exercise ECG non-diagnostic is explicitly enumerated in the criterion.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
-  },
-  {
-    "entry_id": "DRAFT-CONCEPT-ATTESTED-PTONC-02",
-    "concept_id": "DRAFT-CONCEPT-ATTESTED-PTONC-02",
-    "canonical_name": "Clinical Staging Impact on Intended Treatment Strategy",
-    "domain": "medical_oncology",
-    "policy_id": "NCD-PET-ONC",
-    "criterion_code": "CRIT-PTONC-02",
-    "criterion_name": "Clinical Staging Impact on Intended Treatment Strategy",
-    "vignette_id": "DEV-NCD-PET-ONC-APP",
-    "grounding_quote": "Documented clinical intent where PET-CT findings will directly guide management: determining surgical resectability, radiation treatment volume, or systemic therapy choice.",
-    "attested_note_phrasing": "Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.",
-    "accepted_terms": [
-      "pet-ct for initial oncologic staging",
-      "initial oncologic staging to determine resectability",
-      "initial systemic staging required to determine resectability",
-      "whole-body 18f-fdg positron emission tomography with computed tomography (pet-ct) for initial oncologic staging"
-    ],
-    "prohibited_near_misses": [
-      "routine surveillance in asymptomatic remission",
-      "pet scan for unproven experimental indication"
-    ],
-    "drafting_model": "gemini-pro",
-    "governing_rule_check": "PASS_EQUIVALENCE",
-    "governing_rule_rationale": "Initial oncologic staging to determine surgical resectability is explicitly given in the criterion description.",
-    "status": "PENDING_HUMAN_REVIEW",
-    "reviewer_decision": null,
-    "reviewer_notes": null,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "created_at": "2026-11-10 17:00:00 UTC"
   }
 ]
