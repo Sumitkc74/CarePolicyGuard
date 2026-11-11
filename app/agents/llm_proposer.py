@@ -109,6 +109,8 @@ class LLMProposalAgent:
     Never a decider. Every proposal must pass Gate A, Gate B, and Gate C in order.
     """
 
+    span_repair_enabled: bool = True
+
     def __init__(
         self,
         endpoint_url: Optional[str] = None,
@@ -116,12 +118,14 @@ class LLMProposalAgent:
         timeout_seconds: Optional[float] = None,
         availability_checker: Optional[Any] = None,
         max_calls_per_case: int = 3,
-        max_time_per_case_seconds: float = 30.0
+        max_time_per_case_seconds: float = 30.0,
+        span_repair_enabled: bool = True
     ):
         self.endpoint_url = endpoint_url or settings.LOCAL_LLM_URL
         self.model_name = model_name or settings.LOCAL_LLM_MODEL
         self.timeout_seconds = timeout_seconds or settings.LOCAL_LLM_TIMEOUT_SECONDS
         self.enabled = settings.ENABLE_LLM_PROPOSAL_STEP
+        self.span_repair_enabled = span_repair_enabled
         self._availability_checker = availability_checker
         self.max_calls_per_case = max_calls_per_case
         self.max_time_per_case_seconds = max_time_per_case_seconds
@@ -164,16 +168,24 @@ class LLMProposalAgent:
         with httpx.Client(timeout=self.timeout_seconds) as client:
             return client.post(self.endpoint_url, json=payload)
 
-    @staticmethod
-    def locate_claimed_span(text: str, claimed_text: str) -> Tuple[int, int]:
+    @classmethod
+    def locate_claimed_span(cls, text: str, claimed_text: str, allow_repair: bool = True) -> Tuple[int, int]:
         """
-        Locates a verbatim claimed substring in the clinical note deterministically.
-        If claimed_text is absent or empty: returns (-1, -1).
-        If multiple occurrences: selects the first occurrence that is NOT clinically negated
-        and has patient experiencer; if none or all match, selects the first occurrence in document order.
+        Locates a claimed substring in the clinical note deterministically.
+        1. Checks exact verbatim match in text.
+        2. If not found and allow_repair is True, attempts deterministic span-repair:
+           - Case-insensitive search on trimmed claimed text (removing outer whitespace/punctuation).
+           - Normalizing minor whitespace/punctuation differences between words while ensuring
+             all words appear contiguously in the exact same sequence.
+           - Returns the exact original character slice [s:e] from text.
+        3. If no matching span exists in text (hallucination): returns (-1, -1).
+        4. If multiple occurrences exist: tie-breaks by preferring non-negated patient experiencer,
+           falling back to document order.
         """
-        if not claimed_text or claimed_text not in text:
+        if not text or not claimed_text:
             return -1, -1
+
+        # 1. Exact verbatim search
         occurrences: List[Tuple[int, int]] = []
         pos = 0
         while True:
@@ -182,6 +194,37 @@ class LLMProposalAgent:
                 break
             occurrences.append((idx, idx + len(claimed_text)))
             pos = idx + 1
+
+        if not occurrences and allow_repair:
+            # 2. Case and punctuation-insensitive deterministic span repair
+            cleaned = claimed_text.strip(" \t\r\n'\"`.,;:!?-")
+            if cleaned:
+                # 2a. Case-insensitive substring search
+                pos = 0
+                cleaned_lower = cleaned.lower()
+                text_lower = text.lower()
+                while True:
+                    idx = text_lower.find(cleaned_lower, pos)
+                    if idx == -1:
+                        break
+                    occurrences.append((idx, idx + len(cleaned)))
+                    pos = idx + 1
+
+                # 2b. Flexible contiguous word-boundary search if 2a found nothing
+                if not occurrences:
+                    import re as _re
+                    words = [_re.escape(w) for w in _re.split(r'\s+', cleaned) if w]
+                    if len(words) >= 2:
+                        pat = r'(?i)\b' + r'\s+'.join(words) + r'(?:\b|[.,;:!?])'
+                        for m in _re.finditer(pat, text):
+                            s_m = m.start()
+                            e_m = m.end()
+                            while e_m > s_m and text[e_m - 1] in '.,;:!? ':
+                                e_m -= 1
+                            occurrences.append((s_m, e_m))
+
+        if not occurrences:
+            return -1, -1
 
         if len(occurrences) == 1:
             return occurrences[0]
@@ -370,15 +413,19 @@ class LLMProposalAgent:
                     claimed = str(p.get("claimed_text", "")).strip()
                     if not claimed:
                         continue
-                    # Locate span in narrative via deterministic exact-substring matcher
-                    start, end = self.locate_claimed_span(ehr_text, claimed)
+                    # Locate span in narrative via deterministic matcher with repair
+                    allow_rep = getattr(self, "span_repair_enabled", True)
+                    start, end = self.locate_claimed_span(ehr_text, claimed, allow_repair=allow_rep)
                     if start == -1:
                         # Hallucinated quote not in text: record (0, 0) so Gate A rejects
                         start, end = 0, 0
+                        repaired_text = claimed
+                    else:
+                        repaired_text = ehr_text[start:end]
                     proposals.append(LLMProposedSpan(
                         criterion_code=ccode,
                         proposed_status=p.get("proposed_status", "MET"),
-                        claimed_text=claimed,
+                        claimed_text=repaired_text,
                         char_start=int(start),
                         char_end=int(end),
                         numeric_value=p.get("numeric_value"),
@@ -427,25 +474,27 @@ class LLMProposalAgent:
 
         claimed = proposal.claimed_text
 
-        # Gate (a): Verify verbatim quote existence in narrative
+        # Gate (a): Verify verbatim quote existence in narrative (with deterministic case/punctuation repair)
         s = proposal.char_start
         e = proposal.char_end
 
-        if not claimed or claimed not in text:
-            offset_clause = f"Invalid character offsets [{s}:{e}] for note of length {len(text)}. " if (s < 0 or e > len(text) or s >= e) else ""
-            return GateEvaluationResult(
-                proposal=proposal,
-                passed=False,
-                failing_gate="GATE_A_EXACT_SLICE",
-                rejection_reason=f"{offset_clause}Hallucinated evidence: claimed text '{claimed[:30]}...' does not exist in EHR note."
-            )
-
-        # System locates the span in the narrative with text.find(claimed_text) and records the located offsets.
-        # If the incoming proposal had wrong or uninitialized offsets, system re-anchors to the located span.
-        if s < 0 or e > len(text) or s >= e or text[s:e] != claimed:
-            s, e = cls.locate_claimed_span(text, claimed)
+        # System verifies and/or deterministically repairs offsets to the exact slice in note
+        if not claimed or claimed not in text or s < 0 or e > len(text) or s >= e or text[s:e] != claimed:
+            allow_rep = getattr(cls, "span_repair_enabled", True)
+            s, e = cls.locate_claimed_span(text, claimed, allow_repair=allow_rep)
+            if s == -1:
+                offset_clause = f"Invalid character offsets [{proposal.char_start}:{proposal.char_end}] for note of length {len(text)}. " if (proposal.char_start < 0 or proposal.char_end > len(text) or proposal.char_start >= proposal.char_end) else ""
+                return GateEvaluationResult(
+                    proposal=proposal,
+                    passed=False,
+                    failing_gate="GATE_A_EXACT_SLICE",
+                    rejection_reason=f"{offset_clause}Hallucinated evidence: claimed text '{claimed[:30]}...' does not exist in EHR note."
+                )
+            # Re-anchor proposal to the exact verbatim slice from the note
             proposal.char_start = s
             proposal.char_end = e
+            proposal.claimed_text = text[s:e]
+            claimed = proposal.claimed_text
 
         actual_slice = text[s:e]
         if actual_slice != claimed:
