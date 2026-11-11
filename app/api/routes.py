@@ -70,7 +70,10 @@ from app.schemas.contracts import (
     BatchAdjudicationRequest,
     BatchAdjudicationResponse,
     BatchAdjudicationItemResult,
-    BootstrapSetupRequest
+    BootstrapSetupRequest,
+    OverrideRequest,
+    OverrideResponse,
+    NotificationResponse
 )
 from app.api.deps import (
     get_current_user,
@@ -679,6 +682,7 @@ def sanitize_audit_log_for_user(log: AdjudicationLog, current_user: Optional[Use
 
 @api_router.get("/audit-logs", response_model=List[AuditLogOut], summary="List Audit Logs with SHA-256 Hashes")
 def get_audit_logs(
+    http_response: Response,
     policy_id: Optional[str] = Query(None, description="Filter by Medicare policy ID"),
     decision: Optional[str] = Query(None, description="Filter by decision"),
     limit: int = Query(50, ge=1, le=200),
@@ -692,6 +696,9 @@ def get_audit_logs(
     - Auditor: Complete cross-facility audit across all system records for regulatory oversight.
     - Admin: Operational technical metadata across system records (clinical narratives redacted).
     """
+    total_system_records = db.query(AdjudicationLog).count()
+    http_response.headers["X-Total-System-Records"] = str(total_system_records)
+
     query = db.query(AdjudicationLog)
     if policy_id:
         query = query.filter(AdjudicationLog.policy_id == policy_id)
@@ -1321,6 +1328,153 @@ def sign_off_clinical_determination(
         message="Determination successfully signed off. Lifecycle stage is now FINAL (releasable)."
     )
 
+
+@api_router.post("/determination/{case_id}/override", response_model=OverrideResponse, summary="Execute Human Clinician Override")
+def override_clinical_determination(
+    case_id: str,
+    request: OverrideRequest,
+    current_user: User = Depends(get_verified_clinician_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Task 4d: Human Override Workflow.
+    Allows a verified clinician to record a clinical override on a DENIED or DEFERRED case with an explicit rationale (>= 10 chars).
+    Preserves original system output identically in original_system_output_json.
+    Transitions determination to FINAL and releasable under recorded clinician responsibility.
+    """
+    dec_upper = request.override_decision.upper().strip()
+    if dec_upper not in ("APPROVED", "DENIED"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Override decision must be strictly 'APPROVED' or 'DENIED'."
+        )
+
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
+    if not adj and log and log.full_adjudication_json:
+        try:
+            adj = FinalAdjudication.model_validate_json(log.full_adjudication_json)
+        except Exception:
+            pass
+
+    if not adj and not log:
+        raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
+
+    if not adj and log:
+        # Reconstruct minimal FinalAdjudication if JSON was corrupted
+        from app.schemas.contracts import AdjudicationDecision, DeterminationStage
+        adj = FinalAdjudication(
+            case_id=log.case_id,
+            patient_id_masked=log.patient_id_masked,
+            policy_id=log.policy_id,
+            policy_title=log.policy_id,
+            adjudication_decision=AdjudicationDecision(log.decision),
+            calibrated_aggregate_confidence=log.calibrated_confidence,
+            sufficiency_score=log.sufficiency_score or 0.0,
+            raw_confidence=log.raw_confidence or 0.0,
+            criterion_assessments=[],
+            verification_audits=[],
+            action_required_questions=[],
+            audit_hash=log.audit_hash or "RECONSTRUCTED",
+            sanitized_ehr_text=log.sanitized_ehr_preview or "",
+            timestamp=log.created_at or datetime.now(timezone.utc)
+        )
+
+    now = datetime.now(timezone.utc)
+    cred = current_user.credential_title or "MD"
+    signed_name = f"{current_user.username}, {cred}"
+
+    from app.services.deferral_queue import HumanOverrideService
+    from app.schemas.contracts import AdjudicationDecision
+    override_enum = AdjudicationDecision.APPROVED if dec_upper == "APPROVED" else AdjudicationDecision.DENIED
+    overridden_adj = HumanOverrideService.record_override(
+        original_adjudication=adj,
+        override_decision=override_enum,
+        override_reason=request.override_reason,
+        clinician_id=signed_name,
+        clinician_role=cred
+    )
+
+    # Wire 'becomes final' step
+    overridden_adj.determination_stage = "FINAL"
+    overridden_adj.is_releasable = True
+    overridden_adj.human_sign_off_status = "OVERRIDDEN_FINAL"
+    _EPHEMERAL_ADJUDICATIONS[case_id] = overridden_adj
+
+    if log:
+        log.decision = dec_upper
+        log.determination_stage = "FINAL"
+        log.is_releasable = True
+        log.human_sign_off_status = "OVERRIDDEN_FINAL"
+        log.signed_by = signed_name
+        log.signed_at = now
+        log.full_adjudication_json = overridden_adj.model_dump_json()
+        if not log.original_system_output_json:
+            log.original_system_output_json = adj.model_dump_json()
+        log.required_clinician_action_notes = ((log.required_clinician_action_notes or "") + f"\n[Human Override]: {request.override_reason}").strip()
+        db.commit()
+
+    # Notify originating clinician if override performed by another user
+    if log and log.user_id:
+        try:
+            from app.db.models import InAppNotification
+            notif = InAppNotification(
+                user_id=log.user_id,
+                case_id=case_id,
+                policy_id=log.policy_id,
+                decision=dec_upper,
+                title=f"Override Applied: {dec_upper} ({log.policy_id})",
+                message=f"Case {case_id} was overridden to '{dec_upper}' by {signed_name}. Rationale: {request.override_reason[:100]}",
+                is_read=False
+            )
+            db.add(notif)
+            db.commit()
+        except Exception:
+            pass
+
+    return OverrideResponse(
+        case_id=case_id,
+        original_decision=adj.adjudication_decision.value,
+        override_decision=dec_upper,
+        override_reason=request.override_reason,
+        determination_stage="FINAL",
+        is_releasable=True,
+        human_sign_off_status="OVERRIDDEN_FINAL",
+        overridden_by=signed_name,
+        audit_hash=overridden_adj.audit_hash,
+        timestamp=now.isoformat()
+    )
+
+
+@api_router.get("/notifications", response_model=List[NotificationResponse], summary="List Clinician In-App Notifications")
+def get_user_notifications(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Task 4c: Retrieves real-time in-app notifications for the originating clinician.
+    """
+    from app.db.models import InAppNotification
+    notifs = db.query(InAppNotification).filter(InAppNotification.user_id == current_user.id).order_by(InAppNotification.created_at.desc()).limit(50).all()
+    return notifs
+
+
+@api_router.patch("/notifications/{notif_id}/read", summary="Mark In-App Notification as Read")
+def mark_notification_read(
+    notif_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Marks an in-app notification as read."""
+    from app.db.models import InAppNotification
+    notif = db.query(InAppNotification).filter(InAppNotification.id == notif_id, InAppNotification.user_id == current_user.id).first()
+    if not notif:
+        raise HTTPException(status_code=404, detail="Notification not found.")
+    notif.is_read = True
+    db.commit()
+    return {"status": "success", "id": notif_id, "is_read": True}
+
+
 @api_router.get("/determination/{case_id}", response_model=FinalAdjudication, summary="Retrieve Determination")
 def get_determination_record(
     case_id: str,
@@ -1672,7 +1826,10 @@ def get_deferral_queue(
             )
         ).all()
     }
-    return [item for item in items if item.case_id in user_case_ids]
+    return [
+        item for item in items 
+        if item.case_id in user_case_ids or getattr(item, "assigned_to_user_id", None) == current_user.id
+    ]
 
 @api_router.get("/deferral/queue/{case_id}", response_model=DeferralQueueItem, summary="Get Single Deferral Work Queue Item")
 def get_deferral_queue_item(

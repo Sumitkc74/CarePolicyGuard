@@ -806,7 +806,12 @@ class MultiAgentVerificationPipeline:
         if decision == AdjudicationDecision.DEFERRED_TO_HUMAN:
             try:
                 from app.services.deferral_queue import DeferralWorkQueue
-                DeferralWorkQueue.add_case(final_result, action_questions=action_required_questions, db=self.db)
+                DeferralWorkQueue.add_case(
+                    final_result,
+                    action_questions=action_required_questions,
+                    db=self.db,
+                    user_id=user_id
+                )
             except Exception as queue_err:
                 print(f"Deferral queue registration notice: {queue_err}")
 
@@ -840,6 +845,26 @@ class MultiAgentVerificationPipeline:
                 )
                 self.db.add(log_entry)
                 self.db.commit()
+
+                # Task 4c: Automatically notify originating clinician of case outcome (APPROVED, DENIED, DEFERRED)
+                if user_id:
+                    try:
+                        from app.db.models import InAppNotification
+                        notif_title = f"Adjudication Result: {decision.value} ({policy_id})"
+                        notif_msg = f"Case {case_id} for policy {policy_id} resulted in determination '{decision.value}'."
+                        notif = InAppNotification(
+                            user_id=user_id,
+                            case_id=case_id,
+                            policy_id=policy_id,
+                            decision=decision.value,
+                            title=notif_title,
+                            message=notif_msg,
+                            is_read=False
+                        )
+                        self.db.add(notif)
+                        self.db.commit()
+                    except Exception as notif_err:
+                        print(f"Failed to record in-app notification: {notif_err}")
             except Exception as e:
                 self.db.rollback()
                 print(f"Failed to persist adjudication log: {e}")

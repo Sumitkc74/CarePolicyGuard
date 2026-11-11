@@ -244,7 +244,8 @@
                 <button class="nav-btn" id="tab-batch-btn" onclick="switchMainTab('batch')">Batch Roster</button>
                 <button class="nav-btn" id="tab-audit-btn" onclick="switchMainTab('audit')">Audit Ledger</button>
                 <button class="nav-btn" id="tab-benchmark-btn" onclick="switchMainTab('benchmark')">Benchmark</button>
-                <button class="nav-btn" id="tab-crd-btn" onclick="switchMainTab('crd')">EHR CDS &amp; DTR</button>
+                <button class="nav-btn" id="tab-crd-btn" onclick="switchMainTab('crd')">EHR Coverage Check</button>
+                <button class="nav-btn" id="tab-users-btn" onclick="switchMainTab('users')" style="display: none;">User Management</button>
                 <button class="nav-btn" id="tab-telemetry-btn" onclick="switchMainTab('telemetry')">Telemetry &amp; Metrics</button>
             </nav>
             <div class="user-profile-badge" id="user-badge" onclick="toggleAuthModal()" title="Provider Profile &amp; Settings">
@@ -1397,14 +1398,14 @@
 </section>
 
         <!-- ========================================== -->
-        <!-- TAB 5: HL7 DA VINCI CRD & DTR SIMULATOR -->
+        <!-- TAB 5: EHR COVERAGE CHECK (HL7 DA VINCI CRD & DTR SIMULATOR) -->
         <!-- ========================================== -->
         <section id="crd-view" class="view-panel">
             <div class="view-header" style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
                     <div>
-                        <h2 style="font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">HL7 Da Vinci CRD &amp; DTR Simulation Engine</h2>
-                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">CMS-0057-F Compliant Coverage Requirements Discovery (CDS Hooks 1.0) and Documentation Templates &amp; Rules ($populate).</p>
+                        <h2 style="font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">EHR Coverage Check</h2>
+                        <p style="font-size: 13px; color: #94a3b8; margin: 0;"><span style="font-weight: 600; color: #cbd5e1;">HL7 Da Vinci CRD &amp; DTR Simulation</span> &bull; CMS-0057-F Compliant Coverage Requirements Discovery (CDS Hooks 1.0) and Documentation Templates &amp; Rules ($populate).</p>
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <span class="badge-role-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8;">CDS Hooks 1.0</span>
@@ -1489,7 +1490,53 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- TAB 6: OPERATIONAL TELEMETRY & METRICS -->
+        <!-- TAB 6: ADMIN USER MANAGEMENT -->
+        <!-- ========================================== -->
+        <section id="users-view" class="view-panel">
+            <div class="view-header" style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h2 style="font-size: 20px; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">User &amp; Clinician Management</h2>
+                        <p style="font-size: 13px; color: #94a3b8; margin: 0;">Admin control panel: provision new clinician accounts, invite administrators, and inspect credentialing verification.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn-primary" onclick="openInviteClinicianModal()" style="padding: 7px 14px; font-size: 12px;">
+                            + Invite Clinician
+                        </button>
+                        <button type="button" class="btn-side-tutorial" onclick="openCreateAdminModal()" style="padding: 7px 14px; font-size: 12px;">
+                            + Create Admin
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="loadAdminClinicians()" style="padding: 7px 14px; font-size: 12px;">
+                            Refresh List
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+                <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid var(--border-color); color: #94a3b8; font-size: 12px;">
+                            <th style="padding: 10px;">ID</th>
+                            <th style="padding: 10px;">Username / Email</th>
+                            <th style="padding: 10px;">Full Name</th>
+                            <th style="padding: 10px;">NPI &amp; Title</th>
+                            <th style="padding: 10px;">Role</th>
+                            <th style="padding: 10px;">Status</th>
+                            <th style="padding: 10px;">Verified</th>
+                            <th style="padding: 10px;">Created</th>
+                            <th style="padding: 10px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-users-table-body" style="font-size: 13px;">
+                        <tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 32px;">Loading clinicians...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 7: OPERATIONAL TELEMETRY & METRICS -->
         <!-- ========================================== -->
         <section id="telemetry-view" class="view-panel">
             <div class="view-header" style="margin-bottom: 20px;">
@@ -2602,6 +2649,85 @@
                     <button type="submit" style="padding: 8px 16px; background: #38BDF8; color: #0F172A; font-weight: 600; font-size: 0.82rem; border: none; border-radius: 8px; cursor: pointer;">Continue</button>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN INVITE CLINICIAN -->
+    <div id="modal-invite-clinician" class="modal-backdrop hidden" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); width: 90%; max-width: 480px; padding: 24px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0;">Invite / Provision Clinician</h3>
+                <button type="button" onclick="closeInviteClinicianModal()" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">&times;</button>
+            </div>
+            <form onsubmit="handleInviteClinicianSubmit(event)">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Institutional Email *</label>
+                    <input type="email" id="invite-clinician-email" required class="login-input" style="width: 100%;" placeholder="doctor@hospital.org">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Temporary Password (Optional - auto-generated if blank)</label>
+                    <input type="password" id="invite-clinician-password" class="login-input" style="width: 100%;" placeholder="Leave blank to auto-generate">
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="closeInviteClinicianModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btn-submit-invite-clinician">Send Invitation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN CREATE ADMIN -->
+    <div id="modal-create-admin" class="modal-backdrop hidden" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); width: 90%; max-width: 480px; padding: 24px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0;">Create System Administrator</h3>
+                <button type="button" onclick="closeCreateAdminModal()" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">&times;</button>
+            </div>
+            <form onsubmit="handleCreateAdminSubmit(event)">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Admin Email *</label>
+                    <input type="email" id="create-admin-email" required class="login-input" style="width: 100%;" placeholder="admin2@carepolicyguard.med">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Initial Password * (min 8 chars)</label>
+                    <input type="password" id="create-admin-password" required minlength="8" class="login-input" style="width: 100%;" placeholder="AdminSecure!2026">
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="closeCreateAdminModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btn-submit-create-admin">Create Admin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CLINICIAN HUMAN OVERRIDE -->
+    <div id="modal-human-override" class="modal-backdrop hidden" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); width: 90%; max-width: 520px; padding: 24px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #fbbf24; margin: 0;">Request Human Clinical Override</h3>
+                <button type="button" onclick="closeHumanOverrideModal()" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">&times;</button>
+            </div>
+            <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 12px;">
+                Under CMS regulations, a licensed clinician may override an algorithmic denial or deferral by providing an explicit, auditable clinical rationale (&ge; 10 characters). The original system evaluation is cryptographically preserved.
+            </p>
+            <form onsubmit="handleHumanOverrideSubmit(event)">
+                <input type="hidden" id="override-case-id">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Target Determination *</label>
+                    <select id="override-target-decision" class="login-input" style="width: 100%;">
+                        <option value="APPROVED">APPROVED (Authorize Procedure)</option>
+                        <option value="DENIED">DENIED (Confirm Exclusion)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">Clinical Rationale / Justification * (min 10 characters)</label>
+                    <textarea id="override-rationale" rows="4" required minlength="10" class="login-input" style="width: 100%; font-size: 12px; resize: vertical;" placeholder="Document patient-specific clinical justification for overriding the system determination..."></textarea>
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="closeHumanOverrideModal()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="btn-submit-override" style="background: #f59e0b; border-color: #f59e0b; color: #000; font-weight: 700;">Record Clinical Override</button>
+                </div>
+            </form>
         </div>
     </div>
 

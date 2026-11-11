@@ -683,3 +683,35 @@ class BatchAdjudicationResponse(BaseModel):
     results: list[BatchAdjudicationItemResult]
 
 
+class NotificationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    user_id: int
+    case_id: str
+    policy_id: str
+    decision: str
+    title: str
+    message: str
+    is_read: bool
+    created_at: datetime
+
+
+class OverrideRequest(BaseModel):
+    override_decision: str = Field(..., description="Target decision: 'APPROVED' or 'DENIED'")
+    override_reason: str = Field(..., min_length=10, description="Mandatory detailed clinical rationale justifying human override")
+
+
+class OverrideResponse(BaseModel):
+    case_id: str
+    original_decision: str
+    override_decision: str
+    override_reason: str
+    determination_stage: str
+    is_releasable: bool
+    human_sign_off_status: str
+    overridden_by: str
+    audit_hash: str
+    timestamp: str
+
+
+

@@ -204,6 +204,7 @@ class DeferralQueueRecord(Base):
     action_required_questions_json = Column(Text, nullable=False, default="[]")
     audit_hash = Column(String(64), index=True, nullable=False)
     current_state = Column(String(50), default="PENDING_EVIDENCE", nullable=False)
+    assigned_to_user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
     created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
@@ -226,4 +227,19 @@ class CredentialingAuditLog(Base):
     notes = Column(Text, nullable=True)
     audit_hash = Column(String(64), nullable=False)
     created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
+
+
+class InAppNotification(Base):
+    __tablename__ = "in_app_notifications"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    case_id = Column(String(100), index=True, nullable=False)
+    policy_id = Column(String(50), nullable=False)
+    decision = Column(String(50), nullable=False)
+    title = Column(String(255), nullable=False)
+    message = Column(Text, nullable=False)
+    is_read = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
+
 

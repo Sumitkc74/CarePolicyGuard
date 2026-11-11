@@ -186,7 +186,7 @@ function switchMainTab(tabName) {
         runLiveBenchmark();
     } else if (tabName === "crd") {
         if (currentRole !== "Admin") {
-            showToast("EHR CDS Hooks & DTR simulation is restricted to IT Administrators and Health Informatics.", "warning");
+            showToast("EHR Coverage Check simulation is restricted to IT Administrators and Health Informatics.", "warning");
             switchMainTab(currentRole === "Auditor" ? "audit" : "adjudicate");
             return;
         }
@@ -195,6 +195,17 @@ function switchMainTab(tabName) {
         const view = document.getElementById("crd-view");
         if (view) view.classList.add("active");
         initCrdSimulator();
+    } else if (tabName === "users") {
+        if (currentRole !== "Admin") {
+            showToast("User Management is restricted to System Administrators.", "warning");
+            switchMainTab("adjudicate");
+            return;
+        }
+        const btn = document.getElementById("tab-users-btn");
+        if (btn) btn.classList.add("active");
+        const view = document.getElementById("users-view");
+        if (view) view.classList.add("active");
+        loadAdminClinicians();
     } else if (tabName === "telemetry") {
         if (currentRole !== "Admin") {
             showToast("Operational Telemetry & System Health is restricted to IT Administrators.", "warning");
@@ -1116,14 +1127,22 @@ function updateRoleBasedNavigation() {
         }
     }
 
-    // 2. EHR CDS Hooks & DTR Simulation Engine: IT Administrator ONLY
+    // 2. EHR Coverage Check (CDS Hooks & DTR Simulation Engine): IT Administrator ONLY
     const crdBtn = document.getElementById("tab-crd-btn");
     if (crdBtn) {
         crdBtn.style.display = isAdmin ? "" : "none";
     }
+    const usersBtn = document.getElementById("tab-users-btn");
+    if (usersBtn) {
+        usersBtn.style.display = isAdmin ? "" : "none";
+    }
     if (!isAdmin) {
         const crdView = document.getElementById("crd-view");
         if (crdView && crdView.classList.contains("active")) {
+            switchMainTab(isClinician ? "adjudicate" : "audit");
+        }
+        const usersView = document.getElementById("users-view");
+        if (usersView && usersView.classList.contains("active")) {
             switchMainTab(isClinician ? "adjudicate" : "audit");
         }
     }
@@ -3228,6 +3247,14 @@ function renderAdjudicationResults(data) {
                     <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg></span>
                     Revise Clinical Note / Add Evidence
                 </button>
+                <button type="button" class="btn-secondary" onclick="tryDifferentPolicyAfterDenial()" style="border-color: #38bdf8; color: #38bdf8;">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+                    Try Different Policy Candidate
+                </button>
+                <button type="button" class="btn-secondary" onclick="openHumanOverrideModal('${escapeHtml(data.case_id)}')" style="border-color: #f59e0b; color: #fbbf24;">
+                    <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></span>
+                    Request Human Override
+                </button>
                 <button type="button" class="btn-secondary" onclick="goToWizardScreen(4)">
                     <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
                     Inspect Denial Notice (Internal Only)
@@ -3784,6 +3811,10 @@ async function loadAuditLogs() {
             headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
         });
         if (res.ok) {
+            const sysCountHeader = res.headers.get("X-Total-System-Records");
+            if (sysCountHeader !== null) {
+                window._cachedAuditTotalSystemRecords = parseInt(sysCountHeader, 10);
+            }
             const logs = await res.json();
             window._cachedAuditLogs = Array.isArray(logs) ? logs : [];
             filterAuditLogs();
@@ -3847,9 +3878,14 @@ function filterAuditLogs(query) {
     tbody.innerHTML = "";
 
     if (allLogs.length === 0) {
-        const emptyMsg = (currentRole === "Clinician")
-            ? "No cases found. Adjudicate or sign a case to record it in your personal ledger."
-            : "No adjudication audit logs recorded yet. Ephemeral zero-retention mode is active.";
+        let emptyMsg;
+        if (currentRole === "Clinician") {
+            emptyMsg = (window._cachedAuditTotalSystemRecords && window._cachedAuditTotalSystemRecords > 0)
+                ? "No cases found for your clinician account. Records exist under compliance review, but none were submitted or signed by your account."
+                : "No cases recorded in the system yet. Adjudicate or sign a case to record it in your personal ledger.";
+        } else {
+            emptyMsg = "No adjudication audit logs recorded yet in the system.";
+        }
         tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 32px;">${emptyMsg}</td></tr>`;
         return;
     }
@@ -6928,7 +6964,7 @@ function loadRosterItemIntoWizard(idx) {
 }
 
 // =============================================================================
-// HL7 DA VINCI CRD & DTR SIMULATOR
+// EHR COVERAGE CHECK (HL7 DA VINCI CRD & DTR SIMULATOR)
 // =============================================================================
 
 const CRD_PRESETS = {
@@ -7163,12 +7199,12 @@ async function loadLiveTelemetry() {
         const approved = adj.approved || 0;
         const denied = adj.denied || 0;
         const abstained = adj.abstained || 0;
-        const appRate = total > 0 ? Math.round((approved / total) * 100) : 100;
+        const appRate = total > 0 ? `${Math.round((approved / total) * 100)}%` : "no data yet";
 
         document.getElementById("telemetry-total-adjudications").textContent = total;
-        document.getElementById("telemetry-approval-rate").textContent = `${appRate}%`;
-        document.getElementById("telemetry-latency-avg").textContent = `${adj.average_latency_ms || 45} ms`;
-        document.getElementById("telemetry-active-sessions").textContent = sec.active_sessions || 1;
+        document.getElementById("telemetry-approval-rate").textContent = appRate;
+        document.getElementById("telemetry-latency-avg").textContent = (total > 0 && adj.average_latency_ms !== undefined && adj.average_latency_ms !== null) ? `${adj.average_latency_ms} ms` : "no data yet";
+        document.getElementById("telemetry-active-sessions").textContent = (sec.active_sessions !== undefined && sec.active_sessions !== null) ? sec.active_sessions : "no data yet";
 
         document.getElementById("telemetry-count-approved").textContent = approved;
         document.getElementById("telemetry-count-denied").textContent = denied;
@@ -7184,9 +7220,9 @@ async function loadLiveTelemetry() {
             document.getElementById("telemetry-bar-abstained").style.width = "0%";
         }
 
-        document.getElementById("telemetry-total-users").textContent = sec.total_users || 4;
-        document.getElementById("telemetry-revoked-sessions").textContent = sec.revoked_sessions || 0;
-        document.getElementById("telemetry-policies-count").textContent = rules.active_policies_count || 6;
+        document.getElementById("telemetry-total-users").textContent = (sec.total_users !== undefined && sec.total_users !== null) ? sec.total_users : "no data yet";
+        document.getElementById("telemetry-revoked-sessions").textContent = sec.revoked_sessions !== undefined ? sec.revoked_sessions : 0;
+        document.getElementById("telemetry-policies-count").textContent = (rules.active_policies_count !== undefined && rules.active_policies_count !== null) ? rules.active_policies_count : "no data yet";
 
         // Populate Cache & System Telemetry
         const cache = data.cache_and_system || {};
@@ -7498,6 +7534,237 @@ function toggleBillingDetails() {
         if (label) label.textContent = "View Billing & Milestones";
     }
 }
+
+// =============================================================================
+// ADMIN USER MANAGEMENT & CLINICIAN PROVISIONING (TASK 2)
+// =============================================================================
+
+async function loadAdminClinicians() {
+    const tbody = document.getElementById("admin-users-table-body");
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 32px;">Loading clinicians from system records...</td></tr>`;
+
+    try {
+        const res = await fetch("/api/v1/admin/users/clinicians", {
+            headers: currentToken ? { "Authorization": `Bearer ${currentToken}` } : {}
+        });
+        if (!res.ok) {
+            throw new Error(`Failed to load clinicians: HTTP ${res.status}`);
+        }
+        const users = await res.json();
+        if (!users || users.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 32px;">No clinicians registered in the system yet. Click "+ Invite Clinician" to provision one.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = users.map(u => {
+            const isVerified = u.is_verified_medical_pro;
+            const verifiedBadge = isVerified 
+                ? `<span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Verified</span>`
+                : `<span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Unverified</span>`;
+            
+            const statusBadge = u.is_active 
+                ? `<span style="color: #38bdf8;">Active</span>`
+                : `<span style="color: #f43f5e;">Inactive</span>`;
+
+            const toggleBtn = u.is_active
+                ? `<button type="button" class="btn-demo-chip" style="font-size: 11px; padding: 3px 8px; border-color: #f43f5e; color: #fca5a5;" onclick="toggleUserStatus(${u.id}, false)">Deactivate</button>`
+                : `<button type="button" class="btn-demo-chip" style="font-size: 11px; padding: 3px 8px; border-color: #10b981; color: #6ee7b7;" onclick="toggleUserStatus(${u.id}, true)">Activate</button>`;
+
+            return `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 10px; font-family: var(--font-mono); font-size: 11px;">#${u.id}</td>
+                    <td style="padding: 10px; font-weight: 600; color: #f1f5f9;">${escapeHtml(u.email || u.username)}</td>
+                    <td style="padding: 10px;">${escapeHtml(u.full_name || '—')}</td>
+                    <td style="padding: 10px;">${escapeHtml(u.npi_number || 'Pending')} ${u.credential_title ? '(' + escapeHtml(u.credential_title) + ')' : ''}</td>
+                    <td style="padding: 10px;"><span class="badge-role-tag">${escapeHtml(u.role)}</span></td>
+                    <td style="padding: 10px;">${statusBadge}</td>
+                    <td style="padding: 10px;">${verifiedBadge}</td>
+                    <td style="padding: 10px; font-size: 11px; color: #94a3b8;">${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+                    <td style="padding: 10px;">${toggleBtn}</td>
+                </tr>
+            `;
+        }).join("");
+    } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: #f43f5e; padding: 24px;">Failed to load user list: ${escapeHtml(e.message)}</td></tr>`;
+    }
+}
+
+async function toggleUserStatus(userId, activate) {
+    const reason = activate ? "Administrative reactivation" : "Administrative deactivation";
+    try {
+        const res = await fetch(`/api/v1/admin/users/${userId}/status`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({ is_active: activate, reason: reason })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        showToast(`User status updated to ${activate ? 'Active' : 'Inactive'}`, "success");
+        loadAdminClinicians();
+    } catch (err) {
+        showToast(`Status update failed: ${err.message}`, true);
+    }
+}
+
+function openInviteClinicianModal() {
+    const m = document.getElementById("modal-invite-clinician");
+    if (m) m.style.display = "flex";
+}
+
+function closeInviteClinicianModal() {
+    const m = document.getElementById("modal-invite-clinician");
+    if (m) m.style.display = "none";
+}
+
+async function handleInviteClinicianSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById("invite-clinician-email").value.trim();
+    const pwd = document.getElementById("invite-clinician-password").value;
+    const btn = document.getElementById("btn-submit-invite-clinician");
+    if (btn) btn.disabled = true;
+
+    try {
+        const payload = { email: email };
+        if (pwd) payload.temporary_password = pwd;
+
+        const res = await fetch("/api/v1/admin/users/clinicians", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        showToast(`Clinician invitation sent to ${email}`, "success");
+        closeInviteClinicianModal();
+        loadAdminClinicians();
+    } catch (err) {
+        showToast(`Invite failed: ${err.message}`, true);
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+function openCreateAdminModal() {
+    const m = document.getElementById("modal-create-admin");
+    if (m) m.style.display = "flex";
+}
+
+function closeCreateAdminModal() {
+    const m = document.getElementById("modal-create-admin");
+    if (m) m.style.display = "none";
+}
+
+async function handleCreateAdminSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById("create-admin-email").value.trim();
+    const pwd = document.getElementById("create-admin-password").value;
+    const btn = document.getElementById("btn-submit-create-admin");
+    if (btn) btn.disabled = true;
+
+    try {
+        const res = await fetch("/api/v1/admin/users/admins", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({ email: email, password: pwd })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        showToast(`Administrator account created for ${email}`, "success");
+        closeCreateAdminModal();
+        loadAdminClinicians();
+    } catch (err) {
+        showToast(`Create admin failed: ${err.message}`, true);
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+// =============================================================================
+// HUMAN OVERRIDE & ALTERNATIVE POLICY WORKFLOWS (TASKS 4d & 5)
+// =============================================================================
+
+function openHumanOverrideModal(caseId) {
+    const cid = caseId || (lastAdjudicationResult && lastAdjudicationResult.case_id);
+    if (!cid) {
+        showToast("No active case to override.", true);
+        return;
+    }
+    document.getElementById("override-case-id").value = cid;
+    const m = document.getElementById("modal-human-override");
+    if (m) m.style.display = "flex";
+}
+
+function closeHumanOverrideModal() {
+    const m = document.getElementById("modal-human-override");
+    if (m) m.style.display = "none";
+}
+
+async function handleHumanOverrideSubmit(e) {
+    e.preventDefault();
+    const caseId = document.getElementById("override-case-id").value;
+    const dec = document.getElementById("override-target-decision").value;
+    const reason = document.getElementById("override-rationale").value.trim();
+    const btn = document.getElementById("btn-submit-override");
+    if (btn) btn.disabled = true;
+
+    try {
+        const res = await fetch(`/api/v1/determination/${encodeURIComponent(caseId)}/override`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
+            },
+            body: JSON.stringify({
+                override_decision: dec,
+                override_reason: reason
+            })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        showToast(`Clinical override recorded: Determination is now FINAL (${dec})`, "success");
+        closeHumanOverrideModal();
+        // Update local adjudication view
+        if (lastAdjudicationResult) {
+            lastAdjudicationResult.adjudication_decision = dec;
+            lastAdjudicationResult.determination_stage = "FINAL";
+            lastAdjudicationResult.is_releasable = true;
+        }
+        goToWizardScreen(4);
+    } catch (err) {
+        showToast(`Override failed: ${err.message}`, true);
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+function tryDifferentPolicyAfterDenial() {
+    showToast("Opening policy selection for alternative coverage candidate...", "info");
+    goToWizardScreen(1);
+    const selectElem = document.getElementById("policy-select");
+    if (selectElem) {
+        selectElem.focus();
+    }
+}
+
 
 
 // Global modal backdrop click & Escape key handler

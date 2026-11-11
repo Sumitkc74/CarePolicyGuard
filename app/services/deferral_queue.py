@@ -36,6 +36,7 @@ class DeferralQueueItem(BaseModel):
     action_required_questions: List[str]
     audit_hash: str
     created_at: str
+    assigned_to_user_id: Optional[int] = None
     current_state: InternalWorkflowState = InternalWorkflowState.PRE_CHECK
     is_internal_system_state: bool = True
     notice: str = "Internal work queue only; no payer transmission has occurred."
@@ -56,7 +57,8 @@ class DeferralWorkQueue:
         cls,
         adjudication: FinalAdjudication,
         action_questions: Optional[List[str]] = None,
-        db: Optional[Any] = None
+        db: Optional[Any] = None,
+        user_id: Optional[int] = None
     ) -> DeferralQueueItem:
         missing = [c.criterion_code for c in adjudication.criterion_assessments if c.status == DeterminationStatus.NOT_MET and not c.is_exclusion]
         insufficient = [c.criterion_code for c in adjudication.criterion_assessments if c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE and not c.is_exclusion]
@@ -76,6 +78,7 @@ class DeferralWorkQueue:
             action_required_questions=questions,
             audit_hash=adjudication.audit_hash,
             created_at=datetime.now(timezone.utc).isoformat(),
+            assigned_to_user_id=user_id,
             current_state=state
         )
         cls._QUEUE[adjudication.case_id] = item
@@ -99,7 +102,8 @@ class DeferralWorkQueue:
                         insufficient_criteria_json=json.dumps(insufficient),
                         action_required_questions_json=json.dumps(questions),
                         audit_hash=adjudication.audit_hash,
-                        current_state=state.value
+                        current_state=state.value,
+                        assigned_to_user_id=user_id
                     )
                     local_db.add(rec)
                 else:
@@ -112,6 +116,8 @@ class DeferralWorkQueue:
                     rec.action_required_questions_json = json.dumps(questions)
                     rec.audit_hash = adjudication.audit_hash
                     rec.current_state = state.value
+                    if user_id is not None:
+                        rec.assigned_to_user_id = user_id
                 local_db.commit()
             except Exception:
                 local_db.rollback()
@@ -134,20 +140,20 @@ class DeferralWorkQueue:
             try:
                 records = local_db.query(DeferralQueueRecord).all()
                 for rec in records:
-                    if rec.case_id not in cls._QUEUE:
-                        cls._QUEUE[rec.case_id] = DeferralQueueItem(
-                            case_id=rec.case_id,
-                            patient_id_masked=rec.patient_id_masked,
-                            policy_id=rec.policy_id,
-                            policy_title=rec.policy_title,
-                            provisional_decision=rec.provisional_decision,
-                            missing_criteria=json.loads(rec.missing_criteria_json or "[]"),
-                            insufficient_criteria=json.loads(rec.insufficient_criteria_json or "[]"),
-                            action_required_questions=json.loads(rec.action_required_questions_json or "[]"),
-                            audit_hash=rec.audit_hash,
-                            created_at=rec.created_at.isoformat() if rec.created_at else datetime.now(timezone.utc).isoformat(),
-                            current_state=InternalWorkflowState(rec.current_state) if rec.current_state in InternalWorkflowState._value2member_map_ else InternalWorkflowState.PRE_CHECK
-                        )
+                    cls._QUEUE[rec.case_id] = DeferralQueueItem(
+                        case_id=rec.case_id,
+                        patient_id_masked=rec.patient_id_masked,
+                        policy_id=rec.policy_id,
+                        policy_title=rec.policy_title,
+                        provisional_decision=rec.provisional_decision,
+                        missing_criteria=json.loads(rec.missing_criteria_json or "[]"),
+                        insufficient_criteria=json.loads(rec.insufficient_criteria_json or "[]"),
+                        action_required_questions=json.loads(rec.action_required_questions_json or "[]"),
+                        audit_hash=rec.audit_hash,
+                        created_at=rec.created_at.isoformat() if rec.created_at else datetime.now(timezone.utc).isoformat(),
+                        assigned_to_user_id=getattr(rec, "assigned_to_user_id", None),
+                        current_state=InternalWorkflowState(rec.current_state) if rec.current_state in InternalWorkflowState._value2member_map_ else InternalWorkflowState.PRE_CHECK
+                    )
             except Exception:
                 pass
             finally:

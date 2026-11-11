@@ -87,7 +87,7 @@ def get_metrics_json(db: Session = Depends(get_db)) -> Dict[str, Any]:
     abstained = db.query(AdjudicationLog).filter(AdjudicationLog.abstention_status == True).count()
 
     logs = db.query(AdjudicationLog.execution_time_ms).filter(AdjudicationLog.execution_time_ms.isnot(None)).all()
-    avg_latency_ms = (sum(l[0] for l in logs) / len(logs)) if logs else 45.0
+    avg_latency_ms = (sum(l[0] for l in logs) / len(logs)) if logs else None
 
     return {
         "adjudications": {
@@ -96,7 +96,7 @@ def get_metrics_json(db: Session = Depends(get_db)) -> Dict[str, Any]:
             "denied": denied,
             "abstained": abstained,
             "approval_rate": (approved / total_adjudications) if total_adjudications > 0 else 0.0,
-            "average_latency_ms": round(avg_latency_ms, 2)
+            "average_latency_ms": round(avg_latency_ms, 2) if avg_latency_ms is not None else None
         },
         "security": {
             "total_users": db.query(User).count(),
