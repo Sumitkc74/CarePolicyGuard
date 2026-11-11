@@ -29,14 +29,16 @@ class CalibratedAbstentionGate:
         Returns:
             (decision, abstention_status, raw_aggregate_conf, calibrated_aggregate_conf, abstention_reason, clinician_action_notes)
         """
-        if not criteria_assessments:
+        if not criteria_assessments or not audit_results:
+            missing_input = "No policy criteria evaluated." if not criteria_assessments else "No verification audit results provided."
+            action_note = "Review policy selection and criteria configuration." if not criteria_assessments else "Review adversarial verification pipeline inputs."
             return (
                 AdjudicationDecision.DEFERRED_TO_HUMAN,
                 True,
                 0.0,
                 0.0,
-                "No policy criteria evaluated.",
-                "Review policy selection and criteria configuration."
+                missing_input,
+                action_note
             )
 
         # 1. Aggregate confidence calculation

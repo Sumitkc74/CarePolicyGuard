@@ -494,13 +494,32 @@ class MultiAgentVerificationPipeline:
                                 ca.raw_confidence = 0.50
 
             # Task 2: Agent 4 Calibrated Abstention Gate & Decisions
-            if budget_halt:
+            if short_circuit_denial:
+                decision = AdjudicationDecision.DENIED
+                abstention_status = False
+                raw_aggregate_conf = 0.95
+                calibrated_aggregate_conf = 0.95
+                abstention_reason = denial_reason
+                clinician_action_notes = "Statutory exclusion triggered; autonomous denial based on documented contraindication."
+                board.post(
+                    agent="Agent 4: Abstention Gate",
+                    message_type=BoardMessageType.DECISION,
+                    content=f"Final Determination: DENIED. Statutory exclusion condition verified present in clinical record.",
+                    metadata={"decision": "DENIED", "statutory_exclusion": True}
+                )
+            elif budget_halt:
                 decision = AdjudicationDecision.DEFERRED_TO_HUMAN
                 abstention_status = True
                 raw_aggregate_conf = 0.50
                 calibrated_aggregate_conf = 0.50
                 abstention_reason = "Operational budget exhausted: Execution bounds reached; case deferred to human review."
                 clinician_action_notes = "Case halted due to operational budget exhaustion. Review remaining criteria."
+                board.post(
+                    agent="Agent 4: Abstention Gate",
+                    message_type=BoardMessageType.HALT,
+                    content=f"HALT: Case deferred to human clinician. Trigger reason: {abstention_reason}",
+                    metadata={"tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
+                )
             else:
                 gate = CalibratedAbstentionGate(tau=gate_tau)
                 (
@@ -512,30 +531,20 @@ class MultiAgentVerificationPipeline:
                     clinician_action_notes
                 ) = gate.evaluate(criteria_assessments, verification_audits)
 
-            if short_circuit_denial:
-                decision = AdjudicationDecision.DENIED
-                abstention_status = False
-                abstention_reason = denial_reason
-                board.post(
-                    agent="Agent 4: Abstention Gate",
-                    message_type=BoardMessageType.DECISION,
-                    content=f"Final Determination: DENIED. Statutory exclusion condition verified present in clinical record.",
-                    metadata={"decision": "DENIED", "statutory_exclusion": True}
-                )
-            elif abstention_status:
-                board.post(
-                    agent="Agent 4: Abstention Gate",
-                    message_type=BoardMessageType.HALT,
-                    content=f"HALT: Case deferred to human clinician. Trigger reason: {abstention_reason}",
-                    metadata={"tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
-                )
-            else:
-                board.post(
-                    agent="Agent 4: Abstention Gate",
-                    message_type=BoardMessageType.DECISION,
-                    content=f"Final Determination: {decision.value}. All statutory coverage requirements satisfied with aggregate calibrated sufficiency {calibrated_aggregate_conf:.3f} >= tau ({gate_tau:.2f}).",
-                    metadata={"decision": decision.value, "sufficiency_score": calibrated_aggregate_conf}
-                )
+                if abstention_status:
+                    board.post(
+                        agent="Agent 4: Abstention Gate",
+                        message_type=BoardMessageType.HALT,
+                        content=f"HALT: Case deferred to human clinician. Trigger reason: {abstention_reason}",
+                        metadata={"tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
+                    )
+                else:
+                    board.post(
+                        agent="Agent 4: Abstention Gate",
+                        message_type=BoardMessageType.DECISION,
+                        content=f"Final Determination: {decision.value}. All statutory coverage requirements satisfied with aggregate calibrated sufficiency {calibrated_aggregate_conf:.3f} >= tau ({gate_tau:.2f}).",
+                        metadata={"decision": decision.value, "sufficiency_score": calibrated_aggregate_conf}
+                    )
         else:
             # 3. Agent 2: Criteria Evaluation (Agentic Tool Selection)
             criteria_assessments = []
