@@ -1,0 +1,649 @@
+{
+  "title": "Synonymy Case Trace and Decision Blocker Classification (v30)",
+  "description": "Comprehensive trace of all 19 synonymy development vignettes evaluating why proposals did or did not resolve decisions, mapping each case to exact blocker categories.",
+  "total_synonymy_cases": 19,
+  "resolved_cases": 1,
+  "unresolved_cases": 18,
+  "bucket_summary_across_18_unresolved": {
+    "(a) multi_criterion_block": 1,
+    "(b) evidence_not_applied (wiring defect)": 0,
+    "(c) confidence_block": 0,
+    "(d) other": {
+      "total_other": 17,
+      "gate_a_quote_mismatch_hallucinated_offsets": 7,
+      "gate_c_disjoint_concept_map_entries": 9,
+      "gate_c_governing_rule_coverage_judgment": 1
+    }
+  },
+  "wiring_defect_remediation": {
+    "defect_identified": "MultiAgentVerificationPipeline.adjudicate_sync (app/agents/pipeline.py lines 192-200) updated assessment.status to MET upon accepting an LLM proposal, but failed to update assessment.raw_confidence from verified_span.confidence (leaving it at default 0.50).",
+    "impact": "Triggered CalibratedAbstentionGate weakest_link_floor (0.65) and dragged calibrated aggregate confidence below tau=0.85.",
+    "fix_applied": "Updated app/agents/pipeline.py to set assessment.raw_confidence = verified_span.confidence or 0.95.",
+    "regression_test": "tests/test_wiring_accepted_proposal_confidence.py (PASSED)"
+  },
+  "case_traces": [
+    {
+      "vignette_id": "DEV-LCD-IMRT-APP",
+      "policy_id": "LCD-IMRT",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-IMRT-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-IMRT-02",
+          "criterion_name": "Dosimetric Proof of 3D Conformal Inadequacy",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%).",
+              "char_start": 321,
+              "char_end": 382,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('3D Conformal Radiation Exceeds Tolerance' vs 'Dosimetric Proof of 3D Conformal Inadequacy (Rectal Tolerance)').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
+      "policy_id": "LCD-KNEE-ORTHOSIS",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-KORTH-01",
+        "CRIT-KORTH-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-KORTH-01",
+          "criterion_name": "Documented Objective Knee Laxity or Ligamentous Deficiency",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "3+ anterior drawer, grade III Lachman, and pivot shift",
+              "char_start": 416,
+              "char_end": 470,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('ligamentous instability of knee' vs 'Documented Objective Knee Laxity or Ligamentous Deficiency').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-KORTH-02",
+          "criterion_name": "Medical Justification for Custom vs Prefabricated Device",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "conical thigh geometry",
+              "char_start": 551,
+              "char_end": 573,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Anatomical Justification for Custom Orthosis' vs 'Medical Justification for Custom vs Prefabricated Device').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-LCD-KYPHO-APP",
+      "policy_id": "LCD-KYPHO",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_a_quote_mismatch",
+      "initial_unmet_criteria": [
+        "CRIT-KYPHO-01",
+        "CRIT-KYPHO-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-KYPHO-01",
+          "criterion_name": "Severe Pain Score (NRS/VAS >= 6/10)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Pain rating is 8/10 on visual analog scale.",
+              "char_start": 224,
+              "char_end": 267,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Severe Vertebral Pain' vs 'Severe Pain Score (NRS/VAS >= 6/10)').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-KYPHO-02",
+          "criterion_name": "Acute Edema on MRI Confirming Recent Compression Fracture",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "STIR or T2 MRI demonstrating hyperintense bone marrow edema confirming an acute/subacute fracture of the target vertebral body (or positive bone scan).",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 878. Hallucinated evidence: claimed text 'STIR or T2 MRI demonstrating h...' does not exist in EHR note."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "LLM produced paraphrased text, acronym variation, or summarized policy wording that could not be mapped to exact character offsets in EHR narrative ([0:0] offsets). Gate A exact slice check rejected proposal."
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
+      "policy_id": "LCD-LUMBAR-DECOMP",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-LDEC-01"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-LDEC-01",
+          "criterion_name": "Severe Central or Foraminal Stenosis on MRI/CT",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "severe lumbar spinal stenosis",
+              "char_start": 522,
+              "char_end": 551,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Moderate to Severe Lumbar Stenosis' vs 'Severe Central or Foraminal Stenosis on MRI/CT').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
+      "policy_id": "LCD-MRI-BRAIN",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_coverage_judgment",
+      "initial_unmet_criteria": [
+        "CRIT-MRIB-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-MRIB-02",
+          "criterion_name": "Progressive Headache with Red Flags or Abnormal Exam",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness",
+              "char_start": 155,
+              "char_end": 282,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Proposed term 'progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness' has no entry in concept map.. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "Governing Rule enforcement: CRIT-MRIB-02 requires headache red flags. Proposed phrase 'progressive right upper extremity clumsiness...' is a focal motor symptom, not a headache synonym. Pre-audit flag 'NEEDS_HUMAN_JUDGMENT' correctly prevents automated approval of clinical substitution."
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
+      "policy_id": "LCD-MRI-LUMBAR",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_a_quote_mismatch",
+      "initial_unmet_criteria": [
+        "CRIT-MRIL-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-MRIL-02",
+          "criterion_name": "Preceding Plain Lumbar Radiograph Evaluation",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Recent plain radiographs of the lumbar spine performed prior to or in conjunction with advanced imaging request (unless red flag).",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 776. Hallucinated evidence: claimed text 'Recent plain radiographs of th...' does not exist in EHR note."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "LLM produced paraphrased text, acronym variation, or summarized policy wording that could not be mapped to exact character offsets in EHR narrative ([0:0] offsets). Gate A exact slice check rejected proposal."
+    },
+    {
+      "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+      "policy_id": "LCD-PAD-ATHERO",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_a_quote_mismatch",
+      "initial_unmet_criteria": [
+        "CRIT-PAD-01",
+        "CRIT-PAD-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-PAD-01",
+          "criterion_name": "Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "severe claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 831. Hallucinated evidence: claimed text 'severe claudication occurring ...' does not exist in EHR note."
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-PAD-02",
+          "criterion_name": "Arterial Hemodynamic Stenosis (>= 70% on Angiography or ABI <= 0.70)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Ankle-Brachial Index (ABI) <= 0.70 and angiography/duplex showing >= 70% stenosis of target lower extremity artery.",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 831. Hallucinated evidence: claimed text 'Ankle-Brachial Index (ABI) <= ...' does not exist in EHR note."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "LLM produced paraphrased text, acronym variation, or summarized policy wording that could not be mapped to exact character offsets in EHR narrative ([0:0] offsets). Gate A exact slice check rejected proposal."
+    },
+    {
+      "vignette_id": "DEV-LCD-POWER-WC-APP",
+      "policy_id": "LCD-POWER-WC",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_a_quote_mismatch",
+      "initial_unmet_criteria": [
+        "CRIT-PWC-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-PWC-02",
+          "criterion_name": "Specialty Evaluation by Licensed PT/OT and Certified ATP",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Specialty evaluation by licensed PT/OT and Certified ATP",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 890. Hallucinated evidence: claimed text 'Specialty evaluation by licens...' does not exist in EHR note."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "LLM produced paraphrased text, acronym variation, or summarized policy wording that could not be mapped to exact character offsets in EHR narrative ([0:0] offsets). Gate A exact slice check rejected proposal."
+    },
+    {
+      "vignette_id": "DEV-LCD-PROTON-APP",
+      "policy_id": "LCD-PROTON",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-PBT-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-PBT-02",
+          "criterion_name": "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Comparative planning demonstrates that conventional photon VMAT delivers unacceptable toxic doses (brainstem max dose 62 Gy).",
+              "char_start": 305,
+              "char_end": 430,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Proton Beam Radiotherapy Dosimetric Comparison' vs 'Skull Base, Spine, or Critical Structure Proximity').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-LCD-RAD-NIV-APP",
+      "policy_id": "LCD-RAD-NIV",
+      "primary_bucket": "resolved",
+      "sub_bucket": "resolved_deterministic_expanded_map",
+      "initial_unmet_criteria": [],
+      "criteria_evaluations": [],
+      "diagnostic_rationale": "Both criteria (CRIT-NIV-01 and CRIT-NIV-02) satisfied deterministically by in-sample expanded ConceptMap. Adjudication succeeded with decision APPROVED."
+    },
+    {
+      "vignette_id": "DEV-LCD-SBRT-APP",
+      "policy_id": "LCD-SBRT",
+      "primary_bucket": "multi_criterion_block",
+      "sub_bucket": "multi_criterion_block_with_wiring_defect",
+      "initial_unmet_criteria": [
+        "CRIT-SBRT-01",
+        "CRIT-SBRT-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-SBRT-01",
+          "criterion_name": "Early-Stage NSCLC (T1-T2N0M0) or Oligometastases (<= 3 Lesions)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "early-stage non-small cell lung cancer",
+              "char_start": 651,
+              "char_end": 689,
+              "passed_gates": true,
+              "failing_gate": null,
+              "rejection_reason": null
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-SBRT-02",
+          "criterion_name": "Rigid Immobilization and Organ Motion Management Plan",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Stereotactic body radiation therapy (SBRT) delivering 50 Gy in 4 fractions with respiratory motion tracking.",
+              "char_start": 697,
+              "char_end": 805,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Stereotactic Body Radiation Therapy Immobilization and Motion Management Plan' vs 'Rigid Immobilization and Organ Motion Management Plan').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "CRIT-SBRT-01 proposal was accepted by Gates A, B, C and cross-examination. However, CRIT-SBRT-02 was unmet (failed Gate C due to disjoint concept entry in map). In addition, criterion assessment raw_confidence wiring defect left CRIT-SBRT-01 at 0.50, triggering weakest-link floor. Even with confidence wiring fixed, CRIT-SBRT-02 remains unmet."
+    },
+    {
+      "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
+      "policy_id": "NCD-CARDIAC-REHAB",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-CREH-01",
+        "CRIT-CREH-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-CREH-01",
+          "criterion_name": "Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Recent surgical revascularization for ischemic heart disease in stable clinical condition.",
+              "char_start": 702,
+              "char_end": 792,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('NCD-CARDIAC-REHAB.CRIT-CREH-01' vs 'Qualifying Cardiac Event (Post-CABG Revascularization)').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-CREH-02",
+          "criterion_name": "Physician-Prescribed Individualized Exercise Treatment Plan",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "individualized aerobic exercise plan",
+              "char_start": 645,
+              "char_end": 681,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Individualized Exercise Plan' vs 'Physician-Prescribed Individualized Exercise Treatment Plan').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-NCD-CCTA-APP",
+      "policy_id": "NCD-CCTA",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_a_quote_mismatch",
+      "initial_unmet_criteria": [
+        "CRIT-CCTA-01",
+        "CRIT-CCTA-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-CCTA-01",
+          "criterion_name": "Intermediate CAD Probability and Target Heart Rate (< 65 bpm)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Intermediate pre-test probability of obstructive CAD",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 775. Hallucinated evidence: claimed text 'Intermediate pre-test probabil...' does not exist in EHR note."
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-CCTA-02",
+          "criterion_name": "Inconclusive Prior Stress Testing or Equivocal Biomarkers",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram.",
+              "char_start": 586,
+              "char_end": 692,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Inconclusive or equivocal prior stress testing' vs 'Inconclusive Prior Stress Testing or Equivocal Baseline ECG').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "LLM produced paraphrased text, acronym variation, or summarized policy wording that could not be mapped to exact character offsets in EHR narrative ([0:0] offsets). Gate A exact slice check rejected proposal."
+    },
+    {
+      "vignette_id": "DEV-NCD-MPI-PET-APP",
+      "policy_id": "NCD-MPI-PET",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-PETM-01"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-PETM-01",
+          "criterion_name": "Intermediate-to-High Pre-Test CAD Probability",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Severe coronary disease and ischemic systolic dysfunction with inconclusive SPECT.",
+              "char_start": 574,
+              "char_end": 656,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Intermediate-to-High Pre-Test CAD Probability' vs 'Intermediate-to-High Pre-Test CAD Probability (Established Ischemic CAD)').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-NCD-PACEMAKER-APP",
+      "policy_id": "NCD-PACEMAKER",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-PACE-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-PACE-02",
+          "criterion_name": "Absence of Reversible Etiologies",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Not taking AV nodal blocking agents.",
+              "char_start": 234,
+              "char_end": 270,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Proposed term 'Not taking AV nodal blocking agents.' has no entry in concept map.. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-NCD-PET-ONC-APP",
+      "policy_id": "NCD-PET-ONC",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_a_quote_mismatch",
+      "initial_unmet_criteria": [
+        "CRIT-PTONC-01",
+        "CRIT-PTONC-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-PTONC-01",
+          "criterion_name": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 712. Hallucinated evidence: claimed text 'Histologically Confirmed Malig...' does not exist in EHR note."
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-PTONC-02",
+          "criterion_name": "Clinical Staging Impact on Intended Treatment Strategy",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging.",
+              "char_start": 600,
+              "char_end": 712,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('PET-CT findings guide treatment' vs 'Clinical Staging Impact on Intended Treatment Strategy').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "LLM produced paraphrased text, acronym variation, or summarized policy wording that could not be mapped to exact character offsets in EHR narrative ([0:0] offsets). Gate A exact slice check rejected proposal."
+    },
+    {
+      "vignette_id": "DEV-NCD-PUMP-APP",
+      "policy_id": "NCD-PUMP",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-PUMP-01",
+        "CRIT-PUMP-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-PUMP-01",
+          "criterion_name": "Successful Intrathecal Preliminary Trial Response",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "75% pain reduction",
+              "char_start": 493,
+              "char_end": 511,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Positive Intrathecal Trial Response' vs 'Successful Intrathecal Preliminary Trial Response').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        },
+        {
+          "criterion_code": "CRIT-PUMP-02",
+          "criterion_name": "Intolerable Side Effects or Failure of Systemic Analgesics",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Intractable pelvic pain refractory to systemic medical therapy with successful preliminary intrathecal screening trial.",
+              "char_start": 627,
+              "char_end": 746,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Intractable Pain Unresponsive to Systemic Analgesics' vs 'Chronic Intertrigo and Maceration').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    },
+    {
+      "vignette_id": "DEV-NCD-SGD-APP",
+      "policy_id": "NCD-SGD",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_a_quote_mismatch",
+      "initial_unmet_criteria": [
+        "CRIT-SGD-02"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-SGD-02",
+          "criterion_name": "Formal Evaluation by Licensed Speech-Language Pathologist (SLP)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Formal evaluation by licensed speech-language pathologist (SLP) documenting profound anarthria with severe oral-motor dyspraxia. Receptive language and cognition remain intact. SLP completed formal device trial with dedicated eye-gaze speech-generating system; patient achieved 95% message accuracy. Device requested is a dedicated augmentative communication device.",
+              "char_start": 0,
+              "char_end": 0,
+              "passed_gates": false,
+              "failing_gate": "GATE_A_EXACT_SLICE",
+              "rejection_reason": "Invalid character offsets [0:0] for note of length 898. Hallucinated evidence: claimed text 'Formal evaluation by licensed ...' does not exist in EHR note."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "LLM produced paraphrased text, acronym variation, or summarized policy wording that could not be mapped to exact character offsets in EHR narrative ([0:0] offsets). Gate A exact slice check rejected proposal."
+    },
+    {
+      "vignette_id": "DEV-OPD-SI-FUSION-APP",
+      "policy_id": "OPD-SI-FUSION",
+      "primary_bucket": "other",
+      "sub_bucket": "other_gate_c_disjoint_concepts",
+      "initial_unmet_criteria": [
+        "CRIT-SI-01"
+      ],
+      "criteria_evaluations": [
+        {
+          "criterion_code": "CRIT-SI-01",
+          "criterion_name": "Diagnostic SI Block Pain Relief (>= 75%)",
+          "has_proposal": true,
+          "proposals": [
+            {
+              "claimed_text": "Severe chronic right sacroiliac joint dysfunction with positive provocative physical signs and > 75% relief on diagnostic intra-articular block.",
+              "char_start": 714,
+              "char_end": 858,
+              "passed_gates": false,
+              "failing_gate": "GATE_C_MAP_CHECK",
+              "rejection_reason": "Concept Map check failed: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('SI Joint Pain Relief' vs 'Diagnostic SI Block Pain Relief (>= 75%)').. Claim submitted to human review queue; case defers."
+            }
+          ]
+        }
+      ],
+      "diagnostic_rationale": "ConceptMap check failed with NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts. Criterion term was registered in v27 draft while attested note phrase was registered in separate v29 entry without unified concept definition, causing verify_equivalence to fail."
+    }
+  ]
+}

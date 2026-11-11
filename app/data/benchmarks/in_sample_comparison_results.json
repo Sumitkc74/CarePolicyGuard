@@ -20,7 +20,9 @@
       "concordant_decisions": 39
     },
     "synonymy_resolved_count": 0,
-    "synonymy_resolved_cases": []
+    "synonymy_resolved_cases": [],
+    "gate_c_vetoes": 0,
+    "accounting_closes": true
   },
   "arm_b_in_sample_expanded": {
     "arm_name": "Arm B: In-Sample Expanded Map (147 concepts, span repair ON) [IN-SAMPLE]",
@@ -43,7 +45,9 @@
     "synonymy_resolved_count": 1,
     "synonymy_resolved_cases": [
       "DEV-LCD-RAD-NIV-APP"
-    ]
+    ],
+    "gate_c_vetoes": 1,
+    "accounting_closes": true
   },
   "in_sample_true_delta": {
     "calls_delta": 0,

@@ -173,6 +173,7 @@ def run_clean_arm(
     gate_a_fails = telem.get("gate_a_rejections", 0)
     gate_b_fails = telem.get("gate_b_rejections", 0)
     gate_c_fails = telem.get("gate_c_map_rejections", 0)
+    gate_c_vetoes = telem.get("gate_c_vetoes", 0)
     proposals_accepted = telem.get("proposals_accepted", 0)
     gate_a_passes = calls - gate_a_fails
 
@@ -187,7 +188,9 @@ def run_clean_arm(
         "gate_a_fails": gate_a_fails,
         "gate_b_rejections": gate_b_fails,
         "gate_c_map_rejections": gate_c_fails,
+        "gate_c_vetoes": gate_c_vetoes,
         "proposals_accepted": proposals_accepted,
+        "accounting_closes": (gate_a_passes - gate_b_fails - gate_c_fails - gate_c_vetoes == proposals_accepted),
         "concordant_decisions": concordant_count,
         "accuracy_pct": acc_pct,
         "four_number_safety": {

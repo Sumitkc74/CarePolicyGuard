@@ -191,6 +191,7 @@ class MultiAgentVerificationPipeline:
                     )
                     if verified_span:
                         assessment.verified_spans.append(verified_span)
+                        assessment.raw_confidence = verified_span.confidence or 0.95
                         if not decl_crit.is_exclusion:
                             assessment.status = DeterminationStatus.MET
                             assessment.clinical_rationale += f" [Conversationally Verified LLM Proposal Accepted: '{verified_span.source_text}']"

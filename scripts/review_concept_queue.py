@@ -51,6 +51,8 @@ def list_entries(policy_id=None, status_filter=None, show_flag=None):
         print(f" Status:            {item.get('status')}")
         print(f" Governing Flag:    {item.get('governing_rule_check')}")
         print(f" Grounding Quote:   \"{item.get('grounding_quote')}\"")
+        if item.get("attested_note_phrasing"):
+            print(f" Attested Phrasing: \"{item.get('attested_note_phrasing')}\"")
         print(f" Accepted Terms:    {', '.join(item.get('accepted_terms', []))}")
         print(f" Near Misses:       {', '.join(item.get('prohibited_near_misses', []))}")
         print(f" Rule Rationale:    {item.get('governing_rule_rationale')}")
