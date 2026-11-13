@@ -36,7 +36,11 @@ class PolicyShortlistService:
     - MIN_RELEVANCE_FLOOR (0.15): Minimum unified relevance score required for a policy
       to be eligible for inclusion on the clinician's shortlist.
     - MAX_SHORTLIST_SIZE (5): Maximum candidate policies displayed on the shortlist.
-    - MIN_SHORTLIST_SIZE (3): Target minimum shortlist size when qualifying candidates exist.
+    - MIN_SHORTLIST_SIZE (3): Recommended display floor for UI shortlist rendering when
+      sufficient candidates clear the relevance floor.
+    - Single-Candidate Rule: When exactly 1 candidate qualifies, margin is set to 1.0
+      (uncontested). Pre-selection requires satisfying MIN_PRESELECT_COVERAGE_RATIO (0.33)
+      and supported_criteria_count >= 1; otherwise defaults to SELECTION_REQUIRED.
     """
 
     SCORE_MARGIN_THRESHOLD: float = 0.08
@@ -227,9 +231,12 @@ class PolicyShortlistService:
             # Baseline score preserves lexical relevance (0.85 floor), boosted up to +30% for high criteria coverage
             reranked_score = round(u_score * (0.85 + 0.30 * coverage_ratio), 4)
 
-            # 0-Coverage Rule:
-            # A candidate whose title matches lexically but whose criteria coverage is 0
-            # is placed below candidates with non-zero coverage, keeping its score and coverage label.
+            # 0-Coverage Demotion Rule (Soft 0.85 Multiplier):
+            # A candidate whose title/text matches lexically but whose criteria coverage is 0
+            # receives a soft demotion via the (0.85 + 0.30 * 0) = 0.85 multiplier (a 15% penalty),
+            # while candidates with higher coverage receive up to a 1.15 multiplier (+15% boost).
+            # This demotes 0-coverage candidates below moderately matching candidates with verified criteria,
+            # while preserving the candidate's unified score and explicit coverage display.
             coverage_display = f"{supported_criteria_count} of {total_criteria_count} criteria have supporting text"
 
             pol_title = getattr(policy_obj, "title", pid) if policy_obj else pid

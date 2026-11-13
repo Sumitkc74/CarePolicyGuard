@@ -1081,14 +1081,15 @@ async def extract_clinical_text(
     # Verify physician name, signature, and clinical authenticity
     auth_check = verify_clinical_document_authenticity(extracted_text)
 
-    # Suggest matching policy using Hybrid BM25 + Semantic Retriever
-    hybrid_retriever = HybridPolicyRetriever(db=db)
-    candidates = hybrid_retriever.retrieve_hybrid(extracted_text, top_k=3)
-    suggested_policy = "NCD-20.4"
-    policy_title = "Implantable Automatic Defibrillators"
-    if candidates and candidates[0].get("rrf_score", 0.0) > 0.01:
-        suggested_policy = candidates[0]["policy_id"]
-        policy_title = candidates[0].get("title", suggested_policy)
+    # Suggest matching policy using unified Policy Shortlist Service
+    from app.services.policy_shortlist_service import PolicyShortlistService
+    shortlist_res = PolicyShortlistService.compute_shortlist(extracted_text, db=db, top_k=3)
+    suggested_policy = shortlist_res.get("preselected_policy_id")
+    policy_title = shortlist_res.get("preselected_policy_title")
+    if not suggested_policy and shortlist_res.get("shortlist"):
+        top_cand = shortlist_res["shortlist"][0]
+        suggested_policy = top_cand["policy_id"]
+        policy_title = top_cand["policy_title"]
 
     return {
         "filename": primary_filename,
@@ -1140,15 +1141,10 @@ async def upload_clinical_note(
     if len(extracted_text) < 20:
         raise HTTPException(status_code=400, detail="Extracted document text is too short to evaluate.")
 
-    # Auto-detect policy if not specified
+    # Auto-detect policy if not specified via unified shortlist & margin rule
     pipeline = MultiAgentVerificationPipeline(db=db)
     if not policy_id or policy_id.lower() in ["auto", "none", ""]:
-        retriever = PolicyRetrievalAgent(db=db)
-        candidates = retriever.search_policies_by_narrative(extracted_text)
-        if candidates and candidates[0]["relevance_score"] > 0.05:
-            policy_id = candidates[0]["policy_id"]
-        else:
-            policy_id = "NCD-20.4"  # Default cardiology fallback
+        policy_id = "AUTO"
 
     # Execute Adjudication Pipeline
     adjudication = await pipeline.adjudicate(

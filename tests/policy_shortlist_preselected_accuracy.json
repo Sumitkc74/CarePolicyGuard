@@ -1,0 +1,1310 @@
+{
+  "dataset": "84 dev vignettes, author-written, not held-out, not clinical validation",
+  "database": "carepolicyguard.db (repo SQLite database)",
+  "pipeline_mode": "MultiAgentVerificationPipeline.adjudicate_sync (deterministic)",
+  "preselected_count": 40,
+  "selection_required_count": 44,
+  "policy_match_count": 39,
+  "policy_match_rate": 0.975,
+  "preselected_decision_accuracy_under_gold": 0.625,
+  "preselected_decision_accuracy_under_preselected": 0.625,
+  "preselected_decision_agreement_rate": 1.0,
+  "selection_required_decision_accuracy_under_gold": 0.2727,
+  "preselected_cases": [
+    {
+      "vignette_id": "DEV-LCD-ACDF-APP",
+      "title": "Cervical radiculopathy with MRI-proven disc herniation",
+      "gold_policy": "LCD-ACDF",
+      "preselected_policy": "LCD-ACDF",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.1619,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-ACDF-NEG",
+      "title": "Axial neck pain without radiculopathy or disc herniation",
+      "gold_policy": "LCD-ACDF",
+      "preselected_policy": "LCD-ACDF",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.1267,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-ACI-APP",
+      "title": "Focal femoral condyle chondral defect post-microfracture failure",
+      "gold_policy": "LCD-ACI",
+      "preselected_policy": "LCD-ACI",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.4706,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-ACI-NEG",
+      "title": "Severe tricompartmental osteoarthritis with sub-threshold lesion",
+      "gold_policy": "LCD-ACI",
+      "preselected_policy": "LCD-ACI",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.2349,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-CT-CHEST-APP",
+      "title": "Solitary pulmonary nodule on chest radiograph with hemoptysis",
+      "gold_policy": "LCD-CT-CHEST",
+      "preselected_policy": "LCD-CT-CHEST",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.4373,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-ESI-APP",
+      "title": "L5 radicular nerve root pain refractory to physical therapy",
+      "gold_policy": "LCD-ESI",
+      "preselected_policy": "LCD-ESI",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.3414,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-ESI-NEG",
+      "title": "Axial low back pain without radicular symptoms or physical therapy",
+      "gold_policy": "LCD-ESI",
+      "preselected_policy": "LCD-ESI",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.2596,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-EVAR-APP",
+      "title": "Infrarenal AAA diameter 5.8 cm with adequate proximal aortic neck",
+      "gold_policy": "LCD-EVAR",
+      "preselected_policy": "LCD-EVAR",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.6152,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-FACET-APP",
+      "title": "Chronic lumbar facet arthropathy with 85% relief on dual MBB",
+      "gold_policy": "LCD-FACET",
+      "preselected_policy": "LCD-FACET",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.5675,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-HALLUX-APP",
+      "title": "Painful hallux valgus deformity failing 16 weeks orthotics",
+      "gold_policy": "LCD-HALLUX",
+      "preselected_policy": "LCD-HALLUX",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.4645,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-HALLUX-NEG",
+      "title": "Painless cosmetic complaint with minimal 10 degree deviation",
+      "gold_policy": "LCD-HALLUX",
+      "preselected_policy": "LCD-HALLUX",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.4579,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-ARTHRO-APP",
+      "title": "End-stage osteoarthritis of right hip refractory to non-operative care",
+      "gold_policy": "LCD-HIP-ARTHRO",
+      "preselected_policy": "LCD-HIP-ARTHRO",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.2485,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-SCOOP-APP",
+      "title": "Femoroacetabular impingement with acetabular labral tear on MRI",
+      "gold_policy": "LCD-HIP-SCOOP",
+      "preselected_policy": "LCD-HIP-SCOOP",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.3131,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-IMRT-APP",
+      "title": "Localized prostate adenocarcinoma adjacent to critical rectal wall",
+      "gold_policy": "LCD-IMRT",
+      "preselected_policy": "LCD-IMRT",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.1734,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ARTHRO-APP",
+      "title": "Mechanical bucket-handle meniscal tear with persistent knee locking",
+      "gold_policy": "LCD-KNEE-ARTHRO",
+      "preselected_policy": "LCD-KNEE-ARTHRO",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.3572,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
+      "title": "Severe lumbar canal stenosis with neurogenic claudication",
+      "gold_policy": "LCD-LUMBAR-DECOMP",
+      "preselected_policy": "LCD-LUMBAR-DECOMP",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.2523,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-FUSION-APP",
+      "title": "Grade II degenerative spondylolisthesis with dynamic instability",
+      "gold_policy": "LCD-LUMBAR-FUSION",
+      "preselected_policy": "LCD-LUMBAR-FUSION",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.1892,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
+      "title": "Subacute progressive right facial droop and unilateral weakness",
+      "gold_policy": "LCD-MRI-BRAIN",
+      "preselected_policy": "LCD-MRI-BRAIN",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.3727,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-PCI-APP",
+      "title": "Refractory Canadian Class III angina with 85% proximal LAD stenosis",
+      "gold_policy": "LCD-PCI",
+      "preselected_policy": "LCD-PCI",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.2147,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-POWER-WC-APP",
+      "title": "Non-ambulatory ALS with quadriplegia requiring power positioning",
+      "gold_policy": "LCD-POWER-WC",
+      "preselected_policy": "LCD-POWER-WC",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.3563,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-PROTON-APP",
+      "title": "Base of skull chordoma adjacent to brainstem and optic chiasm",
+      "gold_policy": "LCD-PROTON",
+      "preselected_policy": "LCD-PROTON",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.2868,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-RAD-NIV-APP",
+      "title": "Severe COPD with chronic hypercapnia failing standard PAP",
+      "gold_policy": "LCD-RAD-NIV",
+      "preselected_policy": "LCD-RAD-NIV",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.3102,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-ROTATOR-CUFF-APP",
+      "title": "Full-thickness supraspinatus tear failing 16 weeks physical therapy",
+      "gold_policy": "LCD-ROTATOR-CUFF",
+      "preselected_policy": "LCD-ROTATOR-CUFF",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.3306,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-ROTATOR-CUFF-NEG",
+      "title": "Severe cuff tear arthropathy with bone-on-bone glenohumeral collapse",
+      "gold_policy": "LCD-ROTATOR-CUFF",
+      "preselected_policy": "LCD-SHOULDER-ARTHRO",
+      "is_match": false,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.0909,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-SBRT-APP",
+      "title": "Medically inoperable clinical Stage I NSCLC of right upper lobe",
+      "gold_policy": "LCD-SBRT",
+      "preselected_policy": "LCD-SBRT",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.3253,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-APP",
+      "title": "Severe glenohumeral osteoarthritis failing 5 months conservative care",
+      "gold_policy": "LCD-SHOULDER-ARTHRO",
+      "preselected_policy": "LCD-SHOULDER-ARTHRO",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.2145,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-LCD-WOUND-VAC-APP",
+      "title": "Deep dehisced abdominal surgical wound failing 6 weeks moist dressings",
+      "gold_policy": "LCD-WOUND-VAC",
+      "preselected_policy": "LCD-WOUND-VAC",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.3391,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-NCD-CATARACT-APP",
+      "title": "Dense nuclear sclerosis with visual acuity 20/60 impairing driving",
+      "gold_policy": "NCD-CATARACT",
+      "preselected_policy": "NCD-CATARACT",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.5505,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-NCD-MPI-PET-APP",
+      "title": "Ischemic cardiomyopathy with inconclusive SPECT due to body habitus",
+      "gold_policy": "NCD-MPI-PET",
+      "preselected_policy": "NCD-MPI-PET",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.2822,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-NCD-SGD-APP",
+      "title": "Severe expressive anarthria secondary to ALS failing natural speech",
+      "gold_policy": "NCD-SGD",
+      "preselected_policy": "NCD-SGD",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.2688,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-OPD-BLEPH-APP",
+      "title": "Severe dermatochalasis with superior visual field restriction",
+      "gold_policy": "OPD-BLEPH",
+      "preselected_policy": "OPD-BLEPH",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.6094,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-OPD-BLEPH-NEG",
+      "title": "Mild eyelid wrinkling without visual field obscuration",
+      "gold_policy": "OPD-BLEPH",
+      "preselected_policy": "OPD-BLEPH",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.4591,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-OPD-BOTOX-APP",
+      "title": "Intractable chronic migraine 18 days/month failing oral prophylaxis",
+      "gold_policy": "OPD-BOTOX",
+      "preselected_policy": "OPD-BOTOX",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.4209,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-OPD-BOTOX-NEG",
+      "title": "Episodic tension headache occurring 4 days per month",
+      "gold_policy": "OPD-BOTOX",
+      "preselected_policy": "OPD-BOTOX",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.4433,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-OPD-PANNI-APP",
+      "title": "Massive abdominal pannus hanging past pubis with chronic ulcerated intertrigo",
+      "gold_policy": "OPD-PANNI",
+      "preselected_policy": "OPD-PANNI",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.3417,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-OPD-PANNI-NEG",
+      "title": "Mild abdominal wall laxity without dermatitis or sub-pubic apron",
+      "gold_policy": "OPD-PANNI",
+      "preselected_policy": "OPD-PANNI",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.2321,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-OPD-RHINO-APP",
+      "title": "Severe nasal septal deviation and valve collapse failing topical steroids",
+      "gold_policy": "OPD-RHINO",
+      "preselected_policy": "OPD-RHINO",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.4132,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-OPD-SI-FUSION-APP",
+      "title": "Chronic sacroiliac joint dysfunction with positive provocative tests and block",
+      "gold_policy": "OPD-SI-FUSION",
+      "preselected_policy": "OPD-SI-FUSION",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "decision_under_preselected": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "preselected_matches_expected": false,
+      "decisions_agree": true,
+      "score_margin": 0.3341,
+      "coverage_ratio": 0.5
+    },
+    {
+      "vignette_id": "DEV-OPD-VEIN-APP",
+      "title": "Symptomatic great saphenous insufficiency with 1200ms reflux failing stockings",
+      "gold_policy": "OPD-VEIN",
+      "preselected_policy": "OPD-VEIN",
+      "is_match": true,
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "decision_under_preselected": "APPROVED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.3758,
+      "coverage_ratio": 1.0
+    },
+    {
+      "vignette_id": "DEV-OPD-VEIN-NEG",
+      "title": "Isolated spider veins without axial reflux or compression trial",
+      "gold_policy": "OPD-VEIN",
+      "preselected_policy": "OPD-VEIN",
+      "is_match": true,
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "decision_under_preselected": "DENIED",
+      "gold_matches_expected": true,
+      "preselected_matches_expected": true,
+      "decisions_agree": true,
+      "score_margin": 0.3794,
+      "coverage_ratio": 0.5
+    }
+  ],
+  "selection_required_cases": [
+    {
+      "vignette_id": "DEV-LCD-CT-CHEST-NEG",
+      "title": "Uncomplicated acute bronchitis without abnormal radiograph",
+      "gold_policy": "LCD-CT-CHEST",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "LCD-CT-CHEST",
+        "NCD-CCTA",
+        "LCD-MRI-BRAIN",
+        "NCD-MPI-PET",
+        "NCD-PET-ONC"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-EVAR-NEG",
+      "title": "Small stable infrarenal aneurysm measuring 3.8 cm",
+      "gold_policy": "LCD-EVAR",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "LCD-EVAR",
+        "NCD-CCTA",
+        "LCD-CT-CHEST",
+        "OPD-VEIN",
+        "LCD-MRI-BRAIN"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-FACET-NEG",
+      "title": "Acute radicular sciatica with negative diagnostic facet block",
+      "gold_policy": "LCD-FACET",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "LCD-FACET",
+        "LCD-ESI",
+        "OPD-CERV-DISC",
+        "NCD-SCS",
+        "LCD-ACDF"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-ARTHRO-NEG",
+      "title": "Mild hip strain with active superficial wound infection",
+      "gold_policy": "LCD-HIP-ARTHRO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-HIP-ARTHRO",
+        "LCD-TOTAL-KNEE-01",
+        "OPD-SI-FUSION",
+        "NCD-20.33",
+        "OPD-CERV-DISC"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-SCOOP-NEG",
+      "title": "Advanced degenerative hip arthritis with joint space obliteration",
+      "gold_policy": "LCD-HIP-SCOOP",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-HIP-ARTHRO",
+        "LCD-TOTAL-KNEE-01",
+        "OPD-SI-FUSION",
+        "NCD-20.29",
+        "LCD-LUMBAR-FUSION"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-IMRT-NEG",
+      "title": "Palliative treatment of painful diffuse bone metastasis",
+      "gold_policy": "LCD-IMRT",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-IMRT",
+        "LCD-SBRT",
+        "LCD-PROTON",
+        "LCD-LUMBAR-DECOMP",
+        "LCD-KYPHO"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ARTHRO-NEG",
+      "title": "Bone-on-bone knee osteoarthritis without discrete mechanical tear",
+      "gold_policy": "LCD-KNEE-ARTHRO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-KNEE-ARTHRO",
+        "LCD-TOTAL-KNEE-01",
+        "LCD-ROTATOR-CUFF",
+        "LCD-ACI",
+        "LCD-HIP-ARTHRO"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
+      "title": "Severe chronic ACL/PCL laxity failing prefabricated bracing",
+      "gold_policy": "LCD-KNEE-ORTHOSIS",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-KNEE-ORTHOSIS",
+        "NCD-20.29",
+        "LCD-TOTAL-KNEE-01",
+        "LCD-PAD-ATHERO",
+        "OPD-VEIN"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
+      "title": "Temporary postoperative rehabilitation following routine arthroscopy",
+      "gold_policy": "LCD-KNEE-ORTHOSIS",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-KNEE-ARTHRO",
+        "LCD-ACI",
+        "LCD-TOTAL-KNEE-01",
+        "LCD-KNEE-ORTHOSIS",
+        "LCD-HIP-SCOOP"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-KYPHO-APP",
+      "title": "Acute painful osteoporotic vertebral compression fracture with bone edema",
+      "gold_policy": "LCD-KYPHO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-KYPHO",
+        "LCD-LUMBAR-DECOMP",
+        "NCD-20.7",
+        "LCD-LUMBAR-FUSION",
+        "LCD-MRI-LUMBAR"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-KYPHO-NEG",
+      "title": "Vertebral collapse in the setting of active infectious osteomyelitis",
+      "gold_policy": "LCD-KYPHO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "LCD-KYPHO",
+        "LCD-MRI-BRAIN",
+        "NCD-20.7",
+        "LCD-PCI",
+        "NCD-20.29"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-DECOMP-NEG",
+      "title": "Postural low back pain with widely patent spinal canal",
+      "gold_policy": "LCD-LUMBAR-DECOMP",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-LUMBAR-DECOMP",
+        "LCD-MRI-LUMBAR",
+        "LCD-LUMBAR-FUSION",
+        "LCD-ESI",
+        "NCD-SCS"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-FUSION-NEG",
+      "title": "Isolated disc herniation without mechanical instability",
+      "gold_policy": "LCD-LUMBAR-FUSION",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-LUMBAR-FUSION",
+        "OPD-CERV-DISC",
+        "LCD-ACDF",
+        "LCD-LUMBAR-DECOMP",
+        "LCD-MRI-LUMBAR"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-BRAIN-NEG",
+      "title": "Chronic recurrent tension headache with normal neurological exam",
+      "gold_policy": "LCD-MRI-BRAIN",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-MRI-BRAIN",
+        "OPD-BOTOX",
+        "NCD-CARDIAC-REHAB"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
+      "title": "Progressive foot drop and severe S1 radiculopathy after 6 weeks therapy",
+      "gold_policy": "LCD-MRI-LUMBAR",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-ESI",
+        "LCD-MRI-LUMBAR",
+        "OPD-CERV-DISC",
+        "LCD-MRI-BRAIN",
+        "LCD-LUMBAR-FUSION"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-LUMBAR-NEG",
+      "title": "Acute muscular lumbar strain of 4 days duration",
+      "gold_policy": "LCD-MRI-LUMBAR",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-MRI-LUMBAR",
+        "LCD-LUMBAR-DECOMP",
+        "NCD-20.29",
+        "LCD-ESI",
+        "LCD-LUMBAR-FUSION"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+      "title": "Severe lifestyle-limiting calf claudication with SFA occlusion",
+      "gold_policy": "LCD-PAD-ATHERO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-20.29",
+        "LCD-PAD-ATHERO",
+        "OPD-VEIN",
+        "NCD-20.7",
+        "LCD-LUMBAR-DECOMP"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-PAD-ATHERO-NEG",
+      "title": "Asymptomatic mild peripheral arterial disease with ABI 0.88",
+      "gold_policy": "LCD-PAD-ATHERO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-PAD-ATHERO",
+        "NCD-20.29",
+        "NCD-20.7",
+        "LCD-KYPHO",
+        "NCD-220.13"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-PCI-NEG",
+      "title": "Non-hemodynamic mild 30% coronary plaque with negative stress test",
+      "gold_policy": "LCD-PCI",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "NCD-20.7",
+        "LCD-PCI",
+        "NCD-CCTA",
+        "NCD-MPI-PET",
+        "LCD-CT-CHEST"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-POWER-WC-NEG",
+      "title": "Mild mobility deficit with preserved ability to propel manual chair",
+      "gold_policy": "LCD-POWER-WC",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-POWER-WC",
+        "LCD-TOTAL-KNEE-01",
+        "LCD-PAD-ATHERO",
+        "LCD-KNEE-ORTHOSIS",
+        "LCD-KNEE-ARTHRO"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-PROTON-NEG",
+      "title": "Widespread metastatic disease with multiple hepatic and bone deposits",
+      "gold_policy": "LCD-PROTON",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-PROTON",
+        "LCD-SBRT",
+        "NCD-PET-ONC",
+        "LCD-IMRT",
+        "NCD-20.4"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-RAD-NIV-NEG",
+      "title": "Uncomplicated obstructive sleep apnea with normal daytime carbon dioxide",
+      "gold_policy": "LCD-RAD-NIV",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-L33829",
+        "LCD-RAD-NIV",
+        "LCD-PAD-ATHERO",
+        "OPD-SI-FUSION"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-SBRT-NEG",
+      "title": "Disseminated metastatic carcinoma with widespread organ deposits",
+      "gold_policy": "LCD-SBRT",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "LCD-SBRT",
+        "LCD-PROTON",
+        "LCD-IMRT",
+        "NCD-PET-ONC",
+        "NCD-20.4"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-NEG",
+      "title": "Severe shoulder arthrosis with active purulent joint infection",
+      "gold_policy": "LCD-SHOULDER-ARTHRO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-SHOULDER-ARTHRO",
+        "LCD-TOTAL-KNEE-01",
+        "LCD-HIP-ARTHRO",
+        "NCD-PUMP",
+        "OPD-SI-FUSION"
+      ]
+    },
+    {
+      "vignette_id": "DEV-LCD-WOUND-VAC-NEG",
+      "title": "Sacral wound with 100% thick black necrotic eschar without debridement",
+      "gold_policy": "LCD-WOUND-VAC",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "LCD-WOUND-VAC",
+        "NCD-20.29",
+        "LCD-KYPHO",
+        "NCD-240.2",
+        "LCD-L33829"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
+      "title": "Recent coronary artery bypass surgery ready for structured rehab",
+      "gold_policy": "NCD-CARDIAC-REHAB",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-CARDIAC-REHAB",
+        "NCD-MPI-PET",
+        "NCD-CCTA",
+        "LCD-CT-CHEST",
+        "LCD-PAD-ATHERO"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-CARDIAC-REHAB-NEG",
+      "title": "Resting chest pain with acute decompensated heart failure",
+      "gold_policy": "NCD-CARDIAC-REHAB",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "NCD-CARDIAC-REHAB",
+        "LCD-CT-CHEST",
+        "NCD-20.29"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-CATARACT-NEG",
+      "title": "Mild 20/25 vision without functional impairment in daily tasks",
+      "gold_policy": "NCD-CATARACT",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-CATARACT",
+        "LCD-MRI-BRAIN",
+        "NCD-CARDIAC-REHAB",
+        "LCD-KNEE-ORTHOSIS"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-CCTA-APP",
+      "title": "Intermediate probability exertional chest tightness with equivocal ECG",
+      "gold_policy": "NCD-CCTA",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-CCTA",
+        "LCD-CT-CHEST",
+        "NCD-MPI-PET",
+        "NCD-PET-ONC",
+        "LCD-PCI"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-CCTA-NEG",
+      "title": "High-risk acute ST-elevation myocardial infarction",
+      "gold_policy": "NCD-CCTA",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-CCTA",
+        "NCD-CARDIAC-REHAB",
+        "LCD-PCI",
+        "LCD-CT-CHEST",
+        "LCD-RAD-NIV"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-MPI-PET-NEG",
+      "title": "Asymptomatic executive checkup with zero cardiac risk factors",
+      "gold_policy": "NCD-MPI-PET",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "NCD-MPI-PET",
+        "LCD-CT-CHEST",
+        "NCD-20.29",
+        "NCD-CARDIAC-REHAB",
+        "NCD-PACEMAKER"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-PACEMAKER-APP",
+      "title": "Symptomatic complete third-degree heart block with syncope",
+      "gold_policy": "NCD-PACEMAKER",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-PACEMAKER",
+        "NCD-CARDIAC-REHAB",
+        "NCD-MPI-PET",
+        "LCD-ACI",
+        "LCD-TOTAL-KNEE-01"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-PACEMAKER-NEG",
+      "title": "Transient sinus bradycardia secondary to severe beta-blocker overdose",
+      "gold_policy": "NCD-PACEMAKER",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-PACEMAKER",
+        "NCD-CARDIAC-REHAB",
+        "LCD-PCI",
+        "LCD-ACI",
+        "NCD-PUMP"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-PET-ONC-APP",
+      "title": "Newly diagnosed biopsy-proven esophageal adenocarcinoma staging",
+      "gold_policy": "NCD-PET-ONC",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-PET-ONC",
+        "NCD-MPI-PET",
+        "LCD-CT-CHEST",
+        "NCD-CCTA",
+        "LCD-MRI-BRAIN"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-PET-ONC-NEG",
+      "title": "Asymptomatic surveillance 5 years post-resection of early breast cancer",
+      "gold_policy": "NCD-PET-ONC",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-SBRT",
+        "LCD-WOUND-VAC",
+        "LCD-HIP-ARTHRO"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-PUMP-APP",
+      "title": "Severe intractable cancer pain failing systemic opioids with positive trial",
+      "gold_policy": "NCD-PUMP",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-PUMP",
+        "LCD-LUMBAR-FUSION",
+        "LCD-KYPHO",
+        "NCD-SCS",
+        "LCD-LUMBAR-DECOMP"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-PUMP-NEG",
+      "title": "Untreated bacteremia and local paraspinal abscess at surgical site",
+      "gold_policy": "NCD-PUMP",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "NCD-PUMP",
+        "LCD-MRI-LUMBAR",
+        "LCD-LUMBAR-DECOMP",
+        "LCD-ESI",
+        "LCD-TOTAL-KNEE-01"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-SCS-APP",
+      "title": "Failed back surgery syndrome with 80% relief during percutaneous trial",
+      "gold_policy": "NCD-SCS",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "LCD-LUMBAR-DECOMP",
+        "NCD-SCS",
+        "LCD-ESI",
+        "OPD-VEIN",
+        "NCD-20.29"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-SCS-NEG",
+      "title": "Failed trial stimulation with worsening pain and active cocaine abuse",
+      "gold_policy": "NCD-SCS",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-SCS",
+        "LCD-PCI",
+        "LCD-RAD-NIV",
+        "LCD-KYPHO",
+        "LCD-ACI"
+      ]
+    },
+    {
+      "vignette_id": "DEV-NCD-SGD-NEG",
+      "title": "Request for un-adapted standard consumer entertainment tablet",
+      "gold_policy": "NCD-SGD",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "NCD-SGD",
+        "LCD-MRI-BRAIN"
+      ]
+    },
+    {
+      "vignette_id": "DEV-OPD-CERV-DISC-APP",
+      "title": "Single-level C5-C6 soft disc radiculopathy failing 8 weeks therapy",
+      "gold_policy": "OPD-CERV-DISC",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "APPROVED",
+      "decision_under_gold": "APPROVED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "OPD-CERV-DISC",
+        "LCD-ACDF",
+        "LCD-ESI",
+        "LCD-TOTAL-KNEE-01",
+        "LCD-LUMBAR-DECOMP"
+      ]
+    },
+    {
+      "vignette_id": "DEV-OPD-CERV-DISC-NEG",
+      "title": "Severe multilevel facet arthrosis and spondylolisthesis",
+      "gold_policy": "OPD-CERV-DISC",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DENIED",
+      "gold_matches_expected": true,
+      "shortlist_candidates": [
+        "OPD-CERV-DISC",
+        "LCD-SHOULDER-ARTHRO",
+        "LCD-LUMBAR-FUSION",
+        "LCD-TOTAL-KNEE-01",
+        "LCD-ACDF"
+      ]
+    },
+    {
+      "vignette_id": "DEV-OPD-RHINO-NEG",
+      "title": "Desire for dorsal hump reduction without breathing obstruction",
+      "gold_policy": "OPD-RHINO",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "OPD-RHINO",
+        "LCD-L33829",
+        "LCD-IMRT",
+        "LCD-ACDF",
+        "LCD-KNEE-ORTHOSIS"
+      ]
+    },
+    {
+      "vignette_id": "DEV-OPD-SI-FUSION-NEG",
+      "title": "Negative provocative tests and zero pain relief from diagnostic block",
+      "gold_policy": "OPD-SI-FUSION",
+      "status": "SELECTION_REQUIRED",
+      "expected_decision": "DENIED",
+      "decision_under_gold": "DEFERRED_TO_HUMAN",
+      "gold_matches_expected": false,
+      "shortlist_candidates": [
+        "OPD-SI-FUSION",
+        "LCD-FACET",
+        "LCD-LUMBAR-FUSION",
+        "LCD-ACDF",
+        "NCD-SCS"
+      ]
+    }
+  ]
+}

@@ -10,8 +10,8 @@
 > 3. Zero circular cues: narratives contain no policy slugs, no LCD/NCD identifiers, and no coverage verdict phrases.
 > 4. Criterion traceability for all 42 extended policies remains strictly `CLAIMED_UNVERIFIED` pending independent regulatory audit.
 
-**Audit Execution Timestamp**: `2026-11-10 06:43:55 UTC`  
-**Git Commit Head**: `47d2aa0225a114ad7ef124670bf99c6b18e4026c`  
+**Audit Execution Timestamp**: `2026-11-13 07:49:16 UTC`  
+**Git Commit Head**: `c458be6c06aa29c2c2e9f56704d4f9c04d5c21a5`  
 **Total Extended Policies Audited**: `42`  
 **Total Evaluation Cases**: `84`  
 **Pipeline Decision Threshold**: `tau = 0.85` (unchanged)  

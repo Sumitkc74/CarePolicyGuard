@@ -249,7 +249,7 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                     continue
 
                 candidates = retriever.search_policies_by_narrative(extracted_text)
-                policy_id = candidates[0]["policy_id"] if candidates and candidates[0]["relevance_score"] > 0.05 else "NCD-20.4"
+                policy_id = candidates[0]["policy_id"] if candidates and candidates[0]["relevance_score"] > 0.05 else "AUTO"
 
                 pt_match = re.search(r'\b(PT-[\w-]+|Patient ID:\s*[\w-]+|MRN:\s*[\w-]+)\b', extracted_text, re.IGNORECASE)
                 if pt_match:

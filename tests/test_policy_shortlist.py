@@ -80,18 +80,13 @@ def test_margin_rule_preselection_decisive_vs_close_call(dev_vignettes):
     assert res_decisive["preselection_margin"] is not None
     assert res_decisive["preselection_margin"] >= 0.08
 
-    # 2. Close Call Case (ambiguous note with neck/back pain mentioning competing surgical procedures)
-    ambiguous_note = (
-        "Patient presents for orthopedic surgical consultation with severe cervical and lumbar symptoms. "
-        "Complains of pain and reduced range of motion. Discussed anterior cervical discectomy and fusion (ACDF), "
-        "cervical disc arthroplasty, and posterior lumbar interbody fusion. Conservative physical therapy completed."
-    )
-    res_close = PolicyShortlistService.compute_shortlist(ambiguous_note, top_k=5)
-    if res_close.get("shortlist"):
-        margin = res_close.get("preselection_margin")
-        if margin is None or margin < 0.08:
-            assert res_close["status"] == "SELECTION_REQUIRED"
-            assert res_close["preselected_policy_id"] is None
+    # 2. Close Call Case (DEV-LCD-MRI-LUMBAR-APP: margin 0.027 < 0.08 between top candidates)
+    vig_close = next(v for v in dev_vignettes if v.get("vignette_id") == "DEV-LCD-MRI-LUMBAR-APP")
+    res_close = PolicyShortlistService.compute_shortlist(vig_close["ehr_narrative"], top_k=5)
+    assert res_close["status"] == "SELECTION_REQUIRED"
+    assert res_close["preselected_policy_id"] is None
+    assert res_close["preselection_margin"] is not None
+    assert res_close["preselection_margin"] < 0.08
 
 
 def test_no_governing_policy_off_topic():
@@ -192,3 +187,42 @@ def test_shortlist_api_endpoint_contracts(dev_vignettes):
     assert "shortlist" in data or "candidates" in data
     candidates = data.get("shortlist") or data.get("candidates")
     assert len(candidates) <= 3
+
+
+def test_upload_note_off_topic_defers_without_ncd20_4():
+    """Regression test: /api/v1/upload-note with an off-topic note must NOT default to NCD-20.4.
+    It must return DEFERRED_TO_HUMAN under policy_id='NONE'.
+    """
+    client = TestClient(app)
+    off_topic_content = (
+        b"Patient presents for routine follow-up of mild eczema on the left forearm. "
+        b"Prescribed topical hydrocortisone cream. Vital signs normal, lungs clear, heart regular."
+    )
+
+    files = {"file": ("eczema_note.txt", off_topic_content, "text/plain")}
+    res = client.post("/api/v1/upload-note", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    adj = data["adjudication"]
+    assert adj["adjudication_decision"] == "DEFERRED_TO_HUMAN"
+    assert adj["policy_id"] == "NONE"
+    assert adj["policy_id"] != "NCD-20.4"
+
+
+def test_extract_text_off_topic_returns_null_suggestion():
+    """Regression test: /api/v1/extract-clinical-text with an off-topic note must return
+    suggested_policy_id=None and suggested_policy_title=None, NEVER defaulting to NCD-20.4.
+    """
+    client = TestClient(app)
+    off_topic_content = (
+        b"Patient presents for routine follow-up of mild seasonal allergies and sneezing. "
+        b"Prescribed cetirizine 10mg daily. No active cardiovascular or orthopedic complaints."
+    )
+
+    files = {"files": ("allergy_note.txt", off_topic_content, "text/plain")}
+    res = client.post("/api/v1/extract-text", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["suggested_policy_id"] is None
+    assert data["suggested_policy_title"] is None
+
