@@ -102,34 +102,148 @@ class MultiAgentVerificationPipeline:
         sanitized_ehr = sanitize_phi(ehr_narrative) if settings.ENABLE_PHI_MASKING else ehr_narrative
         masked_patient_id = f"PT-***{patient_id[-4:]}" if len(patient_id) > 4 else f"PT-***"
 
-        # 1b. Policy Auto-Discovery via Hybrid Policy Retrieval (BM25 + Dense RRF)
-        retrieval_insights = None
+        # Initialize Case Message Board for the full adjudication lifecycle (Task 1 & Task 5)
+        from app.schemas.message_board import CaseMessageBoard, BoardMessageType
+        board = CaseMessageBoard(case_id=case_id)
+
+        # 1b. Policy Shortlist & Governing Directive Selection (Task 1, Task 2, Task 3, Task 4)
         is_auto_policy = (not policy_id) or str(policy_id).strip().upper() in ("AUTO", "AUTOMATIC", "DETECT", "HYBRID", "NONE")
+        policy_choice_metadata: Dict[str, Any] = {}
+
         if is_auto_policy:
-            hybrid_results = self.hybrid_retriever.retrieve_hybrid(sanitized_ehr, top_k=3)
-            if hybrid_results:
-                policy_id = hybrid_results[0]["policy_id"]
+            from app.services.policy_shortlist_service import PolicyShortlistService
+            shortlist_data = PolicyShortlistService.compute_shortlist(sanitized_ehr, db=self.db, top_k=5)
+
+            # Post POLICY_SHORTLIST on board for auto flow (Task 5)
+            board.post(
+                agent="Policy Shortlist Evaluator",
+                message_type=BoardMessageType.POLICY_SHORTLIST,
+                content=(
+                    f"Evaluated Medicare policy shortlist: {len(shortlist_data.get('shortlist', []))} candidate policies ranked "
+                    f"by unified lexical-semantic score and criteria coverage (status: {shortlist_data['status']})."
+                ),
+                metadata={
+                    "shortlist_status": shortlist_data["status"],
+                    "candidates": [
+                        {
+                            "rank": c["rank"],
+                            "policy_id": c["policy_id"],
+                            "title": c["policy_title"],
+                            "unified_score": c["unified_score"],
+                            "reranked_score": c["reranked_score"],
+                            "coverage": c["coverage_display"],
+                            "matching_phrases": c["matching_phrases"]
+                        }
+                        for c in shortlist_data.get("shortlist", [])
+                    ],
+                    "margin_threshold": shortlist_data.get("margin_threshold", 0.08),
+                    "coverage_floor": shortlist_data.get("coverage_floor", 0.33)
+                }
+            )
+
+            if shortlist_data["status"] == "PRESELECTED":
+                policy_id = shortlist_data["preselected_policy_id"]
+                policy_choice_metadata = {
+                    "chooser": "auto",
+                    "reason": "Confident score margin and statutory criteria coverage threshold satisfied",
+                    "margin": shortlist_data.get("preselection_margin"),
+                    "coverage_ratio": shortlist_data.get("preselection_coverage_ratio"),
+                    "status": "PRESELECTED",
+                    "timestamp": timestamp.isoformat()
+                }
                 retrieval_insights = {
                     "auto_discovered": True,
                     "selected_policy_id": policy_id,
-                    "selected_policy_title": hybrid_results[0].get("policy_title", ""),
-                    "candidates": hybrid_results
+                    "selected_policy_title": shortlist_data.get("preselected_policy_title", ""),
+                    "candidates": shortlist_data.get("shortlist", []),
+                    "shortlist_status": shortlist_data["status"],
+                    "margin": shortlist_data.get("preselection_margin")
                 }
+                board.post(
+                    agent="Policy Shortlist Evaluator",
+                    message_type=BoardMessageType.POLICY_CHOSEN,
+                    content=f"Policy {policy_id} pre-selected automatically under margin rule ({shortlist_data['message']}).",
+                    metadata={
+                        "chosen_policy_id": policy_id,
+                        "chooser": "auto",
+                        "margin": shortlist_data.get("preselection_margin"),
+                        "coverage_ratio": shortlist_data.get("preselection_coverage_ratio"),
+                        "status": "PRESELECTED"
+                    }
+                )
             else:
-                policy_id = "NCD-20.4"
+                # TASK 4 BINDING RULE:
+                # Delete fallback to NCD-20.4. When AUTO has no pre-selected policy or no governing policy found,
+                # the system MUST NOT silently adjudicate under a guessed policy. It halts and returns DEFERRED_TO_HUMAN.
+                policy_choice_metadata = {
+                    "chooser": "none",
+                    "reason": shortlist_data["message"],
+                    "margin": shortlist_data.get("preselection_margin"),
+                    "coverage_ratio": shortlist_data.get("preselection_coverage_ratio"),
+                    "status": shortlist_data["status"],
+                    "timestamp": timestamp.isoformat()
+                }
                 retrieval_insights = {
                     "auto_discovered": True,
-                    "selected_policy_id": policy_id,
-                    "selected_policy_title": "Implantable Automatic Defibrillators",
-                    "candidates": []
+                    "selected_policy_id": None,
+                    "selected_policy_title": "No Governing Medicare Policy Selected",
+                    "candidates": shortlist_data.get("shortlist", []),
+                    "shortlist_status": shortlist_data["status"],
+                    "margin": shortlist_data.get("preselection_margin")
                 }
+                board.post(
+                    agent="Policy Shortlist Evaluator",
+                    message_type=BoardMessageType.POLICY_CHOSEN,
+                    content=f"No governing policy chosen (status: {shortlist_data['status']}). Reason: {shortlist_data['message']}. Adjudication halted with documentation alert.",
+                    metadata={
+                        "chosen_policy_id": None,
+                        "chooser": "none",
+                        "status": shortlist_data["status"],
+                        "reason": shortlist_data["message"]
+                    }
+                )
+                board.post(
+                    agent="Agent 4: Calibrated Abstention Gate",
+                    message_type=BoardMessageType.HALT,
+                    content=f"Adjudication halted: {shortlist_data['message']}",
+                    metadata={"decision": "DEFERRED_TO_HUMAN", "reason": shortlist_data["message"]}
+                )
+                return self._build_no_governing_policy_result(
+                    case_id=case_id,
+                    patient_id_masked=masked_patient_id,
+                    sanitized_ehr=sanitized_ehr,
+                    shortlist_data=shortlist_data,
+                    policy_choice_metadata=policy_choice_metadata,
+                    retrieval_insights=retrieval_insights,
+                    board=board,
+                    execution_mode=execution_mode,
+                    user_id=user_id,
+                    save_record=save_record
+                )
         else:
-            hybrid_results = self.hybrid_retriever.retrieve_hybrid(sanitized_ehr, top_k=3)
+            policy_choice_metadata = {
+                "chooser": "clinician",
+                "reason": "Direct manual policy selection by clinician",
+                "selected_policy_id": policy_id,
+                "status": "MANUAL_SELECT",
+                "timestamp": timestamp.isoformat()
+            }
             retrieval_insights = {
                 "auto_discovered": False,
                 "selected_policy_id": policy_id,
-                "candidates": hybrid_results
+                "candidates": [],
+                "shortlist_status": "MANUAL_SELECT"
             }
+            board.post(
+                agent="Policy Shortlist Evaluator",
+                message_type=BoardMessageType.POLICY_CHOSEN,
+                content=f"Governing policy {policy_id} selected manually by clinician.",
+                metadata={
+                    "chosen_policy_id": policy_id,
+                    "chooser": "clinician",
+                    "status": "MANUAL_SELECT"
+                }
+            )
 
         # 2. Agent 1: Policy Retrieval
         policy_obj = self.retrieval_agent.retrieve_policy(policy_id)
@@ -228,7 +342,7 @@ class MultiAgentVerificationPipeline:
             from app.core.agentic_guardrails import AgenticGuardrails, GuardrailViolationError, BudgetExhaustionHalt
             from app.services.declarative_engine import DeclarativePolicyEngine
 
-            board = CaseMessageBoard(case_id=case_id)
+            # board is already initialized at start of case and has recorded POLICY_SHORTLIST and POLICY_CHOSEN
             judge = ClinicalEquivalenceJudge()
             if getattr(self.llm_proposer, "timeout_seconds", None):
                 judge.timeout_seconds = max(self.llm_proposer.timeout_seconds, 15.0)
@@ -799,7 +913,9 @@ class MultiAgentVerificationPipeline:
             llm_proposal_metadata=llm_proposal_metadata,
             agentic_audit_trail=agentic_audit_trail,
             candidate_tau_analysis=candidate_tau_analysis,
-            message_board=board.to_records() if 'board' in locals() and board else None
+            message_board=board.to_records() if 'board' in locals() and board else None,
+            policy_shortlist=shortlist_data.get("shortlist", []) if 'shortlist_data' in locals() else None,
+            policy_choice_metadata=policy_choice_metadata if 'policy_choice_metadata' in locals() else None
         )
 
         # 7. Persistence (Zero-Retention Medical Privacy Safe Harbor)
@@ -868,6 +984,115 @@ class MultiAgentVerificationPipeline:
             except Exception as e:
                 self.db.rollback()
                 print(f"Failed to persist adjudication log: {e}")
+
+        return final_result
+
+    def _build_no_governing_policy_result(
+        self,
+        case_id: str,
+        patient_id_masked: str,
+        sanitized_ehr: str,
+        shortlist_data: Dict[str, Any],
+        policy_choice_metadata: Dict[str, Any],
+        retrieval_insights: Dict[str, Any],
+        board: Any,
+        execution_mode: str,
+        user_id: Optional[int] = None,
+        save_record: bool = True
+    ) -> FinalAdjudication:
+        """
+        Builds a safe, non-clearing FinalAdjudication when no governing Medicare policy
+        could be confidently determined or pre-selected under the margin rule (Task 4).
+        """
+        timestamp = datetime.now(timezone.utc)
+        decision = AdjudicationDecision.DEFERRED_TO_HUMAN
+        abstention_reason = shortlist_data.get("message", "No governing Medicare policy selected or unambiguous match found.")
+        clinician_action_notes = "Documentation alert: Clinician selection required or additional clinical evidence needed."
+
+        audit_hash = compute_audit_hash(
+            patient_id_masked=patient_id_masked,
+            policy_id="NONE",
+            decision=decision.value,
+            calibrated_confidence=0.50,
+            criterion_assessments=[],
+            evidence_spans=[],
+            timestamp=timestamp
+        )
+
+        final_result = FinalAdjudication(
+            case_id=case_id,
+            patient_id_masked=patient_id_masked,
+            policy_id="NONE",
+            policy_title="No Governing Medicare Policy Selected",
+            adjudication_decision=decision,
+            abstention_status=True,
+            raw_aggregate_confidence=0.50,
+            calibrated_aggregate_confidence=None,
+            calibrated_confidence_explanation="No governing policy selected; case halted with documentation alert",
+            determination_stage="PROVISIONAL",
+            is_releasable=False,
+            human_sign_off_status="PENDING_CLINICAL_SIGN_OFF",
+            abstention_threshold=0.85,
+            abstention_reason=abstention_reason,
+            criterion_assessments=[],
+            verification_audits=[],
+            audit_hash=audit_hash,
+            required_clinician_action_notes=clinician_action_notes,
+            execution_time_ms=shortlist_data.get("execution_time_ms", 0.0),
+            sanitized_ehr_text=sanitized_ehr,
+            timestamp=timestamp,
+            execution_mode=execution_mode,
+            retrieval_insights=retrieval_insights,
+            score_type="sufficiency_score",
+            sufficiency_score=0.0,
+            sufficiency_formula="no_governing_policy_selected",
+            criteria_met_count=0,
+            criteria_total_count=0,
+            missing_criteria=[],
+            insufficient_criteria=[],
+            deferral_reason=abstention_reason,
+            action_required_questions=[
+                "Which Medicare policy governs this clinical encounter?",
+                "Are additional clinical progress notes, imaging reports, or operative summaries available?"
+            ],
+            policy_shortlist=shortlist_data.get("shortlist", []),
+            policy_choice_metadata=policy_choice_metadata,
+            message_board=board.to_records() if board else None
+        )
+
+        if self.db and save_record:
+            try:
+                log_entry = AdjudicationLog(
+                    case_id=case_id,
+                    patient_id_masked=patient_id_masked,
+                    policy_id="NONE",
+                    decision=decision.value,
+                    abstention_status=True,
+                    abstention_reason=abstention_reason,
+                    calibrated_confidence=None,
+                    sufficiency_score=0.0,
+                    raw_confidence=0.50,
+                    criterion_evaluations_json="[]",
+                    evidence_spans_json="[]",
+                    adversarial_audits_json="[]",
+                    required_clinician_action_notes=clinician_action_notes,
+                    audit_hash=audit_hash,
+                    sanitized_ehr_preview=sanitized_ehr[:300] + "...",
+                    execution_time_ms=shortlist_data.get("execution_time_ms", 0.0),
+                    user_id=user_id,
+                    determination_stage="PROVISIONAL",
+                    is_releasable=False,
+                    human_sign_off_status="PENDING_CLINICAL_SIGN_OFF",
+                    full_adjudication_json=final_result.model_dump_json(),
+                    full_ehr_text=sanitized_ehr,
+                    original_system_output_json=final_result.model_dump_json(),
+                    created_at=timestamp
+                )
+                self.db.add(log_entry)
+                self.db.commit()
+            except Exception as e:
+                self.db.rollback()
+                print(f"Failed to persist unselected policy adjudication log: {e}")
 
         return final_result
 

@@ -51,6 +51,8 @@ from app.schemas.contracts import (
     FinalAdjudication,
     MultiPolicyScanRequest,
     MultiPolicyScanResponse,
+    PolicyShortlistRequest,
+    PolicyShortlistResponse,
     PolicyMatchSummary,
     AuditLogOut,
     BenchmarkResponse,
@@ -458,6 +460,34 @@ def get_policy(policy_id: str, db: Session = Depends(get_db)):
             detail=f"Medicare policy '{policy_id}' not found."
         )
     return policy
+
+# =============================================================================
+# MEDICARE POLICY SHORTLIST & PRE-SELECTION (Task 1, 2, 3, 5)
+# =============================================================================
+
+@api_router.post("/policies/shortlist", response_model=PolicyShortlistResponse, summary="Compute Deterministic Policy Shortlist")
+async def get_policy_shortlist(
+    request: PolicyShortlistRequest,
+    current_user: Optional[User] = Depends(get_optional_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Computes a deterministic, criteria-grounded shortlist of candidate Medicare policies
+    for an incoming EHR clinical progress note before full adjudication runs (Tasks 1, 2, 3, 5).
+    """
+    if not request.ehr_narrative or not request.ehr_narrative.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Clinical EHR narrative cannot be empty."
+        )
+
+    from app.services.policy_shortlist_service import PolicyShortlistService
+    shortlist_result = PolicyShortlistService.compute_shortlist(
+        ehr_narrative=request.ehr_narrative,
+        db=db,
+        top_k=request.top_k
+    )
+    return PolicyShortlistResponse(**shortlist_result)
 
 # =============================================================================
 # MULTI-AGENT ADJUDICATION PIPELINE

@@ -18,6 +18,8 @@ from app.schemas.contracts import ClinicalEvidenceSpan
 
 class BoardMessageType(str, Enum):
     """Recognized message types on the shared case message board."""
+    POLICY_SHORTLIST = "POLICY_SHORTLIST"
+    POLICY_CHOSEN = "POLICY_CHOSEN"
     POLICY_SELECTED = "POLICY_SELECTED"
     ASSESSMENT_PROPOSED = "ASSESSMENT_PROPOSED"
     CHALLENGE = "CHALLENGE"

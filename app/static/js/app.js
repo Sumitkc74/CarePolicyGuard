@@ -90,8 +90,8 @@ function getActivePatientIdentity() {
     }
     // Clinician view: under 45 CFR § 164.506 (TPO), display authentic unmasked patient identity
     // to certify medical necessity without wrong-patient signing risk
-    let patId = (document.getElementById("patient-id-input") && document.getElementById("patient-id-input").value.trim()) || 
-                (currentCoveragePacket && currentCoveragePacket.patient_id) || 
+    let patId = (document.getElementById("patient-id-input") && document.getElementById("patient-id-input").value.trim()) ||
+                (currentCoveragePacket && currentCoveragePacket.patient_id) ||
                 currentPatientId || "PT-CARD-8821";
 
     let name = currentPatientName;
@@ -348,7 +348,7 @@ function handleEmailInputLive(val) {
     const email = (val || "").trim().toLowerCase();
     const disallowed = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "mail.com", "protonmail.com"];
     const domain = email.split("@")[1] || "";
-    
+
     if (disallowed.includes(domain)) {
         hint.className = "field-feedback-hint error";
         hint.innerHTML = `<span class="med-icon icon-xs"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></span><span>Personal email prohibited under HIPAA. Use hospital or institutional email.</span>`;
@@ -532,7 +532,7 @@ async function initGoogleGIS() {
 
         if (cfg.google_enabled && cfg.google_client_id) {
             window._googleClientId = cfg.google_client_id;
-            
+
             const checkGisReady = () => {
                 if (window.google && window.google.accounts && window.google.accounts.id) {
                     google.accounts.id.initialize({
@@ -609,7 +609,7 @@ async function handleGoogleOAuthCredential(credential) {
     try {
         const res = await fetch("/api/v1/auth/oauth/google", {
             method: "POST",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ credential })
@@ -1121,7 +1121,7 @@ function updateRoleBasedNavigation() {
     if (!isClinician) {
         const adjView = document.getElementById("adjudicate-view");
         const batchView = document.getElementById("batch-view");
-        if ((adjView && adjView.classList.contains("active")) || 
+        if ((adjView && adjView.classList.contains("active")) ||
             (batchView && batchView.classList.contains("active"))) {
             switchMainTab(isAuditor ? "audit" : "telemetry");
         }
@@ -1420,7 +1420,7 @@ async function loadAuthModalSecurityDetails() {
             const enabledMethods = data.enabled_methods || [data.mfa_method || "email_otp"];
             const methodCount = enabledMethods.length;
             const primaryLabel = data.primary_method === "totp_app" ? "Authenticator App" : (data.primary_method === "email_otp" ? "Email OTP" : "SMS OTP");
-            
+
             if (badge) {
                 badge.innerHTML = `<span class="text-emerald">Active (${methodCount} Configured - Primary: ${primaryLabel})</span>`;
             }
@@ -2476,7 +2476,7 @@ function proceedToStep2() {
         if (!auth.has_doctor_name) missingParts.push("doctor/physician name (e.g. Dr. Name, MD)");
         if (!auth.has_doctor_signature) missingParts.push("electronic signature or attestation line");
         showToast(`Document requires: ${missingParts.join(" and ")}. Please append below or certify.`, true);
-        
+
         // If user wants to proceed anyway, allow them after warning or let them edit
         const proceedConfirmed = confirm(`Clinical Document Verification Warning:\n\nThis note is missing ${missingParts.join(" and ")}.\n\nMedicare Part B prior authorization requires treating physician identification and signature.\n\nDo you want to proceed to Step 2 anyway and supply attestation on the official form?`);
         if (!proceedConfirmed) {
@@ -2490,13 +2490,17 @@ function proceedToStep2() {
 }
 
 let lastMultiPolicyScanResult = null;
+let lastShortlistResponse = null;
 let canonicalBestMatchPolicyId = null;
+let preselectedPolicyId = null;
 let userSelectedPolicyId = null;
 let showAllCandidates = false;
 
 function toggleShowAllCandidates() {
     showAllCandidates = !showAllCandidates;
-    if (lastMultiPolicyScanResult) {
+    if (lastShortlistResponse) {
+        renderPolicyShortlistResults(lastShortlistResponse);
+    } else if (lastMultiPolicyScanResult) {
         renderMultiPolicyScanResults(lastMultiPolicyScanResult);
     }
 }
@@ -2507,159 +2511,170 @@ async function triggerMultiPolicyAutoScan() {
     const featuredSlot = document.getElementById("featured-policy-slot");
     const gridElem = document.getElementById("policy-match-grid");
     const subtitleElem = document.getElementById("step2-subtitle-text");
+    const runBtn = document.getElementById("run-adjudicate-btn");
 
     if (!ehrText || ehrText.length < 20) return;
 
     if (subtitleElem) {
-        subtitleElem.textContent = "Scanning clinical documentation across all 50 CMS policies in database...";
+        subtitleElem.textContent = "Computing unified policy shortlist and criteria coverage across Medicare database...";
     }
 
-    if (featuredSlot && !lastMultiPolicyScanResult) {
+    if (featuredSlot) {
         featuredSlot.innerHTML = `
             <div class="featured-hero-card" style="text-align: center; padding: 36px 20px; border: 1px dashed rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.65);">
                 <div style="margin: 0 auto 14px auto; width: 34px; height: 34px; border: 3px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-                <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem; margin-bottom: 6px;">Evaluating Clinical Record Across 50 Medicare Policies...</div>
-                <div style="color: #94a3b8; font-size: 0.82rem;">Comparing diagnostic evidence, numerical thresholds (LVEF, AHI), and statutory exclusion criteria</div>
+                <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem; margin-bottom: 6px;">Evaluating Clinical Record Across Medicare Policies...</div>
+                <div style="color: #94a3b8; font-size: 0.82rem;">Unified scoring (RRF + BM25 + Narrative) & criteria coverage reranking</div>
             </div>
         `;
     }
 
     try {
-        const res = await fetch("/api/v1/adjudicate/scan-all", {
+        const res = await fetch("/api/v1/policies/shortlist", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 ...(currentToken ? { "Authorization": `Bearer ${currentToken}` } : {})
             },
             body: JSON.stringify({
-                patient_id: patId,
-                ehr_narrative: ehrText
+                ehr_narrative: ehrText,
+                top_k: 5
             })
         });
 
         if (res.ok) {
             const data = await res.json();
-            lastMultiPolicyScanResult = data;
-            canonicalBestMatchPolicyId = data.best_match_policy_id || (data.all_matches && data.all_matches[0] ? data.all_matches[0].policy_id : "NCD-20.4");
-            if (!userSelectedPolicyId) {
-                userSelectedPolicyId = canonicalBestMatchPolicyId;
-            }
-            renderMultiPolicyScanResults(data);
+            lastShortlistResponse = data;
+            renderPolicyShortlistResults(data);
         } else {
-            if (subtitleElem) subtitleElem.textContent = "Multi-policy scan ready.";
+            if (subtitleElem) subtitleElem.textContent = "Policy shortlist generation failed.";
         }
     } catch (e) {
-        console.error("Multi-policy auto-scan failed:", e);
-        if (subtitleElem) subtitleElem.textContent = "Multi-policy scan offline.";
+        console.error("Policy shortlist failed:", e);
+        if (subtitleElem) subtitleElem.textContent = "Policy shortlist offline.";
     }
 }
 
-function renderMultiPolicyScanResults(data) {
+function renderPolicyShortlistResults(data) {
     const featuredSlot = document.getElementById("featured-policy-slot");
     const gridElem = document.getElementById("policy-match-grid");
     const policySelect = document.getElementById("policy-select");
     const subtitleElem = document.getElementById("step2-subtitle-text");
     const runBtn = document.getElementById("run-adjudicate-btn");
 
-    canonicalBestMatchPolicyId = data.best_match_policy_id || canonicalBestMatchPolicyId || (data.all_matches && data.all_matches[0] ? data.all_matches[0].policy_id : "NCD-20.4");
+    preselectedPolicyId = data.preselected_policy_id || null;
+    canonicalBestMatchPolicyId = preselectedPolicyId;
 
-    // Active policy ID is userSelectedPolicyId if set, otherwise canonical best match
-    const activeId = userSelectedPolicyId || (policySelect ? policySelect.value : null) || canonicalBestMatchPolicyId;
-    if (policySelect) policySelect.value = activeId;
-    userSelectedPolicyId = activeId;
-
-    const featuredMatch = (data.all_matches && data.all_matches.length > 0)
-        ? (data.all_matches.find(m => m.policy_id === activeId) || data.all_matches[0])
-        : null;
-
-    const otherMatches = (data.all_matches && featuredMatch)
-        ? data.all_matches.filter(m => m.policy_id !== featuredMatch.policy_id)
-        : [];
-
-    // Prioritize canonical best match in candidate cards grid if alternate policy is selected at top
-    otherMatches.sort((a, b) => {
-        if (a.policy_id === canonicalBestMatchPolicyId) return -1;
-        if (b.policy_id === canonicalBestMatchPolicyId) return 1;
-        return 0;
-    });
-
-    const isFeaturedBestMatch = (featuredMatch && featuredMatch.policy_id === canonicalBestMatchPolicyId);
-
-    // Update Step 2 Subtitle
-    if (subtitleElem && featuredMatch) {
-        if (isFeaturedBestMatch) {
-            subtitleElem.innerHTML = `Candidate policies evaluated against clinical documentation. <strong style="color:#f59e0b;">Recommended Best Match: ${canonicalBestMatchPolicyId}</strong> is active below.`;
-        } else {
-            subtitleElem.innerHTML = `Active Directive: <strong style="color:#38bdf8;">${featuredMatch.policy_id} &mdash; ${featuredMatch.policy_title}</strong> <span style="color:#f59e0b;">(Manual Selection &bull; Recommended Best Match was ${canonicalBestMatchPolicyId})</span>`;
+    // Status handling: NO_GOVERNING_POLICY
+    if (data.status === "NO_GOVERNING_POLICY" || !data.candidates || data.candidates.length === 0) {
+        if (policySelect) policySelect.value = "";
+        userSelectedPolicyId = null;
+        if (subtitleElem) {
+            subtitleElem.innerHTML = `<span style="color: #f87171; font-weight: 600;">No Governing Medicare Policy Identified</span>`;
         }
-    }
-
-    // Update Run Button Label
-    if (runBtn && featuredMatch) {
-        runBtn.innerHTML = `Run Coverage Check with <strong>${featuredMatch.policy_id}</strong> <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>`;
-    }
-
-    // 1. Render Featured (Bigger Hero Card at the top)
-    if (featuredSlot && featuredMatch) {
-        const confVal = (featuredMatch.calibrated_confidence != null)
-            ? featuredMatch.calibrated_confidence
-            : (featuredMatch.sufficiency_score != null ? featuredMatch.sufficiency_score : (featuredMatch.met_criteria / (featuredMatch.total_criteria || 1)));
-        const pct = Math.round(confVal * 100);
-        let statusBadge = "";
-        if (featuredMatch.decision === "APPROVED") {
-            statusBadge = `<span class="badge-featured-status approved"><span class="badge-dot" style="background:#10b981;"></span>QUALIFIED (${pct}%)</span>`;
-        } else if (featuredMatch.decision === "DEFERRED_TO_HUMAN") {
-            statusBadge = `<span class="badge-featured-status deferred"><span class="badge-dot" style="background:#f59e0b;"></span>AUDITOR REVIEW (${pct}%)</span>`;
-        } else {
-            statusBadge = `<span class="badge-featured-status unmet"><span class="badge-dot" style="background:#64748b;"></span>CRITERIA UNMET (${pct}%)</span>`;
+        if (runBtn) {
+            runBtn.disabled = true;
+            runBtn.innerHTML = `No Governing Policy &mdash; Submission Halted`;
         }
-
-        const primaryBadge = isFeaturedBestMatch
-            ? `<span class="badge-best-featured"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> BEST MATCH (RECOMMENDED)</span>`
-            : `<span class="badge-custom-selected"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> ACTIVE SELECTION (MANUAL)</span>`;
-
-        const activePill = isFeaturedBestMatch
-            ? `<span class="featured-active-pill"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> SELECTED DIRECTIVE</span>`
-            : `<span class="featured-active-pill custom-active"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> SELECTED DIRECTIVE</span>`;
-
-        const overrideNotice = (!isFeaturedBestMatch && canonicalBestMatchPolicyId)
-            ? `
-                <div class="selection-override-notice">
-                    <div>
-                        <span style="font-weight: 700; color: #f8fafc;">Manual Directive Active:</span> Evaluating <strong>${featuredMatch.policy_id}</strong> (Recommended match for this clinical note was <strong>${canonicalBestMatchPolicyId}</strong>).
+        if (featuredSlot) {
+            featuredSlot.innerHTML = `
+                <div class="featured-hero-card" style="border: 1px solid rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); padding: 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                        <span class="med-icon icon-lg icon-red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span>
+                        <div>
+                            <div style="font-weight: 700; color: #fca5a5; font-size: 1.1rem;">No Governing Medicare Policy Matches Note</div>
+                            <div style="color: #94a3b8; font-size: 0.85rem;">All candidates scored below minimum relevance floor (&lt; 0.15)</div>
+                        </div>
                     </div>
-                    <button type="button" class="btn-revert-best" onclick="selectPolicyFromScan('${canonicalBestMatchPolicyId}', true)">
-                        &larr; Switch back to Best Match (${canonicalBestMatchPolicyId})
-                    </button>
+                    <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin-bottom: 12px;">
+                        No governing Medicare policy matches this clinical documentation. Prior authorization cannot be submitted under an unrelated policy. Review note or select a manual policy from the database.
+                    </p>
                 </div>
-            `
-            : "";
+            `;
+        }
+        if (gridElem) {
+            gridElem.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 24px;">No candidate policies met statutory criteria.</div>`;
+        }
+        updatePolicyStep2Preview();
+        return;
+    }
 
+    // Auto pre-select if available and user has not manually chosen another
+    if (data.status === "PRESELECTED" && !userSelectedPolicyId) {
+        userSelectedPolicyId = data.preselected_policy_id;
+    }
+
+    const activeId = userSelectedPolicyId || (data.status === "PRESELECTED" ? data.preselected_policy_id : null);
+    if (policySelect) policySelect.value = activeId || "";
+
+    // Subtitle update
+    if (subtitleElem) {
+        if (data.status === "PRESELECTED") {
+            const marginStr = (data.score_margin != null) ? data.score_margin.toFixed(3) : "0.00";
+            subtitleElem.innerHTML = `Shortlist ranked by unified evidence & criteria. <strong style="color: #34d399;">Pre-selected: ${data.preselected_policy_id}</strong> (Score margin: ${marginStr} &ge; 0.08, coverage &ge; 33%).`;
+        } else {
+            subtitleElem.innerHTML = `<span style="color: #f59e0b; font-weight: 700;">Close match detected &mdash; clinician selection required before running coverage.</span>`;
+        }
+    }
+
+    // Run button state
+    if (runBtn) {
+        if (activeId) {
+            runBtn.disabled = false;
+            runBtn.innerHTML = `Run Coverage Check with <strong>${activeId}</strong> <span class="med-icon icon-sm"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>`;
+        } else {
+            runBtn.disabled = true;
+            runBtn.innerHTML = `Clinician Selection Required (Click a Card Below)`;
+        }
+    }
+
+    // 1. Featured card (active policy or #1 candidate)
+    const featuredCand = data.candidates.find(c => c.policy_id === activeId) || data.candidates[0];
+    const otherCandidates = data.candidates.filter(c => c.policy_id !== featuredCand.policy_id);
+
+    const isPreselected = (featuredCand.policy_id === data.preselected_policy_id);
+    const scorePct = Math.round((featuredCand.unified_score || 0) * 100);
+    const covPct = Math.round((featuredCand.coverage_ratio || 0) * 100);
+
+    const preselectBadge = isPreselected
+        ? `<span class="badge-best-featured" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399;"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> PRE-SELECTED (MARGIN ${(data.score_margin || 0).toFixed(2)} &ge; 0.08)</span>`
+        : (data.status === "SELECTION_REQUIRED" && !userSelectedPolicyId)
+            ? `<span class="badge-featured-status deferred" style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fbbf24;">SELECTION REQUIRED</span>`
+            : `<span class="badge-custom-selected"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> CLINICIAN SELECTED</span>`;
+
+    const activePill = (activeId === featuredCand.policy_id)
+        ? `<span class="featured-active-pill"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> ACTIVE DIRECTIVE</span>`
+        : `<button type="button" class="btn-subtle-doc" style="background: #0284c7; color: white;" onclick="selectPolicyFromShortlist('${featuredCand.policy_id}')">Select Directive</button>`;
+
+    const phraseChips = (featuredCand.matching_phrases && featuredCand.matching_phrases.length > 0)
+        ? `<div style="display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0;">
+            ${featuredCand.matching_phrases.slice(0, 4).map(p => `<span style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; color: #38bdf8;">&ldquo;${p}&rdquo;</span>`).join("")}
+          </div>`
+        : "";
+
+    if (featuredSlot) {
         featuredSlot.innerHTML = `
-            <div class="featured-hero-card animate-swap ${featuredMatch.decision.toLowerCase()}">
+            <div class="featured-hero-card ${activeId === featuredCand.policy_id ? 'selected-active' : ''}">
                 <div class="featured-top-row">
                     <div class="featured-meta-group">
-                        <span class="featured-code">${featuredMatch.policy_id}</span>
+                        <span class="featured-code">#${featuredCand.rank} ${featuredCand.policy_id}</span>
                         <span class="featured-dot">&bull;</span>
-                        <span class="featured-category">${featuredMatch.category}</span>
+                        <span class="featured-category">${featuredCand.category || 'Medicare Part B'}</span>
                     </div>
                     <div class="featured-badges">
-                        ${primaryBadge}
-                        ${statusBadge}
+                        ${preselectBadge}
+                        <span class="badge-featured-status approved">Score: ${scorePct}%</span>
                     </div>
                 </div>
-                <div class="featured-title">${featuredMatch.policy_title}</div>
-                ${overrideNotice}
+                <div class="featured-title">${featuredCand.policy_title}</div>
+                ${phraseChips}
                 <div class="featured-bottom-row">
                     <div class="featured-criteria-count">
                         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>${featuredMatch.met_criteria}/${featuredMatch.total_criteria} Criteria Satisfied</span>
+                        <span>${featuredCand.met_criteria}/${featuredCand.total_criteria} Criteria Satisfied (${covPct}%)</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <button type="button" class="btn-subtle-doc" onclick="openPolicyDocumentModal('${featuredMatch.policy_id}')" title="Read complete Medicare statutory guidelines and criteria document">
-                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                            Read Policy Document
-                        </button>
+                        <button type="button" class="btn-subtle-doc" onclick="openPolicyDocumentModal('${featuredCand.policy_id}')">Read Policy Document</button>
                         ${activePill}
                     </div>
                 </div>
@@ -2667,67 +2682,37 @@ function renderMultiPolicyScanResults(data) {
         `;
     }
 
-    // 2. Render Other Candidates (Smaller Cards) - Top 15 Closest by default
-    const titleElem = document.getElementById("other-candidates-title");
-    const countPill = document.getElementById("candidates-count-pill");
-    const toggleBtn = document.getElementById("btn-toggle-candidates");
-
-    const displayMatches = showAllCandidates ? otherMatches : otherMatches.slice(0, 15);
-
-    if (titleElem) {
-        titleElem.textContent = showAllCandidates
-            ? `All Candidate Policies (${otherMatches.length})`
-            : "Top 15 Closest Candidate Policies";
-    }
-    if (countPill) {
-        countPill.textContent = showAllCandidates
-            ? `Showing All ${otherMatches.length + 1}`
-            : `Top 15 Closest of ${data.all_matches ? data.all_matches.length : 50}`;
-    }
-    if (toggleBtn) {
-        toggleBtn.textContent = showAllCandidates
-            ? "Show Top 15 Closest"
-            : `Show All (${data.all_matches ? data.all_matches.length : 50})`;
-    }
-
+    // 2. Render other candidate cards
     if (gridElem) {
         gridElem.innerHTML = "";
-        displayMatches.forEach((m, idx) => {
-            const isCanonBest = (m.policy_id === canonicalBestMatchPolicyId);
+        otherCandidates.forEach((cand) => {
+            const isCandActive = (cand.policy_id === activeId);
+            const cPct = Math.round((cand.unified_score || 0) * 100);
+            const cov = Math.round((cand.coverage_ratio || 0) * 100);
+
             const card = document.createElement("div");
-            card.className = `mini-policy-card ${m.decision.toLowerCase()} ${isCanonBest ? "is-best-match" : ""}`;
-            card.onclick = () => selectPolicyFromScan(m.policy_id, true);
+            card.className = `mini-policy-card ${isCandActive ? "selected-active" : ""}`;
+            card.onclick = () => selectPolicyFromShortlist(cand.policy_id);
 
-            let statusPill = "";
-            const confVal = (m.calibrated_confidence != null)
-                ? m.calibrated_confidence
-                : (m.sufficiency_score != null ? m.sufficiency_score : (m.met_criteria / (m.total_criteria || 1)));
-            const pct = Math.round(confVal * 100);
-            if (m.decision === "APPROVED") {
-                statusPill = `<span class="mini-status approved">Qualified ${pct}%</span>`;
-            } else if (m.decision === "DEFERRED_TO_HUMAN") {
-                statusPill = `<span class="mini-status deferred">Review ${pct}%</span>`;
-            } else {
-                statusPill = `<span class="mini-status unmet">Unmet</span>`;
-            }
-
-            const headerTag = isCanonBest
-                ? `<div style="display: flex; align-items: center; gap: 6px;"><span class="badge-best-mini"><svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> BEST MATCH</span> <span class="mini-code">${m.policy_id}</span></div>`
-                : `<div style="display: flex; align-items: center;"><span class="mini-rank-pill">#${idx + 1}</span><span class="mini-code">${m.policy_id}</span></div>`;
-
-            const selectLabel = isCanonBest
-                ? `<span class="mini-select-btn best-revert">&larr; Select Best Match &uarr;</span>`
-                : `<span class="mini-select-btn">Select Directive &uarr;</span>`;
+            const phrases = (cand.matching_phrases && cand.matching_phrases.length > 0)
+                ? `<div style="display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0;">
+                    ${cand.matching_phrases.slice(0, 2).map(p => `<span style="font-size: 0.7rem; background: rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 3px; padding: 1px 5px; color: #94a3b8;">&ldquo;${p}&rdquo;</span>`).join("")}
+                  </div>`
+                : "";
 
             card.innerHTML = `
                 <div class="mini-top-row">
-                    ${headerTag}
-                    ${statusPill}
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="mini-rank-pill">#${cand.rank}</span>
+                        <span class="mini-code">${cand.policy_id}</span>
+                    </div>
+                    <span class="mini-status approved">${cPct}%</span>
                 </div>
-                <div class="mini-title" title="${m.policy_title}">${m.policy_title}</div>
+                <div class="mini-title" title="${cand.policy_title}">${cand.policy_title}</div>
+                ${phrases}
                 <div class="mini-footer">
-                    <span class="mini-crit-count">${m.met_criteria}/${m.total_criteria} Met</span>
-                    ${selectLabel}
+                    <span class="mini-crit-count">${cand.met_criteria}/${cand.total_criteria} Met (${cov}%)</span>
+                    <span class="mini-select-btn">${isCandActive ? "Selected" : "Select Directive &uarr;"}</span>
                 </div>
             `;
             gridElem.appendChild(card);
@@ -2737,12 +2722,14 @@ function renderMultiPolicyScanResults(data) {
     updatePolicyStep2Preview();
 }
 
-function selectPolicyFromScan(policyId, triggerToast = true) {
+function selectPolicyFromShortlist(policyId) {
     userSelectedPolicyId = policyId;
     const policySelect = document.getElementById("policy-select");
     if (policySelect) policySelect.value = policyId;
 
-    if (lastMultiPolicyScanResult) {
+    if (lastShortlistResponse) {
+        renderPolicyShortlistResults(lastShortlistResponse);
+    } else if (lastMultiPolicyScanResult) {
         renderMultiPolicyScanResults(lastMultiPolicyScanResult);
     }
     updatePolicyStep2Preview();
@@ -2752,26 +2739,99 @@ function selectPolicyFromScan(policyId, triggerToast = true) {
         featuredSlot.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    if (triggerToast) {
-        const targetPol = (lastMultiPolicyScanResult && lastMultiPolicyScanResult.all_matches)
-            ? lastMultiPolicyScanResult.all_matches.find(m => m.policy_id === policyId)
-            : null;
-        const titleStr = targetPol ? ` (${targetPol.policy_title})` : "";
-        if (policyId === canonicalBestMatchPolicyId) {
-            showToast(`Re-selected Recommended Best Match: ${policyId}${titleStr}. Ready to check coverage.`);
-        } else {
-            showToast(`Active policy switched to ${policyId}${titleStr}. Directive brought to top.`);
-        }
+    showToast(`Active policy switched to ${policyId}. Directive brought to top.`);
+}
+
+function selectPolicyFromScan(policyId, triggerToast = true) {
+    selectPolicyFromShortlist(policyId);
+}
+
+function renderMultiPolicyScanResults(data) {
+    // Adapter if called with old scan result format
+    if (data.candidates) {
+        return renderPolicyShortlistResults(data);
     }
+    const adapted = {
+        candidates: (data.all_matches || []).map((m, idx) => ({
+            rank: idx + 1,
+            policy_id: m.policy_id,
+            policy_title: m.policy_title,
+            category: m.category,
+            unified_score: m.calibrated_confidence || m.sufficiency_score || 0.5,
+            met_criteria: m.met_criteria || 0,
+            total_criteria: m.total_criteria || 0,
+            coverage_ratio: m.total_criteria ? (m.met_criteria / m.total_criteria) : 0,
+            matching_phrases: []
+        })),
+        preselected_policy_id: data.best_match_policy_id || (data.all_matches && data.all_matches[0] ? data.all_matches[0].policy_id : null),
+        status: (data.best_match_policy_id ? "PRESELECTED" : "SELECTION_REQUIRED"),
+        score_margin: 0.10,
+        runner_up_policy_id: null
+    };
+    renderPolicyShortlistResults(adapted);
 }
 
 function updatePolicyStep2Preview() {
-    const policyId = document.getElementById("policy-select").value || "NCD-20.4";
+    const policySelect = document.getElementById("policy-select");
+    const policyId = (policySelect && policySelect.value) ? policySelect.value : "";
     const patientId = document.getElementById("patient-id-input").value || (currentNoteMode === "actual" ? "PT-ACTUAL-CLINICAL" : "PT-CARD-8821");
 
     const badgeIcon = document.getElementById("policy-badge-icon");
     const titleElem = document.getElementById("step2-policy-title");
     const idElem = document.getElementById("step2-policy-id");
+    const patElem = document.getElementById("step2-patient-id");
+    const listElem = document.getElementById("step2-requirements-list");
+
+    if (idElem) idElem.textContent = policyId || "NONE";
+    if (patElem) {
+        if (currentNoteMode === "actual") {
+            patElem.textContent = `Patient Identifier: ${patientId} (Actual Clinical Consultation Note)`;
+        } else {
+            patElem.textContent = `Sample Case: Synthetic Test Record (${patientId})`;
+        }
+    }
+
+    if (!policyId) {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></span>`;
+        if (titleElem) titleElem.textContent = "No Policy Selected";
+        if (listElem) listElem.innerHTML = `<span class="rule-chip" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">Select a candidate policy to inspect criteria</span>`;
+        return;
+    }
+
+    if (policyId === "NCD-20.4") {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-blue"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path><path d="M3.5 12h3l2-4 3 8 2-5 2 2h4"></path></svg></span>`;
+        if (titleElem) titleElem.textContent = "Implantable Automatic Defibrillators";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">LVEF &le; 35%</span>
+            <span class="rule-chip">NYHA Class II or III</span>
+            <span class="rule-chip">GDMT &ge; 90 days</span>
+            <span class="rule-chip">No MI within 40 days</span>
+        `;
+    } else if (policyId === "LCD-L33829") {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-cyan"><svg viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg></span>`;
+        if (titleElem) titleElem.textContent = "PAP Devices for Sleep Apnea";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">Diagnostic Polysomnogram</span>
+            <span class="rule-chip">AHI &ge; 15/hr (or &ge; 5 with symptoms)</span>
+            <span class="rule-chip">Face-to-face evaluation</span>
+        `;
+    } else if (policyId === "NCD-20.29") {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-amber"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>`;
+        if (titleElem) titleElem.textContent = "Hyperbaric Oxygen for Diabetic Wounds";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">Diabetic lower extremity wound</span>
+            <span class="rule-chip">Wagner Grade III or higher</span>
+            <span class="rule-chip">Failed 30-day conventional care</span>
+        `;
+    } else {
+        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>`;
+        if (titleElem) titleElem.textContent = "Medicare Coverage Determination";
+        if (listElem) listElem.innerHTML = `
+            <span class="rule-chip">Documented clinical necessity</span>
+            <span class="rule-chip">Prior conservative therapy</span>
+        `;
+    }
+}
     const patElem = document.getElementById("step2-patient-id");
     const listElem = document.getElementById("step2-requirements-list");
 
@@ -2927,7 +2987,7 @@ function resetAdjudicationDisplay() {
     if (ehrHigh) ehrHigh.innerHTML = `<p class="placeholder-text">Extracted sentences anchoring each requirement will appear highlighted here.</p>`;
     const critList = document.getElementById("criteria-cards-list");
     if (critList) critList.innerHTML = `<div class="empty-state-notice">Criteria breakdown will appear here after evaluation.</div>`;
-    
+
     const hashDisp = document.getElementById("audit-hash-display");
     if (hashDisp) hashDisp.textContent = "Awaiting Adjudication Run";
 
@@ -2971,6 +3031,11 @@ async function executeAdjudication() {
     }
     if (ehrText.length < 20) {
         showToast("Patient note is too short (at least 20 characters required).", true);
+        return;
+    }
+
+    if (!policyId || policyId.trim() === "" || policyId === "NONE") {
+        showToast("Please select a Medicare policy candidate from the shortlist first.", true);
         return;
     }
 
@@ -3179,7 +3244,7 @@ function renderAdjudicationResults(data) {
             : data.sufficiency_score;
         metricCal.textContent = calScore != null ? `${(calScore * 100).toFixed(1)}%` : "100.0%";
     }
-    
+
     // Check if any grounding failure
     const allGrounded = data.verification_audits.every(v => v.grounding_status);
     const groundingElem = document.getElementById("metric-grounding");
@@ -3208,6 +3273,37 @@ function renderAdjudicationResults(data) {
         else if (data.policy_id === "LCD-L33829") resPolicyCat.textContent = "CPAP Therapy (Pulmonology)";
         else if (data.policy_id === "NCD-20.29") resPolicyCat.textContent = "Hyperbaric Oxygen (Wound Care)";
         else resPolicyCat.textContent = "Medicare Part B";
+    }
+
+    // Provenance Card for Screen 3
+    const provContainer = document.getElementById("adjudication-shortlist-provenance");
+    if (provContainer) {
+        if (data.policy_choice_metadata) {
+            const meta = data.policy_choice_metadata;
+            const isAuto = (meta.chooser === "auto");
+            const chooserLabel = isAuto ? "Automated Pre-Selection" : "Clinician Selection";
+            const marginStr = (meta.score_margin != null) ? meta.score_margin.toFixed(3) : "N/A";
+            const runnerUpStr = meta.runner_up_policy_id || "None";
+            provContainer.style.display = "block";
+            provContainer.innerHTML = `
+                <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8;">Policy Provenance &amp; Selection</span>
+                        <span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 9999px; background: ${isAuto ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.2)'}; color: ${isAuto ? '#34d399' : '#38bdf8'}; font-weight: 600;">${chooserLabel}</span>
+                    </div>
+                    <div style="font-size: 0.88rem; color: #e2e8f0; line-height: 1.4;">
+                        <strong>Chosen Policy:</strong> <span style="color: #f8fafc; font-weight: 600;">${escapeHtml(data.policy_id)}</span> &mdash; ${escapeHtml(data.policy_title || "Medicare Directive")}
+                    </div>
+                    <div style="display: flex; gap: 16px; margin-top: 6px; font-size: 0.8rem; color: #94a3b8;">
+                        <span><strong>Selected By:</strong> ${chooserLabel}</span>
+                        <span><strong>Score Margin:</strong> ${marginStr}</span>
+                        <span><strong>Runner-up:</strong> ${escapeHtml(runnerUpStr)}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            provContainer.style.display = "none";
+        }
     }
 
     // Criteria Status Card
@@ -3909,7 +4005,7 @@ function filterAuditLogs(query) {
         const tr = document.createElement("tr");
         const ts = new Date(log.created_at).toLocaleString();
         const shortHash = log.audit_hash ? (log.audit_hash.slice(0, 16) + "...") : "Awaiting...";
-        
+
         let decisionChip = `<span class="badge-status not-met">${escapeHtml(log.decision || "DENIED")}</span>`;
         if (log.decision === "APPROVED") decisionChip = `<span class="badge-status met">${escapeHtml(log.decision)}</span>`;
         else if (log.decision === "DEFERRED_TO_HUMAN") decisionChip = `<span class="badge-status insufficient">${escapeHtml(log.decision)}</span>`;
@@ -4091,7 +4187,7 @@ async function viewAuditRecordDetails(caseId) {
                 criteriaList.forEach(crit => {
                     const row = document.createElement("div");
                     row.className = "audit-criterion-row";
-                    
+
                     const statusStr = (crit.status || (crit.satisfied ? "MET" : "NOT_MET")).toUpperCase();
                     let stChip = `<span class="badge-status not-met" style="padding:2px 8px;font-size:0.72rem;">Not Met</span>`;
                     if (statusStr === "MET") {
@@ -4451,12 +4547,12 @@ async function uploadFileAndAdjudicate(file) {
         }
 
         const data = await res.json();
-        
+
         // Populate extracted text into EHR textarea and visible pastebox
         document.getElementById("ehr-input").value = data.extracted_text;
         const pasteBox = document.getElementById("actual-paste-textarea");
         if (pasteBox) pasteBox.value = data.extracted_text;
-        
+
         // Auto-select matched policy
         const matchedPolicyId = data.adjudication.policy_id;
         const policySelect = document.getElementById("policy-select");
@@ -4478,7 +4574,7 @@ async function uploadFileAndAdjudicate(file) {
         const uploadChip = document.getElementById("upload-status-chip");
         if (uploadChip) uploadChip.textContent = `Auto-Matched ${matchedPolicyId}`;
         showToast(`Document parsed! Governing policy: ${matchedPolicyId}. Coverage check complete.`);
-        
+
         updatePolicyStep2Preview();
         updateWorkflowRibbon(3);
         goToWizardScreen(3);
@@ -4575,7 +4671,7 @@ function populatePacketDocument() {
                 statusColor = "#B45309";
             }
 
-            const quoteText = (currentRole === "Auditor") 
+            const quoteText = (currentRole === "Auditor")
                 ? (c.extracted_evidence_quote || 'Not documented in record')
                 : formatEvidenceQuoteForClinician(c.extracted_evidence_quote, patName);
 
@@ -5008,7 +5104,7 @@ function printPacketDocument() {
     const packetId = p.packet_id || "CMS-PAC-2026-FORM";
     const icdCodes = (p.icd10_codes || []).join(", ") || "None specified";
     const cptCodes = (p.cpt_hcpcs_codes || []).join(", ") || "None specified";
-    
+
     // Read current user edits from on-screen fields
     const summaryElem = document.getElementById("doc-clinical-summary");
     const clinicalSummary = summaryElem ? summaryElem.value.trim() : (p.clinical_summary || "");
@@ -5021,7 +5117,7 @@ function printPacketDocument() {
     (p.criteria_sections || []).forEach((c, idx) => {
         const attestInput = document.getElementById(`doc-attest-${idx}`);
         const userAttest = attestInput ? attestInput.value.trim() : (c.physician_attestation || "Verified against clinical documentation.");
-        
+
         let statusText = "MET";
         let statusColor = "#15803D";
         if (c.status === "NOT_MET") {
@@ -6332,7 +6428,7 @@ function renderBatchEmptyState() {
     currentBatchRoster = [];
     window._activeBatchLoaded = false;
     currentBatchCohortType = "";
-    
+
     const selectEl = document.getElementById("batch-cohort-select");
     if (selectEl) selectEl.value = "";
 
@@ -6380,7 +6476,7 @@ function clearCustomCohort() {
     currentBatchRoster = [];
     currentBatchCohortType = '';
     window._activeBatchLoaded = false;
-    
+
     const optUpload = document.getElementById("opt-cohort-upload");
     if (optUpload) optUpload.style.display = "none";
     const clearBtn = document.getElementById("btn-clear-custom-cohort");
@@ -6437,20 +6533,20 @@ async function switchBatchCohort(cohortType, autoRun = false) {
 
 function filterBatchTable(filterType) {
     currentBatchFilter = filterType;
-    
+
     const pills = document.querySelectorAll(".batch-filter-pill");
     pills.forEach(pill => pill.classList.remove("active"));
-    
+
     const targetPillId = {
         'ALL': 'filter-all',
         'APPROVED': 'filter-approved',
         'DENIED': 'filter-denied',
         'DEFERRED': 'filter-deferred'
     }[filterType] || 'filter-all';
-    
+
     const activeEl = document.getElementById(targetPillId);
     if (activeEl) activeEl.classList.add("active");
-    
+
     const rows = document.querySelectorAll("#batch-table-body tr:not(.empty-filter-row)");
     let visibleCount = 0;
     rows.forEach(tr => {
@@ -6489,22 +6585,22 @@ function searchBatchTable(query) {
     const q = (query || "").toLowerCase().trim();
     const rows = document.querySelectorAll("#batch-table-body tr:not(.empty-filter-row):not(#batch-empty-roster-row)");
     let matchCount = 0;
-    
+
     rows.forEach(tr => {
         const text = tr.textContent.toLowerCase();
         const rowDecision = tr.getAttribute("data-decision") || "PENDING";
-        
+
         let pillMatch = true;
         if (currentBatchFilter === 'APPROVED' && rowDecision !== 'APPROVED') pillMatch = false;
         if (currentBatchFilter === 'DENIED' && rowDecision !== 'DENIED') pillMatch = false;
         if (currentBatchFilter === 'DEFERRED' && (rowDecision !== 'DEFERRED' && rowDecision !== 'HOLD' && !rowDecision.includes('DEFER'))) pillMatch = false;
-        
+
         const matchesQuery = !q || text.includes(q);
         const visible = matchesQuery && pillMatch;
         tr.style.display = visible ? "" : "none";
         if (visible) matchCount++;
     });
-    
+
     const tbody = document.getElementById("batch-table-body");
     const existingEmpty = document.getElementById("batch-empty-search-row");
     if (matchCount === 0 && rows.length > 0) {
@@ -6525,26 +6621,26 @@ function exportBatchRosterCSV() {
         showToast("No patient records in roster to export.", "warning");
         return;
     }
-    
+
     const headers = ["Index", "Patient ID", "Patient Name", "Demographics", "Policy ID", "CPT/HCPCS", "Procedure Description", "Adjudication Decision", "Calibrated Confidence", "Safety Gate", "Clinical Summary"];
-    
+
     const rows = currentBatchRoster.map((item, idx) => {
         let decision = "PENDING";
         let conf = "--";
         let gate = "--";
-        
+
         if (window._lastBatchResults && window._lastBatchResults[idx]) {
             const res = window._lastBatchResults[idx];
             decision = (res.decision || "PENDING").toUpperCase();
             conf = `${Math.round((res.calibrated_confidence || 0) * 100)}%`;
             gate = res.abstention_status ? "Triggered (tau < 0.85)" : "Passed (tau >= 0.85)";
         }
-        
+
         const cleanSummary = (item.clinical_narrative || "").replace(/\s+/g, " ").replace(/"/g, '""');
         const pName = (item.patient_name || "").replace(/"/g, '""');
         const demo = (item.demographics || "").replace(/"/g, '""');
         const procName = (item.procedure_name || getProcedureDescription(item.requested_procedure_code)).replace(/"/g, '""');
-        
+
         return [
             idx + 1,
             `"${item.patient_id}"`,
@@ -6559,7 +6655,7 @@ function exportBatchRosterCSV() {
             `"${cleanSummary}"`
         ].join(",");
     });
-    
+
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -6569,7 +6665,7 @@ function exportBatchRosterCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     showToast(`Exported ${currentBatchRoster.length} cases to CSV file.`, "success");
 }
 
@@ -6585,7 +6681,7 @@ function loadSampleBatchRoster(rosterType) {
         renderBatchEmptyState();
         return;
     }
-    
+
     const cohortLabels = {
         practice: {
             title: `Active Roster: Multi-Specialty Benchmark Cohort (${currentBatchRoster.length} Patients)`,
@@ -6613,18 +6709,18 @@ function loadSampleBatchRoster(rosterType) {
         title: `Active Roster: Cohort (${currentBatchRoster.length} Patients)`,
         sub: "Practice Cohort"
     };
-    
+
     const titleEl = document.getElementById("batch-roster-title");
     if (titleEl) titleEl.textContent = label.title;
     const subEl = document.getElementById("batch-cohort-name-sub");
     if (subEl) subEl.textContent = label.sub;
-    
+
     document.getElementById("batch-total-count").textContent = currentBatchRoster.length;
     document.getElementById("batch-approved-count").textContent = "--";
     document.getElementById("batch-denied-count").textContent = "--";
     document.getElementById("batch-deferred-count").textContent = "--";
     document.getElementById("batch-latency-count").textContent = "-- ms";
-    
+
     renderBatchTablePending();
 }
 
@@ -6651,9 +6747,9 @@ function renderBatchTablePending() {
     currentBatchRoster.forEach((item, idx) => {
         const tr = document.createElement("tr");
         tr.setAttribute("data-decision", "PENDING");
-        
-        const snippet = item.clinical_narrative.length > 95 
-            ? item.clinical_narrative.substring(0, 95) + "..." 
+
+        const snippet = item.clinical_narrative.length > 95
+            ? item.clinical_narrative.substring(0, 95) + "..."
             : item.clinical_narrative;
         const specialty = getPolicySpecialty(item.policy_id);
         const procName = item.procedure_name || getProcedureDescription(item.requested_procedure_code);
@@ -6732,7 +6828,7 @@ async function executeBatchAdjudication() {
         }
 
         const data = await res.json();
-        
+
         // Update summary metrics
         document.getElementById("batch-total-count").textContent = data.total_patients;
         document.getElementById("batch-approved-count").textContent = data.approved_count;
@@ -6770,13 +6866,13 @@ function renderBatchResults(results) {
         else if (decisionNorm === "DENIED") deniedCount++;
         else deferredCount++;
 
-        const snippet = item.adjudication.sanitized_ehr_text.length > 95 
-            ? item.adjudication.sanitized_ehr_text.substring(0, 95) + "..." 
+        const snippet = item.adjudication.sanitized_ehr_text.length > 95
+            ? item.adjudication.sanitized_ehr_text.substring(0, 95) + "..."
             : item.adjudication.sanitized_ehr_text;
 
         const specialty = getPolicySpecialty(item.policy_id);
-        const cptCode = item.adjudication.cpt_codes && item.adjudication.cpt_codes.length > 0 
-            ? item.adjudication.cpt_codes[0] 
+        const cptCode = item.adjudication.cpt_codes && item.adjudication.cpt_codes.length > 0
+            ? item.adjudication.cpt_codes[0]
             : (item.requested_procedure_code || 'N/A');
 
         let decisionBadge = "";
@@ -6893,7 +6989,7 @@ function viewBatchItemInWizard(idx) {
     const item = window._lastBatchResults[idx];
     lastAdjudicationResult = item.adjudication;
     currentCoveragePacket = null;
-    
+
     switchMainTab('adjudicate');
     renderCoverageScreen(item.adjudication);
     goToWizardScreen(3);
@@ -6943,10 +7039,10 @@ function loadInspectedNoteIntoWizard() {
 function loadRosterItemIntoWizard(idx) {
     if (!currentBatchRoster || !currentBatchRoster[idx]) return;
     const item = currentBatchRoster[idx];
-    
+
     currentNoteMode = "actual";
     switchMainTab('adjudicate');
-    
+
     const pasteArea = document.getElementById("actual-paste-textarea");
     const ehrInput = document.getElementById("ehr-input");
     const patInput = document.getElementById("patient-id-input");
@@ -7250,8 +7346,8 @@ async function loadLiveTelemetry() {
 // =============================================================================
 
 function downloadPacketPdf(customCaseId) {
-    const caseId = customCaseId || 
-        (currentCoveragePacket && currentCoveragePacket.case_id) || 
+    const caseId = customCaseId ||
+        (currentCoveragePacket && currentCoveragePacket.case_id) ||
         (lastAdjudicationResult && lastAdjudicationResult.case_id) ||
         (window._LAST_ADJUDICATION_DATA && window._LAST_ADJUDICATION_DATA.case_id);
 
@@ -7307,8 +7403,8 @@ function downloadPacketPdf(customCaseId) {
 }
 
 function downloadAppealLetterPdf(customCaseId) {
-    const caseId = customCaseId || 
-        (currentCoveragePacket && currentCoveragePacket.case_id) || 
+    const caseId = customCaseId ||
+        (currentCoveragePacket && currentCoveragePacket.case_id) ||
         (lastAdjudicationResult && lastAdjudicationResult.case_id) ||
         (window._LAST_ADJUDICATION_DATA && window._LAST_ADJUDICATION_DATA.case_id);
 
@@ -7559,11 +7655,11 @@ async function loadAdminClinicians() {
 
         tbody.innerHTML = users.map(u => {
             const isVerified = u.is_verified_medical_pro;
-            const verifiedBadge = isVerified 
+            const verifiedBadge = isVerified
                 ? `<span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Verified</span>`
                 : `<span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Unverified</span>`;
-            
-            const statusBadge = u.is_active 
+
+            const statusBadge = u.is_active
                 ? `<span style="color: #38bdf8;">Active</span>`
                 : `<span style="color: #f43f5e;">Inactive</span>`;
 

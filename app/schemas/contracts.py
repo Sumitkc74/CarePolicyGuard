@@ -201,8 +201,60 @@ class FinalAdjudication(BaseModel):
     agentic_audit_trail: dict[str, Any] | None = Field(default=None, description="Autonomous agentic decisions: Agent 2 tool selections, Agent 3 multi-round debates, Agent 4 queue priority")
     candidate_tau_analysis: dict[str, Any] | None = Field(default=None, description="Agent 4 candidate tau derived on development data reported alongside operative 0.85")
     message_board: list[dict[str, Any]] | None = Field(default=None, description="Task 1: Shared chronological message board recording all agent communication")
+    policy_shortlist: list[dict[str, Any]] | None = Field(default=None, description="Task 5: Shortlist of candidate Medicare policies evaluated with unified scores and criteria coverage")
+    policy_choice_metadata: dict[str, Any] | None = Field(default=None, description="Task 5: Persistence of who chose the policy (clinician vs auto), margin, coverage, and timestamp")
 
 # Request / Response DTOs
+class PolicyShortlistCandidate(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    rank: int = Field(..., description="Shortlist rank index (1-based)")
+    policy_id: str = Field(..., description="CMS Policy Identifier, e.g. LCD-ACDF or NCD-20.4")
+    policy_title: str = Field(..., description="Official title of the Medicare policy")
+    unified_score: float = Field(..., description="Fused lexical-semantic score before coverage adjustment")
+    reranked_score: float = Field(..., description="Final shortlist score after criteria-coverage reranking")
+    coverage_display: str = Field(..., description="Human-readable coverage string, e.g. '2 of 4 criteria have supporting text'")
+    supported_criteria_count: int = Field(..., description="Number of statutory criteria supported in note")
+    total_criteria_count: int = Field(..., description="Total non-exclusion criteria in policy")
+    coverage_ratio: float = Field(..., description="Proportion of criteria supported [0.0, 1.0]")
+    matching_phrases: list[str] = Field(default_factory=list, description="Direct quoted matching text snippets from clinical record")
+
+    @property
+    def met_criteria(self) -> int:
+        return self.supported_criteria_count
+
+    @property
+    def total_criteria(self) -> int:
+        return self.total_criteria_count
+
+class PolicyShortlistRequest(BaseModel):
+    ehr_narrative: str = Field(..., description="Clinical documentation narrative")
+    patient_id: str | None = Field(default="PT-SHORTLIST", description="Patient identifier")
+    top_k: int = Field(default=5, ge=1, le=10, description="Maximum shortlist entries to return (3-5)")
+
+class PolicyShortlistResponse(BaseModel):
+    status: str = Field(..., description="'PRESELECTED' | 'SELECTION_REQUIRED' | 'NO_GOVERNING_POLICY'")
+    preselected_policy_id: str | None = Field(default=None, description="Policy ID if preselected under margin rule")
+    preselected_policy_title: str | None = Field(default=None, description="Policy title if preselected")
+    preselection_margin: float | None = Field(default=None, description="Score difference between candidate #1 and #2")
+    preselection_coverage_ratio: float | None = Field(default=None, description="Coverage ratio of candidate #1")
+    shortlist: list[PolicyShortlistCandidate] = Field(default_factory=list, description="Ranked shortlist of qualifying candidate policies")
+    message: str = Field(..., description="Clinical status message or documentation alert")
+    margin_threshold: float = Field(default=0.08, description="Stated uncalibrated margin threshold for auto-preselection")
+    coverage_floor: float = Field(default=0.33, description="Stated uncalibrated coverage floor for auto-preselection")
+    execution_time_ms: float = Field(default=0.0, description="Shortlist execution latency in milliseconds")
+
+    @property
+    def candidates(self) -> list[PolicyShortlistCandidate]:
+        return self.shortlist
+
+    @property
+    def score_margin(self) -> float | None:
+        return self.preselection_margin
+
+    @property
+    def runner_up_policy_id(self) -> str | None:
+        return self.shortlist[1].policy_id if len(self.shortlist) > 1 else None
+
 class PolicyMatchSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

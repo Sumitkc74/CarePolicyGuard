@@ -1,0 +1,111 @@
+{
+  "total_cases": 84,
+  "top1_count": 75,
+  "top1_rate": 0.8929,
+  "top3_count": 81,
+  "top3_rate": 0.9643,
+  "top5_count": 82,
+  "top5_rate": 0.9762,
+  "preselected_count": 40,
+  "preselected_rate": 0.4762,
+  "selection_required_count": 44,
+  "selection_required_rate": 0.5238,
+  "no_governing_count": 0,
+  "preselected_decision_matches": 40,
+  "preselected_decision_accuracy": 1.0,
+  "latency_p50_ms": 320.54,
+  "latency_p90_ms": 381.55,
+  "latency_p95_ms": 401.81,
+  "missed_top1_cases": [
+    {
+      "vignette_id": "DEV-LCD-HIP-SCOOP-NEG",
+      "gold_policy": "LCD-HIP-SCOOP",
+      "top1_policy": "LCD-HIP-ARTHRO",
+      "gold_rank": ">5",
+      "top1_score": 0.6592,
+      "gold_score": null,
+      "status": "SELECTION_REQUIRED",
+      "title": "Advanced degenerative hip arthritis with joint space obliteration"
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
+      "gold_policy": "LCD-KNEE-ORTHOSIS",
+      "top1_policy": "LCD-KNEE-ARTHRO",
+      "gold_rank": 4,
+      "top1_score": 0.7438,
+      "gold_score": 0.5747,
+      "status": "SELECTION_REQUIRED",
+      "title": "Temporary postoperative rehabilitation following routine arthroscopy"
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
+      "gold_policy": "LCD-MRI-LUMBAR",
+      "top1_policy": "LCD-ESI",
+      "gold_rank": 2,
+      "top1_score": 0.9898,
+      "gold_score": 0.9625,
+      "status": "SELECTION_REQUIRED",
+      "title": "Progressive foot drop and severe S1 radiculopathy after 6 weeks therapy"
+    },
+    {
+      "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+      "gold_policy": "LCD-PAD-ATHERO",
+      "top1_policy": "NCD-20.29",
+      "gold_rank": 2,
+      "top1_score": 0.8582,
+      "gold_score": 0.85,
+      "status": "SELECTION_REQUIRED",
+      "title": "Severe lifestyle-limiting calf claudication with SFA occlusion"
+    },
+    {
+      "vignette_id": "DEV-LCD-PCI-NEG",
+      "gold_policy": "LCD-PCI",
+      "top1_policy": "NCD-20.7",
+      "gold_rank": 2,
+      "top1_score": 0.7093,
+      "gold_score": 0.6693,
+      "status": "SELECTION_REQUIRED",
+      "title": "Non-hemodynamic mild 30% coronary plaque with negative stress test"
+    },
+    {
+      "vignette_id": "DEV-LCD-RAD-NIV-NEG",
+      "gold_policy": "LCD-RAD-NIV",
+      "top1_policy": "LCD-L33829",
+      "gold_rank": 2,
+      "top1_score": 0.953,
+      "gold_score": 0.8779,
+      "status": "SELECTION_REQUIRED",
+      "title": "Uncomplicated obstructive sleep apnea with normal daytime carbon dioxide"
+    },
+    {
+      "vignette_id": "DEV-LCD-ROTATOR-CUFF-NEG",
+      "gold_policy": "LCD-ROTATOR-CUFF",
+      "top1_policy": "LCD-SHOULDER-ARTHRO",
+      "gold_rank": 2,
+      "top1_score": 0.8585,
+      "gold_score": 0.7676,
+      "status": "PRESELECTED",
+      "title": "Severe cuff tear arthropathy with bone-on-bone glenohumeral collapse"
+    },
+    {
+      "vignette_id": "DEV-NCD-PET-ONC-NEG",
+      "gold_policy": "NCD-PET-ONC",
+      "top1_policy": "LCD-SBRT",
+      "gold_rank": ">5",
+      "top1_score": 0.5597,
+      "gold_score": null,
+      "status": "SELECTION_REQUIRED",
+      "title": "Asymptomatic surveillance 5 years post-resection of early breast cancer"
+    },
+    {
+      "vignette_id": "DEV-NCD-SCS-APP",
+      "gold_policy": "NCD-SCS",
+      "top1_policy": "LCD-LUMBAR-DECOMP",
+      "gold_rank": 2,
+      "top1_score": 0.803,
+      "gold_score": 0.765,
+      "status": "SELECTION_REQUIRED",
+      "title": "Failed back surgery syndrome with 80% relief during percutaneous trial"
+    }
+  ]
+}

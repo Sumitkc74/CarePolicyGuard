@@ -52,12 +52,23 @@ class PolicyRetrievalAgent:
     def search_policies_by_narrative(self, narrative: str) -> List[Dict[str, Any]]:
         """
         Hybrid lexical-semantic retrieval matching EHR clinical narrative against
-        indexed Medicare NCD and LCD policies.
+        indexed Medicare NCD and LCD policies. Falls back to DeclarativePolicyEngine
+        when running offline or without database persistence.
         """
-        if not self.db:
+        policies = []
+        if self.db:
+            try:
+                policies = self.db.query(MedicarePolicy).all()
+            except Exception:
+                policies = []
+
+        if not policies:
+            from app.services.declarative_engine import DeclarativePolicyEngine
+            policies = DeclarativePolicyEngine.get_all_policies()
+
+        if not policies:
             return []
 
-        policies = self.db.query(MedicarePolicy).all()
         scored_policies = []
         cleaned_text = narrative.lower()
 
@@ -66,22 +77,38 @@ class PolicyRetrievalAgent:
             matched_terms = []
 
             # 1. Title and category match
-            if pol.category.lower() in cleaned_text:
+            pol_cat = getattr(pol, "category", "") or ""
+            if pol_cat.lower() in cleaned_text:
                 score += 2.0
-                matched_terms.append(pol.category)
+                matched_terms.append(pol_cat)
 
             # 2. Key phrases in policy description
-            desc_words = [w for w in re.findall(r'\b[a-z]{4,}\b', pol.title.lower()) if w not in {"with", "from", "that", "this", "care"}]
+            pol_title = getattr(pol, "title", "") or ""
+            stop_words = {"with", "from", "that", "this", "care", "left", "right", "other", "device", "devices", "therapy", "coverage", "procedure", "procedures", "patient", "chronic", "mild", "normal"}
+            desc_words = [w for w in re.findall(r'\b[a-z]{4,}\b', pol_title.lower()) if w not in stop_words]
             for dw in desc_words:
-                if dw in cleaned_text:
+                if re.search(r'\b' + re.escape(dw) + r'\b', cleaned_text):
                     score += 1.5
                     matched_terms.append(dw)
 
             # 3. Criteria keyword passage matches
-            for crit in pol.criteria:
-                kw_list = [k.strip().lower() for k in crit.keywords.split(",") if k.strip()]
+            pol_criteria = getattr(pol, "criteria", []) or []
+            for crit in pol_criteria:
+                raw_kw = getattr(crit, "keywords", None)
+                if isinstance(raw_kw, list):
+                    kw_list = [k.strip().lower() for k in raw_kw if k.strip()]
+                elif isinstance(raw_kw, str):
+                    kw_list = [k.strip().lower() for k in raw_kw.split(",") if k.strip()]
+                else:
+                    raw_kw = getattr(crit, "entity_names", []) or []
+                    kw_list = [k.strip().lower() for k in raw_kw if k.strip()]
+
                 for kw in kw_list:
-                    if kw in cleaned_text:
+                    if len(kw) <= 3:
+                        matched = bool(re.search(r'\b' + re.escape(kw) + r'\b', cleaned_text))
+                    else:
+                        matched = (kw in cleaned_text)
+                    if matched:
                         score += 1.0
                         if kw not in matched_terms:
                             matched_terms.append(kw)
@@ -89,23 +116,27 @@ class PolicyRetrievalAgent:
             # 4. Clinical Taxonomy Acronym and Synonym Cross-Referencing
             tax_terms = CLINICAL_TAXONOMY_MAP.get(pol.policy_id, [])
             for tt in tax_terms:
-                if tt in cleaned_text:
+                if len(tt) <= 4:
+                    matched = bool(re.search(r'\b' + re.escape(tt) + r'\b', cleaned_text))
+                else:
+                    matched = (tt in cleaned_text)
+                if matched:
                     score += 3.0
                     if tt not in matched_terms:
                         matched_terms.append(tt)
 
             # Normalize score
-            max_possible = max(1.0, len(pol.criteria) * 2.0 + 4.0)
+            max_possible = max(1.0, len(pol_criteria) * 2.0 + 4.0)
             norm_score = min(1.0, score / max_possible)
 
             scored_policies.append({
                 "policy_id": pol.policy_id,
-                "title": pol.title,
-                "jurisdiction": pol.jurisdiction,
-                "category": pol.category,
+                "title": pol_title,
+                "jurisdiction": getattr(pol, "jurisdiction", "National"),
+                "category": pol_cat,
                 "relevance_score": round(norm_score, 3),
                 "matched_terms": matched_terms[:8],
-                "criteria_count": len(pol.criteria)
+                "criteria_count": len(pol_criteria)
             })
 
         scored_policies.sort(key=lambda x: x["relevance_score"], reverse=True)
