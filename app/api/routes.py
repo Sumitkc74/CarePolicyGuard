@@ -1084,12 +1084,17 @@ async def extract_clinical_text(
     # Suggest matching policy using unified Policy Shortlist Service
     from app.services.policy_shortlist_service import PolicyShortlistService
     shortlist_res = PolicyShortlistService.compute_shortlist(extracted_text, db=db, top_k=3)
-    suggested_policy = shortlist_res.get("preselected_policy_id")
-    policy_title = shortlist_res.get("preselected_policy_title")
-    if not suggested_policy and shortlist_res.get("shortlist"):
-        top_cand = shortlist_res["shortlist"][0]
-        suggested_policy = top_cand["policy_id"]
-        policy_title = top_cand["policy_title"]
+    status = shortlist_res.get("status", "NO_GOVERNING_POLICY")
+    suggested_policy = None
+    policy_title = None
+
+    if status == "PRESELECTED":
+        suggested_policy = shortlist_res.get("preselected_policy_id")
+        policy_title = shortlist_res.get("preselected_policy_title")
+
+    # On SELECTION_REQUIRED or NO_GOVERNING_POLICY, suggested_policy and policy_title remain None.
+    # Provide ranked candidates so clinician sees candidate choices on SELECTION_REQUIRED.
+    candidates = shortlist_res.get("shortlist", [])
 
     return {
         "filename": primary_filename,
@@ -1098,6 +1103,8 @@ async def extract_clinical_text(
         "extracted_text": extracted_text,
         "suggested_policy_id": suggested_policy,
         "suggested_policy_title": policy_title,
+        "suggestion_status": status,
+        "candidates": candidates,
         "authenticity": auth_check
     }
 

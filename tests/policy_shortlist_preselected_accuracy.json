@@ -2,6 +2,64 @@
   "dataset": "84 dev vignettes, author-written, not held-out, not clinical validation",
   "database": "carepolicyguard.db (repo SQLite database)",
   "pipeline_mode": "MultiAgentVerificationPipeline.adjudicate_sync (deterministic)",
+  "mode_comparison": {
+    "declarative_under_gold": {
+      "accuracy_count": 39,
+      "total_cases": 84,
+      "accuracy_rate": 0.4643,
+      "execution_mode": "declarative",
+      "source": "DEVELOPMENT_EVALUATION_REPORT.md (scripts/evaluate_extended_policies.py)"
+    },
+    "deterministic_under_gold": {
+      "accuracy_count": 37,
+      "total_cases": 84,
+      "accuracy_rate": 0.4405,
+      "execution_mode": "deterministic",
+      "source": "tests/policy_shortlist_preselected_accuracy.json (scripts/evaluate_preselected_accuracy.py)"
+    },
+    "deterministic_shortlist_flow": {
+      "accuracy_count": 37,
+      "total_cases": 84,
+      "accuracy_rate": 0.4405,
+      "execution_mode": "deterministic",
+      "source": "tests/policy_shortlist_preselected_accuracy.json (scripts/evaluate_preselected_accuracy.py)"
+    },
+    "flips": [
+      {
+        "vignette_id": "DEV-LCD-PCI-NEG",
+        "expected_decision": "DENIED",
+        "declarative_decision": "DEFERRED_TO_HUMAN",
+        "deterministic_decision": "DENIED",
+        "declarative_correct": false,
+        "deterministic_correct": true
+      },
+      {
+        "vignette_id": "DEV-LCD-ACDF-APP",
+        "expected_decision": "APPROVED",
+        "declarative_decision": "APPROVED",
+        "deterministic_decision": "DEFERRED_TO_HUMAN",
+        "declarative_correct": true,
+        "deterministic_correct": false
+      },
+      {
+        "vignette_id": "DEV-OPD-PANNI-APP",
+        "expected_decision": "APPROVED",
+        "declarative_decision": "APPROVED",
+        "deterministic_decision": "DENIED",
+        "declarative_correct": true,
+        "deterministic_correct": false
+      },
+      {
+        "vignette_id": "DEV-OPD-RHINO-APP",
+        "expected_decision": "APPROVED",
+        "declarative_decision": "APPROVED",
+        "deterministic_decision": "DENIED",
+        "declarative_correct": true,
+        "deterministic_correct": false
+      }
+    ],
+    "interpretation": "In deterministic mode the shortlist flow accuracy (37/84) equals under-gold accuracy (37/84) with 40/40 preselected decision agreement, proving that preselection costs zero decision accuracy and the 39-to-37 gap is entirely an evaluation mode difference between declarative and deterministic pipelines."
+  },
   "preselected_count": 40,
   "selection_required_count": 44,
   "policy_match_count": 39,

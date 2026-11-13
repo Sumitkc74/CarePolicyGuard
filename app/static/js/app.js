@@ -2272,15 +2272,27 @@ async function handleActualFileUpload(event) {
             pasteBox.scrollIntoView({ behavior: "smooth", block: "center" });
         }
 
-        // Auto-match suggested policy
-        if (data.suggested_policy_id) {
-            const policySelect = document.getElementById("policy-select");
+        // Auto-match suggested policy: only pre-fill on confident PRESELECTED status
+        const policySelect = document.getElementById("policy-select");
+        if (data.suggestion_status === "PRESELECTED" && data.suggested_policy_id) {
             if (policySelect) policySelect.value = data.suggested_policy_id;
+        } else if (data.suggestion_status === "SELECTION_REQUIRED") {
+            // Close call: leave select empty for clinician manual choice
+            if (policySelect) policySelect.value = "";
         }
 
         // Show confirmation badge banner on Screen 1
         if (banner && descText) {
-            descText.textContent = `Extracted from "${file.name}" (${data.character_count} chars). Please review, edit if needed, and confirm below:`;
+            let statusNote = "";
+            if (data.suggestion_status === "SELECTION_REQUIRED") {
+                const candList = (data.candidates && data.candidates.length > 0)
+                    ? data.candidates.slice(0, 3).map(c => c.policy_id || c.title).join(", ")
+                    : "competing policies";
+                statusNote = ` (Close match between candidates [${candList}] — please pick governing policy manually).`;
+            } else if (data.suggestion_status === "PRESELECTED") {
+                statusNote = ` (Pre-selected policy: ${data.suggested_policy_id}).`;
+            }
+            descText.textContent = `Extracted from "${file.name}" (${data.character_count} chars).${statusNote} Please review, edit if needed, and confirm below:`;
             banner.classList.remove("hidden");
         }
 

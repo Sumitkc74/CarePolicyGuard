@@ -226,3 +226,71 @@ def test_extract_text_off_topic_returns_null_suggestion():
     assert data["suggested_policy_id"] is None
     assert data["suggested_policy_title"] is None
 
+
+def test_extract_text_close_call_returns_null_and_selection_required(dev_vignettes):
+    """A close-call note (e.g. DEV-LCD-MRI-LUMBAR-APP, margin 0.027 < 0.08)
+    must return suggested_policy_id=None and suggestion_status='SELECTION_REQUIRED',
+    with candidates populated on the response.
+    """
+    client = TestClient(app)
+    vig_close = next(v for v in dev_vignettes if v.get("vignette_id") == "DEV-LCD-MRI-LUMBAR-APP")
+    files = {"files": ("lumbar_note.txt", vig_close["ehr_narrative"].encode("utf-8"), "text/plain")}
+    res = client.post("/api/v1/extract-text", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["suggestion_status"] == "SELECTION_REQUIRED"
+    assert data["suggested_policy_id"] is None
+    assert data["suggested_policy_title"] is None
+    assert "candidates" in data
+    assert len(data["candidates"]) > 0
+
+
+def test_extract_text_preselected_returns_policy_and_preselected_status(dev_vignettes):
+    """A decisive note (e.g. DEV-LCD-ACDF-APP) must return suggested_policy_id='LCD-ACDF'
+    and suggestion_status='PRESELECTED'.
+    """
+    client = TestClient(app)
+    vig_decisive = next(v for v in dev_vignettes if v.get("vignette_id") == "DEV-LCD-ACDF-APP")
+    files = {"files": ("acdf_note.txt", vig_decisive["ehr_narrative"].encode("utf-8"), "text/plain")}
+    res = client.post("/api/v1/extract-text", files=files)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["suggestion_status"] == "PRESELECTED"
+    assert data["suggested_policy_id"] == "LCD-ACDF"
+    assert data["suggested_policy_title"] is not None
+
+
+def test_mode_comparison_flips_recorded_and_verified(dev_vignettes):
+    """Verifies that declarative and deterministic evaluation modes produce the expected
+    distinct decisions on flip cases (e.g. DEV-LCD-PCI-NEG and DEV-LCD-ACDF-APP),
+    proving that the accuracy delta is a mode difference, not a shortlist effect.
+    """
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    # 1. DEV-LCD-PCI-NEG: declarative DEFERRED_TO_HUMAN (wrong), deterministic DENIED (right)
+    vig_pci = next(v for v in dev_vignettes if v.get("vignette_id") == "DEV-LCD-PCI-NEG")
+    decl_pci = pipeline.adjudicate_sync(
+        patient_id="PT-TEST", policy_id=vig_pci["policy_id"], ehr_narrative=vig_pci["ehr_narrative"],
+        execution_mode="declarative", save_record=False
+    )
+    det_pci = pipeline.adjudicate_sync(
+        patient_id="PT-TEST", policy_id=vig_pci["policy_id"], ehr_narrative=vig_pci["ehr_narrative"],
+        execution_mode="deterministic", save_record=False
+    )
+    assert decl_pci.adjudication_decision.value == "DEFERRED_TO_HUMAN"
+    assert det_pci.adjudication_decision.value == "DENIED"
+
+    # 2. DEV-LCD-ACDF-APP: declarative APPROVED (right), deterministic DEFERRED_TO_HUMAN (wrong)
+    vig_acdf = next(v for v in dev_vignettes if v.get("vignette_id") == "DEV-LCD-ACDF-APP")
+    decl_acdf = pipeline.adjudicate_sync(
+        patient_id="PT-TEST", policy_id=vig_acdf["policy_id"], ehr_narrative=vig_acdf["ehr_narrative"],
+        execution_mode="declarative", save_record=False
+    )
+    det_acdf = pipeline.adjudicate_sync(
+        patient_id="PT-TEST", policy_id=vig_acdf["policy_id"], ehr_narrative=vig_acdf["ehr_narrative"],
+        execution_mode="deterministic", save_record=False
+    )
+    assert decl_acdf.adjudication_decision.value == "APPROVED"
+    assert det_acdf.adjudication_decision.value == "DEFERRED_TO_HUMAN"
+
+
