@@ -11,6 +11,7 @@ Outputs saved to app/data/benchmarks/agentic_v36_comparison_raw.json.
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
 import sys
@@ -84,18 +85,22 @@ def build_merged_in_memory_map() -> tuple[ConceptMap, int, int]:
     return merged_map, committed_count, added_drafts
 
 
-def run_arm_a(vignettes: list[dict[str, Any]]) -> dict[str, Any]:
+def run_arm_a(vignettes: list[dict[str, Any]], span_repair_enabled: bool = True) -> dict[str, Any]:
     """Runs Arm A: existing pipeline path (declarative mode) with committed map (12 concepts)."""
-    logger.info("Starting Arm A: Existing Pipeline Path (Declarative, Committed Map 12 concepts)...")
+    logger.info(
+        f"Starting Arm A: Existing Pipeline Path (Declarative, Committed Map 12 concepts, "
+        f"span_repair={span_repair_enabled})..."
+    )
 
-    # Ensure clean committed map
+    # Ensure clean committed map and configured span repair
     cm_mod._GLOBAL_CONCEPT_MAP = ConceptMap()
-    LLMProposalAgent.span_repair_enabled = False
+    LLMProposalAgent.span_repair_enabled = span_repair_enabled
 
     pipeline = MultiAgentVerificationPipeline(db=None)
     pipeline.llm_proposer.enabled = True
     pipeline.llm_proposer.model_name = "qwen2.5:3b"
     pipeline.llm_proposer.timeout_seconds = 30.0
+    pipeline.llm_proposer.span_repair_enabled = span_repair_enabled
 
     cases = []
     concordant_count = 0
@@ -111,6 +116,8 @@ def run_arm_a(vignettes: list[dict[str, Any]]) -> dict[str, Any]:
         exp_dec = vig["expected_decision"]
         narrative = vig["ehr_narrative"]
 
+        telem_before = dict(pipeline.llm_proposer.telemetry)
+
         res = pipeline.adjudicate_sync(
             patient_id=f"PT-ARM-A-{idx:03d}",
             policy_id=pid,
@@ -120,6 +127,14 @@ def run_arm_a(vignettes: list[dict[str, Any]]) -> dict[str, Any]:
         )
         act_dec = res.adjudication_decision.value
         is_concordant = (act_dec == exp_dec)
+
+        telem_after = dict(pipeline.llm_proposer.telemetry)
+        c_calls = telem_after.get("total_calls", 0) - telem_before.get("total_calls", 0)
+        c_ga = telem_after.get("gate_a_rejections", 0) - telem_before.get("gate_a_rejections", 0)
+        c_gb = telem_after.get("gate_b_rejections", 0) - telem_before.get("gate_b_rejections", 0)
+        c_gcm = telem_after.get("gate_c_map_rejections", 0) - telem_before.get("gate_c_map_rejections", 0)
+        c_gcv = telem_after.get("gate_c_vetoes", 0) - telem_before.get("gate_c_vetoes", 0)
+        c_acc = telem_after.get("proposals_accepted", 0) - telem_before.get("proposals_accepted", 0)
 
         if is_concordant:
             concordant_count += 1
@@ -155,6 +170,12 @@ def run_arm_a(vignettes: list[dict[str, Any]]) -> dict[str, Any]:
             "is_concordant": is_concordant,
             "abstention_reason": getattr(res, "abstention_reason", None),
             "calibrated_confidence": res.calibrated_aggregate_confidence,
+            "calls": c_calls,
+            "gate_a_failures": c_ga,
+            "gate_b_rejections": c_gb,
+            "gate_c_map_rejections": c_gcm,
+            "gate_c_vetoes": c_gcv,
+            "claims_accepted_gate_chain_count": c_acc,
             "accepted_claims": accepted_claims,
             "criterion_assessments": [
                 {
@@ -182,6 +203,7 @@ def run_arm_a(vignettes: list[dict[str, Any]]) -> dict[str, Any]:
 
     return {
         "arm_name": "Arm A: Pipeline Path (Declarative, Committed Map 12 Concepts)",
+        "span_repair_enabled": span_repair_enabled,
         "elapsed_seconds": elapsed,
         "total_cases": len(vignettes),
         "calls": calls,
@@ -201,16 +223,21 @@ def run_arm_a(vignettes: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap) -> dict[str, Any]:
+def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap, span_repair_enabled: bool = True) -> dict[str, Any]:
     """Runs Arm B: agentic message-board mode with merged map in-memory."""
-    logger.info("Starting Arm B: Agentic Mode (Message Board, Merged Map 131 concepts)...")
+    logger.info(
+        f"Starting Arm B: Agentic Mode (Message Board, Merged Map 131 concepts, "
+        f"span_repair={span_repair_enabled})..."
+    )
 
     cm_mod._GLOBAL_CONCEPT_MAP = merged_map
+    LLMProposalAgent.span_repair_enabled = span_repair_enabled
 
     pipeline = MultiAgentVerificationPipeline(db=None)
     pipeline.llm_proposer.enabled = True
     pipeline.llm_proposer.model_name = "qwen2.5:3b"
     pipeline.llm_proposer.timeout_seconds = 30.0
+    pipeline.llm_proposer.span_repair_enabled = span_repair_enabled
 
     cases = []
     concordant_count = 0
@@ -270,6 +297,12 @@ def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap) -> dict[s
         case_concessions = 0
         case_defenses = 0
         case_claims_accepted = 0
+        case_gate_a_failures = 0
+        case_gate_b_rejections = 0
+        case_gate_c_map_rejections = 0
+        case_gate_c_vetoes = 0
+        case_gate_chain_accepted_claims = []
+        case_unresolved_disagreements = 0
 
         for m in board_msgs:
             mtype = m.get("message_type")
@@ -285,12 +318,16 @@ def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap) -> dict[s
                 total_challenges_raised += 1
                 fg = meta.get("failing_gate", "")
                 if fg == "GATE_A_EXACT_SLICE":
+                    case_gate_a_failures += 1
                     gate_a_failures += 1
                 elif fg == "GATE_B_SEMANTIC":
+                    case_gate_b_rejections += 1
                     gate_b_rejections += 1
                 elif fg == "GATE_C_MAP_CHECK":
+                    case_gate_c_map_rejections += 1
                     gate_c_map_rejections += 1
                 elif fg in ("GATE_C_VETO", "GATE_C_AGENT3_VETO", "GATE_C_ADVERSARIAL_VETO"):
+                    case_gate_c_vetoes += 1
                     gate_c_vetoes += 1
 
             if agent.startswith("Agent 2") and mtype == "CONCEDE":
@@ -303,8 +340,21 @@ def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap) -> dict[s
                 if meta.get("gate_chain_passed"):
                     case_claims_accepted += 1
                     total_claims_accepted += 1
+                    ev = m.get("evidence")
+                    source_txt = ""
+                    if ev:
+                        if hasattr(ev, "source_text"):
+                            source_txt = ev.source_text
+                        elif isinstance(ev, dict):
+                            source_txt = ev.get("source_text", "")
+                    case_gate_chain_accepted_claims.append({
+                        "criterion_code": m.get("criterion_code"),
+                        "source_text": source_txt,
+                        "content": m.get("content"),
+                    })
 
             if meta.get("disagreement_unresolved"):
+                case_unresolved_disagreements += 1
                 total_deferrals_unresolved_disagreement += 1
 
         # Accepted claims in case
@@ -332,6 +382,14 @@ def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap) -> dict[s
             "judge_calls": case_judge_calls,
             "challenges_raised": case_challenges,
             "concessions": case_concessions,
+            "calls": case_judge_calls,
+            "gate_a_failures": case_gate_a_failures,
+            "gate_b_rejections": case_gate_b_rejections,
+            "gate_c_map_rejections": case_gate_c_map_rejections,
+            "gate_c_vetoes": case_gate_c_vetoes,
+            "claims_accepted_gate_chain_count": case_claims_accepted,
+            "claims_accepted_gate_chain": case_gate_chain_accepted_claims,
+            "unresolved_disagreements": case_unresolved_disagreements,
             "claims_accepted": accepted_claims,
             "criterion_assessments": [
                 {
@@ -352,6 +410,7 @@ def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap) -> dict[s
 
     return {
         "arm_name": "Arm B: Agentic Mode (Message Board, Merged Map 131 Concepts)",
+        "span_repair_enabled": span_repair_enabled,
         "elapsed_seconds": elapsed,
         "total_cases": len(vignettes),
         "calls": total_judge_calls,
@@ -381,6 +440,28 @@ def run_arm_b(vignettes: list[dict[str, Any]], merged_map: ConceptMap) -> dict[s
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Compare Arm A (declarative) and Arm B (agentic)")
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v36_comparison_raw_span_repair_on.json"),
+        help="Path to output raw JSON"
+    )
+    parser.add_argument(
+        "--span-repair",
+        dest="span_repair",
+        action="store_true",
+        default=True,
+        help="Enable span repair (production default: True)"
+    )
+    parser.add_argument(
+        "--no-span-repair",
+        dest="span_repair",
+        action="store_false",
+        help="Disable span repair (v37 historical setting)"
+    )
+    args = parser.parse_args()
+
     logger.info("Loading 84 development vignettes...")
     vignettes_file = ROOT_DIR / "app" / "data" / "policies_extended" / "dev_vignettes_extended.json"
     with open(vignettes_file, "r", encoding="utf-8") as f:
@@ -389,14 +470,18 @@ def main():
     merged_map, committed_count, added_drafts = build_merged_in_memory_map()
 
     # Run Arm A
-    arm_a_results = run_arm_a(vignettes)
+    arm_a_results = run_arm_a(vignettes, span_repair_enabled=args.span_repair)
 
     # Run Arm B
-    arm_b_results = run_arm_b(vignettes, merged_map)
+    arm_b_results = run_arm_b(vignettes, merged_map, span_repair_enabled=args.span_repair)
 
     comparison_summary = {
         "metadata": {
             "execution_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "script_version": "v37.1 (span repair enabled, recomputable per-case records)",
+            "git_head": "8b72d5236b22e96d7aef28cb9dfb5e3ce01e13ab",
+            "span_repair_enabled": args.span_repair,
+            "note": "Supersedes v37 benchmark numbers where they differ due to production-default span repair setting.",
             "dataset": "84 dev vignettes, author-written, not held-out, not clinical validation",
             "model": "qwen2.5:3b (local Ollama)",
             "budget": "3 calls / 30s per case",
@@ -416,14 +501,15 @@ def main():
         "arm_b": arm_b_results,
     }
 
-    out_file = ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v36_comparison_raw.json"
+    out_file = Path(args.output)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(comparison_summary, f, indent=2)
 
     logger.info(f"Comparison completed successfully. Raw results saved to: {out_file}")
 
     print("\n" + "=" * 75)
-    print("CLEAN COMPARISON SUMMARY: ARM A vs ARM B")
+    print(f"CLEAN COMPARISON SUMMARY: ARM A vs ARM B (span_repair={args.span_repair})")
     print("=" * 75)
     print(f"{'Metric':<35} | {'Arm A (Pipeline)':<18} | {'Arm B (Agentic)':<18}")
     print("-" * 75)
