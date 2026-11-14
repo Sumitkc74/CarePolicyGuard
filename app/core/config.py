@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     ENABLE_LLM_PROPOSAL_STEP: bool = os.getenv("ENABLE_LLM_PROPOSAL_STEP", "false").lower() in ("true", "1", "yes")
     LOCAL_LLM_URL: str = os.getenv("LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
     LOCAL_LLM_MODEL: str = os.getenv("LOCAL_LLM_MODEL", "qwen2.5:3b")
+    LOCAL_LLM_JUDGE_MODEL: str = os.getenv("LOCAL_LLM_JUDGE_MODEL", os.getenv("LOCAL_LLM_MODEL", "qwen2.5:3b"))
     LOCAL_LLM_TIMEOUT_SECONDS: float = float(os.getenv("LOCAL_LLM_TIMEOUT_SECONDS", "5.0"))
 
     # CORS & Networking

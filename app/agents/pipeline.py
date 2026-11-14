@@ -336,6 +336,7 @@ class MultiAgentVerificationPipeline:
             ) = gate.evaluate(criteria_assessments, verification_audits)
         elif execution_mode == "agentic":
             # Communicating Multi-Agent Adjudication Architecture (Tasks 1, 2, 3)
+            from app.schemas.contracts import ClinicalEvidenceSpan
             from app.schemas.message_board import CaseMessageBoard, BoardMessageType
             from app.core.candidate_span_extractor import CandidateSpanExtractor
             from app.core.llm_judge import ClinicalEquivalenceJudge, EquivalenceVerdict
@@ -344,8 +345,7 @@ class MultiAgentVerificationPipeline:
 
             # board is already initialized at start of case and has recorded POLICY_SHORTLIST and POLICY_CHOSEN
             judge = ClinicalEquivalenceJudge()
-            if getattr(self.llm_proposer, "timeout_seconds", None):
-                judge.timeout_seconds = max(self.llm_proposer.timeout_seconds, 15.0)
+            judge.timeout_seconds = 30.0
             judge.reset_case_budget()
 
             # Task 1 & 2: Agent 1 posts POLICY_SELECTED with score and margin to runner-up
@@ -376,15 +376,76 @@ class MultiAgentVerificationPipeline:
                 }
             )
 
-            # Task 2: Agent 2 Autonomous Deliberation & Dynamic Tool Selection
-            # Agent 2 orders criteria dynamically: check exclusions first
+            # Task 1 & Task 4: Agent 2 Planning & Dynamic Tool Selection
+            # 1. Deterministic preliminary pass to categorize criteria
+            settled_codes: list[str] = []
+            needs_judge_codes: list[str] = []
+            missing_evidence_codes: list[str] = []
+            prelim_assessments: dict[str, Any] = {}
+            candidate_spans_cache: dict[str, list[Any]] = {}
+
+            # Exclusions checked first
             ordered_criteria = sorted(criteria_defs, key=lambda c: 0 if c.get("is_exclusion", False) else 1)
+
+            for crit in ordered_criteria:
+                ccode = crit.get("criterion_code", "UNKNOWN")
+                is_excl = crit.get("is_exclusion", False)
+                decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
+                ass = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
+                prelim_assessments[ccode] = ass
+
+                if is_excl:
+                    settled_codes.append(ccode)
+                else:
+                    if ass.status in (DeterminationStatus.MET, DeterminationStatus.NOT_MET):
+                        settled_codes.append(ccode)
+                    else:
+                        cands = CandidateSpanExtractor.extract_candidates(
+                            ehr_narrative=sanitized_ehr,
+                            criterion=crit,
+                            max_candidates=3
+                        )
+                        candidate_spans_cache[ccode] = cands
+                        if cands:
+                            needs_judge_codes.append(ccode)
+                        else:
+                            missing_evidence_codes.append(ccode)
+
+            # Post Task 1 PLAN message to board
+            plan_meta = {
+                "settled_deterministic": settled_codes,
+                "needs_judge": needs_judge_codes,
+                "missing_evidence": missing_evidence_codes,
+                "routing": {
+                    c.get("criterion_code", ""): (
+                        "SETTLED_DETERMINISTIC" if c.get("criterion_code") in settled_codes
+                        else ("NEEDS_JUDGE" if c.get("criterion_code") in needs_judge_codes else "MISSING_EVIDENCE")
+                    )
+                    for c in criteria_defs
+                }
+            }
+            board.post(
+                agent="Agent 2: Clinical Evaluator",
+                message_type=BoardMessageType.PLAN,
+                content=(
+                    f"Adjudication Plan: {len(settled_codes)} settled deterministically "
+                    f"({', '.join(settled_codes) or 'none'}), {len(needs_judge_codes)} need LLM judgment "
+                    f"({', '.join(needs_judge_codes) or 'none'}), {len(missing_evidence_codes)} missing evidence "
+                    f"({', '.join(missing_evidence_codes) or 'none'})."
+                ),
+                metadata=plan_meta
+            )
+
+            # Routing metrics
+            judge_calls_otherwise_deferring = 0
+            judge_calls_already_settled = 0
+
             criteria_assessments = []
             agent2_tool_decisions = []
             short_circuit_denial = False
             budget_halt = False
             denial_reason = ""
-            total_agent_turns = 1  # Agent 1 was turn 1
+            total_agent_turns = 2  # Agent 1 was turn 1, Agent 2 plan was turn 2
             verification_audits = []
             agent3_debate_rounds = []
 
@@ -392,14 +453,10 @@ class MultiAgentVerificationPipeline:
                 ccode = crit.get("criterion_code", "UNKNOWN")
                 is_excl = crit.get("is_exclusion", False)
                 total_agent_turns += 1
-
-                # 1. Deterministic extraction first
-                decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
-                assessment = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
+                assessment = prelim_assessments.get(ccode)
 
                 if is_excl:
                     if assessment.status == DeterminationStatus.MET:
-                        # Statutory exclusion met -> proven contraindication
                         short_circuit_denial = True
                         denial_reason = f"Statutory exclusion {ccode} triggered: '{assessment.clinical_rationale}'"
                         board.post(
@@ -450,14 +507,8 @@ class MultiAgentVerificationPipeline:
                     criteria_assessments.append(assessment)
                     continue
 
-                # INSUFFICIENT_EVIDENCE: Deterministic extraction missed
-                # Deterministic engine extracts verbatim candidate slices with exact note offsets
-                candidate_spans = CandidateSpanExtractor.extract_candidates(
-                    ehr_narrative=sanitized_ehr,
-                    criterion=crit,
-                    max_candidates=3
-                )
-
+                # If missing evidence (zero candidate spans extracted), do NOT burn LLM calls
+                candidate_spans = candidate_spans_cache.get(ccode, [])
                 if not candidate_spans:
                     board.post(
                         agent="Agent 2: Clinical Evaluator",
@@ -469,78 +520,101 @@ class MultiAgentVerificationPipeline:
                     criteria_assessments.append(assessment)
                     continue
 
-                # Evaluate top candidate spans with LLM Judge under operational budgets
+                # Task 2 & Task 4: Evaluate otherwise-deferring criterion with LLM Judge (criterion-level mode)
                 promoted = False
                 budget_halt = False
-                for cand in candidate_spans:
-                    try:
-                        if judge.case_call_count >= AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
-                            raise BudgetExhaustionHalt("LLM_CALLS", AgenticGuardrails.MAX_LLM_CALLS_PER_CASE, judge.case_call_count)
-                        AgenticGuardrails.check_budgets(
-                            llm_calls=judge.case_call_count,
-                            elapsed_seconds=judge.case_elapsed_ms / 1000.0,
-                            agent_turns=total_agent_turns,
-                            criterion_debate_rounds=0
-                        )
-                    except BudgetExhaustionHalt as bh:
-                        board.post(
-                            agent="Agent 4: Abstention Gate",
-                            message_type=BoardMessageType.HALT,
-                            content=f"HALT triggered: {bh}. Execution bounds reached; case defers to human clinician.",
-                            criterion_code=ccode,
-                            metadata={"resource": bh.resource, "limit": bh.limit}
-                        )
-                        budget_halt = True
-                        break
 
-                    total_agent_turns += 1
-                    judge_res = judge.judge_equivalence_sync(
-                        criterion=crit,
-                        candidate_span_text=cand.source_text
+                if ccode in needs_judge_codes:
+                    judge_calls_otherwise_deferring += 1
+                else:
+                    judge_calls_already_settled += 1
+
+                try:
+                    if judge.case_call_count >= AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
+                        raise BudgetExhaustionHalt("LLM_CALLS", AgenticGuardrails.MAX_LLM_CALLS_PER_CASE, judge.case_call_count)
+                    AgenticGuardrails.check_budgets(
+                        llm_calls=judge.case_call_count,
+                        elapsed_seconds=judge.case_elapsed_ms / 1000.0,
+                        agent_turns=total_agent_turns,
+                        criterion_debate_rounds=0
                     )
+                except BudgetExhaustionHalt as bh:
                     board.post(
-                        agent="Agent 2: Clinical Evaluator",
-                        message_type=BoardMessageType.VERDICT,
-                        content=f"LLM Judge evaluated candidate span '{cand.source_text}': verdict={judge_res.verdict.value} (Rationale: {judge_res.rationale}).",
+                        agent="Agent 4: Abstention Gate",
+                        message_type=BoardMessageType.HALT,
+                        content=f"HALT triggered: {bh}. Execution bounds reached; case defers to human clinician.",
                         criterion_code=ccode,
-                        evidence={"source_text": cand.source_text, "start_char": cand.start_char, "end_char": cand.end_char},
-                        metadata={"verdict": judge_res.verdict.value, "latency_ms": judge_res.elapsed_ms}
+                        metadata={"resource": bh.resource, "limit": bh.limit}
                     )
+                    budget_halt = True
+                    criteria_assessments.append(assessment)
+                    break
 
-                    if judge_res.verdict == EquivalenceVerdict.EQUIVALENT:
-                        ev_span = cand.to_evidence_span(confidence=0.95)
+                total_agent_turns += 1
 
-                        # Sequential Gate Chain: Gate B (semantics) + Gate C (ConceptMap) + Agent 3 cross-examination
+                # Task 2: Call judge_criterion_sync
+                crit_judgment = judge.judge_criterion_sync(
+                    criterion=crit,
+                    note_text=sanitized_ehr,
+                    deterministic_assessment=assessment
+                )
+
+                board.post(
+                    agent="Agent 2: Clinical Evaluator",
+                    message_type=BoardMessageType.JUDGMENT,
+                    content=(
+                        f"LLM Judge evaluated criterion {ccode}: status={crit_judgment.status} "
+                        f"(Rationale: {crit_judgment.rationale}; quoted_evidence: '{crit_judgment.quoted_evidence[:80]}...')."
+                    ),
+                    criterion_code=ccode,
+                    evidence={"quoted_evidence": crit_judgment.quoted_evidence},
+                    metadata={
+                        "status": crit_judgment.status,
+                        "confidence": crit_judgment.confidence,
+                        "elapsed_ms": crit_judgment.elapsed_ms,
+                        "status_code": crit_judgment.status_code
+                    }
+                )
+
+                if crit_judgment.status == "MET" and crit_judgment.quoted_evidence:
+                    # Gate A: Verbatim grounding check
+                    s, e = LLMProposalAgent.locate_claimed_span(sanitized_ehr, crit_judgment.quoted_evidence, allow_repair=True)
+                    if s == -1 or e == -1:
+                        board.post(
+                            agent="Agent 3: Adversarial Verifier",
+                            message_type=BoardMessageType.CHALLENGE,
+                            content=f"Gate A Failure on {ccode}: Quoted evidence '{crit_judgment.quoted_evidence}' could not be located in narrative.",
+                            criterion_code=ccode,
+                            metadata={"gate": "Gate A", "failing_gate": "Gate A"}
+                        )
+                        board.post(
+                            agent="Agent 2: Clinical Evaluator",
+                            message_type=BoardMessageType.CONCEDE,
+                            content=f"Conceding challenge on {ccode}: Gate A ungrounded quote; withdrawing judgment.",
+                            criterion_code=ccode
+                        )
+                    else:
+                        ev_span = ClinicalEvidenceSpan(
+                            source_text=sanitized_ehr[s:e],
+                            start_char=s,
+                            end_char=e,
+                            confidence=crit_judgment.confidence or 0.95
+                        )
                         gate_res = AgenticGuardrails.evaluate_gate_chain(
                             candidate_span=ev_span,
                             criterion=crit,
                             ehr_narrative=sanitized_ehr,
+                            concept_map=None,
                             verifier_agent=self.verifier_agent
                         )
 
-                        if gate_res["passed"]:
-                            assessment.status = DeterminationStatus.MET
-                            assessment.verified_spans = [ev_span]
-                            assessment.raw_confidence = 0.95
-                            assessment.clinical_rationale = f"Semantic equivalence verified: '{cand.source_text}' ({gate_res['reason']})."
-
-                            board.post(
-                                agent="Agent 2: Clinical Evaluator",
-                                message_type=BoardMessageType.DEFENSE,
-                                content=f"Candidate span passed Gate B, Gate C, and Agent 3 verification. Promoting {ccode} to MET with verified grounding [{cand.start_char}:{cand.end_char}].",
-                                criterion_code=ccode,
-                                evidence=ev_span,
-                                metadata={"gate_chain_passed": True, "verbatim_grounded": True}
-                            )
-                            promoted = True
-                            break
-                        else:
+                        if not gate_res["passed"]:
                             failing_gate = gate_res["failing_gate"]
                             reason = gate_res["reason"]
                             board.post(
                                 agent="Agent 3: Adversarial Verifier",
                                 message_type=BoardMessageType.CHALLENGE,
-                                content=f"Challenge on {ccode} candidate span '{cand.source_text}': Rejected by {failing_gate} ({reason}).",
+                                content=f"Challenge on {ccode} judgment span '{sanitized_ehr[s:e]}': Rejected by {failing_gate} ({reason}).",
                                 criterion_code=ccode,
                                 evidence=ev_span,
                                 metadata={"failing_gate": failing_gate}
@@ -548,9 +622,121 @@ class MultiAgentVerificationPipeline:
                             board.post(
                                 agent="Agent 2: Clinical Evaluator",
                                 message_type=BoardMessageType.CONCEDE,
-                                content=f"Conceding challenge on {ccode} candidate span '{cand.source_text}': gate failure acknowledged; withdrawing candidate.",
+                                content=f"Conceding challenge on {ccode} judgment span '{sanitized_ehr[s:e]}': {failing_gate} failure acknowledged.",
                                 criterion_code=ccode
                             )
+                        else:
+                            # Task 3: Agent 3 Adversarial Counter-Reading Challenge via LLM
+                            adv_challenge = judge.generate_adversarial_counter_reading_sync(
+                                criterion=crit,
+                                proposed_evidence=sanitized_ehr[s:e],
+                                note_text=sanitized_ehr
+                            )
+                            total_agent_turns += 1
+
+                            board.post(
+                                agent="Agent 3: Adversarial Verifier",
+                                message_type=BoardMessageType.CHALLENGE,
+                                content=f"LLM Counter-Reading on {ccode}: {adv_challenge.get('rationale')}",
+                                criterion_code=ccode,
+                                metadata={
+                                    **adv_challenge,
+                                    "adversarial_counter_reading": True
+                                }
+                            )
+
+                            # Agent 2 evaluates counter-reading
+                            is_fatal_challenge = False
+                            cr = adv_challenge.get("rationale", "")
+                            if adv_challenge.get("has_objection") and adv_challenge.get("objection_type") in ("NEGATION", "EXPERIENCER"):
+                                is_fatal_challenge = True
+
+                            total_agent_turns += 1
+                            if is_fatal_challenge:
+                                board.post(
+                                    agent="Agent 2: Clinical Evaluator",
+                                    message_type=BoardMessageType.CONCEDE,
+                                    content=f"Conceding challenge on {ccode}: Agent 3 demonstrated proven contradiction in narrative.",
+                                    criterion_code=ccode
+                                )
+                            else:
+                                board.post(
+                                    agent="Agent 2: Clinical Evaluator",
+                                    message_type=BoardMessageType.DEFENSE,
+                                    content=f"Defense of {ccode}: Verbatim grounding at [{s}:{e}] reaffirmed against counter-reading; no disabling contradiction found.",
+                                    criterion_code=ccode,
+                                    evidence=ev_span,
+                                    metadata={"gate_chain_passed": True, "verbatim_grounded": True}
+                                )
+                                assessment.status = DeterminationStatus.MET
+                                assessment.verified_spans = [ev_span]
+                                assessment.raw_confidence = 0.95
+                                assessment.clinical_rationale = f"Semantic equivalence verified via LLM judgment: '{sanitized_ehr[s:e]}'."
+                                promoted = True
+
+                # Fallback: If criterion-level judgment was not promoted, evaluate candidate spans if any remain
+                if not promoted:
+                    cand_spans = candidate_spans_cache.get(ccode, [])
+                    for cand in cand_spans:
+                        if judge.case_call_count >= AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
+                            break
+                        total_agent_turns += 1
+                        judge_res = judge.judge_equivalence_sync(
+                            criterion=crit,
+                            candidate_span_text=cand.source_text
+                        )
+                        board.post(
+                            agent="Agent 2: Clinical Evaluator",
+                            message_type=BoardMessageType.VERDICT,
+                            content=f"LLM Judge evaluated candidate span '{cand.source_text}': verdict={judge_res.verdict.value} (Rationale: {judge_res.rationale}).",
+                            criterion_code=ccode,
+                            evidence={"source_text": cand.source_text, "start_char": cand.start_char, "end_char": cand.end_char},
+                            metadata={"verdict": judge_res.verdict.value, "latency_ms": judge_res.elapsed_ms}
+                        )
+
+                        if judge_res.verdict == EquivalenceVerdict.EQUIVALENT:
+                            ev_span = cand.to_evidence_span(confidence=0.95)
+                            gate_res = AgenticGuardrails.evaluate_gate_chain(
+                                candidate_span=ev_span,
+                                criterion=crit,
+                                ehr_narrative=sanitized_ehr,
+                                concept_map=None,
+                                verifier_agent=self.verifier_agent
+                            )
+
+                            if gate_res["passed"]:
+                                assessment.status = DeterminationStatus.MET
+                                assessment.verified_spans = [ev_span]
+                                assessment.raw_confidence = 0.95
+                                assessment.clinical_rationale = f"Semantic equivalence verified: '{cand.source_text}' ({gate_res['reason']})."
+
+                                board.post(
+                                    agent="Agent 2: Clinical Evaluator",
+                                    message_type=BoardMessageType.DEFENSE,
+                                    content=f"Candidate span passed Gate B, Gate C, and Agent 3 verification. Promoting {ccode} to MET with verified grounding [{cand.start_char}:{cand.end_char}].",
+                                    criterion_code=ccode,
+                                    evidence=ev_span,
+                                    metadata={"gate_chain_passed": True, "verbatim_grounded": True}
+                                )
+                                promoted = True
+                                break
+                            else:
+                                failing_gate = gate_res["failing_gate"]
+                                reason = gate_res["reason"]
+                                board.post(
+                                    agent="Agent 3: Adversarial Verifier",
+                                    message_type=BoardMessageType.CHALLENGE,
+                                    content=f"Challenge on {ccode} candidate span '{cand.source_text}': Rejected by {failing_gate} ({reason}).",
+                                    criterion_code=ccode,
+                                    evidence=ev_span,
+                                    metadata={"failing_gate": failing_gate}
+                                )
+                                board.post(
+                                    agent="Agent 2: Clinical Evaluator",
+                                    message_type=BoardMessageType.CONCEDE,
+                                    content=f"Conceding challenge on {ccode} candidate span '{cand.source_text}': gate failure acknowledged; withdrawing candidate.",
+                                    criterion_code=ccode
+                                )
 
                 criteria_assessments.append(assessment)
                 if budget_halt:
