@@ -45,7 +45,7 @@ class AgenticGuardrails:
     """
 
     MAX_LLM_CALLS_PER_CASE: int = 3
-    MAX_LLM_TIME_PER_CASE_SECONDS: float = 30.0
+    MAX_LLM_TIME_PER_CASE_SECONDS: float = 60.0
     MAX_DEBATE_ROUNDS_PER_CRITERION: int = 2
     MAX_AGENT_TURNS_PER_CASE: int = 25
     OPERATIVE_TAU: float = 0.85

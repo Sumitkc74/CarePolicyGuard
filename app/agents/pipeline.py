@@ -344,7 +344,7 @@ class MultiAgentVerificationPipeline:
             from app.services.declarative_engine import DeclarativePolicyEngine
 
             # board is already initialized at start of case and has recorded POLICY_SHORTLIST and POLICY_CHOSEN
-            judge = ClinicalEquivalenceJudge()
+            judge = ClinicalEquivalenceJudge(max_time_per_case_seconds=60.0)
             judge.timeout_seconds = 30.0
             judge.reset_case_budget()
 
@@ -762,12 +762,142 @@ class MultiAgentVerificationPipeline:
                                 assessment.clinical_rationale = f"Semantic equivalence verified via LLM judgment: '{sanitized_ehr[s:e]}'."
                                 promoted = True
 
-                # Fallback: If criterion-level judgment was not promoted, evaluate candidate spans if any remain
-                if not promoted:
+                # Task 1 & Task 2 (v53): Agent 3 Advocacy & Capped Fallback
+                # If criterion-level judgment was NOT MET or INSUFFICIENT_EVIDENCE, Agent 3 acts as advocate
+                if not promoted and not budget_halt and ccode in needs_judge_codes:
+                    advocacy_attempted = False
+                    # Only attempt advocacy if budget remains
+                    if judge.case_call_count < AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
+                        advocacy_budget_exhausted = False
+                        try:
+                            AgenticGuardrails.check_budgets(
+                                llm_calls=judge.case_call_count,
+                                elapsed_seconds=judge.case_elapsed_ms / 1000.0,
+                                agent_turns=total_agent_turns,
+                                criterion_debate_rounds=0
+                            )
+                        except BudgetExhaustionHalt as bh:
+                            advocacy_budget_exhausted = True
+                            board.post(
+                                agent="Agent 4: Abstention Gate",
+                                message_type=BoardMessageType.HALT,
+                                content=f"HALT triggered before advocacy attempt: {bh}. Execution bounds reached.",
+                                criterion_code=ccode,
+                                metadata={"resource": bh.resource, "limit": bh.limit}
+                            )
+
+                        if not advocacy_budget_exhausted:
+                            advocacy_attempted = True
+                            total_agent_turns += 1
+                            adv_res = judge.generate_advocacy_sync(
+                                criterion=crit,
+                                note_text=sanitized_ehr,
+                                deterministic_assessment=assessment
+                            )
+                            adv_quote = adv_res.advocacy_quote.strip()
+
+                            board.post(
+                                agent="Agent 3: Adversarial Verifier",
+                                message_type=BoardMessageType.ADVOCACY,
+                                content=(
+                                    f"Agent 3 advocacy for {ccode}: "
+                                    f"{adv_res.rationale} (Quoted evidence: '{adv_quote}')."
+                                ),
+                                criterion_code=ccode,
+                                evidence={"advocacy_quote": adv_quote},
+                                metadata={
+                                    "status_code": adv_res.status_code,
+                                    "elapsed_ms": adv_res.elapsed_ms,
+                                    "advocacy_quote": adv_quote,
+                                    "advocacy_rationale": adv_res.rationale
+                                }
+                            )
+
+                            if adv_quote:
+                                # Gate A: Verbatim grounding check
+                                adv_s, adv_e = LLMProposalAgent.locate_claimed_span(sanitized_ehr, adv_quote, allow_repair=True)
+                                if adv_s == -1 or adv_e == -1:
+                                    board.post(
+                                        agent="Agent 3: Adversarial Verifier",
+                                        message_type=BoardMessageType.CHALLENGE,
+                                        content=f"Gate A Failure on advocacy for {ccode}: Quoted evidence '{adv_quote}' could not be located in narrative.",
+                                        criterion_code=ccode,
+                                        metadata={"gate": "Gate A", "failing_gate": "Gate A", "advocacy_rejected": True}
+                                    )
+                                else:
+                                    adv_span = ClinicalEvidenceSpan(
+                                        source_text=sanitized_ehr[adv_s:adv_e],
+                                        start_char=adv_s,
+                                        end_char=adv_e,
+                                        confidence=0.92
+                                    )
+                                    adv_gate_res = AgenticGuardrails.evaluate_gate_chain(
+                                        candidate_span=adv_span,
+                                        criterion=crit,
+                                        ehr_narrative=sanitized_ehr,
+                                        concept_map=None,
+                                        verifier_agent=self.verifier_agent
+                                    )
+
+                                    if adv_gate_res["passed"]:
+                                        assessment.status = DeterminationStatus.MET
+                                        assessment.verified_spans = [adv_span]
+                                        assessment.raw_confidence = 0.92
+                                        assessment.clinical_rationale = (
+                                            f"Criterion satisfied via Agent 3 advocacy grounded quote: "
+                                            f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res['reason']})."
+                                        )
+                                        board.post(
+                                            agent="Agent 2: Clinical Evaluator",
+                                            message_type=BoardMessageType.DEFENSE,
+                                            content=(
+                                                f"Defense of {ccode}: Grounded advocacy quote '{sanitized_ehr[adv_s:adv_e]}' "
+                                                f"passed Gate A, Gate B, and Gate C. Promoting {ccode} to MET."
+                                            ),
+                                            criterion_code=ccode,
+                                            evidence=adv_span,
+                                            metadata={
+                                                "advocacy_promoted": True,
+                                                "gate_chain_passed": True,
+                                                "verbatim_grounded": True,
+                                                "quote": sanitized_ehr[adv_s:adv_e]
+                                            }
+                                        )
+                                        promoted = True
+                                    else:
+                                        failing_gate = adv_gate_res["failing_gate"]
+                                        reason = adv_gate_res["reason"]
+                                        board.post(
+                                            agent="Agent 3: Adversarial Verifier",
+                                            message_type=BoardMessageType.CHALLENGE,
+                                            content=f"Advocacy on {ccode} rejected by {failing_gate} ({reason}).",
+                                            criterion_code=ccode,
+                                            evidence=adv_span,
+                                            metadata={"failing_gate": failing_gate, "advocacy_rejected": True}
+                                        )
+                            else:
+                                board.post(
+                                    agent="Agent 3: Adversarial Verifier",
+                                    message_type=BoardMessageType.CHALLENGE,
+                                    content=f"Advocacy on {ccode} produced no supporting evidence: '{adv_res.rationale}'.",
+                                    criterion_code=ccode,
+                                    metadata={"advocacy_rejected": True, "empty_quote": True}
+                                )
+
+                # Task 2 (v53): Capped Fallback
+                # Only run fallback for legitimate role: judge errors or timeouts (status_code != COMPLETED).
+                # Skip fallback entirely on clean NOT_MET or INSUFFICIENT_EVIDENCE with completed status.
+                # When run, capped at at most 1 fallback span call per criterion.
+                should_run_fallback = (
+                    not promoted
+                    and not budget_halt
+                    and getattr(crit_judgment, "status_code", "COMPLETED") != "COMPLETED"
+                )
+
+                if should_run_fallback:
                     cand_spans = candidate_spans_cache.get(ccode, [])
-                    for cand in cand_spans:
-                        if judge.case_call_count >= AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
-                            break
+                    if cand_spans and judge.case_call_count < AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
+                        cand = cand_spans[0]  # At most 1 fallback span call
                         total_agent_turns += 1
                         judge_res = judge.judge_equivalence_sync(
                             criterion=crit,
@@ -807,7 +937,6 @@ class MultiAgentVerificationPipeline:
                                     metadata={"gate_chain_passed": True, "verbatim_grounded": True}
                                 )
                                 promoted = True
-                                break
                             else:
                                 failing_gate = gate_res["failing_gate"]
                                 reason = gate_res["reason"]

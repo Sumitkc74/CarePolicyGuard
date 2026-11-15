@@ -257,9 +257,9 @@ def test_budget_exhaustion_halts() -> None:
         AgenticGuardrails.check_budgets(llm_calls=4, elapsed_seconds=5.0, agent_turns=5, criterion_debate_rounds=1)
     assert "LLM_CALLS" in str(exc_calls.value)
 
-    # 2. Time > 30.0s
+    # 2. Time > 60.0s (v53 parameter change from 30.0s to 60.0s for agentic mode)
     with pytest.raises(BudgetExhaustionHalt) as exc_time:
-        AgenticGuardrails.check_budgets(llm_calls=2, elapsed_seconds=31.0, agent_turns=5, criterion_debate_rounds=1)
+        AgenticGuardrails.check_budgets(llm_calls=2, elapsed_seconds=61.0, agent_turns=5, criterion_debate_rounds=1)
     assert "LLM_TIME_SECONDS" in str(exc_time.value)
 
     # 3. Agent Turns > 25

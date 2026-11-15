@@ -26,6 +26,7 @@ class BoardMessageType(str, Enum):
     JUDGMENT = "JUDGMENT"
     CHALLENGE = "CHALLENGE"
     DEFENSE = "DEFENSE"
+    ADVOCACY = "ADVOCACY"
     CONCEDE = "CONCEDE"
     VERDICT = "VERDICT"
     HALT = "HALT"

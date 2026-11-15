@@ -397,3 +397,235 @@ def test_routing_counters_appear_in_result_metadata(sample_vignette):
     assert "judge_calls_total_case" in llm_meta, "judge_calls_total_case must be in llm_proposal_metadata"
     assert "debated_criteria_outcomes" in llm_meta, "debated_criteria_outcomes must be in llm_proposal_metadata"
 
+
+def test_advocacy_with_grounded_quote_promotes_criterion(sample_vignette):
+    """
+    Task 5 (a): Advocacy with a grounded quote that passes the gates promotes the criterion
+    (Agent 2 posts DEFENSE containing the advocacy quote and criterion is promoted to MET).
+    """
+    from app.core.agentic_guardrails import AgenticGuardrails
+    from app.core.llm_judge import AdvocacyResult
+
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    # Judge returns NOT_MET initially on CRIT-IMRT-02
+    mock_not_met = CriterionJudgment(
+        status="NOT_MET",
+        quoted_evidence="",
+        rationale="No explicit mention of organ sparing in initial check.",
+        confidence=0.85,
+        status_code="COMPLETED"
+    )
+
+    # Advocate discovers grounded quote from note
+    mock_advocacy = AdvocacyResult(
+        advocacy_quote="3D-CRT plan exceeds rectal wall tolerance constraints. Recommending IMRT for organ sparing.",
+        rationale="Note explicitly documents exceeding rectal wall constraints requiring IMRT for organ sparing.",
+        status_code="COMPLETED"
+    )
+
+    with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_not_met), \
+         patch.object(ClinicalEquivalenceJudge, "generate_advocacy_sync", return_value=mock_advocacy), \
+         patch.object(AgenticGuardrails, "evaluate_gate_chain", return_value={"passed": True, "failing_gate": None, "reason": "Verified equivalence"}):
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-ADVOCACY-GROUNDED",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    board_msgs = res.message_board or []
+    # Verify ADVOCACY posted on board
+    adv_msgs = [m for m in board_msgs if m.get("message_type") == "ADVOCACY" and m.get("criterion_code") == "CRIT-IMRT-02"]
+    assert len(adv_msgs) >= 1, "Agent 3 must post ADVOCACY message on board"
+    assert "organ sparing" in adv_msgs[0].get("content", "")
+
+    # Verify DEFENSE posted by Agent 2 with quote
+    def_msgs = [m for m in board_msgs if m.get("message_type") == "DEFENSE" and m.get("criterion_code") == "CRIT-IMRT-02"]
+    assert len(def_msgs) >= 1, "Agent 2 must post DEFENSE promoting criterion"
+    assert "organ sparing" in def_msgs[0].get("content", "")
+
+    # Verify criterion was promoted to MET
+    crit_2 = next(ca for ca in res.criterion_assessments if ca.criterion_code == "CRIT-IMRT-02")
+    assert crit_2.status == "MET", "Criterion must be promoted to MET via grounded advocacy"
+
+
+def test_advocacy_with_fabricated_quote_rejected_by_gate_a(sample_vignette):
+    """
+    Task 5 (b): Advocacy with a fabricated quote is rejected by Gate A and the criterion stays deferred.
+    """
+    from app.core.llm_judge import AdvocacyResult
+
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    mock_not_met = CriterionJudgment(
+        status="NOT_MET",
+        quoted_evidence="",
+        rationale="Initial check found insufficient evidence.",
+        confidence=0.85,
+        status_code="COMPLETED"
+    )
+
+    # Advocate hallucinates non-existent quote
+    mock_advocacy = AdvocacyResult(
+        advocacy_quote="Fabricated text that does not exist anywhere in the patient record",
+        rationale="Invented reason.",
+        status_code="COMPLETED"
+    )
+
+    with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_not_met), \
+         patch.object(ClinicalEquivalenceJudge, "generate_advocacy_sync", return_value=mock_advocacy):
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-ADVOCACY-FABRICATED",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    board_msgs = res.message_board or []
+    # Verify Gate A Failure challenge posted
+    challenge_msgs = [
+        m for m in board_msgs
+        if m.get("message_type") == "CHALLENGE"
+        and m.get("criterion_code") == "CRIT-IMRT-02"
+        and "Gate A" in m.get("content", "")
+    ]
+    assert len(challenge_msgs) >= 1, "Gate A failure challenge must be posted for fabricated advocacy quote"
+
+    # Verify criterion was NOT promoted
+    crit_2 = next(ca for ca in res.criterion_assessments if ca.criterion_code == "CRIT-IMRT-02")
+    assert crit_2.status != "MET", "Criterion must stay unpromoted/DEFERRED when advocacy quote is fabricated"
+
+
+def test_advocacy_never_attempted_for_settled_criterion(sample_vignette):
+    """
+    Task 5 (c): Advocacy is never attempted for a settled criterion (routing invariant: 0 advocate calls on settled criteria).
+    """
+    from app.core.llm_judge import AdvocacyResult
+
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    advocacy_called_criteria = []
+
+    def tracking_advocacy(criterion, note_text, deterministic_assessment=None):
+        advocacy_called_criteria.append(criterion.get("criterion_code"))
+        return AdvocacyResult(advocacy_quote="", rationale="None")
+
+    with patch.object(ClinicalEquivalenceJudge, "generate_advocacy_sync", side_effect=tracking_advocacy):
+        pipeline.adjudicate_sync(
+            patient_id="PT-TEST-ADVOCACY-ROUTING",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    # In LCD-IMRT with sample_vignette, CRIT-IMRT-EXCL-01 is settled (exclusion ruled out)
+    # and CRIT-IMRT-01 is settled deterministically (prostate adenocarcinoma).
+    # Only CRIT-IMRT-02 is in needs_judge_codes.
+    assert "CRIT-IMRT-EXCL-01" not in advocacy_called_criteria, "Advocacy must never be called on exclusion criteria"
+    assert "CRIT-IMRT-01" not in advocacy_called_criteria, "Advocacy must never be called on deterministically settled criteria"
+
+
+def test_fallback_skipped_on_clean_not_met_and_capped_on_judge_error(sample_vignette):
+    """
+    Task 5 (d): The fallback is skipped on a clean NOT_MET and capped at 1 call on a judge error.
+    """
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    # Sub-case 1: Clean NOT_MET with status_code="COMPLETED" -> judge_equivalence_sync should be called 0 times
+    mock_clean_not_met = CriterionJudgment(
+        status="NOT_MET",
+        quoted_evidence="",
+        rationale="Clean negative finding.",
+        confidence=0.85,
+        status_code="COMPLETED"
+    )
+
+    fallback_calls = []
+
+    def mock_judge_equiv(criterion, candidate_span_text):
+        fallback_calls.append(candidate_span_text)
+        from app.core.llm_judge import EquivalenceVerdict, JudgeEvaluation
+        return JudgeEvaluation(verdict=EquivalenceVerdict.NOT_EQUIVALENT, rationale="No match")
+
+    with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_clean_not_met), \
+         patch.object(ClinicalEquivalenceJudge, "judge_equivalence_sync", side_effect=mock_judge_equiv):
+        pipeline.adjudicate_sync(
+            patient_id="PT-TEST-FALLBACK-SKIPPED",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    assert len(fallback_calls) == 0, "Fallback must be skipped on clean NOT_MET with COMPLETED status"
+
+    # Sub-case 2: Judge error (status_code="ERROR") -> fallback is capped at exactly 1 call
+    mock_error_judgment = CriterionJudgment(
+        status="MISSING",
+        quoted_evidence="",
+        rationale="Timeout/inference error",
+        confidence=0.50,
+        status_code="ERROR"
+    )
+
+    fallback_error_calls = []
+
+    def mock_judge_equiv_error(criterion, candidate_span_text):
+        fallback_error_calls.append(candidate_span_text)
+        from app.core.llm_judge import EquivalenceVerdict, JudgeEvaluation
+        return JudgeEvaluation(verdict=EquivalenceVerdict.NOT_EQUIVALENT, rationale="No match")
+
+    with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_error_judgment), \
+         patch.object(ClinicalEquivalenceJudge, "judge_equivalence_sync", side_effect=mock_judge_equiv_error):
+        pipeline.adjudicate_sync(
+            patient_id="PT-TEST-FALLBACK-CAPPED",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    assert len(fallback_error_calls) == 1, f"Fallback must be capped at at most 1 call on judge error, got {len(fallback_error_calls)}"
+
+
+def test_60s_time_budget_honored_and_defense_attempted_when_time_remains(sample_vignette):
+    """
+    Task 5 (e): The 60s time budget is honored — a defense call is attempted when time remains
+    after judgment + counter-reading (mocked latencies), and refused when time budget is already exhausted.
+    """
+    from app.core.agentic_guardrails import AgenticGuardrails
+
+    assert AgenticGuardrails.MAX_LLM_TIME_PER_CASE_SECONDS == 60.0, "MAX_LLM_TIME_PER_CASE_SECONDS must be 60.0"
+
+    judge = ClinicalEquivalenceJudge()
+    assert judge.max_time_per_case_seconds == 60.0, "ClinicalEquivalenceJudge default max_time_per_case_seconds must be 60.0"
+
+    # Test 1: Defense call attempted when elapsed time is 35s (would have failed under 30s budget, passes under 60s)
+    judge.case_elapsed_ms = 35000.0  # 35s elapsed
+    judge.case_call_count = 1
+
+    crit = {"criterion_code": "CRIT-TEST-01", "name": "Test", "description": "Desc"}
+    obj = {"objection_type": "TEMPORAL", "rationale": "Too short", "counter_quote": "1 week"}
+
+    # Calling generate_defense_sync directly at 35s elapsed time
+    with patch("httpx.Client.post") as mock_post:
+        mock_resp = mock_post.return_value
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "choices": [{"message": {"content": '{"defense_quote": "3D-CRT plan exceeds rectal wall tolerance constraints", "rationale": "Grounded resolution"}'}}]
+        }
+        res = judge.generate_defense_sync(crit, obj, "original quote", sample_vignette["ehr_narrative"])
+        assert res.status_code == "COMPLETED", "Defense must be attempted when 35s elapsed under 60s budget"
+        assert res.defense_quote == "3D-CRT plan exceeds rectal wall tolerance constraints"
+
+    # Test 2: Defense call refused when elapsed time is 61s (exceeds 60s budget)
+    judge.case_elapsed_ms = 61000.0
+    res_exhausted = judge.generate_defense_sync(crit, obj, "original quote", sample_vignette["ehr_narrative"])
+    assert res_exhausted.status_code == "SKIPPED_BUDGET_EXHAUSTED", "Defense must be refused when elapsed time exceeds 60s"
+    assert "budget exceeded" in res_exhausted.rationale.lower()
+
+

@@ -56,6 +56,14 @@ class DefenseResult(BaseModel):
     status_code: str = Field(default="COMPLETED", description="Execution status")
 
 
+class AdvocacyResult(BaseModel):
+    """Structured advocacy result from Agent 3 arguing FOR criterion satisfaction (Task 1)."""
+    advocacy_quote: str = Field(default="", description="Verbatim text quote from clinical note supporting satisfaction")
+    rationale: str = Field(..., description="Clinical reasoning explaining how the quoted evidence satisfies the requirement")
+    elapsed_ms: float = Field(default=0.0, description="Inference latency in milliseconds")
+    status_code: str = Field(default="COMPLETED", description="Execution status")
+
+
 
 class ClinicalEquivalenceJudge:
     """
@@ -74,7 +82,7 @@ class ClinicalEquivalenceJudge:
         model_name: str | None = None,
         timeout_seconds: float = 30.0,
         max_calls_per_case: int = 3,
-        max_time_per_case_seconds: float = 30.0
+        max_time_per_case_seconds: float = 60.0
     ):
         self.endpoint_url = endpoint_url or getattr(config.settings, "LOCAL_LLM_URL", "http://localhost:11434/v1/chat/completions")
         self.model_name = model_name or getattr(config.settings, "LOCAL_LLM_JUDGE_MODEL", None) or config.settings.LOCAL_LLM_MODEL
@@ -155,7 +163,7 @@ class ClinicalEquivalenceJudge:
             logger.warning(f"Judge time budget exceeded ({self.case_elapsed_ms:.1f}ms / {self.max_time_per_case_seconds*1000}ms).")
             return JudgeEvaluation(
                 verdict=EquivalenceVerdict.AMBIGUOUS,
-                rationale="Judge time budget exceeded (30s max per case); defers to human.",
+                rationale="Judge time budget exceeded (60s max per case); defers to human.",
                 elapsed_ms=0.0,
                 status_code="SKIPPED_BUDGET_EXHAUSTED"
             )
@@ -325,7 +333,7 @@ class ClinicalEquivalenceJudge:
             return CriterionJudgment(
                 status="MISSING",
                 quoted_evidence="",
-                rationale="Judge time budget exceeded (30s max per case); defers to human.",
+                rationale="Judge time budget exceeded (60s max per case); defers to human.",
                 confidence=0.50,
                 elapsed_ms=0.0,
                 status_code="SKIPPED_BUDGET_EXHAUSTED"
@@ -607,4 +615,126 @@ class ClinicalEquivalenceJudge:
                 elapsed_ms=elapsed_ms,
                 status_code="ERROR"
             )
+
+    def generate_advocacy_sync(
+        self,
+        criterion: dict[str, Any],
+        note_text: str,
+        deterministic_assessment: Any | None = None
+    ) -> AdvocacyResult:
+        """
+        Task 1 (v53): When a criterion judge returns NOT_MET or INSUFFICIENT_EVIDENCE,
+        Agent 3 acts as an advocate arguing FOR satisfaction by discovering clinical evidence,
+        synonyms, paraphrases, or subtypes in the note supporting satisfaction.
+        Returns an AdvocacyResult (advocacy_quote + rationale).
+        """
+        t0 = time.perf_counter()
+        ccode = criterion.get("criterion_code", "CRIT-UNKNOWN")
+        cname = criterion.get("name", "")
+        cdesc = criterion.get("description", cname)
+        cintent = criterion.get("clinical_intent", "")
+
+        # Budget checks
+        if self.case_call_count >= self.max_calls_per_case:
+            logger.warning(f"Advocacy budget exceeded ({self.case_call_count}/{self.max_calls_per_case}) on {ccode}.")
+            return AdvocacyResult(
+                advocacy_quote="",
+                rationale="Advocacy call budget exceeded; cannot argue for satisfaction.",
+                elapsed_ms=0.0,
+                status_code="SKIPPED_BUDGET_EXHAUSTED"
+            )
+
+        if self.case_elapsed_ms >= (self.max_time_per_case_seconds * 1000.0):
+            logger.warning(f"Advocacy time budget exceeded ({self.case_elapsed_ms:.1f}ms / {self.max_time_per_case_seconds*1000}ms).")
+            return AdvocacyResult(
+                advocacy_quote="",
+                rationale="Advocacy time budget exceeded; cannot argue for satisfaction.",
+                elapsed_ms=0.0,
+                status_code="SKIPPED_BUDGET_EXHAUSTED"
+            )
+
+        prompt = (
+            f"You are Agent 3 acting as a clinical advocate examining a prior authorization criterion.\n"
+            f"The initial evaluation did not find evidence for this criterion. Your role is to examine the full clinical note "
+            f"to determine if there is valid clinical evidence, medical synonyms, subtypes, or paraphrases that support satisfaction.\n\n"
+            f"CRITERION:\n"
+            f"- Code: {ccode}\n"
+            f"- Name: {cname}\n"
+            f"- Statutory Requirement: {cdesc}\n"
+            f"- Clinical Intent: {cintent}\n\n"
+            f"FULL CLINICAL NOTE:\n\"\"\"\n{note_text}\n\"\"\"\n\n"
+            f"TASK:\n"
+            f"1. Search the note for any documented medical finding, diagnostic report, treatment history, symptom, or synonym that satisfies the clinical intent of this requirement.\n"
+            f"2. If supporting evidence exists, extract the EXACT verbatim quote (advocacy_quote) from the note and provide a concise clinical rationale explaining how it satisfies the requirement.\n"
+            f"3. If the note truly contains no evidence supporting satisfaction, return advocacy_quote as an empty string (\"\") and explain that no supporting evidence exists.\n\n"
+            f"GOVERNING RULES:\n"
+            f"- 'advocacy_quote' MUST be an exact character-for-character excerpt from the clinical note. Never invent or paraphrase the quote.\n"
+            f"- Output ONLY JSON matching this exact structure:\n"
+            f"{{\n"
+            f'  "advocacy_quote": "<verbatim excerpt from note or empty string>",\n'
+            f'  "rationale": "<clinical explanation of satisfaction>"\n'
+            f"}}"
+        )
+
+        payload = {
+            "model": self.model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.0,
+            "response_format": {"type": "json_object"},
+            "max_tokens": 200
+        }
+
+        try:
+            with httpx.Client(timeout=self.timeout_seconds) as client:
+                resp = client.post(self.endpoint_url, json=payload)
+
+            elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_judge_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
+
+            if resp.status_code != 200:
+                return AdvocacyResult(
+                    advocacy_quote="",
+                    rationale=f"LLM endpoint HTTP {resp.status_code}; advocacy call failed.",
+                    elapsed_ms=elapsed_ms,
+                    status_code=f"HTTP_{resp.status_code}"
+                )
+
+            data = resp.json()
+            content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
+            try:
+                parsed = json.loads(content)
+            except (json.JSONDecodeError, ValueError):
+                m_quote = re.search(r'"advocacy_quote":\s*"([^"]*)"', content)
+                m_rat = re.search(r'"rationale":\s*"([^"]+)"', content)
+                parsed = {
+                    "advocacy_quote": m_quote.group(1) if m_quote else "",
+                    "rationale": m_rat.group(1) if m_rat else "Extracted from partial response"
+                }
+
+            quote = str(parsed.get("advocacy_quote", "")).strip()
+            rationale = str(parsed.get("rationale", "No rationale provided.")).strip()
+
+            return AdvocacyResult(
+                advocacy_quote=quote,
+                rationale=rationale,
+                elapsed_ms=elapsed_ms,
+                status_code="COMPLETED"
+            )
+        except (httpx.HTTPError, TimeoutError, ValueError, KeyError, RuntimeError) as exc:
+            elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_judge_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
+            logger.debug(f"Advocacy query exception: {exc}")
+            return AdvocacyResult(
+                advocacy_quote="",
+                rationale=f"Advocacy query exception: {exc!s}",
+                elapsed_ms=elapsed_ms,
+                status_code="ERROR"
+            )
+
 
