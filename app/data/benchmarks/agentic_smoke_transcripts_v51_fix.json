@@ -1,0 +1,2508 @@
+{
+  "metadata": {
+    "timestamp": "2026-11-15T01:27:10.273631+00:00",
+    "description": "Committed board transcripts and routing metadata for v51-fix smoke check",
+    "model": "qwen2.5:3b (local Ollama)",
+    "budget": "3 calls / 30s per case",
+    "execution_mode": "agentic"
+  },
+  "three_case_smoke": [
+    {
+      "case_id": "DEV-LCD-IMRT-APP",
+      "policy_id": "LCD-IMRT",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 9,
+      "turns_taken": 6,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": false,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 1,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-799AA927D4",
+          "timestamp": "2026-11-15T01:21:48.803571Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-IMRT selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-IMRT",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-9CF5351534",
+          "timestamp": "2026-11-15T01:21:48.814590Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-IMRT ('Intensity-Modulated Radiation Therapy (IMRT)') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-IMRT",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-A1339FCA2F",
+          "timestamp": "2026-11-15T01:21:48.907441Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 2 settled deterministically (CRIT-IMRT-EXCL-01, CRIT-IMRT-01), 1 need LLM judgment (CRIT-IMRT-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-IMRT-EXCL-01",
+              "CRIT-IMRT-01"
+            ],
+            "needs_judge": [
+              "CRIT-IMRT-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-IMRT-01": "SETTLED_DETERMINISTIC",
+              "CRIT-IMRT-02": "NEEDS_JUDGE",
+              "CRIT-IMRT-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-E01C29BB07",
+          "timestamp": "2026-11-15T01:21:48.907441Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-IMRT-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-IMRT-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-622CF76F81",
+          "timestamp": "2026-11-15T01:21:48.908459Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-IMRT-01",
+          "evidence": {
+            "source_text": "prostate adenocarcinoma",
+            "start_char": 145,
+            "end_char": 168,
+            "clinical_section": "Clinical Documentation",
+            "confidence": 0.9,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Inclusion criterion CRIT-IMRT-01 satisfied deterministically: 'prostate adenocarcinoma' (Raw confidence: 0.92).",
+          "metadata": {
+            "deterministic": true,
+            "raw_confidence": 0.92
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-6B2FA1CD54",
+          "timestamp": "2026-11-15T01:21:54.510170Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-IMRT-02",
+          "evidence": {
+            "quoted_evidence": "The inverse imrt plan achieves concave dose escalation to 78 Gy while reducing rectal V70 to 14% and bladder wall dose below mandatory constraints."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-IMRT-02: status=NOT_MET (Rationale: The clinical note does not document that 3D conformal radiation would exceed safe dose constraints to the parotid glands, rectum/bladder, or optic nerves. Instead, it describes a successful inverse intensity-modulated radiation therapy (IMRT) plan that reduces the dose to these critical organs.; quoted_evidence: 'The inverse imrt plan achieves concave dose escalation to 78 Gy while reducing r...').",
+          "metadata": {
+            "status": "NOT_MET",
+            "confidence": 0.85,
+            "elapsed_ms": 5601.53,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-89CC8133AD",
+          "timestamp": "2026-11-15T01:21:58.238551Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-IMRT-02",
+          "evidence": {
+            "source_text": "ASSESSMENT & PLAN: Clinically localized prostate malignancy requiring steep dose gradient adjacent to critical organs at risk",
+            "start_char": 531,
+            "end_char": 656
+          },
+          "content": "LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Clinically localized prostate malignancy requiring steep dose gradient adjacent to critical organs at risk': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not specify a comparison to 3D conformal radiation and does not mention parotid glands, rectum/bladder, or optic nerves.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 3728.42
+          }
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-B2A65375A0",
+          "timestamp": "2026-11-15T01:22:02.133661Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-IMRT-02",
+          "evidence": {
+            "source_text": "OBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%)",
+            "start_char": 268,
+            "end_char": 381
+          },
+          "content": "LLM Judge evaluated candidate span 'OBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%)': verdict=NOT_EQUIVALENT (Rationale: The evidence mentions rectal V70 > 25%, which is specific to the rectum, not the parotid glands, rectum/bladder, or optic nerves as required by the criterion.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 3894.76
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-9DBB487BDA",
+          "timestamp": "2026-11-15T01:22:02.135785Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-IMRT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Insufficient evidence for mandatory coverage criteria: [CRIT-IMRT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+            "sufficiency_score": 0.7733
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-E6778B842580]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-IMRT selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-IMRT, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-IMRT ('Intensity-Modulated Radiation Therapy (IMRT)') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-IMRT, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 2 settled deterministically (CRIT-IMRT-EXCL-01, CRIT-IMRT-01), 1 need LLM judgment (CRIT-IMRT-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-IMRT-EXCL-01', 'CRIT-IMRT-01'], needs_judge=['CRIT-IMRT-02'], missing_evidence=[], routing={'CRIT-IMRT-01': 'SETTLED_DETERMINISTIC', 'CRIT-IMRT-02': 'NEEDS_JUDGE', 'CRIT-IMRT-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-IMRT-EXCL-01\n     Content:  Statutory exclusion CRIT-IMRT-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-IMRT-01\n     Content:  Inclusion criterion CRIT-IMRT-01 satisfied deterministically: 'prostate adenocarcinoma' (Raw confidence: 0.92).\n     Evidence: \"prostate adenocarcinoma\" [145:168]\n     Metadata: deterministic=True, raw_confidence=0.92\n\n[#06] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-IMRT-02\n     Content:  LLM Judge evaluated criterion CRIT-IMRT-02: status=NOT_MET (Rationale: The clinical note does not document that 3D conformal radiation would exceed safe dose constraints to the parotid glands, rectum/bladder, or optic nerves. Instead, it describes a successful inverse intensity-modulated radiation therapy (IMRT) plan that reduces the dose to these critical organs.; quoted_evidence: 'The inverse imrt plan achieves concave dose escalation to 78 Gy while reducing r...').\n     Evidence: \"None\"\n     Metadata: status=NOT_MET, confidence=0.85, elapsed_ms=5601.53, status_code=COMPLETED\n\n[#07] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-IMRT-02\n     Content:  LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Clinically localized prostate malignancy requiring steep dose gradient adjacent to critical organs at risk': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not specify a comparison to 3D conformal radiation and does not mention parotid glands, rectum/bladder, or optic nerves.).\n     Evidence: \"ASSESSMENT & PLAN: Clinically localized prostate malignancy requiring steep dose gradient adjacent to critical organs at risk\" [531:656]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=3728.42\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-IMRT-02\n     Content:  LLM Judge evaluated candidate span 'OBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%)': verdict=NOT_EQUIVALENT (Rationale: The evidence mentions rectal V70 > 25%, which is specific to the rectum, not the parotid glands, rectum/bladder, or optic nerves as required by the criterion.).\n     Evidence: \"OBJECTIVE: Dosimetric planning comparison completed: 3D-CRT plan exceeds rectal wall tolerance (rectal V70 > 25%)\" [268:381]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=3894.76\n\n[#09] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-IMRT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).\n     Metadata: tau=0.85, abstention_reason=Insufficient evidence for mandatory coverage criteria: [CRIT-IMRT-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85)., sufficiency_score=0.7733\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-LCD-KYPHO-APP",
+      "policy_id": "LCD-KYPHO",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 11,
+      "turns_taken": 7,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": true,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 2,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-EB34D337A8",
+          "timestamp": "2026-11-15T01:22:02.152236Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-KYPHO selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-KYPHO",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-FA0C6B8973",
+          "timestamp": "2026-11-15T01:22:02.153236Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-KYPHO ('Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-KYPHO",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-0463E51A1E",
+          "timestamp": "2026-11-15T01:22:02.205802Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 1 settled deterministically (CRIT-KYPHO-EXCL-01), 2 need LLM judgment (CRIT-KYPHO-01, CRIT-KYPHO-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-KYPHO-EXCL-01"
+            ],
+            "needs_judge": [
+              "CRIT-KYPHO-01",
+              "CRIT-KYPHO-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-KYPHO-01": "NEEDS_JUDGE",
+              "CRIT-KYPHO-02": "NEEDS_JUDGE",
+              "CRIT-KYPHO-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-44635E9BDA",
+          "timestamp": "2026-11-15T01:22:02.205802Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-KYPHO-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-KYPHO-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-C82DC0E6BB",
+          "timestamp": "2026-11-15T01:22:09.060452Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": {
+            "quoted_evidence": "Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks with persistent inability to ambulate. Denies fever. Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema. No signs of spinal infection."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-KYPHO-01: status=MET (Rationale: The clinical note explicitly states a severe focal spinous process percussion tenderness at T12, along with MRI findings of an acute osteoporotic vertebral compression fracture with intense hyperintensity on STIR imaging, which satisfies the requirement of severe debilitating focal vertebral pain with a pain score of 6/10 or higher on the numeric rating scale (NRS).; quoted_evidence: 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled ora...').",
+          "metadata": {
+            "status": "MET",
+            "confidence": 0.92,
+            "elapsed_ms": 6854.16,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-D052163B01",
+          "timestamp": "2026-11-15T01:22:09.062658Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": null,
+          "content": "Gate A Failure on CRIT-KYPHO-01: Quoted evidence 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks with persistent inability to ambulate. Denies fever. Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema. No signs of spinal infection.' could not be located in narrative.",
+          "metadata": {
+            "gate": "Gate A",
+            "failing_gate": "Gate A"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-2883408ACC",
+          "timestamp": "2026-11-15T01:22:09.062658Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-KYPHO-01: Gate A ungrounded quote; withdrawing judgment.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-FFF59B5632",
+          "timestamp": "2026-11-15T01:22:13.022070Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": {
+            "source_text": "Pain rating is 8/10 on visual analog scale",
+            "start_char": 224,
+            "end_char": 266
+          },
+          "content": "LLM Judge evaluated candidate span 'Pain rating is 8/10 on visual analog scale': verdict=NOT_EQUIVALENT (Rationale: The pain score of 8/10 on the visual analog scale does not match the criterion's requirement of a score of 6/10.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 3959.09
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-B5B3BB64D2",
+          "timestamp": "2026-11-15T01:22:16.847711Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": {
+            "source_text": "SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago",
+            "start_char": 104,
+            "end_char": 222
+          },
+          "content": "LLM Judge evaluated candidate span 'SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago': verdict=NOT_EQUIVALENT (Rationale: The clinical note describes a patient with severe mid-back pain but does not specify the pain score or the type of pain (e.g., focal vertebral pain).).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 3825.37
+          }
+        },
+        {
+          "sequence_number": 10,
+          "message_id": "MSG-7A7B18A984",
+          "timestamp": "2026-11-15T01:22:16.847711Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": "CRIT-KYPHO-02",
+          "evidence": null,
+          "content": "HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.",
+          "metadata": {
+            "resource": "LLM_CALLS",
+            "limit": 3
+          }
+        },
+        {
+          "sequence_number": 11,
+          "message_id": "MSG-D0E36E51BD",
+          "timestamp": "2026-11-15T01:22:16.847711Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+            "sufficiency_score": 0.5
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-7DE1624C2F6A]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-KYPHO selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-KYPHO, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-KYPHO ('Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-KYPHO, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 1 settled deterministically (CRIT-KYPHO-EXCL-01), 2 need LLM judgment (CRIT-KYPHO-01, CRIT-KYPHO-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-KYPHO-EXCL-01'], needs_judge=['CRIT-KYPHO-01', 'CRIT-KYPHO-02'], missing_evidence=[], routing={'CRIT-KYPHO-01': 'NEEDS_JUDGE', 'CRIT-KYPHO-02': 'NEEDS_JUDGE', 'CRIT-KYPHO-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-KYPHO-EXCL-01\n     Content:  Statutory exclusion CRIT-KYPHO-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-KYPHO-01\n     Content:  LLM Judge evaluated criterion CRIT-KYPHO-01: status=MET (Rationale: The clinical note explicitly states a severe focal spinous process percussion tenderness at T12, along with MRI findings of an acute osteoporotic vertebral compression fracture with intense hyperintensity on STIR imaging, which satisfies the requirement of severe debilitating focal vertebral pain with a pain score of 6/10 or higher on the numeric rating scale (NRS).; quoted_evidence: 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled ora...').\n     Evidence: \"None\"\n     Metadata: status=MET, confidence=0.92, elapsed_ms=6854.16, status_code=COMPLETED\n\n[#06] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-KYPHO-01\n     Content:  Gate A Failure on CRIT-KYPHO-01: Quoted evidence 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks with persistent inability to ambulate. Denies fever. Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema. No signs of spinal infection.' could not be located in narrative.\n     Metadata: gate=Gate A, failing_gate=Gate A\n\n[#07] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-KYPHO-01\n     Content:  Conceding challenge on CRIT-KYPHO-01: Gate A ungrounded quote; withdrawing judgment.\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-KYPHO-01\n     Content:  LLM Judge evaluated candidate span 'Pain rating is 8/10 on visual analog scale': verdict=NOT_EQUIVALENT (Rationale: The pain score of 8/10 on the visual analog scale does not match the criterion's requirement of a score of 6/10.).\n     Evidence: \"Pain rating is 8/10 on visual analog scale\" [224:266]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=3959.09\n\n[#09] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-KYPHO-01\n     Content:  LLM Judge evaluated candidate span 'SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago': verdict=NOT_EQUIVALENT (Rationale: The clinical note describes a patient with severe mid-back pain but does not specify the pain score or the type of pain (e.g., focal vertebral pain).).\n     Evidence: \"SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago\" [104:222]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=3825.37\n\n[#10] [Agent 4: Abstention Gate] -> HALT | Criterion: CRIT-KYPHO-02\n     Content:  HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.\n     Metadata: resource=LLM_CALLS, limit=3\n\n[#11] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.\n     Metadata: tau=0.85, abstention_reason=Operational budget exhausted: Execution bounds reached; case deferred to human review., sufficiency_score=0.5\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-LCD-ACDF-APP",
+      "policy_id": "LCD-ACDF",
+      "decision": "APPROVED",
+      "message_count": 7,
+      "turns_taken": 4,
+      "judge_calls": 0,
+      "has_plan": true,
+      "has_judgment": false,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": false,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 0,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 0,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-3380EDC4F6",
+          "timestamp": "2026-11-15T01:22:16.856069Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-ACDF selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-ACDF",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-03455340EC",
+          "timestamp": "2026-11-15T01:22:16.857628Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-ACDF ('Anterior Cervical Discectomy and Fusion (ACDF)') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-ACDF",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-CA66C4CF2A",
+          "timestamp": "2026-11-15T01:22:16.933766Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 3 settled deterministically (CRIT-ACDF-EXCL-01, CRIT-ACDF-01, CRIT-ACDF-02), 0 need LLM judgment (none), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-ACDF-EXCL-01",
+              "CRIT-ACDF-01",
+              "CRIT-ACDF-02"
+            ],
+            "needs_judge": [],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-ACDF-01": "SETTLED_DETERMINISTIC",
+              "CRIT-ACDF-02": "SETTLED_DETERMINISTIC",
+              "CRIT-ACDF-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-8CE855021B",
+          "timestamp": "2026-11-15T01:22:16.933766Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-ACDF-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-ACDF-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-1A025E9A61",
+          "timestamp": "2026-11-15T01:22:16.933766Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-ACDF-01",
+          "evidence": {
+            "source_text": "cervical disc herniation",
+            "start_char": 493,
+            "end_char": 517,
+            "clinical_section": "Clinical Documentation",
+            "confidence": 0.9,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Inclusion criterion CRIT-ACDF-01 satisfied deterministically: 'cervical disc herniation' (Raw confidence: 0.92).",
+          "metadata": {
+            "deterministic": true,
+            "raw_confidence": 0.92
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-A35BB2B3D5",
+          "timestamp": "2026-11-15T01:22:16.933766Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-ACDF-02",
+          "evidence": {
+            "source_text": "cervical physical therapy and oral NSAID treatment for 8 weeks",
+            "start_char": 264,
+            "end_char": 326,
+            "clinical_section": "Clinical Documentation",
+            "confidence": 0.96,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Inclusion criterion CRIT-ACDF-02 satisfied deterministically: 'cervical physical therapy and oral NSAID treatment for 8 weeks' (Raw confidence: 0.96).",
+          "metadata": {
+            "deterministic": true,
+            "raw_confidence": 0.96
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-8E22A2FC0D",
+          "timestamp": "2026-11-15T01:22:16.933766Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "DECISION",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Final Determination: APPROVED. All statutory coverage requirements satisfied with aggregate calibrated sufficiency 0.943 >= tau (0.85).",
+          "metadata": {
+            "decision": "APPROVED",
+            "sufficiency_score": 0.9433
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-B68EB87CE6E1]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-ACDF selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-ACDF, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-ACDF ('Anterior Cervical Discectomy and Fusion (ACDF)') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-ACDF, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 3 settled deterministically (CRIT-ACDF-EXCL-01, CRIT-ACDF-01, CRIT-ACDF-02), 0 need LLM judgment (none), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-ACDF-EXCL-01', 'CRIT-ACDF-01', 'CRIT-ACDF-02'], needs_judge=[], missing_evidence=[], routing={'CRIT-ACDF-01': 'SETTLED_DETERMINISTIC', 'CRIT-ACDF-02': 'SETTLED_DETERMINISTIC', 'CRIT-ACDF-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-ACDF-EXCL-01\n     Content:  Statutory exclusion CRIT-ACDF-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-ACDF-01\n     Content:  Inclusion criterion CRIT-ACDF-01 satisfied deterministically: 'cervical disc herniation' (Raw confidence: 0.92).\n     Evidence: \"cervical disc herniation\" [493:517]\n     Metadata: deterministic=True, raw_confidence=0.92\n\n[#06] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-ACDF-02\n     Content:  Inclusion criterion CRIT-ACDF-02 satisfied deterministically: 'cervical physical therapy and oral NSAID treatment for 8 weeks' (Raw confidence: 0.96).\n     Evidence: \"cervical physical therapy and oral NSAID treatment for 8 weeks\" [264:326]\n     Metadata: deterministic=True, raw_confidence=0.96\n\n[#07] [Agent 4: Abstention Gate] -> DECISION\n     Content:  Final Determination: APPROVED. All statutory coverage requirements satisfied with aggregate calibrated sufficiency 0.943 >= tau (0.85).\n     Metadata: decision=APPROVED, sufficiency_score=0.9433\n\n================================================================================"
+    }
+  ],
+  "nine_case_synonymy_smoke": [
+    {
+      "case_id": "DEV-LCD-KYPHO-APP",
+      "policy_id": "LCD-KYPHO",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 11,
+      "turns_taken": 7,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": true,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 2,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-5CF731ED8D",
+          "timestamp": "2026-11-15T01:22:16.936767Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-KYPHO selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-KYPHO",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-9D69EF838C",
+          "timestamp": "2026-11-15T01:22:16.937768Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-KYPHO ('Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-KYPHO",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-62AA30E6F3",
+          "timestamp": "2026-11-15T01:22:16.987962Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 1 settled deterministically (CRIT-KYPHO-EXCL-01), 2 need LLM judgment (CRIT-KYPHO-01, CRIT-KYPHO-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-KYPHO-EXCL-01"
+            ],
+            "needs_judge": [
+              "CRIT-KYPHO-01",
+              "CRIT-KYPHO-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-KYPHO-01": "NEEDS_JUDGE",
+              "CRIT-KYPHO-02": "NEEDS_JUDGE",
+              "CRIT-KYPHO-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-0072DFD1C3",
+          "timestamp": "2026-11-15T01:22:16.987962Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-KYPHO-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-KYPHO-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-575FF5521B",
+          "timestamp": "2026-11-15T01:22:24.057785Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": {
+            "quoted_evidence": "Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks with persistent inability to ambulate. Denies fever. Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema. No signs of spinal infection."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-KYPHO-01: status=MET (Rationale: The clinical note explicitly states a severe focal spinous process percussion tenderness at T12, along with MRI findings of an acute osteoporotic vertebral compression fracture with intense hyperintensity on STIR imaging, which satisfies the requirement of severe debilitating focal vertebral pain with a pain score of 6/10 or higher on the numeric rating scale (NRS).; quoted_evidence: 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled ora...').",
+          "metadata": {
+            "status": "MET",
+            "confidence": 0.92,
+            "elapsed_ms": 7069.09,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-5E4D5236C0",
+          "timestamp": "2026-11-15T01:22:24.057785Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": null,
+          "content": "Gate A Failure on CRIT-KYPHO-01: Quoted evidence 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks with persistent inability to ambulate. Denies fever. Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema. No signs of spinal infection.' could not be located in narrative.",
+          "metadata": {
+            "gate": "Gate A",
+            "failing_gate": "Gate A"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-365761352C",
+          "timestamp": "2026-11-15T01:22:24.057785Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-KYPHO-01: Gate A ungrounded quote; withdrawing judgment.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-49E2DB5A6A",
+          "timestamp": "2026-11-15T01:22:27.865720Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": {
+            "source_text": "Pain rating is 8/10 on visual analog scale",
+            "start_char": 224,
+            "end_char": 266
+          },
+          "content": "LLM Judge evaluated candidate span 'Pain rating is 8/10 on visual analog scale': verdict=NOT_EQUIVALENT (Rationale: The pain score of 8/10 on the visual analog scale does not match the criterion's requirement of a score of 6/10.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 3807.49
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-69079B7736",
+          "timestamp": "2026-11-15T01:22:31.512202Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-KYPHO-01",
+          "evidence": {
+            "source_text": "SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago",
+            "start_char": 104,
+            "end_char": 222
+          },
+          "content": "LLM Judge evaluated candidate span 'SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago': verdict=NOT_EQUIVALENT (Rationale: The clinical note describes a patient with severe mid-back pain but does not specify the pain score or the type of pain (e.g., focal vertebral pain).).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 3646.08
+          }
+        },
+        {
+          "sequence_number": 10,
+          "message_id": "MSG-0F9A852020",
+          "timestamp": "2026-11-15T01:22:31.512202Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": "CRIT-KYPHO-02",
+          "evidence": null,
+          "content": "HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.",
+          "metadata": {
+            "resource": "LLM_CALLS",
+            "limit": 3
+          }
+        },
+        {
+          "sequence_number": 11,
+          "message_id": "MSG-9443FD4DCA",
+          "timestamp": "2026-11-15T01:22:31.512202Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+            "sufficiency_score": 0.5
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-3F7716D78E38]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-KYPHO selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-KYPHO, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-KYPHO ('Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-KYPHO, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 1 settled deterministically (CRIT-KYPHO-EXCL-01), 2 need LLM judgment (CRIT-KYPHO-01, CRIT-KYPHO-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-KYPHO-EXCL-01'], needs_judge=['CRIT-KYPHO-01', 'CRIT-KYPHO-02'], missing_evidence=[], routing={'CRIT-KYPHO-01': 'NEEDS_JUDGE', 'CRIT-KYPHO-02': 'NEEDS_JUDGE', 'CRIT-KYPHO-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-KYPHO-EXCL-01\n     Content:  Statutory exclusion CRIT-KYPHO-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-KYPHO-01\n     Content:  LLM Judge evaluated criterion CRIT-KYPHO-01: status=MET (Rationale: The clinical note explicitly states a severe focal spinous process percussion tenderness at T12, along with MRI findings of an acute osteoporotic vertebral compression fracture with intense hyperintensity on STIR imaging, which satisfies the requirement of severe debilitating focal vertebral pain with a pain score of 6/10 or higher on the numeric rating scale (NRS).; quoted_evidence: 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled ora...').\n     Evidence: \"None\"\n     Metadata: status=MET, confidence=0.92, elapsed_ms=7069.09, status_code=COMPLETED\n\n[#06] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-KYPHO-01\n     Content:  Gate A Failure on CRIT-KYPHO-01: Quoted evidence 'Percutaneous vertebral augmentation kyphoplasty. Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks with persistent inability to ambulate. Denies fever. Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging demonstrating acute osteoporotic vcf with bone edema. No signs of spinal infection.' could not be located in narrative.\n     Metadata: gate=Gate A, failing_gate=Gate A\n\n[#07] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-KYPHO-01\n     Content:  Conceding challenge on CRIT-KYPHO-01: Gate A ungrounded quote; withdrawing judgment.\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-KYPHO-01\n     Content:  LLM Judge evaluated candidate span 'Pain rating is 8/10 on visual analog scale': verdict=NOT_EQUIVALENT (Rationale: The pain score of 8/10 on the visual analog scale does not match the criterion's requirement of a score of 6/10.).\n     Evidence: \"Pain rating is 8/10 on visual analog scale\" [224:266]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=3807.49\n\n[#09] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-KYPHO-01\n     Content:  LLM Judge evaluated candidate span 'SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago': verdict=NOT_EQUIVALENT (Rationale: The clinical note describes a patient with severe mid-back pain but does not specify the pain score or the type of pain (e.g., focal vertebral pain).).\n     Evidence: \"SUBJECTIVE: 79-year-old female presenting with sudden severe midline mid-back pain after lifting groceries 18 days ago\" [104:222]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=3646.08\n\n[#10] [Agent 4: Abstention Gate] -> HALT | Criterion: CRIT-KYPHO-02\n     Content:  HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.\n     Metadata: resource=LLM_CALLS, limit=3\n\n[#11] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.\n     Metadata: tau=0.85, abstention_reason=Operational budget exhausted: Execution bounds reached; case deferred to human review., sufficiency_score=0.5\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-LCD-MRI-BRAIN-APP",
+      "policy_id": "LCD-MRI-BRAIN",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 9,
+      "turns_taken": 6,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": false,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 1,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-56271CF22E",
+          "timestamp": "2026-11-15T01:22:31.519816Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-MRI-BRAIN selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-MRI-BRAIN",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-9AB3821259",
+          "timestamp": "2026-11-15T01:22:31.520938Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-MRI-BRAIN ('Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-MRI-BRAIN",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-750DDE9BA2",
+          "timestamp": "2026-11-15T01:22:31.595069Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 2 settled deterministically (CRIT-MRIB-EXCL-01, CRIT-MRIB-01), 1 need LLM judgment (CRIT-MRIB-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-MRIB-EXCL-01",
+              "CRIT-MRIB-01"
+            ],
+            "needs_judge": [
+              "CRIT-MRIB-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-MRIB-01": "SETTLED_DETERMINISTIC",
+              "CRIT-MRIB-02": "NEEDS_JUDGE",
+              "CRIT-MRIB-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-DF462FD6D6",
+          "timestamp": "2026-11-15T01:22:31.595069Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-MRIB-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-MRIB-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-1C2CD8B6AE",
+          "timestamp": "2026-11-15T01:22:31.595069Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-MRIB-01",
+          "evidence": {
+            "source_text": "focal neurological deficit",
+            "start_char": 507,
+            "end_char": 533,
+            "clinical_section": "Assessment & Plan",
+            "confidence": 0.9,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Inclusion criterion CRIT-MRIB-01 satisfied deterministically: 'focal neurological deficit' (Raw confidence: 0.92).",
+          "metadata": {
+            "deterministic": true,
+            "raw_confidence": 0.92
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-FFB6E3B63D",
+          "timestamp": "2026-11-15T01:22:46.270116Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-MRIB-02",
+          "evidence": {
+            "quoted_evidence": ""
+          },
+          "content": "LLM Judge evaluated criterion CRIT-MRIB-02: status=MISSING (Rationale: The clinical note does not contain information addressing the specific requirement of progressive headache with red flags or abnormal exam.; quoted_evidence: '...').",
+          "metadata": {
+            "status": "MISSING",
+            "confidence": 0.85,
+            "elapsed_ms": 14674.07,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-27A4200C37",
+          "timestamp": "2026-11-15T01:22:58.210685Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-MRIB-02",
+          "evidence": {
+            "source_text": "SUBJECTIVE: 58-year-old presenting with four days of progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness",
+            "start_char": 102,
+            "end_char": 282
+          },
+          "content": "LLM Judge evaluated candidate span 'SUBJECTIVE: 58-year-old presenting with four days of progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness': verdict=AMBIGUOUS (Rationale: The clinical note describes symptoms of right upper extremity clumsiness, expressive word-finding difficulty, and right facial numbness, which do not directly align with the specified clinical fact of progressive headache with red flags or abnormal exam.).",
+          "metadata": {
+            "verdict": "AMBIGUOUS",
+            "latency_ms": 11940.53
+          }
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-AE59AF8A9A",
+          "timestamp": "2026-11-15T01:23:06.376888Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-MRIB-02",
+          "evidence": {
+            "source_text": "OBJECTIVE: Cranial nerve exam reveals right central facial droop",
+            "start_char": 284,
+            "end_char": 348
+          },
+          "content": "LLM Judge evaluated candidate span 'OBJECTIVE: Cranial nerve exam reveals right central facial droop': verdict=AMBIGUOUS (Rationale: The cranial nerve exam finding does not specify a progressive headache or any of the red flags mentioned in the criterion.).",
+          "metadata": {
+            "verdict": "AMBIGUOUS",
+            "latency_ms": 8165.74
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-B8BBE90670",
+          "timestamp": "2026-11-15T01:23:06.376888Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-MRIB-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Insufficient evidence for mandatory coverage criteria: [CRIT-MRIB-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+            "sufficiency_score": 0.7733
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-0D0E66EDC1B0]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-MRI-BRAIN selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-MRI-BRAIN, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-MRI-BRAIN ('Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-MRI-BRAIN, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 2 settled deterministically (CRIT-MRIB-EXCL-01, CRIT-MRIB-01), 1 need LLM judgment (CRIT-MRIB-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-MRIB-EXCL-01', 'CRIT-MRIB-01'], needs_judge=['CRIT-MRIB-02'], missing_evidence=[], routing={'CRIT-MRIB-01': 'SETTLED_DETERMINISTIC', 'CRIT-MRIB-02': 'NEEDS_JUDGE', 'CRIT-MRIB-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-MRIB-EXCL-01\n     Content:  Statutory exclusion CRIT-MRIB-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-MRIB-01\n     Content:  Inclusion criterion CRIT-MRIB-01 satisfied deterministically: 'focal neurological deficit' (Raw confidence: 0.92).\n     Evidence: \"focal neurological deficit\" [507:533]\n     Metadata: deterministic=True, raw_confidence=0.92\n\n[#06] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-MRIB-02\n     Content:  LLM Judge evaluated criterion CRIT-MRIB-02: status=MISSING (Rationale: The clinical note does not contain information addressing the specific requirement of progressive headache with red flags or abnormal exam.; quoted_evidence: '...').\n     Evidence: \"None\"\n     Metadata: status=MISSING, confidence=0.85, elapsed_ms=14674.07, status_code=COMPLETED\n\n[#07] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-MRIB-02\n     Content:  LLM Judge evaluated candidate span 'SUBJECTIVE: 58-year-old presenting with four days of progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness': verdict=AMBIGUOUS (Rationale: The clinical note describes symptoms of right upper extremity clumsiness, expressive word-finding difficulty, and right facial numbness, which do not directly align with the specified clinical fact of progressive headache with red flags or abnormal exam.).\n     Evidence: \"SUBJECTIVE: 58-year-old presenting with four days of progressive right upper extremity clumsiness, mild expressive word-finding difficulty, and new asymmetric right facial numbness\" [102:282]\n     Metadata: verdict=AMBIGUOUS, latency_ms=11940.53\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-MRIB-02\n     Content:  LLM Judge evaluated candidate span 'OBJECTIVE: Cranial nerve exam reveals right central facial droop': verdict=AMBIGUOUS (Rationale: The cranial nerve exam finding does not specify a progressive headache or any of the red flags mentioned in the criterion.).\n     Evidence: \"OBJECTIVE: Cranial nerve exam reveals right central facial droop\" [284:348]\n     Metadata: verdict=AMBIGUOUS, latency_ms=8165.74\n\n[#09] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-MRIB-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).\n     Metadata: tau=0.85, abstention_reason=Insufficient evidence for mandatory coverage criteria: [CRIT-MRIB-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85)., sufficiency_score=0.7733\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-LCD-MRI-LUMBAR-APP",
+      "policy_id": "LCD-MRI-LUMBAR",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 9,
+      "turns_taken": 6,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": false,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 1,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-17898602C7",
+          "timestamp": "2026-11-15T01:23:06.394385Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-MRI-LUMBAR selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-MRI-LUMBAR",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-501C289E0F",
+          "timestamp": "2026-11-15T01:23:06.395385Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-MRI-LUMBAR ('Magnetic Resonance Imaging (MRI) of the Lumbar Spine') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-MRI-LUMBAR",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-F16D4CDB10",
+          "timestamp": "2026-11-15T01:23:06.473171Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 2 settled deterministically (CRIT-MRIL-EXCL-01, CRIT-MRIL-01), 1 need LLM judgment (CRIT-MRIL-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-MRIL-EXCL-01",
+              "CRIT-MRIL-01"
+            ],
+            "needs_judge": [
+              "CRIT-MRIL-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-MRIL-01": "SETTLED_DETERMINISTIC",
+              "CRIT-MRIL-02": "NEEDS_JUDGE",
+              "CRIT-MRIL-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-4778506BFF",
+          "timestamp": "2026-11-15T01:23:06.473171Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-MRIL-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-MRIL-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-1B91EA31F3",
+          "timestamp": "2026-11-15T01:23:06.473171Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-MRIL-01",
+          "evidence": {
+            "source_text": "lumbar radiculopathy",
+            "start_char": 546,
+            "end_char": 566,
+            "clinical_section": "Clinical Documentation",
+            "confidence": 0.9,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Inclusion criterion CRIT-MRIL-01 satisfied deterministically: 'lumbar radiculopathy' (Raw confidence: 0.92).",
+          "metadata": {
+            "deterministic": true,
+            "raw_confidence": 0.92
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-6E5BF75CCD",
+          "timestamp": "2026-11-15T01:23:21.294625Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-MRIL-02",
+          "evidence": {
+            "quoted_evidence": "Persistent lumbosacral nerve root compression with objective motor deficit following failed 6-week conservative trial. Plan: Magnetic resonance imaging of the lumbar spine."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-MRIL-02: status=NOT_MET (Rationale: The clinical note does not mention any plain lumbar radiographs performed prior to or in conjunction with the advanced imaging request for the lumbar spine.; quoted_evidence: 'Persistent lumbosacral nerve root compression with objective motor deficit follo...').",
+          "metadata": {
+            "status": "NOT_MET",
+            "confidence": 0.85,
+            "elapsed_ms": 14820.5,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-5AE2F02299",
+          "timestamp": "2026-11-15T01:23:31.167246Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-MRIL-02",
+          "evidence": {
+            "source_text": "Plan: Magnetic resonance imaging of the lumbar spine without contrast",
+            "start_char": 706,
+            "end_char": 775
+          },
+          "content": "LLM Judge evaluated candidate span 'Plan: Magnetic resonance imaging of the lumbar spine without contrast': verdict=AMBIGUOUS (Rationale: The MRI plan does not specify whether it is preceded by plain lumbar radiographs.).",
+          "metadata": {
+            "verdict": "AMBIGUOUS",
+            "latency_ms": 9872.7
+          }
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-55D1172129",
+          "timestamp": "2026-11-15T01:23:39.208934Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-MRIL-02",
+          "evidence": {
+            "source_text": "Patient has performed 6 weeks of dedicated physical therapy without relief",
+            "start_char": 279,
+            "end_char": 353
+          },
+          "content": "LLM Judge evaluated candidate span 'Patient has performed 6 weeks of dedicated physical therapy without relief': verdict=AMBIGUOUS (Rationale: The evidence span discusses physical therapy without relief, which is not a plain radiograph evaluation of the lumbar spine.).",
+          "metadata": {
+            "verdict": "AMBIGUOUS",
+            "latency_ms": 8041.71
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-B9C72D71FA",
+          "timestamp": "2026-11-15T01:23:39.209493Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-MRIL-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Insufficient evidence for mandatory coverage criteria: [CRIT-MRIL-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+            "sufficiency_score": 0.7733
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-8C11C8D5D716]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-MRI-LUMBAR selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-MRI-LUMBAR, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-MRI-LUMBAR ('Magnetic Resonance Imaging (MRI) of the Lumbar Spine') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-MRI-LUMBAR, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 2 settled deterministically (CRIT-MRIL-EXCL-01, CRIT-MRIL-01), 1 need LLM judgment (CRIT-MRIL-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-MRIL-EXCL-01', 'CRIT-MRIL-01'], needs_judge=['CRIT-MRIL-02'], missing_evidence=[], routing={'CRIT-MRIL-01': 'SETTLED_DETERMINISTIC', 'CRIT-MRIL-02': 'NEEDS_JUDGE', 'CRIT-MRIL-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-MRIL-EXCL-01\n     Content:  Statutory exclusion CRIT-MRIL-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-MRIL-01\n     Content:  Inclusion criterion CRIT-MRIL-01 satisfied deterministically: 'lumbar radiculopathy' (Raw confidence: 0.92).\n     Evidence: \"lumbar radiculopathy\" [546:566]\n     Metadata: deterministic=True, raw_confidence=0.92\n\n[#06] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-MRIL-02\n     Content:  LLM Judge evaluated criterion CRIT-MRIL-02: status=NOT_MET (Rationale: The clinical note does not mention any plain lumbar radiographs performed prior to or in conjunction with the advanced imaging request for the lumbar spine.; quoted_evidence: 'Persistent lumbosacral nerve root compression with objective motor deficit follo...').\n     Evidence: \"None\"\n     Metadata: status=NOT_MET, confidence=0.85, elapsed_ms=14820.5, status_code=COMPLETED\n\n[#07] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-MRIL-02\n     Content:  LLM Judge evaluated candidate span 'Plan: Magnetic resonance imaging of the lumbar spine without contrast': verdict=AMBIGUOUS (Rationale: The MRI plan does not specify whether it is preceded by plain lumbar radiographs.).\n     Evidence: \"Plan: Magnetic resonance imaging of the lumbar spine without contrast\" [706:775]\n     Metadata: verdict=AMBIGUOUS, latency_ms=9872.7\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-MRIL-02\n     Content:  LLM Judge evaluated candidate span 'Patient has performed 6 weeks of dedicated physical therapy without relief': verdict=AMBIGUOUS (Rationale: The evidence span discusses physical therapy without relief, which is not a plain radiograph evaluation of the lumbar spine.).\n     Evidence: \"Patient has performed 6 weeks of dedicated physical therapy without relief\" [279:353]\n     Metadata: verdict=AMBIGUOUS, latency_ms=8041.71\n\n[#09] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-MRIL-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).\n     Metadata: tau=0.85, abstention_reason=Insufficient evidence for mandatory coverage criteria: [CRIT-MRIL-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85)., sufficiency_score=0.7733\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-LCD-PAD-ATHERO-APP",
+      "policy_id": "LCD-PAD-ATHERO",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 13,
+      "turns_taken": 9,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": true,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 2,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-4223943794",
+          "timestamp": "2026-11-15T01:23:39.216476Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-PAD-ATHERO selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-PAD-ATHERO",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-0DA7FA29E0",
+          "timestamp": "2026-11-15T01:23:39.218108Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-PAD-ATHERO ('Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-PAD-ATHERO",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-46CA7FB4D4",
+          "timestamp": "2026-11-15T01:23:39.270710Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 1 settled deterministically (CRIT-PAD-EXCL-01), 2 need LLM judgment (CRIT-PAD-01, CRIT-PAD-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-PAD-EXCL-01"
+            ],
+            "needs_judge": [
+              "CRIT-PAD-01",
+              "CRIT-PAD-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-PAD-01": "NEEDS_JUDGE",
+              "CRIT-PAD-02": "NEEDS_JUDGE",
+              "CRIT-PAD-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-21FAA392C0",
+          "timestamp": "2026-11-15T01:23:39.270710Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-PAD-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-PAD-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-1137746708",
+          "timestamp": "2026-11-15T01:23:55.634003Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-PAD-01",
+          "evidence": {
+            "quoted_evidence": "Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-PAD-01: status=MET (Rationale: The clinical note explicitly documents the absence of pulses and a resting ankle-brachial index of 0.48, which is consistent with severe arterial stenosis and critical limb ischemia.; quoted_evidence: 'Right lower extremity pulses absent at popliteal and pedal levels. Resting right...').",
+          "metadata": {
+            "status": "MET",
+            "confidence": 0.92,
+            "elapsed_ms": 16362.93,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-E344A77FC7",
+          "timestamp": "2026-11-15T01:23:55.634531Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-PAD-01",
+          "evidence": {
+            "source_text": "Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery.",
+            "start_char": 377,
+            "end_char": 621,
+            "clinical_section": "Clinical Note",
+            "confidence": 0.92,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-PAD-01 judgment span 'Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-E3D4D03662",
+          "timestamp": "2026-11-15T01:23:55.634531Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-PAD-01",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-PAD-01 judgment span 'Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery.': GATE_C_MAP_CHECK failure acknowledged.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-B0DC120CF2",
+          "timestamp": "2026-11-15T01:24:06.982505Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PAD-01",
+          "evidence": {
+            "source_text": "SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)",
+            "start_char": 98,
+            "end_char": 261
+          },
+          "content": "LLM Judge evaluated candidate span 'SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)': verdict=EQUIVALENT (Rationale: The clinical note describes severe intermittent claudication (Rutherford Class 3), which is a synonym for the severe intermittent claudication required by the criterion.).",
+          "metadata": {
+            "verdict": "EQUIVALENT",
+            "latency_ms": 11347.54
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-6C2A3FD332",
+          "timestamp": "2026-11-15T01:24:06.982505Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-PAD-01",
+          "evidence": {
+            "source_text": "SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)",
+            "start_char": 98,
+            "end_char": 261,
+            "clinical_section": "OBJECTIVE",
+            "confidence": 0.95,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-PAD-01 candidate span 'SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 10,
+          "message_id": "MSG-DA483160CF",
+          "timestamp": "2026-11-15T01:24:06.982505Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-PAD-01",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-PAD-01 candidate span 'SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)': gate failure acknowledged; withdrawing candidate.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 11,
+          "message_id": "MSG-97D252EAD0",
+          "timestamp": "2026-11-15T01:24:15.382969Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PAD-01",
+          "evidence": {
+            "source_text": "ASSESSMENT & PLAN: Advanced symptomatic peripheral artery disease failing medical and exercise therapy with severe arterial stenosis",
+            "start_char": 622,
+            "end_char": 754
+          },
+          "content": "LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Advanced symptomatic peripheral artery disease failing medical and exercise therapy with severe arterial stenosis': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not explicitly state severe intermittent claudication or critical limb ischemia with rest pain/ischemic ulceration.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 8399.93
+          }
+        },
+        {
+          "sequence_number": 12,
+          "message_id": "MSG-7713EB4247",
+          "timestamp": "2026-11-15T01:24:15.382969Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": "CRIT-PAD-02",
+          "evidence": null,
+          "content": "HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.",
+          "metadata": {
+            "resource": "LLM_CALLS",
+            "limit": 3
+          }
+        },
+        {
+          "sequence_number": 13,
+          "message_id": "MSG-628F8A041B",
+          "timestamp": "2026-11-15T01:24:15.382969Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+            "sufficiency_score": 0.5
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-811A9C7ED266]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-PAD-ATHERO selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-PAD-ATHERO, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-PAD-ATHERO ('Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-PAD-ATHERO, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 1 settled deterministically (CRIT-PAD-EXCL-01), 2 need LLM judgment (CRIT-PAD-01, CRIT-PAD-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-PAD-EXCL-01'], needs_judge=['CRIT-PAD-01', 'CRIT-PAD-02'], missing_evidence=[], routing={'CRIT-PAD-01': 'NEEDS_JUDGE', 'CRIT-PAD-02': 'NEEDS_JUDGE', 'CRIT-PAD-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-PAD-EXCL-01\n     Content:  Statutory exclusion CRIT-PAD-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-PAD-01\n     Content:  LLM Judge evaluated criterion CRIT-PAD-01: status=MET (Rationale: The clinical note explicitly documents the absence of pulses and a resting ankle-brachial index of 0.48, which is consistent with severe arterial stenosis and critical limb ischemia.; quoted_evidence: 'Right lower extremity pulses absent at popliteal and pedal levels. Resting right...').\n     Evidence: \"None\"\n     Metadata: status=MET, confidence=0.92, elapsed_ms=16362.93, status_code=COMPLETED\n\n[#06] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-PAD-01\n     Content:  Challenge on CRIT-PAD-01 judgment span 'Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery.\" [377:621]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#07] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-PAD-01\n     Content:  Conceding challenge on CRIT-PAD-01 judgment span 'Right lower extremity pulses absent at popliteal and pedal levels. Resting right ankle-brachial index is 0.48. Duplex ultrasound reveals hemodynamically significant stenosis with 85% occlusive calcified plaque in the superficial femoral artery.': GATE_C_MAP_CHECK failure acknowledged.\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PAD-01\n     Content:  LLM Judge evaluated candidate span 'SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)': verdict=EQUIVALENT (Rationale: The clinical note describes severe intermittent claudication (Rutherford Class 3), which is a synonym for the severe intermittent claudication required by the criterion.).\n     Evidence: \"SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)\" [98:261]\n     Metadata: verdict=EQUIVALENT, latency_ms=11347.54\n\n[#09] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-PAD-01\n     Content:  Challenge on CRIT-PAD-01 candidate span 'SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)\" [98:261]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#10] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-PAD-01\n     Content:  Conceding challenge on CRIT-PAD-01 candidate span 'SUBJECTIVE: 68-year-old diabetic smoker with severe lifestyle-limiting claudication occurring after walking less than 50 paces on level ground (Rutherford class 3)': gate failure acknowledged; withdrawing candidate.\n\n[#11] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PAD-01\n     Content:  LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Advanced symptomatic peripheral artery disease failing medical and exercise therapy with severe arterial stenosis': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not explicitly state severe intermittent claudication or critical limb ischemia with rest pain/ischemic ulceration.).\n     Evidence: \"ASSESSMENT & PLAN: Advanced symptomatic peripheral artery disease failing medical and exercise therapy with severe arterial stenosis\" [622:754]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=8399.93\n\n[#12] [Agent 4: Abstention Gate] -> HALT | Criterion: CRIT-PAD-02\n     Content:  HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.\n     Metadata: resource=LLM_CALLS, limit=3\n\n[#13] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.\n     Metadata: tau=0.85, abstention_reason=Operational budget exhausted: Execution bounds reached; case deferred to human review., sufficiency_score=0.5\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-LCD-POWER-WC-APP",
+      "policy_id": "LCD-POWER-WC",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 13,
+      "turns_taken": 10,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": true,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 1,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-E972902C94",
+          "timestamp": "2026-11-15T01:24:15.396178Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy LCD-POWER-WC selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "LCD-POWER-WC",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-D157599CDF",
+          "timestamp": "2026-11-15T01:24:15.397688Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy LCD-POWER-WC ('Complex Rehabilitative Power Wheelchairs (Group 3)') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "LCD-POWER-WC",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-CA27881C8F",
+          "timestamp": "2026-11-15T01:24:15.469910Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 2 settled deterministically (CRIT-PWC-EXCL-01, CRIT-PWC-01), 1 need LLM judgment (CRIT-PWC-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-PWC-EXCL-01",
+              "CRIT-PWC-01"
+            ],
+            "needs_judge": [
+              "CRIT-PWC-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-PWC-01": "SETTLED_DETERMINISTIC",
+              "CRIT-PWC-02": "NEEDS_JUDGE",
+              "CRIT-PWC-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-E07A6186B0",
+          "timestamp": "2026-11-15T01:24:15.469910Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-PWC-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-PWC-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-D5F74A234C",
+          "timestamp": "2026-11-15T01:24:15.469910Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-PWC-01",
+          "evidence": {
+            "source_text": "unable to perform MRADLs",
+            "start_char": 252,
+            "end_char": 276,
+            "clinical_section": "Clinical Documentation",
+            "confidence": 0.9,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Inclusion criterion CRIT-PWC-01 satisfied deterministically: 'unable to perform MRADLs' (Raw confidence: 0.92).",
+          "metadata": {
+            "deterministic": true,
+            "raw_confidence": 0.92
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-51716EDCDA",
+          "timestamp": "2026-11-15T01:24:31.027621Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-PWC-02",
+          "evidence": {
+            "quoted_evidence": "Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-PWC-02: status=MET (Rationale: The clinical note explicitly documents a severe progressive neurological condition with total inability to self-propel manual mobility devices, which is consistent with the requirement for a documented in-person specialty evaluation by a licensed PT/OT in coordination with an ATP.; quoted_evidence: 'Severe progressive neurological condition with total inability to self-propel ma...').",
+          "metadata": {
+            "status": "MET",
+            "confidence": 0.92,
+            "elapsed_ms": 15557.42,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-F3746F9AC6",
+          "timestamp": "2026-11-15T01:24:31.027621Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-PWC-02",
+          "evidence": {
+            "source_text": "Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating.",
+            "start_char": 699,
+            "end_char": 890,
+            "clinical_section": "Clinical Note",
+            "confidence": 0.92,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-PWC-02 judgment span 'Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-A7C37BFE75",
+          "timestamp": "2026-11-15T01:24:31.028159Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-PWC-02",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-PWC-02 judgment span 'Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating.': GATE_C_MAP_CHECK failure acknowledged.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-3996D94354",
+          "timestamp": "2026-11-15T01:24:41.817499Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PWC-02",
+          "evidence": {
+            "source_text": "OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP",
+            "start_char": 402,
+            "end_char": 512
+          },
+          "content": "LLM Judge evaluated candidate span 'OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP': verdict=EQUIVALENT (Rationale: The candidate evidence span uses a medical synonym ('licensed physical therapist' and 'certified ATP') for the clinical concept of a 'licensed Physical or Occupational Therapist (PT/OT) in coordination with an Assistive Technology Professional (ATP)').",
+          "metadata": {
+            "verdict": "EQUIVALENT",
+            "latency_ms": 10789.26
+          }
+        },
+        {
+          "sequence_number": 10,
+          "message_id": "MSG-D121DDB118",
+          "timestamp": "2026-11-15T01:24:41.817499Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-PWC-02",
+          "evidence": {
+            "source_text": "OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP",
+            "start_char": 402,
+            "end_char": 512,
+            "clinical_section": "OBJECTIVE",
+            "confidence": 0.95,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-PWC-02 candidate span 'OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 11,
+          "message_id": "MSG-CDB38222FE",
+          "timestamp": "2026-11-15T01:24:41.817499Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-PWC-02",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-PWC-02 candidate span 'OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP': gate failure acknowledged; withdrawing candidate.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 12,
+          "message_id": "MSG-38925B0A8D",
+          "timestamp": "2026-11-15T01:24:50.186757Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PWC-02",
+          "evidence": {
+            "source_text": "CLINICAL PROGRESS NOTE: Assistive Technology Clinic",
+            "start_char": 50,
+            "end_char": 101
+          },
+          "content": "LLM Judge evaluated candidate span 'CLINICAL PROGRESS NOTE: Assistive Technology Clinic': verdict=AMBIGUOUS (Rationale: The span 'CLINICAL PROGRESS NOTE: Assistive Technology Clinic' does not specify a documented in-person specialty evaluation by a PT/OT and ATP, only mentioning an Assistive Technology Clinic.).",
+          "metadata": {
+            "verdict": "AMBIGUOUS",
+            "latency_ms": 8368.77
+          }
+        },
+        {
+          "sequence_number": 13,
+          "message_id": "MSG-5CEA97A34C",
+          "timestamp": "2026-11-15T01:24:50.186757Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-PWC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Insufficient evidence for mandatory coverage criteria: [CRIT-PWC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+            "sufficiency_score": 0.7733
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-0D8E891575C9]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy LCD-POWER-WC selected manually by clinician.\n     Metadata: chosen_policy_id=LCD-POWER-WC, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy LCD-POWER-WC ('Complex Rehabilitative Power Wheelchairs (Group 3)') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=LCD-POWER-WC, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 2 settled deterministically (CRIT-PWC-EXCL-01, CRIT-PWC-01), 1 need LLM judgment (CRIT-PWC-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-PWC-EXCL-01', 'CRIT-PWC-01'], needs_judge=['CRIT-PWC-02'], missing_evidence=[], routing={'CRIT-PWC-01': 'SETTLED_DETERMINISTIC', 'CRIT-PWC-02': 'NEEDS_JUDGE', 'CRIT-PWC-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-PWC-EXCL-01\n     Content:  Statutory exclusion CRIT-PWC-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-PWC-01\n     Content:  Inclusion criterion CRIT-PWC-01 satisfied deterministically: 'unable to perform MRADLs' (Raw confidence: 0.92).\n     Evidence: \"unable to perform MRADLs\" [252:276]\n     Metadata: deterministic=True, raw_confidence=0.92\n\n[#06] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-PWC-02\n     Content:  LLM Judge evaluated criterion CRIT-PWC-02: status=MET (Rationale: The clinical note explicitly documents a severe progressive neurological condition with total inability to self-propel manual mobility devices, which is consistent with the requirement for a documented in-person specialty evaluation by a licensed PT/OT in coordination with an ATP.; quoted_evidence: 'Severe progressive neurological condition with total inability to self-propel ma...').\n     Evidence: \"None\"\n     Metadata: status=MET, confidence=0.92, elapsed_ms=15557.42, status_code=COMPLETED\n\n[#07] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-PWC-02\n     Content:  Challenge on CRIT-PWC-02 judgment span 'Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating.\" [699:890]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#08] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-PWC-02\n     Content:  Conceding challenge on CRIT-PWC-02 judgment span 'Severe progressive neurological condition with total inability to self-propel manual mobility devices. Plan: Group 3 complex rehabilitative power wheelchair with multi-function power seating.': GATE_C_MAP_CHECK failure acknowledged.\n\n[#09] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PWC-02\n     Content:  LLM Judge evaluated candidate span 'OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP': verdict=EQUIVALENT (Rationale: The candidate evidence span uses a medical synonym ('licensed physical therapist' and 'certified ATP') for the clinical concept of a 'licensed Physical or Occupational Therapist (PT/OT) in coordination with an Assistive Technology Professional (ATP)').\n     Evidence: \"OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP\" [402:512]\n     Metadata: verdict=EQUIVALENT, latency_ms=10789.26\n\n[#10] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-PWC-02\n     Content:  Challenge on CRIT-PWC-02 candidate span 'OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP\" [402:512]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#11] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-PWC-02\n     Content:  Conceding challenge on CRIT-PWC-02 candidate span 'OBJECTIVE: Comprehensive seated mobility evaluation completed by licensed physical therapist and certified ATP': gate failure acknowledged; withdrawing candidate.\n\n[#12] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PWC-02\n     Content:  LLM Judge evaluated candidate span 'CLINICAL PROGRESS NOTE: Assistive Technology Clinic': verdict=AMBIGUOUS (Rationale: The span 'CLINICAL PROGRESS NOTE: Assistive Technology Clinic' does not specify a documented in-person specialty evaluation by a PT/OT and ATP, only mentioning an Assistive Technology Clinic.).\n     Evidence: \"CLINICAL PROGRESS NOTE: Assistive Technology Clinic\" [50:101]\n     Metadata: verdict=AMBIGUOUS, latency_ms=8368.77\n\n[#13] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-PWC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).\n     Metadata: tau=0.85, abstention_reason=Insufficient evidence for mandatory coverage criteria: [CRIT-PWC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85)., sufficiency_score=0.7733\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-NCD-CCTA-APP",
+      "policy_id": "NCD-CCTA",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 11,
+      "turns_taken": 7,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": true,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 2,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-9818FD7D07",
+          "timestamp": "2026-11-15T01:24:50.193380Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy NCD-CCTA selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "NCD-CCTA",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-6FC55352CD",
+          "timestamp": "2026-11-15T01:24:50.195575Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy NCD-CCTA ('Coronary Computed Tomography Angiography (CCTA)') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "NCD-CCTA",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-6C0F2144C9",
+          "timestamp": "2026-11-15T01:24:50.275068Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 1 settled deterministically (CRIT-CCTA-EXCL-01), 2 need LLM judgment (CRIT-CCTA-01, CRIT-CCTA-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-CCTA-EXCL-01"
+            ],
+            "needs_judge": [
+              "CRIT-CCTA-01",
+              "CRIT-CCTA-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-CCTA-01": "NEEDS_JUDGE",
+              "CRIT-CCTA-02": "NEEDS_JUDGE",
+              "CRIT-CCTA-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-DD6444C530",
+          "timestamp": "2026-11-15T01:24:50.275068Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-CCTA-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-CCTA-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-2B335C5583",
+          "timestamp": "2026-11-15T01:25:04.969680Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-CCTA-01",
+          "evidence": {
+            "quoted_evidence": ""
+          },
+          "content": "LLM Judge evaluated criterion CRIT-CCTA-01: status=MISSING (Rationale: The clinical note does not contain information addressing the specific requirement of documented intermediate pre-test probability of obstructive CAD, sinus rhythm, and target heart rate < 65 bpm.; quoted_evidence: '...').",
+          "metadata": {
+            "status": "MISSING",
+            "confidence": 0.85,
+            "elapsed_ms": 14694.18,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-A82507C54F",
+          "timestamp": "2026-11-15T01:25:15.405918Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-CCTA-01",
+          "evidence": {
+            "source_text": "Pre-test probability for obstructive coronary artery disease is intermediate (35%)",
+            "start_char": 251,
+            "end_char": 333
+          },
+          "content": "LLM Judge evaluated candidate span 'Pre-test probability for obstructive coronary artery disease is intermediate (35%)': verdict=EQUIVALENT (Rationale: The pre-test probability of 35% for obstructive coronary artery disease is a valid and equivalent statement to the documented intermediate pre-test probability of obstructive CAD.).",
+          "metadata": {
+            "verdict": "EQUIVALENT",
+            "latency_ms": 10435.99
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-2F34AF3777",
+          "timestamp": "2026-11-15T01:25:15.405918Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-CCTA-01",
+          "evidence": {
+            "source_text": "Pre-test probability for obstructive coronary artery disease is intermediate (35%)",
+            "start_char": 251,
+            "end_char": 333,
+            "clinical_section": "OBJECTIVE",
+            "confidence": 0.95,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-CCTA-01 candidate span 'Pre-test probability for obstructive coronary artery disease is intermediate (35%)': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-0E53B0C689",
+          "timestamp": "2026-11-15T01:25:15.405918Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-CCTA-01",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-CCTA-01 candidate span 'Pre-test probability for obstructive coronary artery disease is intermediate (35%)': gate failure acknowledged; withdrawing candidate.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-D041EF28E5",
+          "timestamp": "2026-11-15T01:25:24.238142Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-CCTA-01",
+          "evidence": {
+            "source_text": "ASSESSMENT & PLAN: Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram",
+            "start_char": 567,
+            "end_char": 691
+          },
+          "content": "LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not specify intermediate pre-test probability of obstructive CAD or target heart rate < 65 bpm.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 8832.01
+          }
+        },
+        {
+          "sequence_number": 10,
+          "message_id": "MSG-3E5B620ECD",
+          "timestamp": "2026-11-15T01:25:24.238142Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": "CRIT-CCTA-02",
+          "evidence": null,
+          "content": "HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.",
+          "metadata": {
+            "resource": "LLM_CALLS",
+            "limit": 3
+          }
+        },
+        {
+          "sequence_number": 11,
+          "message_id": "MSG-6659C4D519",
+          "timestamp": "2026-11-15T01:25:24.238142Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+            "sufficiency_score": 0.5
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-42F505BC8A10]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy NCD-CCTA selected manually by clinician.\n     Metadata: chosen_policy_id=NCD-CCTA, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy NCD-CCTA ('Coronary Computed Tomography Angiography (CCTA)') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=NCD-CCTA, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 1 settled deterministically (CRIT-CCTA-EXCL-01), 2 need LLM judgment (CRIT-CCTA-01, CRIT-CCTA-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-CCTA-EXCL-01'], needs_judge=['CRIT-CCTA-01', 'CRIT-CCTA-02'], missing_evidence=[], routing={'CRIT-CCTA-01': 'NEEDS_JUDGE', 'CRIT-CCTA-02': 'NEEDS_JUDGE', 'CRIT-CCTA-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-CCTA-EXCL-01\n     Content:  Statutory exclusion CRIT-CCTA-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-CCTA-01\n     Content:  LLM Judge evaluated criterion CRIT-CCTA-01: status=MISSING (Rationale: The clinical note does not contain information addressing the specific requirement of documented intermediate pre-test probability of obstructive CAD, sinus rhythm, and target heart rate < 65 bpm.; quoted_evidence: '...').\n     Evidence: \"None\"\n     Metadata: status=MISSING, confidence=0.85, elapsed_ms=14694.18, status_code=COMPLETED\n\n[#06] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-CCTA-01\n     Content:  LLM Judge evaluated candidate span 'Pre-test probability for obstructive coronary artery disease is intermediate (35%)': verdict=EQUIVALENT (Rationale: The pre-test probability of 35% for obstructive coronary artery disease is a valid and equivalent statement to the documented intermediate pre-test probability of obstructive CAD.).\n     Evidence: \"Pre-test probability for obstructive coronary artery disease is intermediate (35%)\" [251:333]\n     Metadata: verdict=EQUIVALENT, latency_ms=10435.99\n\n[#07] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-CCTA-01\n     Content:  Challenge on CRIT-CCTA-01 candidate span 'Pre-test probability for obstructive coronary artery disease is intermediate (35%)': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"Pre-test probability for obstructive coronary artery disease is intermediate (35%)\" [251:333]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#08] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-CCTA-01\n     Content:  Conceding challenge on CRIT-CCTA-01 candidate span 'Pre-test probability for obstructive coronary artery disease is intermediate (35%)': gate failure acknowledged; withdrawing candidate.\n\n[#09] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-CCTA-01\n     Content:  LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not specify intermediate pre-test probability of obstructive CAD or target heart rate < 65 bpm.).\n     Evidence: \"ASSESSMENT & PLAN: Atypical chest discomfort in intermediate pre-test risk patient with equivocal baseline electrocardiogram\" [567:691]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=8832.01\n\n[#10] [Agent 4: Abstention Gate] -> HALT | Criterion: CRIT-CCTA-02\n     Content:  HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.\n     Metadata: resource=LLM_CALLS, limit=3\n\n[#11] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.\n     Metadata: tau=0.85, abstention_reason=Operational budget exhausted: Execution bounds reached; case deferred to human review., sufficiency_score=0.5\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-NCD-PACEMAKER-APP",
+      "policy_id": "NCD-PACEMAKER",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 13,
+      "turns_taken": 9,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": true,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 2,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-4AE16801CA",
+          "timestamp": "2026-11-15T01:25:24.245641Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy NCD-PACEMAKER selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "NCD-PACEMAKER",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-21AEC2C169",
+          "timestamp": "2026-11-15T01:25:24.247394Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy NCD-PACEMAKER ('Permanent Cardiac Pacemakers for Bradyarrhythmias') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "NCD-PACEMAKER",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-B6B697D9C2",
+          "timestamp": "2026-11-15T01:25:24.326887Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 1 settled deterministically (CRIT-PACE-EXCL-01), 2 need LLM judgment (CRIT-PACE-01, CRIT-PACE-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-PACE-EXCL-01"
+            ],
+            "needs_judge": [
+              "CRIT-PACE-01",
+              "CRIT-PACE-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-PACE-01": "NEEDS_JUDGE",
+              "CRIT-PACE-02": "NEEDS_JUDGE",
+              "CRIT-PACE-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-3B34D469AF",
+          "timestamp": "2026-11-15T01:25:24.326887Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-PACE-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-PACE-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-96D95E9AC5",
+          "timestamp": "2026-11-15T01:25:40.790699Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-PACE-01",
+          "evidence": {
+            "quoted_evidence": "Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-PACE-01: status=MET (Rationale: The clinical note explicitly documents complete atrioventricular dissociation (complete AV block) and a ventricular escape rate correlating with pre-syncopal episodes, which satisfies the criterion for high-grade AV block or symptomatic sinus pauses (>= 3.0 seconds).; quoted_evidence: 'Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricul...').",
+          "metadata": {
+            "status": "MET",
+            "confidence": 0.92,
+            "elapsed_ms": 16463.81,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-16D47C7AFC",
+          "timestamp": "2026-11-15T01:25:40.791256Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-PACE-01",
+          "evidence": {
+            "source_text": "Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes.",
+            "start_char": 282,
+            "end_char": 486,
+            "clinical_section": "Clinical Note",
+            "confidence": 0.92,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-PACE-01 judgment span 'Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-29A66C9187",
+          "timestamp": "2026-11-15T01:25:40.791256Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-PACE-01",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-PACE-01 judgment span 'Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes.': GATE_C_MAP_CHECK failure acknowledged.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-5E52A71F6E",
+          "timestamp": "2026-11-15T01:25:52.412635Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PACE-01",
+          "evidence": {
+            "source_text": "ASSESSMENT & PLAN: Symptomatic high-grade third-degree atrioventricular heart block in the absence of reversible causes",
+            "start_char": 532,
+            "end_char": 651
+          },
+          "content": "LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Symptomatic high-grade third-degree atrioventricular heart block in the absence of reversible causes': verdict=NOT_EQUIVALENT (Rationale: The evidence span mentions 'high-grade third-degree atrioventricular heart block' which is a subtype of AV block, but does not specify 'persistent third-degree AV block', 'Mobitz II second-degree block', or 'sinus pauses >= 3.0 seconds'.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 11621.13
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-E3AF981BCA",
+          "timestamp": "2026-11-15T01:26:01.938615Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PACE-01",
+          "evidence": {
+            "source_text": "OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes",
+            "start_char": 271,
+            "end_char": 485
+          },
+          "content": "LLM Judge evaluated candidate span 'OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes': verdict=EQUIVALENT (Rationale: The telemetry monitoring reveals complete atrioventricular dissociation and a ventricular escape rate of 32 bpm, which is consistent with persistent third-degree AV block, matching the clinical fact requirement.).",
+          "metadata": {
+            "verdict": "EQUIVALENT",
+            "latency_ms": 9525.68
+          }
+        },
+        {
+          "sequence_number": 10,
+          "message_id": "MSG-68F6D8E40A",
+          "timestamp": "2026-11-15T01:26:01.938615Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-PACE-01",
+          "evidence": {
+            "source_text": "OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes",
+            "start_char": 271,
+            "end_char": 485,
+            "clinical_section": "OBJECTIVE",
+            "confidence": 0.95,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-PACE-01 candidate span 'OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 11,
+          "message_id": "MSG-7AE04ABD0C",
+          "timestamp": "2026-11-15T01:26:01.939236Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-PACE-01",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-PACE-01 candidate span 'OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes': gate failure acknowledged; withdrawing candidate.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 12,
+          "message_id": "MSG-DBE9E31673",
+          "timestamp": "2026-11-15T01:26:01.939236Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": "CRIT-PACE-02",
+          "evidence": null,
+          "content": "HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.",
+          "metadata": {
+            "resource": "LLM_CALLS",
+            "limit": 3
+          }
+        },
+        {
+          "sequence_number": 13,
+          "message_id": "MSG-63C608BA8D",
+          "timestamp": "2026-11-15T01:26:01.939236Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Operational budget exhausted: Execution bounds reached; case deferred to human review.",
+            "sufficiency_score": 0.5
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-6AFB4513473B]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy NCD-PACEMAKER selected manually by clinician.\n     Metadata: chosen_policy_id=NCD-PACEMAKER, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy NCD-PACEMAKER ('Permanent Cardiac Pacemakers for Bradyarrhythmias') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=NCD-PACEMAKER, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 1 settled deterministically (CRIT-PACE-EXCL-01), 2 need LLM judgment (CRIT-PACE-01, CRIT-PACE-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-PACE-EXCL-01'], needs_judge=['CRIT-PACE-01', 'CRIT-PACE-02'], missing_evidence=[], routing={'CRIT-PACE-01': 'NEEDS_JUDGE', 'CRIT-PACE-02': 'NEEDS_JUDGE', 'CRIT-PACE-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-PACE-EXCL-01\n     Content:  Statutory exclusion CRIT-PACE-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-PACE-01\n     Content:  LLM Judge evaluated criterion CRIT-PACE-01: status=MET (Rationale: The clinical note explicitly documents complete atrioventricular dissociation (complete AV block) and a ventricular escape rate correlating with pre-syncopal episodes, which satisfies the criterion for high-grade AV block or symptomatic sinus pauses (>= 3.0 seconds).; quoted_evidence: 'Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricul...').\n     Evidence: \"None\"\n     Metadata: status=MET, confidence=0.92, elapsed_ms=16463.81, status_code=COMPLETED\n\n[#06] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-PACE-01\n     Content:  Challenge on CRIT-PACE-01 judgment span 'Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes.\" [282:486]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#07] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-PACE-01\n     Content:  Conceding challenge on CRIT-PACE-01 judgment span 'Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes.': GATE_C_MAP_CHECK failure acknowledged.\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PACE-01\n     Content:  LLM Judge evaluated candidate span 'ASSESSMENT & PLAN: Symptomatic high-grade third-degree atrioventricular heart block in the absence of reversible causes': verdict=NOT_EQUIVALENT (Rationale: The evidence span mentions 'high-grade third-degree atrioventricular heart block' which is a subtype of AV block, but does not specify 'persistent third-degree AV block', 'Mobitz II second-degree block', or 'sinus pauses >= 3.0 seconds'.).\n     Evidence: \"ASSESSMENT & PLAN: Symptomatic high-grade third-degree atrioventricular heart block in the absence of reversible causes\" [532:651]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=11621.13\n\n[#09] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PACE-01\n     Content:  LLM Judge evaluated candidate span 'OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes': verdict=EQUIVALENT (Rationale: The telemetry monitoring reveals complete atrioventricular dissociation and a ventricular escape rate of 32 bpm, which is consistent with persistent third-degree AV block, matching the clinical fact requirement.).\n     Evidence: \"OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes\" [271:485]\n     Metadata: verdict=EQUIVALENT, latency_ms=9525.68\n\n[#10] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-PACE-01\n     Content:  Challenge on CRIT-PACE-01 candidate span 'OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes\" [271:485]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#11] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-PACE-01\n     Content:  Conceding challenge on CRIT-PACE-01 candidate span 'OBJECTIVE: Telemetry monitoring reveals sinus rhythm at 75 bpm with complete atrioventricular dissociation and a ventricular escape rate of 32 bpm (complete AV block) correlating directly with pre-syncopal episodes': gate failure acknowledged; withdrawing candidate.\n\n[#12] [Agent 4: Abstention Gate] -> HALT | Criterion: CRIT-PACE-02\n     Content:  HALT triggered: BUDGET_EXHAUSTED [LLM_CALLS]: limit 3 reached with 3. Execution bounds reached; case defers to human clinician.\n     Metadata: resource=LLM_CALLS, limit=3\n\n[#13] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Operational budget exhausted: Execution bounds reached; case deferred to human review.\n     Metadata: tau=0.85, abstention_reason=Operational budget exhausted: Execution bounds reached; case deferred to human review., sufficiency_score=0.5\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-NCD-PET-ONC-APP",
+      "policy_id": "NCD-PET-ONC",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 9,
+      "turns_taken": 6,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": false,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 1,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-865F657E13",
+          "timestamp": "2026-11-15T01:26:01.946237Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy NCD-PET-ONC selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "NCD-PET-ONC",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-E1FFB25380",
+          "timestamp": "2026-11-15T01:26:01.947859Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy NCD-PET-ONC ('Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "NCD-PET-ONC",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-3949B2F06B",
+          "timestamp": "2026-11-15T01:26:02.019460Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 1 settled deterministically (CRIT-PTONC-EXCL-01), 1 need LLM judgment (CRIT-PTONC-02), 1 missing evidence (CRIT-PTONC-01).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-PTONC-EXCL-01"
+            ],
+            "needs_judge": [
+              "CRIT-PTONC-02"
+            ],
+            "missing_evidence": [
+              "CRIT-PTONC-01"
+            ],
+            "routing": {
+              "CRIT-PTONC-01": "MISSING_EVIDENCE",
+              "CRIT-PTONC-02": "NEEDS_JUDGE",
+              "CRIT-PTONC-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-11B551DF83",
+          "timestamp": "2026-11-15T01:26:02.019460Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-PTONC-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-PTONC-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-DF4BE24CF7",
+          "timestamp": "2026-11-15T01:26:02.019460Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-PTONC-01",
+          "evidence": null,
+          "content": "Zero candidate evidence spans found in narrative for CRIT-PTONC-01; status remains INSUFFICIENT_EVIDENCE.",
+          "metadata": {
+            "candidate_count": 0
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-A2AB7D37D6",
+          "timestamp": "2026-11-15T01:26:16.139491Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-PTONC-02",
+          "evidence": {
+            "quoted_evidence": ""
+          },
+          "content": "LLM Judge evaluated criterion CRIT-PTONC-02: status=MISSING (Rationale: The clinical note does not contain information addressing the requirement that imaging findings will directly guide management decisions for surgical resectability, radiation planning, or systemic therapy change.; quoted_evidence: '...').",
+          "metadata": {
+            "status": "MISSING",
+            "confidence": 0.85,
+            "elapsed_ms": 14119.87,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-9559BB117E",
+          "timestamp": "2026-11-15T01:26:26.821333Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PTONC-02",
+          "evidence": {
+            "source_text": "Initial systemic staging required to determine resectability",
+            "start_char": 458,
+            "end_char": 518
+          },
+          "content": "LLM Judge evaluated candidate span 'Initial systemic staging required to determine resectability': verdict=NOT_EQUIVALENT (Rationale: The evidence span 'Initial systemic staging required to determine resectability' does not directly state that PET-CT findings will guide management for surgical resectability, radiation planning, or systemic therapy change. It only mentions the need for systemic staging to determine resectability.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 10681.28
+          }
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-08C832EC0A",
+          "timestamp": "2026-11-15T01:26:35.792562Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-PTONC-02",
+          "evidence": {
+            "source_text": "Plan: Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging",
+            "start_char": 594,
+            "end_char": 711
+          },
+          "content": "LLM Judge evaluated candidate span 'Plan: Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging': verdict=NOT_EQUIVALENT (Rationale: The evidence span mentions PET-CT for oncologic staging, which is related but not the same as the clinical staging impact on treatment strategy.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 8970.82
+          }
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-A48ACFA8BA",
+          "timestamp": "2026-11-15T01:26:35.792562Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-PTONC-01, CRIT-PTONC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Insufficient evidence for mandatory coverage criteria: [CRIT-PTONC-01, CRIT-PTONC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).",
+            "sufficiency_score": 0.6333
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-851FE4037EE9]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy NCD-PET-ONC selected manually by clinician.\n     Metadata: chosen_policy_id=NCD-PET-ONC, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy NCD-PET-ONC ('Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=NCD-PET-ONC, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 1 settled deterministically (CRIT-PTONC-EXCL-01), 1 need LLM judgment (CRIT-PTONC-02), 1 missing evidence (CRIT-PTONC-01).\n     Metadata: settled_deterministic=['CRIT-PTONC-EXCL-01'], needs_judge=['CRIT-PTONC-02'], missing_evidence=['CRIT-PTONC-01'], routing={'CRIT-PTONC-01': 'MISSING_EVIDENCE', 'CRIT-PTONC-02': 'NEEDS_JUDGE', 'CRIT-PTONC-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-PTONC-EXCL-01\n     Content:  Statutory exclusion CRIT-PTONC-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-PTONC-01\n     Content:  Zero candidate evidence spans found in narrative for CRIT-PTONC-01; status remains INSUFFICIENT_EVIDENCE.\n     Metadata: candidate_count=0\n\n[#06] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-PTONC-02\n     Content:  LLM Judge evaluated criterion CRIT-PTONC-02: status=MISSING (Rationale: The clinical note does not contain information addressing the requirement that imaging findings will directly guide management decisions for surgical resectability, radiation planning, or systemic therapy change.; quoted_evidence: '...').\n     Evidence: \"None\"\n     Metadata: status=MISSING, confidence=0.85, elapsed_ms=14119.87, status_code=COMPLETED\n\n[#07] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PTONC-02\n     Content:  LLM Judge evaluated candidate span 'Initial systemic staging required to determine resectability': verdict=NOT_EQUIVALENT (Rationale: The evidence span 'Initial systemic staging required to determine resectability' does not directly state that PET-CT findings will guide management for surgical resectability, radiation planning, or systemic therapy change. It only mentions the need for systemic staging to determine resectability.).\n     Evidence: \"Initial systemic staging required to determine resectability\" [458:518]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=10681.28\n\n[#08] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-PTONC-02\n     Content:  LLM Judge evaluated candidate span 'Plan: Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging': verdict=NOT_EQUIVALENT (Rationale: The evidence span mentions PET-CT for oncologic staging, which is related but not the same as the clinical staging impact on treatment strategy.).\n     Evidence: \"Plan: Whole-body 18F-FDG positron emission tomography with computed tomography (PET-CT) for initial oncologic staging\" [594:711]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=8970.82\n\n[#09] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-PTONC-01, CRIT-PTONC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85).\n     Metadata: tau=0.85, abstention_reason=Insufficient evidence for mandatory coverage criteria: [CRIT-PTONC-01, CRIT-PTONC-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.633) falls below safety threshold tau (0.85)., sufficiency_score=0.6333\n\n================================================================================"
+    },
+    {
+      "case_id": "DEV-NCD-SGD-APP",
+      "policy_id": "NCD-SGD",
+      "decision": "DEFERRED_TO_HUMAN",
+      "message_count": 11,
+      "turns_taken": 8,
+      "judge_calls": 3,
+      "has_plan": true,
+      "has_judgment": true,
+      "has_counter_reading": false,
+      "has_defend": false,
+      "has_concede": true,
+      "judge_routing": {
+        "judge_calls_otherwise_deferring": 1,
+        "judge_calls_already_settled": 0,
+        "judge_calls_total_case": 3,
+        "debated_criteria_outcomes": {}
+      },
+      "board_records": [
+        {
+          "sequence_number": 1,
+          "message_id": "MSG-C809CF2017",
+          "timestamp": "2026-11-15T01:26:35.799212Z",
+          "agent": "Policy Shortlist Evaluator",
+          "message_type": "POLICY_CHOSEN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Governing policy NCD-SGD selected manually by clinician.",
+          "metadata": {
+            "chosen_policy_id": "NCD-SGD",
+            "chooser": "clinician",
+            "status": "MANUAL_SELECT"
+          }
+        },
+        {
+          "sequence_number": 2,
+          "message_id": "MSG-49096D25AB",
+          "timestamp": "2026-11-15T01:26:35.800816Z",
+          "agent": "Agent 1: Policy Retrieval",
+          "message_type": "POLICY_SELECTED",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Selected policy NCD-SGD ('Speech Generating Devices (SGD)') with retrieval score 1.000 (margin to runner-up: 1.000).",
+          "metadata": {
+            "policy_id": "NCD-SGD",
+            "retrieval_score": 1.0,
+            "margin_to_runner_up": 1.0,
+            "uncertainty_flag": false
+          }
+        },
+        {
+          "sequence_number": 3,
+          "message_id": "MSG-292DC668ED",
+          "timestamp": "2026-11-15T01:26:35.875141Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "PLAN",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "Adjudication Plan: 2 settled deterministically (CRIT-SGD-EXCL-01, CRIT-SGD-01), 1 need LLM judgment (CRIT-SGD-02), 0 missing evidence (none).",
+          "metadata": {
+            "settled_deterministic": [
+              "CRIT-SGD-EXCL-01",
+              "CRIT-SGD-01"
+            ],
+            "needs_judge": [
+              "CRIT-SGD-02"
+            ],
+            "missing_evidence": [],
+            "routing": {
+              "CRIT-SGD-01": "SETTLED_DETERMINISTIC",
+              "CRIT-SGD-02": "NEEDS_JUDGE",
+              "CRIT-SGD-EXCL-01": "SETTLED_DETERMINISTIC"
+            }
+          }
+        },
+        {
+          "sequence_number": 4,
+          "message_id": "MSG-876873963C",
+          "timestamp": "2026-11-15T01:26:35.875141Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-SGD-EXCL-01",
+          "evidence": null,
+          "content": "Statutory exclusion CRIT-SGD-EXCL-01 ruled out: no disqualifying condition documented in note.",
+          "metadata": {
+            "is_exclusion": true,
+            "status": "NOT_MET"
+          }
+        },
+        {
+          "sequence_number": 5,
+          "message_id": "MSG-3ED4BE5F2E",
+          "timestamp": "2026-11-15T01:26:35.875141Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "ASSESSMENT_PROPOSED",
+          "criterion_code": "CRIT-SGD-01",
+          "evidence": {
+            "source_text": "anarthria",
+            "start_char": 414,
+            "end_char": 423,
+            "clinical_section": "Clinical Documentation",
+            "confidence": 0.9,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Inclusion criterion CRIT-SGD-01 satisfied deterministically: 'anarthria' (Raw confidence: 0.92).",
+          "metadata": {
+            "deterministic": true,
+            "raw_confidence": 0.92
+          }
+        },
+        {
+          "sequence_number": 6,
+          "message_id": "MSG-ACEFAF07EA",
+          "timestamp": "2026-11-15T01:26:51.338711Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "JUDGMENT",
+          "criterion_code": "CRIT-SGD-02",
+          "evidence": {
+            "quoted_evidence": "Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access."
+          },
+          "content": "LLM Judge evaluated criterion CRIT-SGD-02: status=MET (Rationale: The clinical note explicitly mentions a successful formal SLP device trial, which is consistent with the requirement for a formal written assessment by a licensed Speech-Language Pathologist (SLP) recommending the specific device and detailing trial results with AAC systems.; quoted_evidence: 'Severe irreversible expressive communication deficit with successful formal SLP ...').",
+          "metadata": {
+            "status": "MET",
+            "confidence": 0.92,
+            "elapsed_ms": 15463.76,
+            "status_code": "COMPLETED"
+          }
+        },
+        {
+          "sequence_number": 7,
+          "message_id": "MSG-5ACD275A9F",
+          "timestamp": "2026-11-15T01:26:51.339235Z",
+          "agent": "Agent 3: Adversarial Verifier",
+          "message_type": "CHALLENGE",
+          "criterion_code": "CRIT-SGD-02",
+          "evidence": {
+            "source_text": "Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access.",
+            "start_char": 715,
+            "end_char": 898,
+            "clinical_section": "Clinical Note",
+            "confidence": 0.92,
+            "semantic_support_passed": true,
+            "subject_valid": true,
+            "timing_valid": true,
+            "modality_valid": true,
+            "negation_valid": true,
+            "value_in_range": true,
+            "semantic_invalidation_reasons": []
+          },
+          "content": "Challenge on CRIT-SGD-02 judgment span 'Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).",
+          "metadata": {
+            "failing_gate": "GATE_C_MAP_CHECK"
+          }
+        },
+        {
+          "sequence_number": 8,
+          "message_id": "MSG-C9422208C9",
+          "timestamp": "2026-11-15T01:26:51.339235Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "CONCEDE",
+          "criterion_code": "CRIT-SGD-02",
+          "evidence": null,
+          "content": "Conceding challenge on CRIT-SGD-02 judgment span 'Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access.': GATE_C_MAP_CHECK failure acknowledged.",
+          "metadata": {}
+        },
+        {
+          "sequence_number": 9,
+          "message_id": "MSG-D7F4986328",
+          "timestamp": "2026-11-15T01:27:01.762291Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-SGD-02",
+          "evidence": {
+            "source_text": "OBJECTIVE: Comprehensive assessment by licensed speech-language pathologist (SLP) documents profound anarthria with severe oral-motor dyspraxia",
+            "start_char": 313,
+            "end_char": 456
+          },
+          "content": "LLM Judge evaluated candidate span 'OBJECTIVE: Comprehensive assessment by licensed speech-language pathologist (SLP) documents profound anarthria with severe oral-motor dyspraxia': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not specify a formal written assessment or trial results with AAC systems as required by the criterion.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 10423.02
+          }
+        },
+        {
+          "sequence_number": 10,
+          "message_id": "MSG-40D1A76D5D",
+          "timestamp": "2026-11-15T01:27:10.259663Z",
+          "agent": "Agent 2: Clinical Evaluator",
+          "message_type": "VERDICT",
+          "criterion_code": "CRIT-SGD-02",
+          "evidence": {
+            "source_text": "SLP completed formal device trial with dedicated eye-gaze speech-generating system",
+            "start_char": 506,
+            "end_char": 588
+          },
+          "content": "LLM Judge evaluated candidate span 'SLP completed formal device trial with dedicated eye-gaze speech-generating system': verdict=NOT_EQUIVALENT (Rationale: The candidate evidence span mentions an 'eye-gaze speech-generating system' which is a specific type of AAC system, but does not specify the 'dedicated' aspect required by the criterion.).",
+          "metadata": {
+            "verdict": "NOT_EQUIVALENT",
+            "latency_ms": 8497.16
+          }
+        },
+        {
+          "sequence_number": 11,
+          "message_id": "MSG-3F3920CC32",
+          "timestamp": "2026-11-15T01:27:10.260188Z",
+          "agent": "Agent 4: Abstention Gate",
+          "message_type": "HALT",
+          "criterion_code": null,
+          "evidence": null,
+          "content": "HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-SGD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+          "metadata": {
+            "tau": 0.85,
+            "abstention_reason": "Insufficient evidence for mandatory coverage criteria: [CRIT-SGD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).",
+            "sufficiency_score": 0.7733
+          }
+        }
+      ],
+      "transcript": "================================================================================\nSHARED CASE MESSAGE BOARD TRANSCRIPT [Case ID: CASE-3EF7F37AC55E]\n================================================================================\n\n[#01] [Policy Shortlist Evaluator] -> POLICY_CHOSEN\n     Content:  Governing policy NCD-SGD selected manually by clinician.\n     Metadata: chosen_policy_id=NCD-SGD, chooser=clinician, status=MANUAL_SELECT\n\n[#02] [Agent 1: Policy Retrieval] -> POLICY_SELECTED\n     Content:  Selected policy NCD-SGD ('Speech Generating Devices (SGD)') with retrieval score 1.000 (margin to runner-up: 1.000).\n     Metadata: policy_id=NCD-SGD, retrieval_score=1.0, margin_to_runner_up=1.0, uncertainty_flag=False\n\n[#03] [Agent 2: Clinical Evaluator] -> PLAN\n     Content:  Adjudication Plan: 2 settled deterministically (CRIT-SGD-EXCL-01, CRIT-SGD-01), 1 need LLM judgment (CRIT-SGD-02), 0 missing evidence (none).\n     Metadata: settled_deterministic=['CRIT-SGD-EXCL-01', 'CRIT-SGD-01'], needs_judge=['CRIT-SGD-02'], missing_evidence=[], routing={'CRIT-SGD-01': 'SETTLED_DETERMINISTIC', 'CRIT-SGD-02': 'NEEDS_JUDGE', 'CRIT-SGD-EXCL-01': 'SETTLED_DETERMINISTIC'}\n\n[#04] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-SGD-EXCL-01\n     Content:  Statutory exclusion CRIT-SGD-EXCL-01 ruled out: no disqualifying condition documented in note.\n     Metadata: is_exclusion=True, status=NOT_MET\n\n[#05] [Agent 2: Clinical Evaluator] -> ASSESSMENT_PROPOSED | Criterion: CRIT-SGD-01\n     Content:  Inclusion criterion CRIT-SGD-01 satisfied deterministically: 'anarthria' (Raw confidence: 0.92).\n     Evidence: \"anarthria\" [414:423]\n     Metadata: deterministic=True, raw_confidence=0.92\n\n[#06] [Agent 2: Clinical Evaluator] -> JUDGMENT | Criterion: CRIT-SGD-02\n     Content:  LLM Judge evaluated criterion CRIT-SGD-02: status=MET (Rationale: The clinical note explicitly mentions a successful formal SLP device trial, which is consistent with the requirement for a formal written assessment by a licensed Speech-Language Pathologist (SLP) recommending the specific device and detailing trial results with AAC systems.; quoted_evidence: 'Severe irreversible expressive communication deficit with successful formal SLP ...').\n     Evidence: \"None\"\n     Metadata: status=MET, confidence=0.92, elapsed_ms=15463.76, status_code=COMPLETED\n\n[#07] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-SGD-02\n     Content:  Challenge on CRIT-SGD-02 judgment span 'Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access.': Rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).\n     Evidence: \"Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access.\" [715:898]\n     Metadata: failing_gate=GATE_C_MAP_CHECK\n\n[#08] [Agent 2: Clinical Evaluator] -> CONCEDE | Criterion: CRIT-SGD-02\n     Content:  Conceding challenge on CRIT-SGD-02 judgment span 'Severe irreversible expressive communication deficit with successful formal SLP device trial. Plan: Dedicated synthesized speech-generating device with integrated eye-tracking access.': GATE_C_MAP_CHECK failure acknowledged.\n\n[#09] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-SGD-02\n     Content:  LLM Judge evaluated candidate span 'OBJECTIVE: Comprehensive assessment by licensed speech-language pathologist (SLP) documents profound anarthria with severe oral-motor dyspraxia': verdict=NOT_EQUIVALENT (Rationale: The provided evidence does not specify a formal written assessment or trial results with AAC systems as required by the criterion.).\n     Evidence: \"OBJECTIVE: Comprehensive assessment by licensed speech-language pathologist (SLP) documents profound anarthria with severe oral-motor dyspraxia\" [313:456]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=10423.02\n\n[#10] [Agent 2: Clinical Evaluator] -> VERDICT | Criterion: CRIT-SGD-02\n     Content:  LLM Judge evaluated candidate span 'SLP completed formal device trial with dedicated eye-gaze speech-generating system': verdict=NOT_EQUIVALENT (Rationale: The candidate evidence span mentions an 'eye-gaze speech-generating system' which is a specific type of AAC system, but does not specify the 'dedicated' aspect required by the criterion.).\n     Evidence: \"SLP completed formal device trial with dedicated eye-gaze speech-generating system\" [506:588]\n     Metadata: verdict=NOT_EQUIVALENT, latency_ms=8497.16\n\n[#11] [Agent 4: Abstention Gate] -> HALT\n     Content:  HALT: Case deferred to human clinician. Trigger reason: Insufficient evidence for mandatory coverage criteria: [CRIT-SGD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85).\n     Metadata: tau=0.85, abstention_reason=Insufficient evidence for mandatory coverage criteria: [CRIT-SGD-02]. Supplementary documentation required. | Calibrated aggregate confidence (0.773) falls below safety threshold tau (0.85)., sufficiency_score=0.7733\n\n================================================================================"
+    }
+  ]
+}

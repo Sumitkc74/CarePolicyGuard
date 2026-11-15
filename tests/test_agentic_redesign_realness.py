@@ -197,3 +197,203 @@ def test_judge_model_override_honored():
         assert judge_env.model_name == "qwen2.5:14b"
     # Restore config
     reload(config_mod)
+
+
+def test_fatal_anatomic_mismatch_without_defense_leaves_criterion_deferred(sample_vignette):
+    """
+    Task 5 (a): A mocked ANATOMIC_MISMATCH counter-reading with no successful defense leaves the criterion DEFERRED.
+    """
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    mock_judgment = CriterionJudgment(
+        status="MET",
+        quoted_evidence="prostate adenocarcinoma",
+        rationale="Biopsy proven prostate adenocarcinoma satisfies criterion.",
+        confidence=0.95
+    )
+
+    from app.core.agentic_guardrails import AgenticGuardrails
+    from app.core.llm_judge import DefenseResult
+
+    with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_judgment), \
+         patch.object(AgenticGuardrails, "evaluate_gate_chain", return_value={"passed": True, "failing_gate": None, "reason": "Verified equivalence"}), \
+         patch.object(ClinicalEquivalenceJudge, "generate_adversarial_counter_reading_sync", return_value={
+             "adversarial_counter_reading": True,
+             "has_objection": True,
+             "objection_type": "ANATOMIC_MISMATCH",
+             "counter_quote": "prostate adenocarcinoma",
+             "rationale": "Radiation field targets pelvis instead of spine."
+         }), \
+         patch.object(ClinicalEquivalenceJudge, "generate_defense_sync", return_value=DefenseResult(
+             defense_quote="",
+             rationale="Cannot refute anatomic site discrepancy; pelvis and spine differ."
+         )):
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-ANATOMIC-DEF",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    board_msgs = res.message_board or []
+    # Assert Agent 2 conceded due to failed defense on ANATOMIC_MISMATCH
+    concede_msgs = [
+        m for m in board_msgs
+        if m.get("agent") == "Agent 2: Clinical Evaluator"
+        and m.get("message_type") == "CONCEDE"
+        and "ANATOMIC_MISMATCH" in m.get("content", "")
+    ]
+    assert len(concede_msgs) >= 1, "Agent 2 must concede the ANATOMIC_MISMATCH objection on failure to defend"
+
+    # Outcome for criterion must be recorded in audit trail
+    routing = res.agentic_audit_trail.get("judge_routing", {})
+    outcomes = routing.get("debated_criteria_outcomes", {})
+    assert outcomes.get("CRIT-IMRT-02") == "CONCEDED"
+
+    # Criterion assessment remains not MET (INSUFFICIENT_EVIDENCE or NOT_MET) and case defers
+    crit_2 = next(ca for ca in res.criterion_assessments if ca.criterion_code == "CRIT-IMRT-02")
+    assert crit_2.status != "MET", "Criterion must not be promoted after conceded ANATOMIC_MISMATCH challenge"
+
+
+def test_grounded_defense_quote_produces_defend_and_promotes_criterion(sample_vignette):
+    """
+    Task 5 (b): A grounded defense quote produces a DEFEND containing the quote and objection type,
+    and the criterion is promoted to MET.
+    """
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    mock_judgment = CriterionJudgment(
+        status="MET",
+        quoted_evidence="prostate adenocarcinoma",
+        rationale="Biopsy proven prostate adenocarcinoma satisfies criterion.",
+        confidence=0.95
+    )
+
+    from app.core.agentic_guardrails import AgenticGuardrails
+    from app.core.llm_judge import DefenseResult
+
+    # Note text includes: "3D-CRT plan exceeds rectal wall tolerance constraints."
+    with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_judgment), \
+         patch.object(AgenticGuardrails, "evaluate_gate_chain", return_value={"passed": True, "failing_gate": None, "reason": "Verified equivalence"}), \
+         patch.object(ClinicalEquivalenceJudge, "generate_adversarial_counter_reading_sync", return_value={
+             "adversarial_counter_reading": True,
+             "has_objection": True,
+             "objection_type": "TEMPORAL",
+             "counter_quote": "prostate adenocarcinoma",
+             "rationale": "Biopsy timing ambiguous in clinical record."
+         }), \
+         patch.object(ClinicalEquivalenceJudge, "generate_defense_sync", return_value=DefenseResult(
+             defense_quote="3D-CRT plan exceeds rectal wall tolerance constraints",
+             rationale="Current active simulation plan confirms current clinical workflow."
+         )):
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-DEFENSE-PROMOTES",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    board_msgs = res.message_board or []
+    defend_msgs = [
+        m for m in board_msgs
+        if m.get("agent") == "Agent 2: Clinical Evaluator"
+        and m.get("message_type") == "DEFENSE"
+        and "TEMPORAL" in m.get("content", "")
+    ]
+    assert len(defend_msgs) >= 1, "Agent 2 must post DEFENSE containing objection type 'TEMPORAL'"
+    assert "3D-CRT plan exceeds rectal wall tolerance constraints" in defend_msgs[0].get("content", "")
+
+    # Outcome must be DEFENDED
+    routing = res.agentic_audit_trail.get("judge_routing", {})
+    outcomes = routing.get("debated_criteria_outcomes", {})
+    assert outcomes.get("CRIT-IMRT-02") == "DEFENDED"
+
+    # Criterion must be promoted to MET
+    crit_2 = next(ca for ca in res.criterion_assessments if ca.criterion_code == "CRIT-IMRT-02")
+    assert crit_2.status == "MET", "Criterion must be promoted to MET after successful defense"
+
+
+def test_fabricated_defense_quote_rejected_by_gate_a_and_leaves_criterion_deferred(sample_vignette):
+    """
+    Task 5 (c): A fabricated defense quote is rejected by Gate A and the criterion stays DEFERRED.
+    """
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    mock_judgment = CriterionJudgment(
+        status="MET",
+        quoted_evidence="prostate adenocarcinoma",
+        rationale="Biopsy proven prostate adenocarcinoma satisfies criterion.",
+        confidence=0.95
+    )
+
+    from app.core.agentic_guardrails import AgenticGuardrails
+    from app.core.llm_judge import DefenseResult
+
+    with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_judgment), \
+         patch.object(AgenticGuardrails, "evaluate_gate_chain", return_value={"passed": True, "failing_gate": None, "reason": "Verified equivalence"}), \
+         patch.object(ClinicalEquivalenceJudge, "generate_adversarial_counter_reading_sync", return_value={
+             "adversarial_counter_reading": True,
+             "has_objection": True,
+             "objection_type": "HYPOTHETICAL",
+             "counter_quote": "prostate adenocarcinoma",
+             "rationale": "Condition might be hypothetical rule-out."
+         }), \
+         patch.object(ClinicalEquivalenceJudge, "generate_defense_sync", return_value=DefenseResult(
+             defense_quote="Patient definitely has documented real cancer on pathology report from yesterday",
+             rationale="Pathology confirmed as non-hypothetical."
+         )):
+        res = pipeline.adjudicate_sync(
+            patient_id="PT-TEST-FABRICATED-DEFENSE",
+            policy_id="LCD-IMRT",
+            ehr_narrative=sample_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    board_msgs = res.message_board or []
+    concede_msgs = [
+        m for m in board_msgs
+        if m.get("agent") == "Agent 2: Clinical Evaluator"
+        and m.get("message_type") == "CONCEDE"
+        and "HYPOTHETICAL" in m.get("content", "")
+    ]
+    assert len(concede_msgs) >= 1, "Agent 2 must concede when defense quote fails Gate A grounding"
+
+    routing = res.agentic_audit_trail.get("judge_routing", {})
+    outcomes = routing.get("debated_criteria_outcomes", {})
+    assert outcomes.get("CRIT-IMRT-02") == "CONCEDED"
+
+    crit_2 = next(ca for ca in res.criterion_assessments if ca.criterion_code == "CRIT-IMRT-02")
+    assert crit_2.status != "MET", "Criterion must stay DEFERRED/unpromoted on ungrounded defense quote"
+
+
+def test_routing_counters_appear_in_result_metadata(sample_vignette):
+    """
+    Task 5 (d): The routing counters appear in the result metadata on an agentic case.
+    """
+    pipeline = MultiAgentVerificationPipeline(db=None)
+
+    res = pipeline.adjudicate_sync(
+        patient_id="PT-TEST-ROUTING-META",
+        policy_id="LCD-IMRT",
+        ehr_narrative=sample_vignette["ehr_narrative"],
+        execution_mode="agentic",
+        save_record=False,
+    )
+
+    # Check agentic_audit_trail["judge_routing"]
+    routing = res.agentic_audit_trail.get("judge_routing", {})
+    assert "judge_calls_otherwise_deferring" in routing, "judge_calls_otherwise_deferring must be in judge_routing"
+    assert "judge_calls_already_settled" in routing, "judge_calls_already_settled must be in judge_routing"
+    assert "judge_calls_total_case" in routing, "judge_calls_total_case must be in judge_routing"
+    assert "debated_criteria_outcomes" in routing, "debated_criteria_outcomes must be in judge_routing"
+
+    # Also check llm_proposal_metadata
+    llm_meta = res.llm_proposal_metadata or {}
+    assert "judge_calls_otherwise_deferring" in llm_meta, "judge_calls_otherwise_deferring must be in llm_proposal_metadata"
+    assert "judge_calls_already_settled" in llm_meta, "judge_calls_already_settled must be in llm_proposal_metadata"
+    assert "judge_calls_total_case" in llm_meta, "judge_calls_total_case must be in llm_proposal_metadata"
+    assert "debated_criteria_outcomes" in llm_meta, "debated_criteria_outcomes must be in llm_proposal_metadata"
+

@@ -48,6 +48,15 @@ class CriterionJudgment(BaseModel):
     status_code: str = Field(default="COMPLETED", description="Execution status")
 
 
+class DefenseResult(BaseModel):
+    """Structured defense result from Agent 2 in response to an adversarial counter-reading (Task 2)."""
+    defense_quote: str = Field(default="", description="Verbatim quote from clinical note answering the objection")
+    rationale: str = Field(..., description="Clinical reasoning explaining how the quote resolves the objection")
+    elapsed_ms: float = Field(default=0.0, description="Inference latency in milliseconds")
+    status_code: str = Field(default="COMPLETED", description="Execution status")
+
+
+
 class ClinicalEquivalenceJudge:
     """
     Evaluates semantic equivalence between a criterion and a deterministically extracted span.
@@ -478,3 +487,124 @@ class ClinicalEquivalenceJudge:
         except (httpx.HTTPError, TimeoutError, ValueError, KeyError, RuntimeError) as exc:
             logger.debug(f"Adversarial counter-reading query exception: {exc}")
             return {"has_objection": False, "objection_type": "NONE", "counter_quote": "", "rationale": str(exc)}
+
+    def generate_defense_sync(
+        self,
+        criterion: dict[str, Any],
+        objection: dict[str, Any],
+        proposed_evidence: str,
+        note_text: str
+    ) -> DefenseResult:
+        """
+        Task 2 (v51-fix): Evaluates an adversarial objection against a proposed criterion judgment,
+        attempting to defend the criterion by locating resolving evidence in the note.
+        Returns a structured DefenseResult (defense_quote + rationale).
+        """
+        t0 = time.perf_counter()
+        ccode = criterion.get("criterion_code", "CRIT-UNKNOWN")
+        obj_type = objection.get("objection_type", "OBJECTION")
+        obj_rationale = objection.get("rationale", "")
+        counter_quote = objection.get("counter_quote", "")
+
+        # Budget checks
+        if self.case_call_count >= self.max_calls_per_case:
+            logger.warning(f"Defense budget exceeded ({self.case_call_count}/{self.max_calls_per_case}) on {ccode}.")
+            return DefenseResult(
+                defense_quote="",
+                rationale="Defense call budget exceeded; cannot answer objection.",
+                elapsed_ms=0.0,
+                status_code="SKIPPED_BUDGET_EXHAUSTED"
+            )
+
+        if self.case_elapsed_ms >= (self.max_time_per_case_seconds * 1000.0):
+            logger.warning(f"Defense time budget exceeded ({self.case_elapsed_ms:.1f}ms / {self.max_time_per_case_seconds*1000}ms).")
+            return DefenseResult(
+                defense_quote="",
+                rationale="Defense time budget exceeded; cannot answer objection.",
+                elapsed_ms=0.0,
+                status_code="SKIPPED_BUDGET_EXHAUSTED"
+            )
+
+        prompt = (
+            f"You are Agent 2 (Clinical Evaluator) defending a prior authorization coverage criterion against an adversarial objection.\n\n"
+            f"CRITERION: {ccode}: {criterion.get('name', '')}\n"
+            f"REQUIREMENT: {criterion.get('description', '')}\n"
+            f"ORIGINAL PROPOSED EVIDENCE: \"{proposed_evidence}\"\n\n"
+            f"ADVERSARIAL OBJECTION:\n"
+            f"Objection Type: {obj_type}\n"
+            f"Objection Rationale: {obj_rationale}\n"
+            f"Challenging Quote: \"{counter_quote}\"\n\n"
+            f"FULL CLINICAL NOTE:\n\"\"\"\n{note_text}\n\"\"\"\n\n"
+            f"TASK:\n"
+            f"Examine the clinical note to determine if there is specific evidence that directly resolves, refutes, or satisfies this {obj_type} objection.\n"
+            f"Requirements:\n"
+            f"1. If resolving evidence exists elsewhere in the note, provide a verbatim quote (defense_quote) that is DIFFERENT from the original proposed evidence, and explain how it resolves the objection.\n"
+            f"2. If the objection is valid and cannot be refuted by the clinical note, return defense_quote as an empty string (\"\") and explain why the objection stands.\n\n"
+            f"Output ONLY JSON in this format:\n"
+            f"{{\n"
+            f'  "defense_quote": "<verbatim excerpt from note resolving objection, or empty string>",\n'
+            f'  "rationale": "<clinical explanation answering the objection>"\n'
+            f"}}"
+        )
+
+        payload = {
+            "model": self.model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.0,
+            "response_format": {"type": "json_object"},
+            "max_tokens": 200
+        }
+
+        try:
+            with httpx.Client(timeout=self.timeout_seconds) as client:
+                resp = client.post(self.endpoint_url, json=payload)
+
+            elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_judge_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
+
+            if resp.status_code != 200:
+                return DefenseResult(
+                    defense_quote="",
+                    rationale=f"LLM endpoint HTTP {resp.status_code}; defense call failed.",
+                    elapsed_ms=elapsed_ms,
+                    status_code=f"HTTP_{resp.status_code}"
+                )
+
+            data = resp.json()
+            content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
+            try:
+                parsed = json.loads(content)
+            except (json.JSONDecodeError, ValueError):
+                m_quote = re.search(r'"defense_quote":\s*"([^"]*)"', content)
+                m_rat = re.search(r'"rationale":\s*"([^"]+)"', content)
+                parsed = {
+                    "defense_quote": m_quote.group(1) if m_quote else "",
+                    "rationale": m_rat.group(1) if m_rat else "Extracted from partial response"
+                }
+
+            quote = str(parsed.get("defense_quote", "")).strip()
+            rationale = str(parsed.get("rationale", "No rationale provided.")).strip()
+
+            return DefenseResult(
+                defense_quote=quote,
+                rationale=rationale,
+                elapsed_ms=elapsed_ms,
+                status_code="COMPLETED"
+            )
+        except (httpx.HTTPError, TimeoutError, ValueError, KeyError, RuntimeError) as exc:
+            elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_judge_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
+            logger.debug(f"Defense query exception: {exc}")
+            return DefenseResult(
+                defense_quote="",
+                rationale=f"Defense query exception: {exc!s}",
+                elapsed_ms=elapsed_ms,
+                status_code="ERROR"
+            )
+

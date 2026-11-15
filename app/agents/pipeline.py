@@ -439,6 +439,7 @@ class MultiAgentVerificationPipeline:
             # Routing metrics
             judge_calls_otherwise_deferring = 0
             judge_calls_already_settled = 0
+            debated_criteria_outcomes: dict[str, str] = {}
 
             criteria_assessments = []
             agent2_tool_decisions = []
@@ -645,28 +646,115 @@ class MultiAgentVerificationPipeline:
                                 }
                             )
 
-                            # Agent 2 evaluates counter-reading
-                            is_fatal_challenge = False
-                            cr = adv_challenge.get("rationale", "")
-                            if adv_challenge.get("has_objection") and adv_challenge.get("objection_type") in ("NEGATION", "EXPERIENCER"):
-                                is_fatal_challenge = True
+                            # Task 1 & Task 2 (v51-fix): Widen fatal rule & 2-round debate with evidence-backed defense
+                            has_obj = adv_challenge.get("has_objection", False)
+                            obj_type = adv_challenge.get("objection_type", "NONE")
+                            is_fatal_challenge = bool(has_obj and obj_type in (
+                                "NEGATION", "EXPERIENCER", "TEMPORAL", "HYPOTHETICAL", "ANATOMIC_MISMATCH"
+                            ))
 
                             total_agent_turns += 1
                             if is_fatal_challenge:
-                                board.post(
-                                    agent="Agent 2: Clinical Evaluator",
-                                    message_type=BoardMessageType.CONCEDE,
-                                    content=f"Conceding challenge on {ccode}: Agent 3 demonstrated proven contradiction in narrative.",
-                                    criterion_code=ccode
-                                )
+                                # Agent 2 gets exactly one defense attempt via LLM call
+                                # Check operational budget before calling defense
+                                defense_budget_exhausted = False
+                                try:
+                                    if judge.case_call_count >= AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
+                                        raise BudgetExhaustionHalt("LLM_CALLS", AgenticGuardrails.MAX_LLM_CALLS_PER_CASE, judge.case_call_count)
+                                    AgenticGuardrails.check_budgets(
+                                        llm_calls=judge.case_call_count,
+                                        elapsed_seconds=judge.case_elapsed_ms / 1000.0,
+                                        agent_turns=total_agent_turns,
+                                        criterion_debate_rounds=1
+                                    )
+                                except BudgetExhaustionHalt as bh:
+                                    defense_budget_exhausted = True
+                                    board.post(
+                                        agent="Agent 4: Abstention Gate",
+                                        message_type=BoardMessageType.HALT,
+                                        content=f"HALT triggered before defense attempt: {bh}. Execution bounds reached.",
+                                        criterion_code=ccode,
+                                        metadata={"resource": bh.resource, "limit": bh.limit}
+                                    )
+
+                                if defense_budget_exhausted:
+                                    debated_criteria_outcomes[ccode] = "UNRESOLVED_DISAGREEMENT"
+                                    board.post(
+                                        agent="Agent 2: Clinical Evaluator",
+                                        message_type=BoardMessageType.CONCEDE,
+                                        content=f"Conceding challenge on {ccode} due to operational budget exhaustion during {obj_type} defense.",
+                                        criterion_code=ccode
+                                    )
+                                else:
+                                    # Call generate_defense_sync
+                                    defense_res = judge.generate_defense_sync(
+                                        criterion=crit,
+                                        objection=adv_challenge,
+                                        proposed_evidence=sanitized_ehr[s:e],
+                                        note_text=sanitized_ehr
+                                    )
+                                    total_agent_turns += 1
+
+                                    def_quote = defense_res.defense_quote.strip()
+                                    defense_grounded = False
+                                    def_s, def_e = -1, -1
+
+                                    if def_quote:
+                                        # Must be a span different from the challenged evidence span
+                                        def_s, def_e = LLMProposalAgent.locate_claimed_span(sanitized_ehr, def_quote, allow_repair=True)
+                                        # Verify different span and verbatim grounding
+                                        if def_s != -1 and def_e != -1 and not (def_s == s and def_e == e):
+                                            defense_grounded = True
+
+                                    if defense_grounded:
+                                        debated_criteria_outcomes[ccode] = "DEFENDED"
+                                        def_ev_span = ClinicalEvidenceSpan(
+                                            source_text=sanitized_ehr[def_s:def_e],
+                                            start_char=def_s,
+                                            end_char=def_e,
+                                            confidence=0.95
+                                        )
+                                        board.post(
+                                            agent="Agent 2: Clinical Evaluator",
+                                            message_type=BoardMessageType.DEFENSE,
+                                            content=(
+                                                f"Defense of {ccode}: Grounded evidence '{sanitized_ehr[def_s:def_e]}' resolves {obj_type} objection. "
+                                                f"Rationale: {defense_res.rationale}"
+                                            ),
+                                            criterion_code=ccode,
+                                            evidence=def_ev_span,
+                                            metadata={
+                                                "objection_type": obj_type,
+                                                "defense_quote": sanitized_ehr[def_s:def_e],
+                                                "defense_rationale": defense_res.rationale,
+                                                "gate_chain_passed": True,
+                                                "verbatim_grounded": True
+                                            }
+                                        )
+                                        assessment.status = DeterminationStatus.MET
+                                        assessment.verified_spans = [ev_span, def_ev_span]
+                                        assessment.raw_confidence = 0.95
+                                        assessment.clinical_rationale = f"Semantic equivalence verified and defended against {obj_type} objection using '{sanitized_ehr[def_s:def_e]}'."
+                                        promoted = True
+                                    else:
+                                        debated_criteria_outcomes[ccode] = "CONCEDED"
+                                        board.post(
+                                            agent="Agent 2: Clinical Evaluator",
+                                            message_type=BoardMessageType.CONCEDE,
+                                            content=f"Conceding challenge on {ccode}: Agent 2 defense failed to provide a valid grounded quote resolving {obj_type} objection.",
+                                            criterion_code=ccode,
+                                            metadata={"objection_type": obj_type, "defense_quote": def_quote}
+                                        )
                             else:
+                                # No fatal objection or objection_type is NONE / empty
+                                debated_criteria_outcomes[ccode] = "DEFENDED"
                                 board.post(
                                     agent="Agent 2: Clinical Evaluator",
                                     message_type=BoardMessageType.DEFENSE,
-                                    content=f"Defense of {ccode}: Verbatim grounding at [{s}:{e}] reaffirmed against counter-reading; no disabling contradiction found.",
+                                    content=f"Defense of {ccode}: Verbatim grounding at [{s}:{e}] reaffirmed against counter-reading; no disabling {obj_type} contradiction found in narrative.",
                                     criterion_code=ccode,
                                     evidence=ev_span,
-                                    metadata={"gate_chain_passed": True, "verbatim_grounded": True}
+                                    metadata={"objection_type": obj_type, "gate_chain_passed": True, "verbatim_grounded": True}
                                 )
                                 assessment.status = DeterminationStatus.MET
                                 assessment.verified_spans = [ev_span]
@@ -1037,6 +1125,19 @@ class MultiAgentVerificationPipeline:
             "proposals_accepted": llm_telemetry.get("proposals_accepted", 0),
             "total_latency_ms": round(llm_telemetry.get("total_latency_ms", 0.0), 2)
         }
+
+        # Task 3 (v51-fix): Surface routing counters and debate outcomes in agentic audit trail and metadata
+        if execution_mode == "agentic":
+            agentic_audit_trail["judge_routing"] = {
+                "judge_calls_otherwise_deferring": judge_calls_otherwise_deferring if 'judge_calls_otherwise_deferring' in locals() else 0,
+                "judge_calls_already_settled": judge_calls_already_settled if 'judge_calls_already_settled' in locals() else 0,
+                "judge_calls_total_case": judge.case_call_count if 'judge' in locals() else 0,
+                "debated_criteria_outcomes": debated_criteria_outcomes if 'debated_criteria_outcomes' in locals() else {}
+            }
+            llm_proposal_metadata["judge_calls_otherwise_deferring"] = judge_calls_otherwise_deferring if 'judge_calls_otherwise_deferring' in locals() else 0
+            llm_proposal_metadata["judge_calls_already_settled"] = judge_calls_already_settled if 'judge_calls_already_settled' in locals() else 0
+            llm_proposal_metadata["judge_calls_total_case"] = judge.case_call_count if 'judge' in locals() else 0
+            llm_proposal_metadata["debated_criteria_outcomes"] = debated_criteria_outcomes if 'debated_criteria_outcomes' in locals() else {}
 
         # 6. Cryptographic Chain-of-Custody Seal (SHA-256)
         all_spans = []
