@@ -1,0 +1,4072 @@
+{
+  "benchmark_session": "v55",
+  "timestamp": "2026-11-15T09:18:41.507350+00:00",
+  "total_cases": 84,
+  "metrics": {
+    "top_1_count": 69,
+    "top_1_rate": 0.8214,
+    "top_3_count": 82,
+    "top_3_rate": 0.9762,
+    "top_5_count": 82,
+    "top_5_rate": 0.9762,
+    "preselected_count": 41,
+    "preselected_rate": 0.4881,
+    "selection_required_count": 43,
+    "no_governing_count": 0,
+    "latency_ms_p50": 555.87,
+    "latency_ms_p90": 739.62,
+    "latency_ms_p95": 841.02
+  },
+  "comparison_v47_baseline": {
+    "top_1_delta": -6,
+    "top_3_delta": 1,
+    "top_5_delta": 0,
+    "v47_top_1_rate": 0.8929,
+    "v47_top_3_rate": 0.9643,
+    "v47_top_5_rate": 0.9762
+  },
+  "notable_cases": {
+    "DEV_LCD_WOUND_VAC_NEG": {
+      "vignette_id": "DEV-LCD-WOUND-VAC-NEG",
+      "title": "Sacral wound with 100% thick black necrotic eschar without debridement",
+      "gold_policy": "LCD-WOUND-VAC",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-WOUND-VAC",
+          "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+          "reranked_score": 0.7829,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.7686,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.6113,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-240.2",
+          "policy_title": "Home Use of Oxygen",
+          "reranked_score": 0.4858,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 423.11
+    }
+  },
+  "cases": [
+    {
+      "vignette_id": "DEV-LCD-ACDF-APP",
+      "title": "Cervical radiculopathy with MRI-proven disc herniation",
+      "gold_policy": "LCD-ACDF",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-ACDF",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.9842,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.9625,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.8819,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.7207,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 13394.57
+    },
+    {
+      "vignette_id": "DEV-LCD-ACDF-NEG",
+      "title": "Axial neck pain without radiculopathy or disc herniation",
+      "gold_policy": "LCD-ACDF",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-ACDF",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 1.0781,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.9156,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.8899,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.7437,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.7188,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 455.47
+    },
+    {
+      "vignette_id": "DEV-LCD-ACI-APP",
+      "title": "Focal femoral condyle chondral defect post-microfracture failure",
+      "gold_policy": "LCD-ACI",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-ACI",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.6859,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6306,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.6245,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 0.5979,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 587.44
+    },
+    {
+      "vignette_id": "DEV-LCD-ACI-NEG",
+      "title": "Severe tricompartmental osteoarthritis with sub-threshold lesion",
+      "gold_policy": "LCD-ACI",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-ACI",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.95,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.7098,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.6616,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.6496,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.6082,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 484.49
+    },
+    {
+      "vignette_id": "DEV-LCD-CT-CHEST-APP",
+      "title": "Solitary pulmonary nodule on chest radiograph with hemoptysis",
+      "gold_policy": "LCD-CT-CHEST",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-CT-CHEST",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 1.1212,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-240.2",
+          "policy_title": "Home Use of Oxygen",
+          "reranked_score": 0.8142,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6657,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-PET-ONC",
+          "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+          "reranked_score": 0.6093,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5708,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 549.96
+    },
+    {
+      "vignette_id": "DEV-LCD-CT-CHEST-NEG",
+      "title": "Uncomplicated acute bronchitis without abnormal radiograph",
+      "gold_policy": "LCD-CT-CHEST",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 0.7969,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6269,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6165,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5203,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.5,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 440.04
+    },
+    {
+      "vignette_id": "DEV-LCD-ESI-APP",
+      "title": "L5 radicular nerve root pain refractory to physical therapy",
+      "gold_policy": "LCD-ESI",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-ESI",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.8046,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.7855,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.7576,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.6696,
+          "coverage_ratio": 1.0
+        }
+      ],
+      "latency_ms": 577.57
+    },
+    {
+      "vignette_id": "DEV-LCD-ESI-NEG",
+      "title": "Axial low back pain without radicular symptoms or physical therapy",
+      "gold_policy": "LCD-ESI",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-ESI",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.9375,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.6914,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6859,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.672,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.6165,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 454.12
+    },
+    {
+      "vignette_id": "DEV-LCD-EVAR-APP",
+      "title": "Infrarenal AAA diameter 5.8 cm with adequate proximal aortic neck",
+      "gold_policy": "LCD-EVAR",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-EVAR",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.33",
+          "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+          "reranked_score": 0.6327,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.6316,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 0.4956,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-BLEPH",
+          "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+          "reranked_score": 0.4735,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 559.15
+    },
+    {
+      "vignette_id": "DEV-LCD-EVAR-NEG",
+      "title": "Small stable infrarenal aneurysm measuring 3.8 cm",
+      "gold_policy": "LCD-EVAR",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.7969,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6758,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-PET-ONC",
+          "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+          "reranked_score": 0.6191,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.6133,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.6067,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 533.26
+    },
+    {
+      "vignette_id": "DEV-LCD-FACET-APP",
+      "title": "Chronic lumbar facet arthropathy with 85% relief on dual MBB",
+      "gold_policy": "LCD-FACET",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-FACET",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6707,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6343,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6163,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.6035,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 563.03
+    },
+    {
+      "vignette_id": "DEV-LCD-FACET-NEG",
+      "title": "Acute radicular sciatica with negative diagnostic facet block",
+      "gold_policy": "LCD-FACET",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.8585,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.82,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.7241,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6066,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.5756,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 495.9
+    },
+    {
+      "vignette_id": "DEV-LCD-HALLUX-APP",
+      "title": "Painful hallux valgus deformity failing 16 weeks orthotics",
+      "gold_policy": "LCD-HALLUX",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-HALLUX",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-HALLUX",
+          "policy_title": "Hallux Valgus Correction (Bunionectomy)",
+          "reranked_score": 1.1069,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.7786,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.6497,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.5653,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-SI-FUSION",
+          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+          "reranked_score": 0.5366,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 609.87
+    },
+    {
+      "vignette_id": "DEV-LCD-HALLUX-NEG",
+      "title": "Painless cosmetic complaint with minimal 10 degree deviation",
+      "gold_policy": "LCD-HALLUX",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-HALLUX",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-HALLUX",
+          "policy_title": "Hallux Valgus Correction (Bunionectomy)",
+          "reranked_score": 0.9375,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.559,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 493.35
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-ARTHRO-APP",
+      "title": "End-stage osteoarthritis of right hip refractory to non-operative care",
+      "gold_policy": "LCD-HIP-ARTHRO",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-HIP-ARTHRO",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 1.0879,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.9609,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-SHOULDER-ARTHRO",
+          "policy_title": "Total and Reverse Shoulder Arthroplasty",
+          "reranked_score": 0.7708,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.708,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.6328,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 622.52
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-ARTHRO-NEG",
+      "title": "Mild hip strain with active superficial wound infection",
+      "gold_policy": "LCD-HIP-ARTHRO",
+      "expected_decision": "DENIED",
+      "gold_rank": 3,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6906,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "OPD-SI-FUSION",
+          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+          "reranked_score": 0.6706,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.6559,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-20.33",
+          "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+          "reranked_score": 0.578,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.5561,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 501.11
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-SCOOP-APP",
+      "title": "Femoroacetabular impingement with acetabular labral tear on MRI",
+      "gold_policy": "LCD-HIP-SCOOP",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-HIP-SCOOP",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-HIP-SCOOP",
+          "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+          "reranked_score": 1.0637,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.7236,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.7221,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 0.6971,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.6773,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 752.45
+    },
+    {
+      "vignette_id": "DEV-LCD-HIP-SCOOP-NEG",
+      "title": "Advanced degenerative hip arthritis with joint space obliteration",
+      "gold_policy": "LCD-HIP-SCOOP",
+      "expected_decision": "DENIED",
+      "gold_rank": ">5",
+      "in_top1": false,
+      "in_top3": false,
+      "in_top5": false,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6636,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.6592,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "OPD-SI-FUSION",
+          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+          "reranked_score": 0.5947,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.5732,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.5671,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 434.14
+    },
+    {
+      "vignette_id": "DEV-LCD-IMRT-APP",
+      "title": "Localized prostate adenocarcinoma adjacent to critical rectal wall",
+      "gold_policy": "LCD-IMRT",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-IMRT",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.95,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-PROTON",
+          "policy_title": "Proton Beam Radiotherapy",
+          "reranked_score": 0.7819,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.686,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.5511,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-20.4",
+          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+          "reranked_score": 0.4682,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 560.37
+    },
+    {
+      "vignette_id": "DEV-LCD-IMRT-NEG",
+      "title": "Palliative treatment of painful diffuse bone metastasis",
+      "gold_policy": "LCD-IMRT",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-IMRT",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.9375,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.8469,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-PROTON",
+          "policy_title": "Proton Beam Radiotherapy",
+          "reranked_score": 0.7685,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.682,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.6253,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 449.11
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ARTHRO-APP",
+      "title": "Mechanical bucket-handle meniscal tear with persistent knee locking",
+      "gold_policy": "LCD-KNEE-ARTHRO",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-KNEE-ARTHRO",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 1.1069,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.8215,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.7733,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 0.7572,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-HIP-SCOOP",
+          "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+          "reranked_score": 0.7416,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 605.87
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ARTHRO-NEG",
+      "title": "Bone-on-bone knee osteoarthritis without discrete mechanical tear",
+      "gold_policy": "LCD-KNEE-ARTHRO",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.737,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.7286,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.7077,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.6822,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.6171,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 525.26
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-APP",
+      "title": "Severe chronic ACL/PCL laxity failing prefabricated bracing",
+      "gold_policy": "LCD-KNEE-ORTHOSIS",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.765,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.669,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.623,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.6205,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.6068,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 742.85
+    },
+    {
+      "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
+      "title": "Temporary postoperative rehabilitation following routine arthroscopy",
+      "gold_policy": "LCD-KNEE-ORTHOSIS",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.7279,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.6882,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6873,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-HIP-SCOOP",
+          "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+          "reranked_score": 0.6391,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.6177,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 692.36
+    },
+    {
+      "vignette_id": "DEV-LCD-KYPHO-APP",
+      "title": "Acute painful osteoporotic vertebral compression fracture with bone edema",
+      "gold_policy": "LCD-KYPHO",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.765,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.7366,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6665,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.6049,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5752,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 1137.39
+    },
+    {
+      "vignette_id": "DEV-LCD-KYPHO-NEG",
+      "title": "Vertebral collapse in the setting of active infectious osteomyelitis",
+      "gold_policy": "LCD-KYPHO",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.7756,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.6661,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6344,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5694,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.5498,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 638.6
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
+      "title": "Severe lumbar canal stenosis with neurogenic claudication",
+      "gold_policy": "LCD-LUMBAR-DECOMP",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-LUMBAR-DECOMP",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.9569,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.8313,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.8133,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.7768,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6716,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 861.82
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-DECOMP-NEG",
+      "title": "Postural low back pain with widely patent spinal canal",
+      "gold_policy": "LCD-LUMBAR-DECOMP",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.765,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6781,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6688,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.6424,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6111,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 616.31
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-FUSION-APP",
+      "title": "Grade II degenerative spondylolisthesis with dynamic instability",
+      "gold_policy": "LCD-LUMBAR-FUSION",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-LUMBAR-FUSION",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.9654,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.8298,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.7586,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.7092,
+          "coverage_ratio": 1.0
+        }
+      ],
+      "latency_ms": 727.3
+    },
+    {
+      "vignette_id": "DEV-LCD-LUMBAR-FUSION-NEG",
+      "title": "Isolated disc herniation without mechanical instability",
+      "gold_policy": "LCD-LUMBAR-FUSION",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.8163,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.8075,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.7518,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6905,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.6587,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 610.63
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-BRAIN-APP",
+      "title": "Subacute progressive right facial droop and unilateral weakness",
+      "gold_policy": "LCD-MRI-BRAIN",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-MRI-BRAIN",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 1.0,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6984,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 0.5754,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "OPD-BOTOX",
+          "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+          "reranked_score": 0.5721,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.4837,
+          "coverage_ratio": 0.333
+        }
+      ],
+      "latency_ms": 987.9
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-BRAIN-NEG",
+      "title": "Chronic recurrent tension headache with normal neurological exam",
+      "gold_policy": "LCD-MRI-BRAIN",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.7012,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "OPD-BOTOX",
+          "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+          "reranked_score": 0.6463,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 624.68
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-LUMBAR-APP",
+      "title": "Progressive foot drop and severe S1 radiculopathy after 6 weeks therapy",
+      "gold_policy": "LCD-MRI-LUMBAR",
+      "expected_decision": "APPROVED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.9836,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.9625,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.7728,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.7036,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.6599,
+          "coverage_ratio": 1.0
+        }
+      ],
+      "latency_ms": 772.28
+    },
+    {
+      "vignette_id": "DEV-LCD-MRI-LUMBAR-NEG",
+      "title": "Acute muscular lumbar strain of 4 days duration",
+      "gold_policy": "LCD-MRI-LUMBAR",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.7012,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.6473,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6339,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6333,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.592,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 612.41
+    },
+    {
+      "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
+      "title": "Severe lifestyle-limiting calf claudication with SFA occlusion",
+      "gold_policy": "LCD-PAD-ATHERO",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.85,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.8334,
+          "coverage_ratio": 0.667
+        },
+        {
+          "rank": 3,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.8101,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-20.7",
+          "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+          "reranked_score": 0.7516,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.6797,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 853.16
+    },
+    {
+      "vignette_id": "DEV-LCD-PAD-ATHERO-NEG",
+      "title": "Asymptomatic mild peripheral arterial disease with ABI 0.88",
+      "gold_policy": "LCD-PAD-ATHERO",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.7636,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.7331,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-20.7",
+          "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+          "reranked_score": 0.6307,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-PCI",
+          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+          "reranked_score": 0.5676,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.5573,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 534.79
+    },
+    {
+      "vignette_id": "DEV-LCD-PCI-APP",
+      "title": "Refractory Canadian Class III angina with 85% proximal LAD stenosis",
+      "gold_policy": "LCD-PCI",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-PCI",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-PCI",
+          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+          "reranked_score": 1.0,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.7",
+          "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+          "reranked_score": 0.7463,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6573,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.6098,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.6068,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 552.57
+    },
+    {
+      "vignette_id": "DEV-LCD-PCI-NEG",
+      "title": "Non-hemodynamic mild 30% coronary plaque with negative stress test",
+      "gold_policy": "LCD-PCI",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-PCI",
+          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+          "reranked_score": 0.7085,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6718,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-20.7",
+          "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+          "reranked_score": 0.6596,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.6427,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.6326,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 405.14
+    },
+    {
+      "vignette_id": "DEV-LCD-POWER-WC-APP",
+      "title": "Non-ambulatory ALS with quadriplegia requiring power positioning",
+      "gold_policy": "LCD-POWER-WC",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-POWER-WC",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-POWER-WC",
+          "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+          "reranked_score": 0.95,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.5998,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-RAD-NIV",
+          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+          "reranked_score": 0.5924,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.5613,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.5457,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 581.27
+    },
+    {
+      "vignette_id": "DEV-LCD-POWER-WC-NEG",
+      "title": "Mild mobility deficit with preserved ability to propel manual chair",
+      "gold_policy": "LCD-POWER-WC",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-POWER-WC",
+          "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+          "reranked_score": 0.7331,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.6129,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.5986,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.5905,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5856,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 457.66
+    },
+    {
+      "vignette_id": "DEV-LCD-PROTON-APP",
+      "title": "Base of skull chordoma adjacent to brainstem and optic chiasm",
+      "gold_policy": "LCD-PROTON",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-PROTON",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-PROTON",
+          "policy_title": "Proton Beam Radiotherapy",
+          "reranked_score": 0.9875,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.8544,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.6852,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.4608,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-20.4",
+          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+          "reranked_score": 0.4542,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 536.37
+    },
+    {
+      "vignette_id": "DEV-LCD-PROTON-NEG",
+      "title": "Widespread metastatic disease with multiple hepatic and bone deposits",
+      "gold_policy": "LCD-PROTON",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-PROTON",
+          "policy_title": "Proton Beam Radiotherapy",
+          "reranked_score": 0.7438,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.6984,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.6719,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-PET-ONC",
+          "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+          "reranked_score": 0.6284,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-20.4",
+          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+          "reranked_score": 0.6064,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 443.56
+    },
+    {
+      "vignette_id": "DEV-LCD-RAD-NIV-APP",
+      "title": "Severe COPD with chronic hypercapnia failing standard PAP",
+      "gold_policy": "LCD-RAD-NIV",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-RAD-NIV",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-RAD-NIV",
+          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+          "reranked_score": 1.0,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-240.2",
+          "policy_title": "Home Use of Oxygen",
+          "reranked_score": 0.8233,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.6491,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.5742,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5681,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 667.16
+    },
+    {
+      "vignette_id": "DEV-LCD-RAD-NIV-NEG",
+      "title": "Uncomplicated obstructive sleep apnea with normal daytime carbon dioxide",
+      "gold_policy": "LCD-RAD-NIV",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.9452,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-RAD-NIV",
+          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+          "reranked_score": 0.8835,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.5913,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 479.61
+    },
+    {
+      "vignette_id": "DEV-LCD-ROTATOR-CUFF-APP",
+      "title": "Full-thickness supraspinatus tear failing 16 weeks physical therapy",
+      "gold_policy": "LCD-ROTATOR-CUFF",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-ROTATOR-CUFF",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-SHOULDER-ARTHRO",
+          "policy_title": "Total and Reverse Shoulder Arthroplasty",
+          "reranked_score": 0.8201,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.756,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-HIP-SCOOP",
+          "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+          "reranked_score": 0.7129,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-RHINO",
+          "policy_title": "Rhinoplasty and Septoplasty",
+          "reranked_score": 0.6569,
+          "coverage_ratio": 1.0
+        }
+      ],
+      "latency_ms": 576.44
+    },
+    {
+      "vignette_id": "DEV-LCD-ROTATOR-CUFF-NEG",
+      "title": "Severe cuff tear arthropathy with bone-on-bone glenohumeral collapse",
+      "gold_policy": "LCD-ROTATOR-CUFF",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-SHOULDER-ARTHRO",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-SHOULDER-ARTHRO",
+          "policy_title": "Total and Reverse Shoulder Arthroplasty",
+          "reranked_score": 0.8585,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 0.7638,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.6565,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-HIP-SCOOP",
+          "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+          "reranked_score": 0.6351,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.6264,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 449.48
+    },
+    {
+      "vignette_id": "DEV-LCD-SBRT-APP",
+      "title": "Medically inoperable clinical Stage I NSCLC of right upper lobe",
+      "gold_policy": "LCD-SBRT",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-SBRT",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.95,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.7875,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-PROTON",
+          "policy_title": "Proton Beam Radiotherapy",
+          "reranked_score": 0.7046,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-20.33",
+          "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+          "reranked_score": 0.6342,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-240.2",
+          "policy_title": "Home Use of Oxygen",
+          "reranked_score": 0.5953,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 552.59
+    },
+    {
+      "vignette_id": "DEV-LCD-SBRT-NEG",
+      "title": "Disseminated metastatic carcinoma with widespread organ deposits",
+      "gold_policy": "LCD-SBRT",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.7969,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-PROTON",
+          "policy_title": "Proton Beam Radiotherapy",
+          "reranked_score": 0.6666,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.6311,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-PET-ONC",
+          "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+          "reranked_score": 0.6217,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.5365,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 416.69
+    },
+    {
+      "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-APP",
+      "title": "Severe glenohumeral osteoarthritis failing 5 months conservative care",
+      "gold_policy": "LCD-SHOULDER-ARTHRO",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-SHOULDER-ARTHRO",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-SHOULDER-ARTHRO",
+          "policy_title": "Total and Reverse Shoulder Arthroplasty",
+          "reranked_score": 1.0115,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.9128,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.882,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 0.7455,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.7258,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 573.1
+    },
+    {
+      "vignette_id": "DEV-LCD-SHOULDER-ARTHRO-NEG",
+      "title": "Severe shoulder arthrosis with active purulent joint infection",
+      "gold_policy": "LCD-SHOULDER-ARTHRO",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.7544,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-SHOULDER-ARTHRO",
+          "policy_title": "Total and Reverse Shoulder Arthroplasty",
+          "reranked_score": 0.7243,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.7011,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "OPD-SI-FUSION",
+          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+          "reranked_score": 0.6049,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-PUMP",
+          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+          "reranked_score": 0.6038,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 492.01
+    },
+    {
+      "vignette_id": "DEV-LCD-WOUND-VAC-APP",
+      "title": "Deep dehisced abdominal surgical wound failing 6 weeks moist dressings",
+      "gold_policy": "LCD-WOUND-VAC",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "LCD-WOUND-VAC",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-WOUND-VAC",
+          "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+          "reranked_score": 1.0833,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.875,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-RAD-NIV",
+          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+          "reranked_score": 0.5998,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.589,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-PANNI",
+          "policy_title": "Panniculectomy and Abdominoplasty",
+          "reranked_score": 0.569,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 707.53
+    },
+    {
+      "vignette_id": "DEV-LCD-WOUND-VAC-NEG",
+      "title": "Sacral wound with 100% thick black necrotic eschar without debridement",
+      "gold_policy": "LCD-WOUND-VAC",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-WOUND-VAC",
+          "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+          "reranked_score": 0.7829,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.7686,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.6113,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-240.2",
+          "policy_title": "Home Use of Oxygen",
+          "reranked_score": 0.4858,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 423.11
+    },
+    {
+      "vignette_id": "DEV-NCD-CARDIAC-REHAB-APP",
+      "title": "Recent coronary artery bypass surgery ready for structured rehab",
+      "gold_policy": "NCD-CARDIAC-REHAB",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.8287,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.6556,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.634,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.5986,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-PACEMAKER",
+          "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+          "reranked_score": 0.5878,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 601.62
+    },
+    {
+      "vignette_id": "DEV-NCD-CARDIAC-REHAB-NEG",
+      "title": "Resting chest pain with acute decompensated heart failure",
+      "gold_policy": "NCD-CARDIAC-REHAB",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.7544,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 0.6196,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.4725,
+          "coverage_ratio": 0.333
+        }
+      ],
+      "latency_ms": 452.84
+    },
+    {
+      "vignette_id": "DEV-NCD-CATARACT-APP",
+      "title": "Dense nuclear sclerosis with visual acuity 20/60 impairing driving",
+      "gold_policy": "NCD-CATARACT",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "NCD-CATARACT",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-CATARACT",
+          "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+          "reranked_score": 1.0925,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6171,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5992,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.5126,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.4641,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 589.02
+    },
+    {
+      "vignette_id": "DEV-NCD-CATARACT-NEG",
+      "title": "Mild 20/25 vision without functional impairment in daily tasks",
+      "gold_policy": "NCD-CATARACT",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-CATARACT",
+          "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+          "reranked_score": 0.7438,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5686,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.5551,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.5524,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 474.52
+    },
+    {
+      "vignette_id": "DEV-NCD-CCTA-APP",
+      "title": "Intermediate probability exertional chest tightness with equivocal ECG",
+      "gold_policy": "NCD-CCTA",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.7969,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 0.6522,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.6348,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.6015,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-PCI",
+          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+          "reranked_score": 0.5914,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 611.92
+    },
+    {
+      "vignette_id": "DEV-NCD-CCTA-NEG",
+      "title": "High-risk acute ST-elevation myocardial infarction",
+      "gold_policy": "NCD-CCTA",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6978,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.6269,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-20.4",
+          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+          "reranked_score": 0.6,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-PCI",
+          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+          "reranked_score": 0.5913,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.5692,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 425.21
+    },
+    {
+      "vignette_id": "DEV-NCD-MPI-PET-APP",
+      "title": "Ischemic cardiomyopathy with inconclusive SPECT due to body habitus",
+      "gold_policy": "NCD-MPI-PET",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "NCD-MPI-PET",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 1.0,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.4",
+          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+          "reranked_score": 0.7192,
+          "coverage_ratio": 0.25
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6769,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.6699,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.6049,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 515.29
+    },
+    {
+      "vignette_id": "DEV-NCD-MPI-PET-NEG",
+      "title": "Asymptomatic executive checkup with zero cardiac risk factors",
+      "gold_policy": "NCD-MPI-PET",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.7863,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.6954,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-PACEMAKER",
+          "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+          "reranked_score": 0.6291,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.6241,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 0.5739,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 391.06
+    },
+    {
+      "vignette_id": "DEV-NCD-PACEMAKER-APP",
+      "title": "Symptomatic complete third-degree heart block with syncope",
+      "gold_policy": "NCD-PACEMAKER",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-PACEMAKER",
+          "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+          "reranked_score": 0.7012,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.6084,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.4927,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.4644,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 508.13
+    },
+    {
+      "vignette_id": "DEV-NCD-PACEMAKER-NEG",
+      "title": "Transient sinus bradycardia secondary to severe beta-blocker overdose",
+      "gold_policy": "NCD-PACEMAKER",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-PACEMAKER",
+          "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+          "reranked_score": 0.7012,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.5975,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CATARACT",
+          "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+          "reranked_score": 0.5585,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-PUMP",
+          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+          "reranked_score": 0.557,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.486,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 439.14
+    },
+    {
+      "vignette_id": "DEV-NCD-PET-ONC-APP",
+      "title": "Newly diagnosed biopsy-proven esophageal adenocarcinoma staging",
+      "gold_policy": "NCD-PET-ONC",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-PET-ONC",
+          "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+          "reranked_score": 0.7969,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.7163,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 0.6927,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.6356,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-CCTA",
+          "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+          "reranked_score": 0.6144,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 450.21
+    },
+    {
+      "vignette_id": "DEV-NCD-PET-ONC-NEG",
+      "title": "Asymptomatic surveillance 5 years post-resection of early breast cancer",
+      "gold_policy": "NCD-PET-ONC",
+      "expected_decision": "DENIED",
+      "gold_rank": ">5",
+      "in_top1": false,
+      "in_top3": false,
+      "in_top5": false,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.6482,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.5423,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-WOUND-VAC",
+          "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+          "reranked_score": 0.4713,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 454.29
+    },
+    {
+      "vignette_id": "DEV-NCD-PUMP-APP",
+      "title": "Severe intractable cancer pain failing systemic opioids with positive trial",
+      "gold_policy": "NCD-PUMP",
+      "expected_decision": "APPROVED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.7212,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-PUMP",
+          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+          "reranked_score": 0.7191,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.5937,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.5522,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.5471,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 707.14
+    },
+    {
+      "vignette_id": "DEV-NCD-PUMP-NEG",
+      "title": "Untreated bacteremia and local paraspinal abscess at surgical site",
+      "gold_policy": "NCD-PUMP",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6893,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-PUMP",
+          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+          "reranked_score": 0.6872,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.627,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6253,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.5949,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 430.78
+    },
+    {
+      "vignette_id": "DEV-NCD-SCS-APP",
+      "title": "Failed back surgery syndrome with 80% relief during percutaneous trial",
+      "gold_policy": "NCD-SCS",
+      "expected_decision": "APPROVED",
+      "gold_rank": 3,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.794,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.7924,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.765,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.7357,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.6895,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 534.07
+    },
+    {
+      "vignette_id": "DEV-NCD-SCS-NEG",
+      "title": "Failed trial stimulation with worsening pain and active cocaine abuse",
+      "gold_policy": "NCD-SCS",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.6978,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.5708,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-RAD-NIV",
+          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+          "reranked_score": 0.4849,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-PACEMAKER",
+          "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+          "reranked_score": 0.484,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.465,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 447.09
+    },
+    {
+      "vignette_id": "DEV-NCD-SGD-APP",
+      "title": "Severe expressive anarthria secondary to ALS failing natural speech",
+      "gold_policy": "NCD-SGD",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "NCD-SGD",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-SGD",
+          "policy_title": "Speech Generating Devices (SGD)",
+          "reranked_score": 0.85,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-POWER-WC",
+          "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+          "reranked_score": 0.7392,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.4854,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.4736,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 638.2
+    },
+    {
+      "vignette_id": "DEV-NCD-SGD-NEG",
+      "title": "Request for un-adapted standard consumer entertainment tablet",
+      "gold_policy": "NCD-SGD",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "NCD-SGD",
+          "policy_title": "Speech Generating Devices (SGD)",
+          "reranked_score": 0.666,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5909,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 469.44
+    },
+    {
+      "vignette_id": "DEV-OPD-BLEPH-APP",
+      "title": "Severe dermatochalasis with superior visual field restriction",
+      "gold_policy": "OPD-BLEPH",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-BLEPH",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-BLEPH",
+          "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+          "reranked_score": 1.1356,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-ROTATOR-CUFF",
+          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+          "reranked_score": 0.6012,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.5752,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 583.34
+    },
+    {
+      "vignette_id": "DEV-OPD-BLEPH-NEG",
+      "title": "Mild eyelid wrinkling without visual field obscuration",
+      "gold_policy": "OPD-BLEPH",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-BLEPH",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-BLEPH",
+          "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+          "reranked_score": 0.9631,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.5982,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 560.54
+    },
+    {
+      "vignette_id": "DEV-OPD-BOTOX-APP",
+      "title": "Intractable chronic migraine 18 days/month failing oral prophylaxis",
+      "gold_policy": "OPD-BOTOX",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-BOTOX",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-BOTOX",
+          "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+          "reranked_score": 1.1069,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.6833,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.4808,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 570.94
+    },
+    {
+      "vignette_id": "DEV-OPD-BOTOX-NEG",
+      "title": "Episodic tension headache occurring 4 days per month",
+      "gold_policy": "OPD-BOTOX",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-BOTOX",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-BOTOX",
+          "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+          "reranked_score": 0.9375,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.468,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 422.33
+    },
+    {
+      "vignette_id": "DEV-OPD-CERV-DISC-APP",
+      "title": "Single-level C5-C6 soft disc radiculopathy failing 8 weeks therapy",
+      "gold_policy": "OPD-CERV-DISC",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 1.0637,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.9881,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.9016,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.7695,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.7683,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 632.78
+    },
+    {
+      "vignette_id": "DEV-OPD-CERV-DISC-NEG",
+      "title": "Severe multilevel facet arthrosis and spondylolisthesis",
+      "gold_policy": "OPD-CERV-DISC",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-CERV-DISC",
+          "policy_title": "Cervical Artificial Disc Arthroplasty",
+          "reranked_score": 0.8287,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.7219,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.69,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.6338,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6243,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 489.96
+    },
+    {
+      "vignette_id": "DEV-OPD-PANNI-APP",
+      "title": "Massive abdominal pannus hanging past pubis with chronic ulcerated intertrigo",
+      "gold_policy": "OPD-PANNI",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-PANNI",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-PANNI",
+          "policy_title": "Panniculectomy and Abdominoplasty",
+          "reranked_score": 1.0206,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.6976,
+          "coverage_ratio": 0.667
+        },
+        {
+          "rank": 3,
+          "policy_id": "OPD-RHINO",
+          "policy_title": "Rhinoplasty and Septoplasty",
+          "reranked_score": 0.6859,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.6287,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6281,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 739.77
+    },
+    {
+      "vignette_id": "DEV-OPD-PANNI-NEG",
+      "title": "Mild abdominal wall laxity without dermatitis or sub-pubic apron",
+      "gold_policy": "OPD-PANNI",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-PANNI",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-PANNI",
+          "policy_title": "Panniculectomy and Abdominoplasty",
+          "reranked_score": 0.8375,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.6212,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.5807,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.5775,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.5197,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 662.87
+    },
+    {
+      "vignette_id": "DEV-OPD-RHINO-APP",
+      "title": "Severe nasal septal deviation and valve collapse failing topical steroids",
+      "gold_policy": "OPD-RHINO",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-RHINO",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-RHINO",
+          "policy_title": "Rhinoplasty and Septoplasty",
+          "reranked_score": 1.035,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.7118,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-20.33",
+          "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+          "reranked_score": 0.6168,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.5977,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "OPD-PANNI",
+          "policy_title": "Panniculectomy and Abdominoplasty",
+          "reranked_score": 0.552,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 739.28
+    },
+    {
+      "vignette_id": "DEV-OPD-RHINO-NEG",
+      "title": "Desire for dorsal hump reduction without breathing obstruction",
+      "gold_policy": "OPD-RHINO",
+      "expected_decision": "DENIED",
+      "gold_rank": 2,
+      "in_top1": false,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.6757,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "OPD-RHINO",
+          "policy_title": "Rhinoplasty and Septoplasty",
+          "reranked_score": 0.6533,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.6045,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.588,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.5596,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 468.32
+    },
+    {
+      "vignette_id": "DEV-OPD-SI-FUSION-APP",
+      "title": "Chronic sacroiliac joint dysfunction with positive provocative tests and block",
+      "gold_policy": "OPD-SI-FUSION",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-SI-FUSION",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-SI-FUSION",
+          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+          "reranked_score": 0.9625,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.7124,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6807,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6599,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.6385,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 668.33
+    },
+    {
+      "vignette_id": "DEV-OPD-SI-FUSION-NEG",
+      "title": "Negative provocative tests and zero pain relief from diagnostic block",
+      "gold_policy": "OPD-SI-FUSION",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "SELECTION_REQUIRED",
+      "preselected_policy_id": null,
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-SI-FUSION",
+          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+          "reranked_score": 0.7331,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6346,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.6264,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.6133,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.5931,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 542.68
+    },
+    {
+      "vignette_id": "DEV-OPD-VEIN-APP",
+      "title": "Symptomatic great saphenous insufficiency with 1200ms reflux failing stockings",
+      "gold_policy": "OPD-VEIN",
+      "expected_decision": "APPROVED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-VEIN",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 1.15,
+          "coverage_ratio": 1.0
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.783,
+          "coverage_ratio": 0.667
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.5965,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.5857,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.5728,
+          "coverage_ratio": 0.5
+        }
+      ],
+      "latency_ms": 673.1
+    },
+    {
+      "vignette_id": "DEV-OPD-VEIN-NEG",
+      "title": "Isolated spider veins without axial reflux or compression trial",
+      "gold_policy": "OPD-VEIN",
+      "expected_decision": "DENIED",
+      "gold_rank": 1,
+      "in_top1": true,
+      "in_top3": true,
+      "in_top5": true,
+      "status": "PRESELECTED",
+      "preselected_policy_id": "OPD-VEIN",
+      "retrieved_candidates": [
+        {
+          "rank": 1,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 1.0,
+          "coverage_ratio": 0.5
+        },
+        {
+          "rank": 2,
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.7004,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 3,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.6802,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.6099,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5412,
+          "coverage_ratio": 0.0
+        }
+      ],
+      "latency_ms": 456.36
+    }
+  ]
+}

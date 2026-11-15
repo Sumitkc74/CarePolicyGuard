@@ -1,8 +1,52 @@
 import math
 import re
-from typing import List, Dict, Any, Optional, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 from sqlalchemy.orm import Session
-from app.db.models import MedicarePolicy, PolicyCriterion
+from app.db.models import MedicarePolicy
+
+# Local biomedical embedding model (SapBERT offline)
+_SAPBERT_MODEL_NAME = "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
+_TOKENIZER = None
+_MODEL = None
+_DEVICE = None
+
+_STORE_LOADED = False
+_STORE_MATRIX = None
+_STORE_LOOKUP: Dict[str, int] = {}
+
+
+def _get_sapbert_model():
+    """Lazy loader for local SapBERT model with offline guarantee."""
+    global _TOKENIZER, _MODEL, _DEVICE
+    if _MODEL is None:
+        import torch
+        from transformers import AutoTokenizer, AutoModel
+        _DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        _TOKENIZER = AutoTokenizer.from_pretrained(_SAPBERT_MODEL_NAME, local_files_only=True)
+        _MODEL = AutoModel.from_pretrained(_SAPBERT_MODEL_NAME, local_files_only=True)
+        _MODEL.to(_DEVICE)
+        _MODEL.eval()
+    return _TOKENIZER, _MODEL, _DEVICE
+
+
+def _load_vector_store():
+    """Loads pre-computed dense embeddings from persistent NPZ store if available."""
+    global _STORE_LOADED, _STORE_MATRIX, _STORE_LOOKUP
+    if not _STORE_LOADED:
+        import numpy as np
+        store_path = Path(__file__).resolve().parent.parent / "data" / "embeddings" / "policy_chunks_sapbert.npz"
+        if store_path.exists():
+            try:
+                data = np.load(store_path)
+                _STORE_MATRIX = data["embeddings"]  # Shape: (204, 768), float32
+                chunk_ids = data["chunk_ids"]
+                _STORE_LOOKUP = {str(cid): idx for idx, cid in enumerate(chunk_ids)}
+            except Exception:
+                _STORE_MATRIX = None
+                _STORE_LOOKUP = {}
+        _STORE_LOADED = True
+    return _STORE_MATRIX, _STORE_LOOKUP
 
 class BM25Retriever:
     """
@@ -119,42 +163,107 @@ class DenseSemanticRetriever:
         "intertrigo", "rhinoplasty", "nasal_airway_obstruction", "septoplasty", "nasal_valve_collapse"
     ]
 
+    def __init__(self, use_legacy_projection: bool = False):
+        self.use_legacy_projection = use_legacy_projection
+        if not use_legacy_projection:
+            _load_vector_store()
+
     def _embed_text(self, text: str) -> List[float]:
         """
-        Generates normalized concept projection embedding.
-        In production with PyTorch/Transformers, this maps to SapBERT or BioLinkBERT embeddings.
+        Generates dense embedding representation.
+        In default mode, extracts 768-dimensional L2-normalized SapBERT embeddings offline.
+        When use_legacy_projection=True, computes hand-curated clinical concept vector.
         """
-        lowered = text.lower()
-        vec = []
-        for concept in self.CLINICAL_CONCEPT_VOCAB:
-            parts = concept.split("_")
-            phrase = " ".join(parts)
-            hyphenated = "-".join(parts)
-            if concept in lowered or phrase in lowered or hyphenated in lowered:
-                vec.append(2.0)
-            elif len(parts) > 1 and all(p in lowered for p in parts):
-                vec.append(1.5)
-            else:
-                vec.append(0.0)
+        if self.use_legacy_projection:
+            lowered = text.lower()
+            vec = []
+            for concept in self.CLINICAL_CONCEPT_VOCAB:
+                parts = concept.split("_")
+                phrase = " ".join(parts)
+                hyphenated = "-".join(parts)
+                if concept in lowered or phrase in lowered or hyphenated in lowered:
+                    vec.append(2.0)
+                elif len(parts) > 1 and all(p in lowered for p in parts):
+                    vec.append(1.5)
+                else:
+                    vec.append(0.0)
 
-        # L2 Normalize
-        norm = math.sqrt(sum(x * x for x in vec))
-        if norm > 0:
-            return [x / norm for x in vec]
-        return [0.0] * len(vec)
+            norm = math.sqrt(sum(x * x for x in vec))
+            if norm > 0:
+                return [x / norm for x in vec]
+            return [0.0] * len(vec)
+
+        if not text or not text.strip():
+            return [0.0] * 768
+
+        import torch
+        tokenizer, model, device = _get_sapbert_model()
+
+        inputs = tokenizer(
+            text,
+            padding=True,
+            truncation=True,
+            max_length=512,
+            return_tensors="pt"
+        ).to(device)
+
+        with torch.no_grad():
+            outputs = model(**inputs)
+            cls_rep = outputs.last_hidden_state[:, 0, :]  # Shape: [1, 768]
+            norm = torch.norm(cls_rep, p=2, dim=1, keepdim=True).clamp(min=1e-12)
+            normalized_rep = (cls_rep / norm).cpu().squeeze(0).numpy()
+
+        return normalized_rep.tolist()
 
     def _cosine_similarity(self, v1: List[float], v2: List[float]) -> float:
+        """
+        Computes cosine similarity between two normalized vectors.
+        Since vectors are L2-normalized, cosine similarity is their dot product.
+        """
         dot = sum(a * b for a, b in zip(v1, v2))
-        return max(0.0, min(1.0, dot))
+        return max(0.0, min(1.0, float(dot)))
 
     def search(self, query: str, documents: List[Dict[str, Any]], top_k: int = 5) -> List[Tuple[Dict[str, Any], float]]:
+        """
+        Ranks documents against query using cosine similarity over SapBERT embeddings.
+        Leverages pre-computed chunk embeddings from the persistent local vector store.
+        """
+        if not query or not query.strip() or not documents:
+            return []
+
+        if self.use_legacy_projection:
+            q_vec = self._embed_text(query)
+            scored: List[Tuple[Dict[str, Any], float]] = []
+            for doc in documents:
+                doc_vec = self._embed_text(doc.get("content", ""))
+                sim = self._cosine_similarity(q_vec, doc_vec)
+                if sim > 0:
+                    scored.append((doc, sim))
+            scored.sort(key=lambda x: x[1], reverse=True)
+            return scored[:top_k]
+
         q_vec = self._embed_text(query)
+        store_matrix, store_lookup = _load_vector_store()
+
         scored = []
+        import numpy as np
+        q_arr = np.array(q_vec, dtype=np.float32)
+
         for doc in documents:
-            doc_vec = self._embed_text(doc["content"])
-            sim = self._cosine_similarity(q_vec, doc_vec)
-            if sim > 0:
-                scored.append((doc, sim))
+            chunk_id = f"{doc.get('policy_id', '')}::{doc.get('section', '')}"
+            if store_matrix is not None and chunk_id in store_lookup:
+                idx = store_lookup[chunk_id]
+                doc_vec = store_matrix[idx]
+                sim = float(np.dot(q_arr, doc_vec))
+            else:
+                doc_vec = self._embed_text(doc.get("content", ""))
+                sim = self._cosine_similarity(q_vec, doc_vec)
+
+            sim_clamped = max(0.0, min(1.0, sim))
+            # Semantic relevance floor: filter background language noise (< 0.50) when searching full corpus
+            min_floor = 0.50 if len(documents) >= 50 else 0.0
+            if sim_clamped > min_floor:
+                scored.append((doc, float(sim_clamped)))
 
         scored.sort(key=lambda x: x[1], reverse=True)
         return scored[:top_k]
@@ -173,7 +282,7 @@ class HybridPolicyRetriever:
         self.db = db
         self.use_declarative_only = use_declarative_only
         self.bm25 = BM25Retriever()
-        self.dense = DenseSemanticRetriever()
+        self.dense = DenseSemanticRetriever(use_legacy_projection=use_declarative_only)
         self.chunks: List[Dict[str, Any]] = []
         self._build_index()
 

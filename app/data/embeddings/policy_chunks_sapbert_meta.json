@@ -1,0 +1,1439 @@
+{
+  "model_name": "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
+  "dimension": 768,
+  "normalization": "L2",
+  "chunk_count": 204,
+  "built_at": "2026-11-15T08:54:49.604104+00:00",
+  "build_duration_seconds": 26.81,
+  "device_used": "cpu",
+  "chunks": [
+    {
+      "chunk_id": "LCD-L33829::Indications & Coverage Summary",
+      "policy_id": "LCD-L33829",
+      "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-L33829 Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea Pulmonology / Durable Medical Equipment Me"
+    },
+    {
+      "chunk_id": "LCD-L33829::Criterion: CRIT-CPAP-01",
+      "policy_id": "LCD-L33829",
+      "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+      "section": "Criterion: CRIT-CPAP-01",
+      "content_preview": "CRIT-CPAP-01 Diagnostic Polysomnography (AHI/RDI) Apnea-Hypopnea Index (AHI) or Respiratory Disturbance Index (RDI) >= 1"
+    },
+    {
+      "chunk_id": "LCD-L33829::Criterion: CRIT-CPAP-02",
+      "policy_id": "LCD-L33829",
+      "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+      "section": "Criterion: CRIT-CPAP-02",
+      "content_preview": "CRIT-CPAP-02 Face-to-Face Clinical Evaluation A face-to-face clinical evaluation conducted by the prescribing physician "
+    },
+    {
+      "chunk_id": "LCD-TOTAL-KNEE-01::Indications & Coverage Summary",
+      "policy_id": "LCD-TOTAL-KNEE-01",
+      "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-TOTAL-KNEE-01 Total Knee Arthroplasty (TKA) for Severe Osteoarthritis Orthopedic Surgery Coverage policy for electiv"
+    },
+    {
+      "chunk_id": "LCD-TOTAL-KNEE-01::Criterion: CRIT-TKA-01",
+      "policy_id": "LCD-TOTAL-KNEE-01",
+      "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+      "section": "Criterion: CRIT-TKA-01",
+      "content_preview": "CRIT-TKA-01 Severe Flexion Limitation (<= 90 degrees) Physical exam documenting right or left knee range of motion with "
+    },
+    {
+      "chunk_id": "LCD-TOTAL-KNEE-01::Criterion: CRIT-TKA-02",
+      "policy_id": "LCD-TOTAL-KNEE-01",
+      "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+      "section": "Criterion: CRIT-TKA-02",
+      "content_preview": "CRIT-TKA-02 Failure of Conservative Therapy Duration Failure of non-surgical conservative therapy (physical therapy, NSA"
+    },
+    {
+      "chunk_id": "LCD-TOTAL-KNEE-01::Criterion: CRIT-TKA-EXCL-01",
+      "policy_id": "LCD-TOTAL-KNEE-01",
+      "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+      "section": "Criterion: CRIT-TKA-EXCL-01",
+      "content_preview": "CRIT-TKA-EXCL-01 Active Joint Infection Exclusion Patient must not have active septic arthritis or active systemic infec"
+    },
+    {
+      "chunk_id": "NCD-20.29::Indications & Coverage Summary",
+      "policy_id": "NCD-20.29",
+      "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-20.29 Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities Wound Care CMS coverage for systemic hyperb"
+    },
+    {
+      "chunk_id": "NCD-20.29::Criterion: CRIT-HBOT-01",
+      "policy_id": "NCD-20.29",
+      "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+      "section": "Criterion: CRIT-HBOT-01",
+      "content_preview": "CRIT-HBOT-01 Severe Diabetic Wound Wagner Grade 3 or Higher Documented deep diabetic foot ulceration with involvement of"
+    },
+    {
+      "chunk_id": "NCD-20.29::Criterion: CRIT-HBOT-02",
+      "policy_id": "NCD-20.29",
+      "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+      "section": "Criterion: CRIT-HBOT-02",
+      "content_preview": "CRIT-HBOT-02 Failure of >= 30 Days Standard Conservative Wound Therapy Patient must have completed at least 30 continuou"
+    },
+    {
+      "chunk_id": "NCD-20.29::Criterion: CRIT-HBOT-03",
+      "policy_id": "NCD-20.29",
+      "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+      "section": "Criterion: CRIT-HBOT-03",
+      "content_preview": "CRIT-HBOT-03 Lower Extremity Vascular Assessment Documentation of peripheral perfusion assessment (palpable dorsalis ped"
+    },
+    {
+      "chunk_id": "NCD-20.33::Indications & Coverage Summary",
+      "policy_id": "NCD-20.33",
+      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-20.33 Transcatheter Aortic Valve Replacement (TAVR) Cardiology / Interventional Cardiology CMS coverage for Transcat"
+    },
+    {
+      "chunk_id": "NCD-20.33::Criterion: CRIT-TAVR-01",
+      "policy_id": "NCD-20.33",
+      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "section": "Criterion: CRIT-TAVR-01",
+      "content_preview": "CRIT-TAVR-01 Severe Aortic Stenosis Hemodynamic Threshold Aortic valve area (AVA) <= 1.0 cm2 or mean aortic gradient >= "
+    },
+    {
+      "chunk_id": "NCD-20.33::Criterion: CRIT-TAVR-02",
+      "policy_id": "NCD-20.33",
+      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "section": "Criterion: CRIT-TAVR-02",
+      "content_preview": "CRIT-TAVR-02 Heart Team Consultation Documented formal multidisciplinary Heart Team collaborative consultation involving"
+    },
+    {
+      "chunk_id": "NCD-20.33::Criterion: CRIT-TAVR-EXCL-01",
+      "policy_id": "NCD-20.33",
+      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "section": "Criterion: CRIT-TAVR-EXCL-01",
+      "content_preview": "CRIT-TAVR-EXCL-01 Procedural Futility Exclusion TAVR is excluded when intervention is futile due to active infective end"
+    },
+    {
+      "chunk_id": "NCD-20.33::Criterion: CRIT-TAVR-EXCL-02",
+      "policy_id": "NCD-20.33",
+      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "section": "Criterion: CRIT-TAVR-EXCL-02",
+      "content_preview": "CRIT-TAVR-EXCL-02 Prohibitive Surgical or Anatomical Contraindication Exclusion TAVR is excluded when the patient has pr"
+    },
+    {
+      "chunk_id": "NCD-20.33::Criterion: CRIT-TEER-01",
+      "policy_id": "NCD-20.33",
+      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "section": "Criterion: CRIT-TEER-01",
+      "content_preview": "CRIT-TEER-01 Severe Mitral Regurgitation (Grade 3+ to 4+) Documented moderate-to-severe (Grade 3+) or severe (Grade 4+) "
+    },
+    {
+      "chunk_id": "NCD-20.33::Criterion: CRIT-TEER-02",
+      "policy_id": "NCD-20.33",
+      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "section": "Criterion: CRIT-TEER-02",
+      "content_preview": "CRIT-TEER-02 Multidisciplinary Heart Team Consensus Independent evaluation by a cardiac surgeon and an interventional ca"
+    },
+    {
+      "chunk_id": "NCD-20.4::Indications & Coverage Summary",
+      "policy_id": "NCD-20.4",
+      "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-20.4 Implantable Automatic Defibrillators (ICDs) Cardiology / Electrophysiology CMS National Coverage Determination "
+    },
+    {
+      "chunk_id": "NCD-20.4::Criterion: CRIT-ICD-01",
+      "policy_id": "NCD-20.4",
+      "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+      "section": "Criterion: CRIT-ICD-01",
+      "content_preview": "CRIT-ICD-01 Severe LV Systolic Dysfunction (LVEF <= 35%) Documented Left Ventricular Ejection Fraction (LVEF) <= 35% on "
+    },
+    {
+      "chunk_id": "NCD-20.4::Criterion: CRIT-ICD-02",
+      "policy_id": "NCD-20.4",
+      "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+      "section": "Criterion: CRIT-ICD-02",
+      "content_preview": "CRIT-ICD-02 Heart Failure Functional Classification (NYHA II/III) Patient classified as New York Heart Association (NYHA"
+    },
+    {
+      "chunk_id": "NCD-20.4::Criterion: CRIT-ICD-03",
+      "policy_id": "NCD-20.4",
+      "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+      "section": "Criterion: CRIT-ICD-03",
+      "content_preview": "CRIT-ICD-03 Guideline-Directed Medical Therapy Duration (>=90 Days) Patient has received optimal guideline-directed medi"
+    },
+    {
+      "chunk_id": "NCD-20.4::Criterion: CRIT-ICD-04",
+      "policy_id": "NCD-20.4",
+      "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+      "section": "Criterion: CRIT-ICD-04",
+      "content_preview": "CRIT-ICD-04 Cardiomyopathy Etiology & Revascularization Timeline At least 40 days must have elapsed post-myocardial infa"
+    },
+    {
+      "chunk_id": "NCD-20.4::Criterion: CRIT-ICD-EXCL-01",
+      "policy_id": "NCD-20.4",
+      "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+      "section": "Criterion: CRIT-ICD-EXCL-01",
+      "content_preview": "CRIT-ICD-EXCL-01 Cardiogenic Shock or Terminal Illness Exclusion Exclusion: Patient has active cardiogenic shock or non-"
+    },
+    {
+      "chunk_id": "NCD-20.7::Indications & Coverage Summary",
+      "policy_id": "NCD-20.7",
+      "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-20.7 Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS) Interventional Neurology & Cardi"
+    },
+    {
+      "chunk_id": "NCD-20.7::Criterion: CRIT-CAS-01",
+      "policy_id": "NCD-20.7",
+      "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+      "section": "Criterion: CRIT-CAS-01",
+      "content_preview": "CRIT-CAS-01 Severe Carotid Stenosis (>= 70% Symptomatic or >= 80% Asymptomatic) Documented carotid artery stenosis >= 70"
+    },
+    {
+      "chunk_id": "NCD-20.7::Criterion: CRIT-CAS-02",
+      "policy_id": "NCD-20.7",
+      "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+      "section": "Criterion: CRIT-CAS-02",
+      "content_preview": "CRIT-CAS-02 Documented High Surgical Risk for Carotid Endarterectomy (CEA) Patient has documented clinical or anatomical"
+    },
+    {
+      "chunk_id": "NCD-20.7::Criterion: CRIT-CAS-03",
+      "policy_id": "NCD-20.7",
+      "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
+      "section": "Criterion: CRIT-CAS-03",
+      "content_preview": "CRIT-CAS-03 Mandatory FDA-Approved Embolic Protection Device (EPD) Procedure plan includes deployment of an FDA-approved"
+    },
+    {
+      "chunk_id": "NCD-220.13::Indications & Coverage Summary",
+      "policy_id": "NCD-220.13",
+      "policy_title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-220.13 Percutaneous Left Atrial Appendage Closure (LAAC / Watchman) Electrophysiology & Interventional Cardiology CM"
+    },
+    {
+      "chunk_id": "NCD-220.13::Criterion: CRIT-LAAC-01",
+      "policy_id": "NCD-220.13",
+      "policy_title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
+      "section": "Criterion: CRIT-LAAC-01",
+      "content_preview": "CRIT-LAAC-01 Non-Valvular Atrial Fibrillation with High Stroke Risk (CHA2DS2-VASc >= 3) Documented non-valvular atrial f"
+    },
+    {
+      "chunk_id": "NCD-220.13::Criterion: CRIT-LAAC-02",
+      "policy_id": "NCD-220.13",
+      "policy_title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
+      "section": "Criterion: CRIT-LAAC-02",
+      "content_preview": "CRIT-LAAC-02 Contraindication to Long-Term Oral Anticoagulation (HAS-BLED >= 3) Documented formal contraindication or cl"
+    },
+    {
+      "chunk_id": "NCD-220.13::Criterion: CRIT-LAAC-03",
+      "policy_id": "NCD-220.13",
+      "policy_title": "Percutaneous Left Atrial Appendage Closure (LAAC / Watchman)",
+      "section": "Criterion: CRIT-LAAC-03",
+      "content_preview": "CRIT-LAAC-03 Pre-Procedural Imaging Verifying Absence of LA Thrombus TEE or CTA within 48 hours of procedure confirming "
+    },
+    {
+      "chunk_id": "NCD-240.2::Indications & Coverage Summary",
+      "policy_id": "NCD-240.2",
+      "policy_title": "Home Use of Oxygen",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-240.2 Home Use of Oxygen Pulmonology CMS coverage for long-term home oxygen therapy in chronic respiratory disease. "
+    },
+    {
+      "chunk_id": "NCD-240.2::Criterion: CRIT-O2-01",
+      "policy_id": "NCD-240.2",
+      "policy_title": "Home Use of Oxygen",
+      "section": "Criterion: CRIT-O2-01",
+      "content_preview": "CRIT-O2-01 Resting Hypoxemia (PaO2 <= 55 mmHg or SpO2 <= 88%) Arterial blood gas PaO2 <= 55 mmHg or pulse oximetry oxyge"
+    },
+    {
+      "chunk_id": "NCD-240.2::Criterion: CRIT-O2-02",
+      "policy_id": "NCD-240.2",
+      "policy_title": "Home Use of Oxygen",
+      "section": "Criterion: CRIT-O2-02",
+      "content_preview": "CRIT-O2-02 Clinical Stability at Evaluation Documented evidence that qualifying oximetry or arterial blood gas testing w"
+    },
+    {
+      "chunk_id": "NCD-240.2::Criterion: CRIT-O2-EXCL-01",
+      "policy_id": "NCD-240.2",
+      "policy_title": "Home Use of Oxygen",
+      "section": "Criterion: CRIT-O2-EXCL-01",
+      "content_preview": "CRIT-O2-EXCL-01 Acute Reversible Etiology Exclusion Exclusion: Patient has an active, acute reversible etiology of hypox"
+    },
+    {
+      "chunk_id": "LCD-ACDF::Indications & Coverage Summary",
+      "policy_id": "LCD-ACDF",
+      "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-ACDF Anterior Cervical Discectomy and Fusion (ACDF) Spine Surgery Medicare coverage criteria for anterior cervical d"
+    },
+    {
+      "chunk_id": "LCD-ACDF::Criterion: CRIT-ACDF-01",
+      "policy_id": "LCD-ACDF",
+      "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+      "section": "Criterion: CRIT-ACDF-01",
+      "content_preview": "CRIT-ACDF-01 Correlating Cervical Disc Herniation or Osteophyte on MRI MRI or CT myelogram demonstrating cervical disc p"
+    },
+    {
+      "chunk_id": "LCD-ACDF::Criterion: CRIT-ACDF-02",
+      "policy_id": "LCD-ACDF",
+      "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+      "section": "Criterion: CRIT-ACDF-02",
+      "content_preview": "CRIT-ACDF-02 Conservative Therapy Trial Failure (>= 6 Weeks) Documented trial of non-surgical management for >= 6 weeks,"
+    },
+    {
+      "chunk_id": "LCD-ACDF::Criterion: CRIT-ACDF-EXCL-01",
+      "policy_id": "LCD-ACDF",
+      "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+      "section": "Criterion: CRIT-ACDF-EXCL-01",
+      "content_preview": "CRIT-ACDF-EXCL-01 Neck Pain Only Without Neuropathy Exclusion Surgical fusion performed solely for uncomplicated axial n"
+    },
+    {
+      "chunk_id": "LCD-ACI::Indications & Coverage Summary",
+      "policy_id": "LCD-ACI",
+      "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-ACI Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects Orthopedic Surgery Medicare coverage"
+    },
+    {
+      "chunk_id": "LCD-ACI::Criterion: CRIT-ACI-01",
+      "policy_id": "LCD-ACI",
+      "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+      "section": "Criterion: CRIT-ACI-01",
+      "content_preview": "CRIT-ACI-01 Focal Chondral Defect Surface Area (1.5 to 10.0 cm2) Documented full-thickness cartilage defect (Outerbridge"
+    },
+    {
+      "chunk_id": "LCD-ACI::Criterion: CRIT-ACI-02",
+      "policy_id": "LCD-ACI",
+      "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+      "section": "Criterion: CRIT-ACI-02",
+      "content_preview": "CRIT-ACI-02 Prior Debridement or Marrow Stimulation Failure Documented prior trial and failure of conservative managemen"
+    },
+    {
+      "chunk_id": "LCD-ACI::Criterion: CRIT-ACI-EXCL-01",
+      "policy_id": "LCD-ACI",
+      "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+      "section": "Criterion: CRIT-ACI-EXCL-01",
+      "content_preview": "CRIT-ACI-EXCL-01 Generalized Severe Tricompartmental Osteoarthritis Exclusion Diffuse degenerative joint disease or seve"
+    },
+    {
+      "chunk_id": "LCD-CT-CHEST::Indications & Coverage Summary",
+      "policy_id": "LCD-CT-CHEST",
+      "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-CT-CHEST Computed Tomography (CT) of the Chest with Contrast Diagnostic Radiology / Thoracic Medicare coverage crite"
+    },
+    {
+      "chunk_id": "LCD-CT-CHEST::Criterion: CRIT-CTCH-01",
+      "policy_id": "LCD-CT-CHEST",
+      "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+      "section": "Criterion: CRIT-CTCH-01",
+      "content_preview": "CRIT-CTCH-01 Abnormal Chest Radiograph (Solitary Nodule > 6 mm or Mass) Preceding chest X-ray documenting indeterminate "
+    },
+    {
+      "chunk_id": "LCD-CT-CHEST::Criterion: CRIT-CTCH-02",
+      "policy_id": "LCD-CT-CHEST",
+      "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+      "section": "Criterion: CRIT-CTCH-02",
+      "content_preview": "CRIT-CTCH-02 Unexplained Hemoptysis or Interstitial Lung Disease Evaluation Documented gross hemoptysis in patient aged "
+    },
+    {
+      "chunk_id": "LCD-CT-CHEST::Criterion: CRIT-CTCH-EXCL-01",
+      "policy_id": "LCD-CT-CHEST",
+      "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+      "section": "Criterion: CRIT-CTCH-EXCL-01",
+      "content_preview": "CRIT-CTCH-EXCL-01 Uncomplicated Acute Bronchitis Without Radiograph Exclusion CT chest requested for simple acute bronch"
+    },
+    {
+      "chunk_id": "LCD-ESI::Indications & Coverage Summary",
+      "policy_id": "LCD-ESI",
+      "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-ESI Lumbar Epidural Steroid Injections (ESI) for Radiculopathy Interventional Pain Management Medicare coverage guid"
+    },
+    {
+      "chunk_id": "LCD-ESI::Criterion: CRIT-ESI-01",
+      "policy_id": "LCD-ESI",
+      "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+      "section": "Criterion: CRIT-ESI-01",
+      "content_preview": "CRIT-ESI-01 Radicular Nerve Root Pain with Correlating Signs Documented dermatomal radicular pain radiating below the kn"
+    },
+    {
+      "chunk_id": "LCD-ESI::Criterion: CRIT-ESI-02",
+      "policy_id": "LCD-ESI",
+      "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+      "section": "Criterion: CRIT-ESI-02",
+      "content_preview": "CRIT-ESI-02 Conservative Therapy Trial Failure (>= 4 Weeks) Trial and failure of >= 4 weeks of non-invasive conservative"
+    },
+    {
+      "chunk_id": "LCD-ESI::Criterion: CRIT-ESI-EXCL-01",
+      "policy_id": "LCD-ESI",
+      "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+      "section": "Criterion: CRIT-ESI-EXCL-01",
+      "content_preview": "CRIT-ESI-EXCL-01 Non-Radicular Mechanical Back Pain Exclusion Epidural steroid injection performed solely for generalize"
+    },
+    {
+      "chunk_id": "LCD-EVAR::Indications & Coverage Summary",
+      "policy_id": "LCD-EVAR",
+      "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-EVAR Endovascular Repair of Abdominal Aortic Aneurysm (EVAR) Vascular Surgery Medicare coverage guidelines for endov"
+    },
+    {
+      "chunk_id": "LCD-EVAR::Criterion: CRIT-EVAR-01",
+      "policy_id": "LCD-EVAR",
+      "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+      "section": "Criterion: CRIT-EVAR-01",
+      "content_preview": "CRIT-EVAR-01 Abdominal Aortic Aneurysm Diameter (>= 5.5 cm in Men / >= 5.0 cm in Women) Computed tomography angiography "
+    },
+    {
+      "chunk_id": "LCD-EVAR::Criterion: CRIT-EVAR-02",
+      "policy_id": "LCD-EVAR",
+      "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+      "section": "Criterion: CRIT-EVAR-02",
+      "content_preview": "CRIT-EVAR-02 Suitable Proximal Neck Landing Zone Anatomy CTA confirming proximal infrarenal aortic neck length >= 10 mm "
+    },
+    {
+      "chunk_id": "LCD-EVAR::Criterion: CRIT-EVAR-EXCL-01",
+      "policy_id": "LCD-EVAR",
+      "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+      "section": "Criterion: CRIT-EVAR-EXCL-01",
+      "content_preview": "CRIT-EVAR-EXCL-01 Small Stable Aneurysm (< 5.0 cm) Exclusion Elective repair of small stable asymptomatic aneurysm < 5.0"
+    },
+    {
+      "chunk_id": "LCD-FACET::Indications & Coverage Summary",
+      "policy_id": "LCD-FACET",
+      "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-FACET Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy Interventional Pain Management Me"
+    },
+    {
+      "chunk_id": "LCD-FACET::Criterion: CRIT-FACET-01",
+      "policy_id": "LCD-FACET",
+      "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+      "section": "Criterion: CRIT-FACET-01",
+      "content_preview": "CRIT-FACET-01 Diagnostic Medial Branch Block Relief (>= 80%) Documented >= 80% relief of target facet pain following dua"
+    },
+    {
+      "chunk_id": "LCD-FACET::Criterion: CRIT-FACET-02",
+      "policy_id": "LCD-FACET",
+      "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+      "section": "Criterion: CRIT-FACET-02",
+      "content_preview": "CRIT-FACET-02 Chronic Axial Pain Duration (>= 3 Months) Chronic non-radicular axial back or neck pain causing functional"
+    },
+    {
+      "chunk_id": "LCD-FACET::Criterion: CRIT-FACET-EXCL-01",
+      "policy_id": "LCD-FACET",
+      "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+      "section": "Criterion: CRIT-FACET-EXCL-01",
+      "content_preview": "CRIT-FACET-EXCL-01 Radiculopathy or Acute Fracture Exclusion Primary pain due to radicular disc herniation, severe canal"
+    },
+    {
+      "chunk_id": "LCD-HALLUX::Indications & Coverage Summary",
+      "policy_id": "LCD-HALLUX",
+      "policy_title": "Hallux Valgus Correction (Bunionectomy)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-HALLUX Hallux Valgus Correction (Bunionectomy) Orthopedic Foot & Ankle / Podiatry Medicare coverage criteria for sur"
+    },
+    {
+      "chunk_id": "LCD-HALLUX::Criterion: CRIT-HAL-01",
+      "policy_id": "LCD-HALLUX",
+      "policy_title": "Hallux Valgus Correction (Bunionectomy)",
+      "section": "Criterion: CRIT-HAL-01",
+      "content_preview": "CRIT-HAL-01 Hallux Valgus Angle (> 15 Degrees on Weight-Bearing Radiographs) Weight-bearing radiograph confirming hallux"
+    },
+    {
+      "chunk_id": "LCD-HALLUX::Criterion: CRIT-HAL-02",
+      "policy_id": "LCD-HALLUX",
+      "policy_title": "Hallux Valgus Correction (Bunionectomy)",
+      "section": "Criterion: CRIT-HAL-02",
+      "content_preview": "CRIT-HAL-02 Conservative Footwear and Orthotic Trial Failure (>= 3 Months) Documented trial and failure of >= 3 months o"
+    },
+    {
+      "chunk_id": "LCD-HALLUX::Criterion: CRIT-HAL-EXCL-01",
+      "policy_id": "LCD-HALLUX",
+      "policy_title": "Hallux Valgus Correction (Bunionectomy)",
+      "section": "Criterion: CRIT-HAL-EXCL-01",
+      "content_preview": "CRIT-HAL-EXCL-01 Asymptomatic Cosmetic Bunionectomy Exclusion Bunionectomy performed purely for cosmetic contouring in t"
+    },
+    {
+      "chunk_id": "LCD-HIP-ARTHRO::Indications & Coverage Summary",
+      "policy_id": "LCD-HIP-ARTHRO",
+      "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-HIP-ARTHRO Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis Orthopedic Surgery Medicare coverage guidelines"
+    },
+    {
+      "chunk_id": "LCD-HIP-ARTHRO::Criterion: CRIT-HIP-01",
+      "policy_id": "LCD-HIP-ARTHRO",
+      "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+      "section": "Criterion: CRIT-HIP-01",
+      "content_preview": "CRIT-HIP-01 Advanced Radiographic Hip Osteoarthritis Weight-bearing radiographs demonstrating moderate to severe joint s"
+    },
+    {
+      "chunk_id": "LCD-HIP-ARTHRO::Criterion: CRIT-HIP-02",
+      "policy_id": "LCD-HIP-ARTHRO",
+      "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+      "section": "Criterion: CRIT-HIP-02",
+      "content_preview": "CRIT-HIP-02 Conservative Non-Surgical Management Trial (>= 3 Months) Documented trial and failure of >= 3 months (90 day"
+    },
+    {
+      "chunk_id": "LCD-HIP-ARTHRO::Criterion: CRIT-HIP-EXCL-01",
+      "policy_id": "LCD-HIP-ARTHRO",
+      "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+      "section": "Criterion: CRIT-HIP-EXCL-01",
+      "content_preview": "CRIT-HIP-EXCL-01 Active Joint Infection Exclusion Active localized hip joint sepsis, osteomyelitis, or uncontrolled syst"
+    },
+    {
+      "chunk_id": "LCD-HIP-SCOOP::Indications & Coverage Summary",
+      "policy_id": "LCD-HIP-SCOOP",
+      "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-HIP-SCOOP Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears Orthopedic Surgery Medicare covera"
+    },
+    {
+      "chunk_id": "LCD-HIP-SCOOP::Criterion: CRIT-FAI-01",
+      "policy_id": "LCD-HIP-SCOOP",
+      "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+      "section": "Criterion: CRIT-FAI-01",
+      "content_preview": "CRIT-FAI-01 Cam/Pincer Impingement on Radiographs (Alpha Angle > 55 deg) Radiographs or MRI confirming cam morphology wi"
+    },
+    {
+      "chunk_id": "LCD-HIP-SCOOP::Criterion: CRIT-FAI-02",
+      "policy_id": "LCD-HIP-SCOOP",
+      "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+      "section": "Criterion: CRIT-FAI-02",
+      "content_preview": "CRIT-FAI-02 Conservative Physical Therapy Trial Failure (>= 3 Months) Documented trial and failure of >= 3 months of con"
+    },
+    {
+      "chunk_id": "LCD-HIP-SCOOP::Criterion: CRIT-FAI-EXCL-01",
+      "policy_id": "LCD-HIP-SCOOP",
+      "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+      "section": "Criterion: CRIT-FAI-EXCL-01",
+      "content_preview": "CRIT-FAI-EXCL-01 Advanced Hip Osteoarthritis (Tonnis Grade >= 2) Pre-existing advanced joint space narrowing < 2 mm, sub"
+    },
+    {
+      "chunk_id": "LCD-IMRT::Indications & Coverage Summary",
+      "policy_id": "LCD-IMRT",
+      "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-IMRT Intensity-Modulated Radiation Therapy (IMRT) Radiation Oncology Medicare coverage criteria for intensity-modula"
+    },
+    {
+      "chunk_id": "LCD-IMRT::Criterion: CRIT-IMRT-01",
+      "policy_id": "LCD-IMRT",
+      "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+      "section": "Criterion: CRIT-IMRT-01",
+      "content_preview": "CRIT-IMRT-01 Head and Neck, Prostate, or CNS Malignancy Near Critical Organs Biopsy-proven head and neck squamous cell c"
+    },
+    {
+      "chunk_id": "LCD-IMRT::Criterion: CRIT-IMRT-02",
+      "policy_id": "LCD-IMRT",
+      "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+      "section": "Criterion: CRIT-IMRT-02",
+      "content_preview": "CRIT-IMRT-02 Dosimetric Proof of 3D Conformal Inadequacy Documented comparison confirming 3D conformal radiation would e"
+    },
+    {
+      "chunk_id": "LCD-IMRT::Criterion: CRIT-IMRT-EXCL-01",
+      "policy_id": "LCD-IMRT",
+      "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+      "section": "Criterion: CRIT-IMRT-EXCL-01",
+      "content_preview": "CRIT-IMRT-EXCL-01 Simple Palliative Bone Metastases Exclusion IMRT requested for uncomplicated palliative irradiation of"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ARTHRO::Indications & Coverage Summary",
+      "policy_id": "LCD-KNEE-ARTHRO",
+      "policy_title": "Knee Arthroscopy and Meniscectomy",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-KNEE-ARTHRO Knee Arthroscopy and Meniscectomy Orthopedic Surgery Medicare coverage criteria for diagnostic and thera"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ARTHRO::Criterion: CRIT-KART-01",
+      "policy_id": "LCD-KNEE-ARTHRO",
+      "policy_title": "Knee Arthroscopy and Meniscectomy",
+      "section": "Criterion: CRIT-KART-01",
+      "content_preview": "CRIT-KART-01 Documented Mechanical Symptoms (Locking or Catching) Physical examination and clinical documentation confir"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ARTHRO::Criterion: CRIT-KART-02",
+      "policy_id": "LCD-KNEE-ARTHRO",
+      "policy_title": "Knee Arthroscopy and Meniscectomy",
+      "section": "Criterion: CRIT-KART-02",
+      "content_preview": "CRIT-KART-02 Unstable Meniscal Tear Confirmed on MRI Diagnostic MRI confirming displaced, bucket-handle, flap, or comple"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ARTHRO::Criterion: CRIT-KART-EXCL-01",
+      "policy_id": "LCD-KNEE-ARTHRO",
+      "policy_title": "Knee Arthroscopy and Meniscectomy",
+      "section": "Criterion: CRIT-KART-EXCL-01",
+      "content_preview": "CRIT-KART-EXCL-01 Advanced End-Stage Osteoarthritis Exclusion (Debridement Only) Arthroscopic debridement or lavage perf"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ORTHOSIS::Indications & Coverage Summary",
+      "policy_id": "LCD-KNEE-ORTHOSIS",
+      "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-KNEE-ORTHOSIS Custom-Fabricated Functional Knee Orthoses Durable Medical Equipment (DMEPOS) DME MAC coverage criteri"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ORTHOSIS::Criterion: CRIT-KORTH-01",
+      "policy_id": "LCD-KNEE-ORTHOSIS",
+      "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+      "section": "Criterion: CRIT-KORTH-01",
+      "content_preview": "CRIT-KORTH-01 Documented Objective Knee Laxity or Ligamentous Deficiency Physical examination documenting Grade II or II"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ORTHOSIS::Criterion: CRIT-KORTH-02",
+      "policy_id": "LCD-KNEE-ORTHOSIS",
+      "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+      "section": "Criterion: CRIT-KORTH-02",
+      "content_preview": "CRIT-KORTH-02 Medical Justification for Custom vs Prefabricated Device Documented anatomical justification why an off-th"
+    },
+    {
+      "chunk_id": "LCD-KNEE-ORTHOSIS::Criterion: CRIT-KORTH-EXCL-01",
+      "policy_id": "LCD-KNEE-ORTHOSIS",
+      "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+      "section": "Criterion: CRIT-KORTH-EXCL-01",
+      "content_preview": "CRIT-KORTH-EXCL-01 Temporary Post-Operative Immobilizer Exclusion Custom functional brace requested solely for short-ter"
+    },
+    {
+      "chunk_id": "LCD-KYPHO::Indications & Coverage Summary",
+      "policy_id": "LCD-KYPHO",
+      "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-KYPHO Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty) Interventional Radiology / Spine Surgery "
+    },
+    {
+      "chunk_id": "LCD-KYPHO::Criterion: CRIT-KYPHO-01",
+      "policy_id": "LCD-KYPHO",
+      "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+      "section": "Criterion: CRIT-KYPHO-01",
+      "content_preview": "CRIT-KYPHO-01 Severe Pain Score (NRS/VAS >= 6/10) Severe debilitating focal vertebral pain with pain score >= 6 on 0-10 "
+    },
+    {
+      "chunk_id": "LCD-KYPHO::Criterion: CRIT-KYPHO-02",
+      "policy_id": "LCD-KYPHO",
+      "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+      "section": "Criterion: CRIT-KYPHO-02",
+      "content_preview": "CRIT-KYPHO-02 Acute Edema on MRI Confirming Recent Compression Fracture STIR or T2 MRI demonstrating hyperintense bone m"
+    },
+    {
+      "chunk_id": "LCD-KYPHO::Criterion: CRIT-KYPHO-EXCL-01",
+      "policy_id": "LCD-KYPHO",
+      "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+      "section": "Criterion: CRIT-KYPHO-EXCL-01",
+      "content_preview": "CRIT-KYPHO-EXCL-01 Active Spinal Infection or Chronic Healed Fracture Exclusion Active osteomyelitis, discitis, epidural"
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-DECOMP::Indications & Coverage Summary",
+      "policy_id": "LCD-LUMBAR-DECOMP",
+      "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-LUMBAR-DECOMP Lumbar Laminectomy and Decompression for Spinal Stenosis Spine Surgery Medicare coverage guidelines fo"
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-DECOMP::Criterion: CRIT-LDEC-01",
+      "policy_id": "LCD-LUMBAR-DECOMP",
+      "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+      "section": "Criterion: CRIT-LDEC-01",
+      "content_preview": "CRIT-LDEC-01 Severe Central or Foraminal Stenosis on MRI/CT Diagnostic MRI or CT confirming moderate to severe lumbar ce"
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-DECOMP::Criterion: CRIT-LDEC-02",
+      "policy_id": "LCD-LUMBAR-DECOMP",
+      "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+      "section": "Criterion: CRIT-LDEC-02",
+      "content_preview": "CRIT-LDEC-02 Conservative Therapy Trial Failure (>= 6 Weeks) Trial and failure of >= 6 weeks of non-surgical conservativ"
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-DECOMP::Criterion: CRIT-LDEC-EXCL-01",
+      "policy_id": "LCD-LUMBAR-DECOMP",
+      "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+      "section": "Criterion: CRIT-LDEC-EXCL-01",
+      "content_preview": "CRIT-LDEC-EXCL-01 Absence of Neurologic Symptoms Exclusion Asymptomatic stenosis or incidental radiologic stenosis in th"
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-FUSION::Indications & Coverage Summary",
+      "policy_id": "LCD-LUMBAR-FUSION",
+      "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-LUMBAR-FUSION Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability Spine Surgery Medicare coverag"
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-FUSION::Criterion: CRIT-LUMB-01",
+      "policy_id": "LCD-LUMBAR-FUSION",
+      "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+      "section": "Criterion: CRIT-LUMB-01",
+      "content_preview": "CRIT-LUMB-01 Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm) Radiographic evidence of Grade 1 or highe"
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-FUSION::Criterion: CRIT-LUMB-02",
+      "policy_id": "LCD-LUMBAR-FUSION",
+      "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+      "section": "Criterion: CRIT-LUMB-02",
+      "content_preview": "CRIT-LUMB-02 Conservative Non-Operative Care Trial (>= 90 Days) Patient completed at least 3 months (90 days) of active "
+    },
+    {
+      "chunk_id": "LCD-LUMBAR-FUSION::Criterion: CRIT-LUMB-EXCL-01",
+      "policy_id": "LCD-LUMBAR-FUSION",
+      "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+      "section": "Criterion: CRIT-LUMB-EXCL-01",
+      "content_preview": "CRIT-LUMB-EXCL-01 Isolated Low Back Pain Without Instability Exclusion Fusion requested solely for uncomplicated axial l"
+    },
+    {
+      "chunk_id": "LCD-MRI-BRAIN::Indications & Coverage Summary",
+      "policy_id": "LCD-MRI-BRAIN",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-MRI-BRAIN Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast Diagnostic Radiology / Neuroradiol"
+    },
+    {
+      "chunk_id": "LCD-MRI-BRAIN::Criterion: CRIT-MRIB-01",
+      "policy_id": "LCD-MRI-BRAIN",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+      "section": "Criterion: CRIT-MRIB-01",
+      "content_preview": "CRIT-MRIB-01 Focal Neurological Deficit or New Onset Seizure Clinical examination documenting objective focal neurologic"
+    },
+    {
+      "chunk_id": "LCD-MRI-BRAIN::Criterion: CRIT-MRIB-02",
+      "policy_id": "LCD-MRI-BRAIN",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+      "section": "Criterion: CRIT-MRIB-02",
+      "content_preview": "CRIT-MRIB-02 Progressive Headache with Red Flags or Abnormal Exam Headache with progressive severity, nocturnal awakenin"
+    },
+    {
+      "chunk_id": "LCD-MRI-BRAIN::Criterion: CRIT-MRIB-EXCL-01",
+      "policy_id": "LCD-MRI-BRAIN",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+      "section": "Criterion: CRIT-MRIB-EXCL-01",
+      "content_preview": "CRIT-MRIB-EXCL-01 Typical Chronic Stable Headache Without Red Flags Exclusion Brain MRI requested for long-standing typi"
+    },
+    {
+      "chunk_id": "LCD-MRI-LUMBAR::Indications & Coverage Summary",
+      "policy_id": "LCD-MRI-LUMBAR",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-MRI-LUMBAR Magnetic Resonance Imaging (MRI) of the Lumbar Spine Diagnostic Radiology Medicare coverage criteria for "
+    },
+    {
+      "chunk_id": "LCD-MRI-LUMBAR::Criterion: CRIT-MRIL-01",
+      "policy_id": "LCD-MRI-LUMBAR",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+      "section": "Criterion: CRIT-MRIL-01",
+      "content_preview": "CRIT-MRIL-01 Radicular Deficit After 6 Weeks Conservative Care or Red Flag Documented dermatomal radicular symptoms refr"
+    },
+    {
+      "chunk_id": "LCD-MRI-LUMBAR::Criterion: CRIT-MRIL-02",
+      "policy_id": "LCD-MRI-LUMBAR",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+      "section": "Criterion: CRIT-MRIL-02",
+      "content_preview": "CRIT-MRIL-02 Preceding Plain Lumbar Radiograph Evaluation Recent plain radiographs of the lumbar spine performed prior t"
+    },
+    {
+      "chunk_id": "LCD-MRI-LUMBAR::Criterion: CRIT-MRIL-EXCL-01",
+      "policy_id": "LCD-MRI-LUMBAR",
+      "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+      "section": "Criterion: CRIT-MRIL-EXCL-01",
+      "content_preview": "CRIT-MRIL-EXCL-01 Acute Uncomplicated Low Back Pain (< 6 Weeks) Exclusion MRI requested for uncomplicated acute axial ba"
+    },
+    {
+      "chunk_id": "LCD-PAD-ATHERO::Indications & Coverage Summary",
+      "policy_id": "LCD-PAD-ATHERO",
+      "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-PAD-ATHERO Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease Vascular Surgery / Interventi"
+    },
+    {
+      "chunk_id": "LCD-PAD-ATHERO::Criterion: CRIT-PAD-01",
+      "policy_id": "LCD-PAD-ATHERO",
+      "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+      "section": "Criterion: CRIT-PAD-01",
+      "content_preview": "CRIT-PAD-01 Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6) Clinical documentation of seve"
+    },
+    {
+      "chunk_id": "LCD-PAD-ATHERO::Criterion: CRIT-PAD-02",
+      "policy_id": "LCD-PAD-ATHERO",
+      "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+      "section": "Criterion: CRIT-PAD-02",
+      "content_preview": "CRIT-PAD-02 Arterial Hemodynamic Stenosis (>= 70% on Angiography or ABI <= 0.70) Non-invasive vascular testing showing A"
+    },
+    {
+      "chunk_id": "LCD-PAD-ATHERO::Criterion: CRIT-PAD-EXCL-01",
+      "policy_id": "LCD-PAD-ATHERO",
+      "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+      "section": "Criterion: CRIT-PAD-EXCL-01",
+      "content_preview": "CRIT-PAD-EXCL-01 Mild Claudication or Asymptomatic PAD Exclusion Invasive revascularization performed for mild claudicat"
+    },
+    {
+      "chunk_id": "LCD-PCI::Indications & Coverage Summary",
+      "policy_id": "LCD-PCI",
+      "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-PCI Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents Interventional Cardiology Medicare coverage gu"
+    },
+    {
+      "chunk_id": "LCD-PCI::Criterion: CRIT-PCI-01",
+      "policy_id": "LCD-PCI",
+      "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+      "section": "Criterion: CRIT-PCI-01",
+      "content_preview": "CRIT-PCI-01 Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80) Coronary angiography documenting >= 70% luminal diamete"
+    },
+    {
+      "chunk_id": "LCD-PCI::Criterion: CRIT-PCI-02",
+      "policy_id": "LCD-PCI",
+      "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+      "section": "Criterion: CRIT-PCI-02",
+      "content_preview": "CRIT-PCI-02 Refractory Angina Despite Optimal Medical Therapy (GDMT) Persistent CCS Class II, III, or IV angina despite "
+    },
+    {
+      "chunk_id": "LCD-PCI::Criterion: CRIT-PCI-EXCL-01",
+      "policy_id": "LCD-PCI",
+      "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+      "section": "Criterion: CRIT-PCI-EXCL-01",
+      "content_preview": "CRIT-PCI-EXCL-01 Hemodynamically Insignificant Stenosis (< 50%) Exclusion Elective PCI performed on a non-culprit lesion"
+    },
+    {
+      "chunk_id": "LCD-POWER-WC::Indications & Coverage Summary",
+      "policy_id": "LCD-POWER-WC",
+      "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-POWER-WC Complex Rehabilitative Power Wheelchairs (Group 3) Durable Medical Equipment (DMEPOS) DME MAC coverage crit"
+    },
+    {
+      "chunk_id": "LCD-POWER-WC::Criterion: CRIT-PWC-01",
+      "policy_id": "LCD-POWER-WC",
+      "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+      "section": "Criterion: CRIT-PWC-01",
+      "content_preview": "CRIT-PWC-01 Severe Neurologic or Myopathic Mobility Limitation (MRADLs) Documented severe mobility deficit precluding pa"
+    },
+    {
+      "chunk_id": "LCD-POWER-WC::Criterion: CRIT-PWC-02",
+      "policy_id": "LCD-POWER-WC",
+      "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+      "section": "Criterion: CRIT-PWC-02",
+      "content_preview": "CRIT-PWC-02 Specialty Evaluation by Licensed PT/OT and Certified ATP Documented in-person specialty evaluation by a lice"
+    },
+    {
+      "chunk_id": "LCD-POWER-WC::Criterion: CRIT-PWC-EXCL-01",
+      "policy_id": "LCD-POWER-WC",
+      "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
+      "section": "Criterion: CRIT-PWC-EXCL-01",
+      "content_preview": "CRIT-PWC-EXCL-01 Outdoor-Only Need Without Home Mobility Deficit Exclusion Power wheelchair requested exclusively for le"
+    },
+    {
+      "chunk_id": "LCD-PROTON::Indications & Coverage Summary",
+      "policy_id": "LCD-PROTON",
+      "policy_title": "Proton Beam Radiotherapy",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-PROTON Proton Beam Radiotherapy Radiation Oncology Medicare coverage criteria for proton beam radiotherapy. Covered "
+    },
+    {
+      "chunk_id": "LCD-PROTON::Criterion: CRIT-PBT-01",
+      "policy_id": "LCD-PROTON",
+      "policy_title": "Proton Beam Radiotherapy",
+      "section": "Criterion: CRIT-PBT-01",
+      "content_preview": "CRIT-PBT-01 Skull Base, Spine Chordoma, or Critical Structure Proximity Histologically confirmed skull base/cervical cho"
+    },
+    {
+      "chunk_id": "LCD-PROTON::Criterion: CRIT-PBT-02",
+      "policy_id": "LCD-PROTON",
+      "policy_title": "Proton Beam Radiotherapy",
+      "section": "Criterion: CRIT-PBT-02",
+      "content_preview": "CRIT-PBT-02 Comparative Dosimetric Treatment Plan Demonstrating Sparing Comparative dosimetric planning demonstrating th"
+    },
+    {
+      "chunk_id": "LCD-PROTON::Criterion: CRIT-PBT-EXCL-01",
+      "policy_id": "LCD-PROTON",
+      "policy_title": "Proton Beam Radiotherapy",
+      "section": "Criterion: CRIT-PBT-EXCL-01",
+      "content_preview": "CRIT-PBT-EXCL-01 Widespread Distant Metastases Exclusion Patients with widespread systemic metastatic disease or termina"
+    },
+    {
+      "chunk_id": "LCD-RAD-NIV::Indications & Coverage Summary",
+      "policy_id": "LCD-RAD-NIV",
+      "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-RAD-NIV Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup) Durable Medical "
+    },
+    {
+      "chunk_id": "LCD-RAD-NIV::Criterion: CRIT-NIV-01",
+      "policy_id": "LCD-RAD-NIV",
+      "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+      "section": "Criterion: CRIT-NIV-01",
+      "content_preview": "CRIT-NIV-01 Daytime Hypercapnia (Arterial PaCO2 >= 52 mm Hg) Arterial blood gas (ABG) drawn while awake and breathing pr"
+    },
+    {
+      "chunk_id": "LCD-RAD-NIV::Criterion: CRIT-NIV-02",
+      "policy_id": "LCD-RAD-NIV",
+      "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+      "section": "Criterion: CRIT-NIV-02",
+      "content_preview": "CRIT-NIV-02 Prior CPAP Trial Failure or Severe Hypoventilation Syndrome Documented failure of standard CPAP to resolve h"
+    },
+    {
+      "chunk_id": "LCD-RAD-NIV::Criterion: CRIT-NIV-EXCL-01",
+      "policy_id": "LCD-RAD-NIV",
+      "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+      "section": "Criterion: CRIT-NIV-EXCL-01",
+      "content_preview": "CRIT-NIV-EXCL-01 Simple Obstructive Sleep Apnea Without Hypoventilation Exclusion Device requested for uncomplicated obs"
+    },
+    {
+      "chunk_id": "LCD-ROTATOR-CUFF::Indications & Coverage Summary",
+      "policy_id": "LCD-ROTATOR-CUFF",
+      "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-ROTATOR-CUFF Rotator Cuff Repair (Open or Arthroscopic) Orthopedic Surgery Medicare coverage guidelines for rotator "
+    },
+    {
+      "chunk_id": "LCD-ROTATOR-CUFF::Criterion: CRIT-RC-01",
+      "policy_id": "LCD-ROTATOR-CUFF",
+      "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+      "section": "Criterion: CRIT-RC-01",
+      "content_preview": "CRIT-RC-01 Full-Thickness or High-Grade Rotator Cuff Tear on MRI Diagnostic MRI or ultrasound confirming full-thickness "
+    },
+    {
+      "chunk_id": "LCD-ROTATOR-CUFF::Criterion: CRIT-RC-02",
+      "policy_id": "LCD-ROTATOR-CUFF",
+      "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+      "section": "Criterion: CRIT-RC-02",
+      "content_preview": "CRIT-RC-02 Conservative Therapy Trial Failure (>= 3 Months) Trial and failure of >= 3 months (90 days) of conservative t"
+    },
+    {
+      "chunk_id": "LCD-ROTATOR-CUFF::Criterion: CRIT-RC-EXCL-01",
+      "policy_id": "LCD-ROTATOR-CUFF",
+      "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+      "section": "Criterion: CRIT-RC-EXCL-01",
+      "content_preview": "CRIT-RC-EXCL-01 Severe Irreversible Muscle Fatty Infiltration (Goutallier Grade 4) Chronic massive irreparable tear with"
+    },
+    {
+      "chunk_id": "LCD-SBRT::Indications & Coverage Summary",
+      "policy_id": "LCD-SBRT",
+      "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-SBRT Stereotactic Body Radiation Therapy (SBRT / SABR) Radiation Oncology Medicare coverage criteria for stereotacti"
+    },
+    {
+      "chunk_id": "LCD-SBRT::Criterion: CRIT-SBRT-01",
+      "policy_id": "LCD-SBRT",
+      "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+      "section": "Criterion: CRIT-SBRT-01",
+      "content_preview": "CRIT-SBRT-01 Early-Stage NSCLC (T1-T2N0M0) or Oligometastases (<= 3 Lesions) Biopsy-proven early stage lung cancer in me"
+    },
+    {
+      "chunk_id": "LCD-SBRT::Criterion: CRIT-SBRT-02",
+      "policy_id": "LCD-SBRT",
+      "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+      "section": "Criterion: CRIT-SBRT-02",
+      "content_preview": "CRIT-SBRT-02 Rigid Immobilization and Organ Motion Management Plan Treatment plan incorporating sub-millimeter stereotac"
+    },
+    {
+      "chunk_id": "LCD-SBRT::Criterion: CRIT-SBRT-EXCL-01",
+      "policy_id": "LCD-SBRT",
+      "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+      "section": "Criterion: CRIT-SBRT-EXCL-01",
+      "content_preview": "CRIT-SBRT-EXCL-01 Polymetastatic Disease (> 3 Lesions) Exclusion Patients with diffuse polymetastatic disease (> 3 activ"
+    },
+    {
+      "chunk_id": "LCD-SHOULDER-ARTHRO::Indications & Coverage Summary",
+      "policy_id": "LCD-SHOULDER-ARTHRO",
+      "policy_title": "Total and Reverse Shoulder Arthroplasty",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-SHOULDER-ARTHRO Total and Reverse Shoulder Arthroplasty Orthopedic Surgery Medicare coverage guidelines for anatomic"
+    },
+    {
+      "chunk_id": "LCD-SHOULDER-ARTHRO::Criterion: CRIT-SHLD-01",
+      "policy_id": "LCD-SHOULDER-ARTHRO",
+      "policy_title": "Total and Reverse Shoulder Arthroplasty",
+      "section": "Criterion: CRIT-SHLD-01",
+      "content_preview": "CRIT-SHLD-01 Advanced Glenohumeral Arthropathy or Cuff Tear Arthropathy Radiographs or MRI demonstrating severe glenohum"
+    },
+    {
+      "chunk_id": "LCD-SHOULDER-ARTHRO::Criterion: CRIT-SHLD-02",
+      "policy_id": "LCD-SHOULDER-ARTHRO",
+      "policy_title": "Total and Reverse Shoulder Arthroplasty",
+      "section": "Criterion: CRIT-SHLD-02",
+      "content_preview": "CRIT-SHLD-02 Conservative Therapy Trial Failure (>= 3 Months) Documented trial and failure of >= 3 months of conservativ"
+    },
+    {
+      "chunk_id": "LCD-SHOULDER-ARTHRO::Criterion: CRIT-SHLD-EXCL-01",
+      "policy_id": "LCD-SHOULDER-ARTHRO",
+      "policy_title": "Total and Reverse Shoulder Arthroplasty",
+      "section": "Criterion: CRIT-SHLD-EXCL-01",
+      "content_preview": "CRIT-SHLD-EXCL-01 Paralyzed Deltoid Muscle Exclusion for Reverse Shoulder Complete axillary nerve palsy or absent deltoi"
+    },
+    {
+      "chunk_id": "LCD-WOUND-VAC::Indications & Coverage Summary",
+      "policy_id": "LCD-WOUND-VAC",
+      "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "LCD-WOUND-VAC Negative Pressure Wound Therapy (NPWT / Wound VAC) Durable Medical Equipment (DMEPOS) DME MAC coverage cri"
+    },
+    {
+      "chunk_id": "LCD-WOUND-VAC::Criterion: CRIT-VAC-01",
+      "policy_id": "LCD-WOUND-VAC",
+      "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+      "section": "Criterion: CRIT-VAC-01",
+      "content_preview": "CRIT-VAC-01 Stage III/IV Pressure Ulcer, Diabetic Ulcer, or Dehisced Wound Documented full-thickness Stage III or IV pre"
+    },
+    {
+      "chunk_id": "LCD-WOUND-VAC::Criterion: CRIT-VAC-02",
+      "policy_id": "LCD-WOUND-VAC",
+      "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+      "section": "Criterion: CRIT-VAC-02",
+      "content_preview": "CRIT-VAC-02 Conventional Wound Care Trial Failure (>= 30 Days) Documented trial and failure of >= 30 days of standard co"
+    },
+    {
+      "chunk_id": "LCD-WOUND-VAC::Criterion: CRIT-VAC-EXCL-01",
+      "policy_id": "LCD-WOUND-VAC",
+      "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
+      "section": "Criterion: CRIT-VAC-EXCL-01",
+      "content_preview": "CRIT-VAC-EXCL-01 Untreated Osteomyelitis or Necrotic Eschar Exclusion Active untreated osteomyelitis in wound bed, necro"
+    },
+    {
+      "chunk_id": "NCD-CARDIAC-REHAB::Indications & Coverage Summary",
+      "policy_id": "NCD-CARDIAC-REHAB",
+      "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-CARDIAC-REHAB Comprehensive Outpatient Cardiac Rehabilitation Preventive Cardiology CMS National Coverage Determinat"
+    },
+    {
+      "chunk_id": "NCD-CARDIAC-REHAB::Criterion: CRIT-CREH-01",
+      "policy_id": "NCD-CARDIAC-REHAB",
+      "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+      "section": "Criterion: CRIT-CREH-01",
+      "content_preview": "CRIT-CREH-01 Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%) Documented qualifying diagnosis: acute MI w"
+    },
+    {
+      "chunk_id": "NCD-CARDIAC-REHAB::Criterion: CRIT-CREH-02",
+      "policy_id": "NCD-CARDIAC-REHAB",
+      "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+      "section": "Criterion: CRIT-CREH-02",
+      "content_preview": "CRIT-CREH-02 Physician-Prescribed Individualized Exercise Treatment Plan Documented individualized treatment plan signed"
+    },
+    {
+      "chunk_id": "NCD-CARDIAC-REHAB::Criterion: CRIT-CREH-EXCL-01",
+      "policy_id": "NCD-CARDIAC-REHAB",
+      "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+      "section": "Criterion: CRIT-CREH-EXCL-01",
+      "content_preview": "CRIT-CREH-EXCL-01 Unstable High-Risk Cardiac Condition Exclusion Patients with decompensated heart failure, unstable ang"
+    },
+    {
+      "chunk_id": "NCD-CATARACT::Indications & Coverage Summary",
+      "policy_id": "NCD-CATARACT",
+      "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-CATARACT Cataract Extraction with Intraocular Lens (IOL) Implantation Ophthalmology CMS National Coverage Determinat"
+    },
+    {
+      "chunk_id": "NCD-CATARACT::Criterion: CRIT-CAT-01",
+      "policy_id": "NCD-CATARACT",
+      "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+      "section": "Criterion: CRIT-CAT-01",
+      "content_preview": "CRIT-CAT-01 Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare Documented best-corrected Snellen distance v"
+    },
+    {
+      "chunk_id": "NCD-CATARACT::Criterion: CRIT-CAT-02",
+      "policy_id": "NCD-CATARACT",
+      "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+      "section": "Criterion: CRIT-CAT-02",
+      "content_preview": "CRIT-CAT-02 Documented Impairment in Activities of Daily Living (ADLs) Patient reports that visual impairment significan"
+    },
+    {
+      "chunk_id": "NCD-CATARACT::Criterion: CRIT-CAT-EXCL-01",
+      "policy_id": "NCD-CATARACT",
+      "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+      "section": "Criterion: CRIT-CAT-EXCL-01",
+      "content_preview": "CRIT-CAT-EXCL-01 Glasses Sufficient or Purely Refractive Lens Exchange Exclusion Clear lens extraction performed purely "
+    },
+    {
+      "chunk_id": "NCD-CCTA::Indications & Coverage Summary",
+      "policy_id": "NCD-CCTA",
+      "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-CCTA Coronary Computed Tomography Angiography (CCTA) Cardiovascular Radiology CMS National Coverage Determination fo"
+    },
+    {
+      "chunk_id": "NCD-CCTA::Criterion: CRIT-CCTA-01",
+      "policy_id": "NCD-CCTA",
+      "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+      "section": "Criterion: CRIT-CCTA-01",
+      "content_preview": "CRIT-CCTA-01 Intermediate CAD Probability and Target Heart Rate (< 65 bpm) Documented intermediate pre-test probability "
+    },
+    {
+      "chunk_id": "NCD-CCTA::Criterion: CRIT-CCTA-02",
+      "policy_id": "NCD-CCTA",
+      "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+      "section": "Criterion: CRIT-CCTA-02",
+      "content_preview": "CRIT-CCTA-02 Inconclusive Prior Stress Testing or Equivocal Biomarkers Documented equivocal, inconclusive, or discordant"
+    },
+    {
+      "chunk_id": "NCD-CCTA::Criterion: CRIT-CCTA-EXCL-01",
+      "policy_id": "NCD-CCTA",
+      "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
+      "section": "Criterion: CRIT-CCTA-EXCL-01",
+      "content_preview": "CRIT-CCTA-EXCL-01 Severe Tachyarrhythmia or Severe Renal Impairment Exclusion Severe uncontrolled atrial fibrillation, i"
+    },
+    {
+      "chunk_id": "NCD-MPI-PET::Indications & Coverage Summary",
+      "policy_id": "NCD-MPI-PET",
+      "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-MPI-PET Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging Nuclear Cardiology CMS National Cove"
+    },
+    {
+      "chunk_id": "NCD-MPI-PET::Criterion: CRIT-PETM-01",
+      "policy_id": "NCD-MPI-PET",
+      "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+      "section": "Criterion: CRIT-PETM-01",
+      "content_preview": "CRIT-PETM-01 Intermediate-to-High Pre-Test CAD Probability Documented intermediate or high pre-test probability of ische"
+    },
+    {
+      "chunk_id": "NCD-MPI-PET::Criterion: CRIT-PETM-02",
+      "policy_id": "NCD-MPI-PET",
+      "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+      "section": "Criterion: CRIT-PETM-02",
+      "content_preview": "CRIT-PETM-02 Suboptimal SPECT Imaging or Severe Obesity (BMI >= 35 kg/m2) Documented prior inconclusive/equivocal SPECT "
+    },
+    {
+      "chunk_id": "NCD-MPI-PET::Criterion: CRIT-PETM-EXCL-01",
+      "policy_id": "NCD-MPI-PET",
+      "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+      "section": "Criterion: CRIT-PETM-EXCL-01",
+      "content_preview": "CRIT-PETM-EXCL-01 Low Risk Asymptomatic Screening Exclusion Cardiac PET performed as routine general screening in asympt"
+    },
+    {
+      "chunk_id": "NCD-PACEMAKER::Indications & Coverage Summary",
+      "policy_id": "NCD-PACEMAKER",
+      "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-PACEMAKER Permanent Cardiac Pacemakers for Bradyarrhythmias Cardiology / Electrophysiology CMS National Coverage Det"
+    },
+    {
+      "chunk_id": "NCD-PACEMAKER::Criterion: CRIT-PACE-01",
+      "policy_id": "NCD-PACEMAKER",
+      "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+      "section": "Criterion: CRIT-PACE-01",
+      "content_preview": "CRIT-PACE-01 High-Grade AV Block or Symptomatic Sinus Pauses (>= 3.0 Seconds) Electrocardiographic documentation of pers"
+    },
+    {
+      "chunk_id": "NCD-PACEMAKER::Criterion: CRIT-PACE-02",
+      "policy_id": "NCD-PACEMAKER",
+      "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+      "section": "Criterion: CRIT-PACE-02",
+      "content_preview": "CRIT-PACE-02 Absence of Reversible Etiologies Clinical confirmation that bradyarrhythmia is not caused by reversible dru"
+    },
+    {
+      "chunk_id": "NCD-PACEMAKER::Criterion: CRIT-PACE-EXCL-01",
+      "policy_id": "NCD-PACEMAKER",
+      "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
+      "section": "Criterion: CRIT-PACE-EXCL-01",
+      "content_preview": "CRIT-PACE-EXCL-01 Asymptomatic First-Degree AV Block Exclusion Permanent pacemaker requested for asymptomatic first-degr"
+    },
+    {
+      "chunk_id": "NCD-PET-ONC::Indications & Coverage Summary",
+      "policy_id": "NCD-PET-ONC",
+      "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-PET-ONC Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging Nuclear Medicine / Oncology CMS N"
+    },
+    {
+      "chunk_id": "NCD-PET-ONC::Criterion: CRIT-PTONC-01",
+      "policy_id": "NCD-PET-ONC",
+      "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+      "section": "Criterion: CRIT-PTONC-01",
+      "content_preview": "CRIT-PTONC-01 Histologically Confirmed Malignancy or High-Probability Solitary Nodule Pathology report documenting biops"
+    },
+    {
+      "chunk_id": "NCD-PET-ONC::Criterion: CRIT-PTONC-02",
+      "policy_id": "NCD-PET-ONC",
+      "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+      "section": "Criterion: CRIT-PTONC-02",
+      "content_preview": "CRIT-PTONC-02 Clinical Staging Impact on Intended Treatment Strategy Documented clinical intent where PET-CT findings wi"
+    },
+    {
+      "chunk_id": "NCD-PET-ONC::Criterion: CRIT-PTONC-EXCL-01",
+      "policy_id": "NCD-PET-ONC",
+      "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
+      "section": "Criterion: CRIT-PTONC-EXCL-01",
+      "content_preview": "CRIT-PTONC-EXCL-01 Routine Surveillance in Asymptomatic Remission Exclusion Routine surveillance PET performed in asympt"
+    },
+    {
+      "chunk_id": "NCD-PUMP::Indications & Coverage Summary",
+      "policy_id": "NCD-PUMP",
+      "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-PUMP Implantable Infusion Pumps for Intrathecal Therapy Interventional Pain / Oncology CMS National Coverage Determi"
+    },
+    {
+      "chunk_id": "NCD-PUMP::Criterion: CRIT-PUMP-01",
+      "policy_id": "NCD-PUMP",
+      "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+      "section": "Criterion: CRIT-PUMP-01",
+      "content_preview": "CRIT-PUMP-01 Successful Intrathecal Preliminary Trial Response Documented positive clinical response (>= 50% pain reduct"
+    },
+    {
+      "chunk_id": "NCD-PUMP::Criterion: CRIT-PUMP-02",
+      "policy_id": "NCD-PUMP",
+      "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+      "section": "Criterion: CRIT-PUMP-02",
+      "content_preview": "CRIT-PUMP-02 Intolerable Side Effects or Failure of Systemic Analgesics Documented intractable pain unresponsive to syst"
+    },
+    {
+      "chunk_id": "NCD-PUMP::Criterion: CRIT-PUMP-EXCL-01",
+      "policy_id": "NCD-PUMP",
+      "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+      "section": "Criterion: CRIT-PUMP-EXCL-01",
+      "content_preview": "CRIT-PUMP-EXCL-01 Active Systemic Sepsis Exclusion Active systemic infection, sepsis, meningitis, or localized infection"
+    },
+    {
+      "chunk_id": "NCD-SCS::Indications & Coverage Summary",
+      "policy_id": "NCD-SCS",
+      "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-SCS Spinal Cord Stimulation (SCS) for Chronic Intractable Pain Interventional Pain / Neurosurgery CMS National Cover"
+    },
+    {
+      "chunk_id": "NCD-SCS::Criterion: CRIT-SCS-01",
+      "policy_id": "NCD-SCS",
+      "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+      "section": "Criterion: CRIT-SCS-01",
+      "content_preview": "CRIT-SCS-01 Temporary Trial Pain Reduction (>= 50%) Documented >= 50% pain relief during an externalized temporary spina"
+    },
+    {
+      "chunk_id": "NCD-SCS::Criterion: CRIT-SCS-02",
+      "policy_id": "NCD-SCS",
+      "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+      "section": "Criterion: CRIT-SCS-02",
+      "content_preview": "CRIT-SCS-02 Formal Psychological Evaluation Clearance Documented formal pre-implant psychological evaluation by a licens"
+    },
+    {
+      "chunk_id": "NCD-SCS::Criterion: CRIT-SCS-EXCL-01",
+      "policy_id": "NCD-SCS",
+      "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+      "section": "Criterion: CRIT-SCS-EXCL-01",
+      "content_preview": "CRIT-SCS-EXCL-01 Active Substance Abuse or Untreated Psychosis Exclusion Active untreated substance use disorder, severe"
+    },
+    {
+      "chunk_id": "NCD-SGD::Indications & Coverage Summary",
+      "policy_id": "NCD-SGD",
+      "policy_title": "Speech Generating Devices (SGD)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-SGD Speech Generating Devices (SGD) Durable Medical Equipment (DMEPOS) CMS National Coverage Determination for speec"
+    },
+    {
+      "chunk_id": "NCD-SGD::Criterion: CRIT-SGD-01",
+      "policy_id": "NCD-SGD",
+      "policy_title": "Speech Generating Devices (SGD)",
+      "section": "Criterion: CRIT-SGD-01",
+      "content_preview": "CRIT-SGD-01 Severe Expressive Speech Impairment Precluding Daily Communication Medical record documenting severe express"
+    },
+    {
+      "chunk_id": "NCD-SGD::Criterion: CRIT-SGD-02",
+      "policy_id": "NCD-SGD",
+      "policy_title": "Speech Generating Devices (SGD)",
+      "section": "Criterion: CRIT-SGD-02",
+      "content_preview": "CRIT-SGD-02 Formal Evaluation by Licensed Speech-Language Pathologist (SLP) Formal written assessment by a licensed Spee"
+    },
+    {
+      "chunk_id": "NCD-SGD::Criterion: CRIT-SGD-EXCL-01",
+      "policy_id": "NCD-SGD",
+      "policy_title": "Speech Generating Devices (SGD)",
+      "section": "Criterion: CRIT-SGD-EXCL-01",
+      "content_preview": "CRIT-SGD-EXCL-01 Non-Dedicated Personal Computer / Tablet Exclusion Speech software requested on an unlocked commercial "
+    },
+    {
+      "chunk_id": "OPD-BLEPH::Indications & Coverage Summary",
+      "policy_id": "OPD-BLEPH",
+      "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "OPD-BLEPH Blepharoplasty, Blepharoptosis Repair, and Brow Lift Ophthalmology / Plastic Surgery CMS prior authorization r"
+    },
+    {
+      "chunk_id": "OPD-BLEPH::Criterion: CRIT-BLEPH-01",
+      "policy_id": "OPD-BLEPH",
+      "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+      "section": "Criterion: CRIT-BLEPH-01",
+      "content_preview": "CRIT-BLEPH-01 Visual Field Restriction (>= 30% or 12 Degrees) Goldmann or automated visual field testing demonstrating s"
+    },
+    {
+      "chunk_id": "OPD-BLEPH::Criterion: CRIT-BLEPH-02",
+      "policy_id": "OPD-BLEPH",
+      "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+      "section": "Criterion: CRIT-BLEPH-02",
+      "content_preview": "CRIT-BLEPH-02 Marginal Reflex Distance 1 (MRD1 <= 2.0 mm) Photographic measurement showing Marginal Reflex Distance 1 (M"
+    },
+    {
+      "chunk_id": "OPD-BLEPH::Criterion: CRIT-BLEPH-EXCL-01",
+      "policy_id": "OPD-BLEPH",
+      "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
+      "section": "Criterion: CRIT-BLEPH-EXCL-01",
+      "content_preview": "CRIT-BLEPH-EXCL-01 Purely Cosmetic Eyelid Surgery Exclusion Procedure performed solely for cosmetic appearance without d"
+    },
+    {
+      "chunk_id": "OPD-BOTOX::Indications & Coverage Summary",
+      "policy_id": "OPD-BOTOX",
+      "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "OPD-BOTOX Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia Neurology CMS prior authorization for on"
+    },
+    {
+      "chunk_id": "OPD-BOTOX::Criterion: CRIT-BOTOX-01",
+      "policy_id": "OPD-BOTOX",
+      "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+      "section": "Criterion: CRIT-BOTOX-01",
+      "content_preview": "CRIT-BOTOX-01 Chronic Migraine Frequency (>= 15 Days/Month) Documented headache frequency >= 15 days per month for >= 3 "
+    },
+    {
+      "chunk_id": "OPD-BOTOX::Criterion: CRIT-BOTOX-02",
+      "policy_id": "OPD-BOTOX",
+      "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+      "section": "Criterion: CRIT-BOTOX-02",
+      "content_preview": "CRIT-BOTOX-02 Oral Prophylactic Medication Trial Failure (>= 2 Classes) Documented inadequate response, contraindication"
+    },
+    {
+      "chunk_id": "OPD-BOTOX::Criterion: CRIT-BOTOX-EXCL-01",
+      "policy_id": "OPD-BOTOX",
+      "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+      "section": "Criterion: CRIT-BOTOX-EXCL-01",
+      "content_preview": "CRIT-BOTOX-EXCL-01 Episodic Migraine Exclusion Patient experiencing episodic migraine (< 15 headache days per month) or "
+    },
+    {
+      "chunk_id": "OPD-CERV-DISC::Indications & Coverage Summary",
+      "policy_id": "OPD-CERV-DISC",
+      "policy_title": "Cervical Artificial Disc Arthroplasty",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "OPD-CERV-DISC Cervical Artificial Disc Arthroplasty Spine Surgery / Neurosurgery CMS prior authorization for cervical ar"
+    },
+    {
+      "chunk_id": "OPD-CERV-DISC::Criterion: CRIT-CERV-01",
+      "policy_id": "OPD-CERV-DISC",
+      "policy_title": "Cervical Artificial Disc Arthroplasty",
+      "section": "Criterion: CRIT-CERV-01",
+      "content_preview": "CRIT-CERV-01 Symptomatic Cervical Radiculopathy or Myelopathy Documented cervical radiculopathy (intractable arm pain, p"
+    },
+    {
+      "chunk_id": "OPD-CERV-DISC::Criterion: CRIT-CERV-02",
+      "policy_id": "OPD-CERV-DISC",
+      "policy_title": "Cervical Artificial Disc Arthroplasty",
+      "section": "Criterion: CRIT-CERV-02",
+      "content_preview": "CRIT-CERV-02 Conservative Therapy Trial Failure (>= 6 Weeks) Documented trial and failure of >= 6 weeks of conservative "
+    },
+    {
+      "chunk_id": "OPD-CERV-DISC::Criterion: CRIT-CERV-EXCL-01",
+      "policy_id": "OPD-CERV-DISC",
+      "policy_title": "Cervical Artificial Disc Arthroplasty",
+      "section": "Criterion: CRIT-CERV-EXCL-01",
+      "content_preview": "CRIT-CERV-EXCL-01 Severe Facet Joint Spondylosis Exclusion Severe cervical facet joint degeneration, autofusion, spinal "
+    },
+    {
+      "chunk_id": "OPD-PANNI::Indications & Coverage Summary",
+      "policy_id": "OPD-PANNI",
+      "policy_title": "Panniculectomy and Abdominoplasty",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "OPD-PANNI Panniculectomy and Abdominoplasty Plastic Surgery / General Surgery CMS prior authorization for panniculectomy"
+    },
+    {
+      "chunk_id": "OPD-PANNI::Criterion: CRIT-PANNI-01",
+      "policy_id": "OPD-PANNI",
+      "policy_title": "Panniculectomy and Abdominoplasty",
+      "section": "Criterion: CRIT-PANNI-01",
+      "content_preview": "CRIT-PANNI-01 Severe Apron/Pannus (Hanging Below Pubis Symphysis) Photographic and clinical examination confirming the p"
+    },
+    {
+      "chunk_id": "OPD-PANNI::Criterion: CRIT-PANNI-02",
+      "policy_id": "OPD-PANNI",
+      "policy_title": "Panniculectomy and Abdominoplasty",
+      "section": "Criterion: CRIT-PANNI-02",
+      "content_preview": "CRIT-PANNI-02 Refractory Intertrigo / Dermatitis (>= 3 Months Medical Therapy) Documented chronic intertrigo, maceration"
+    },
+    {
+      "chunk_id": "OPD-PANNI::Criterion: CRIT-PANNI-EXCL-01",
+      "policy_id": "OPD-PANNI",
+      "policy_title": "Panniculectomy and Abdominoplasty",
+      "section": "Criterion: CRIT-PANNI-EXCL-01",
+      "content_preview": "CRIT-PANNI-EXCL-01 Cosmetic Body Contouring Exclusion Panniculectomy or abdominoplasty performed for body contouring or "
+    },
+    {
+      "chunk_id": "OPD-RHINO::Indications & Coverage Summary",
+      "policy_id": "OPD-RHINO",
+      "policy_title": "Rhinoplasty and Septoplasty",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "OPD-RHINO Rhinoplasty and Septoplasty Otolaryngology / Facial Plastic Surgery CMS prior authorization for functional rhi"
+    },
+    {
+      "chunk_id": "OPD-RHINO::Criterion: CRIT-RHINO-01",
+      "policy_id": "OPD-RHINO",
+      "policy_title": "Rhinoplasty and Septoplasty",
+      "section": "Criterion: CRIT-RHINO-01",
+      "content_preview": "CRIT-RHINO-01 Chronic Nasal Airway Obstruction (>= 6 Months) Documented chronic symptomatic nasal airway obstruction sig"
+    },
+    {
+      "chunk_id": "OPD-RHINO::Criterion: CRIT-RHINO-02",
+      "policy_id": "OPD-RHINO",
+      "policy_title": "Rhinoplasty and Septoplasty",
+      "section": "Criterion: CRIT-RHINO-02",
+      "content_preview": "CRIT-RHINO-02 Conservative Medical Therapy Trial Failure (>= 4 Weeks) Documented trial and failure of conservative medic"
+    },
+    {
+      "chunk_id": "OPD-RHINO::Criterion: CRIT-RHINO-EXCL-01",
+      "policy_id": "OPD-RHINO",
+      "policy_title": "Rhinoplasty and Septoplasty",
+      "section": "Criterion: CRIT-RHINO-EXCL-01",
+      "content_preview": "CRIT-RHINO-EXCL-01 Cosmetic Nasal Reshaping Exclusion Rhinoplasty performed solely for aesthetic reshaping or cosmetic d"
+    },
+    {
+      "chunk_id": "OPD-SI-FUSION::Indications & Coverage Summary",
+      "policy_id": "OPD-SI-FUSION",
+      "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "OPD-SI-FUSION Minimally Invasive Sacroiliac (SI) Joint Fusion Orthopedic Spine / Neurosurgery CMS prior authorization fo"
+    },
+    {
+      "chunk_id": "OPD-SI-FUSION::Criterion: CRIT-SI-01",
+      "policy_id": "OPD-SI-FUSION",
+      "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+      "section": "Criterion: CRIT-SI-01",
+      "content_preview": "CRIT-SI-01 Diagnostic SI Block Pain Relief (>= 75%) Documented >= 75% relief of pain immediately following fluoroscopica"
+    },
+    {
+      "chunk_id": "OPD-SI-FUSION::Criterion: CRIT-SI-02",
+      "policy_id": "OPD-SI-FUSION",
+      "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+      "section": "Criterion: CRIT-SI-02",
+      "content_preview": "CRIT-SI-02 Positive SI Joint Provocation Tests (>= 3 Tests) Physical examination documenting positive response on >= 3 p"
+    },
+    {
+      "chunk_id": "OPD-SI-FUSION::Criterion: CRIT-SI-EXCL-01",
+      "policy_id": "OPD-SI-FUSION",
+      "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+      "section": "Criterion: CRIT-SI-EXCL-01",
+      "content_preview": "CRIT-SI-EXCL-01 Active Systemic Infection Exclusion Active localized or systemic infection, osteomyelitis of pelvis, or "
+    },
+    {
+      "chunk_id": "OPD-VEIN::Indications & Coverage Summary",
+      "policy_id": "OPD-VEIN",
+      "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "OPD-VEIN Endovenous Ablation Therapy for Varicose Veins of Lower Extremity Vascular Surgery CMS prior authorization for "
+    },
+    {
+      "chunk_id": "OPD-VEIN::Criterion: CRIT-VEIN-01",
+      "policy_id": "OPD-VEIN",
+      "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+      "section": "Criterion: CRIT-VEIN-01",
+      "content_preview": "CRIT-VEIN-01 Venous Reflux Duration (>= 500 ms on Duplex Ultrasound) Duplex ultrasound examination showing retrograde fl"
+    },
+    {
+      "chunk_id": "OPD-VEIN::Criterion: CRIT-VEIN-02",
+      "policy_id": "OPD-VEIN",
+      "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+      "section": "Criterion: CRIT-VEIN-02",
+      "content_preview": "CRIT-VEIN-02 Graduated Compression Stocking Trial (>= 3 Months) Documented trial of graduated medical compression therap"
+    },
+    {
+      "chunk_id": "OPD-VEIN::Criterion: CRIT-VEIN-EXCL-01",
+      "policy_id": "OPD-VEIN",
+      "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+      "section": "Criterion: CRIT-VEIN-EXCL-01",
+      "content_preview": "CRIT-VEIN-EXCL-01 Asymptomatic Spider Vein Telangiectasia Exclusion Treatment of asymptomatic spider veins or telangiect"
+    }
+  ]
+}
