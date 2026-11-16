@@ -52,8 +52,14 @@ def test_agent2_posts_plan_before_evaluation_on_agentic_case(sample_vignette):
     board_msgs = res.message_board or []
     plan_msgs = [m for m in board_msgs if m.get("message_type") in ("PLAN", getattr(BoardMessageType, "PLAN", "PLAN"))]
 
-    assert len(plan_msgs) >= 1, "Agent 2 must post at least one PLAN message on the board"
-    plan = plan_msgs[0]
+    assert len(plan_msgs) >= 2, "Both Agent 1 and Agent 2 must post PLAN messages on the board"
+    agent1_plans = [m for m in plan_msgs if m.get("agent") == "Agent 1: Case Coordinator"]
+    assert len(agent1_plans) >= 1, "Agent 1 must post initial coordinator plan"
+    assert "two_sided_debate_with_toolbelt" in agent1_plans[0].get("metadata", {}).get("execution_strategy", "")
+
+    agent2_plans = [m for m in plan_msgs if m.get("agent") == "Agent 2: Clinical Evaluator"]
+    assert len(agent2_plans) >= 1, "Agent 2 must post evaluation PLAN message on the board"
+    plan = agent2_plans[0]
     assert plan.get("agent") == "Agent 2: Clinical Evaluator"
     meta = plan.get("metadata", {})
     assert "settled_deterministic" in meta or "routing" in meta, "PLAN metadata must contain criterion routing"

@@ -21,6 +21,9 @@ class PolicyRetrievalAgent:
     governing criteria for clinical presentations.
     """
 
+    # Named configuration threshold: uncalibrated margin requirement for automated pre-selection vs manual choice
+    SCORE_MARGIN_THRESHOLD: float = 0.08
+
     def __init__(self, db: Optional[Session] = None):
         self.db = db
 
@@ -51,9 +54,61 @@ class PolicyRetrievalAgent:
 
     def search_policies_by_narrative(self, narrative: str) -> List[Dict[str, Any]]:
         """
-        Hybrid lexical-semantic retrieval matching EHR clinical narrative against
-        indexed Medicare NCD and LCD policies. Falls back to DeclarativePolicyEngine
-        when running offline or without database persistence.
+        Unified Scorer Entry Point (Task 8).
+        Consolidates PolicyRetrievalAgent and HybridPolicyRetriever into one unified path:
+        BM25 + dense SapBERT + RRF fusion + criteria coverage reranking via PolicyShortlistService.
+        When top candidate is within SCORE_MARGIN_THRESHOLD (0.08) of runner-up, returns
+        top 3-5 candidates with status 'SELECTION_REQUIRED' instead of forcing an ambiguous pick.
+        """
+        from app.services.policy_shortlist_service import PolicyShortlistService
+
+        shortlist_res = PolicyShortlistService.compute_shortlist(narrative, db=self.db, top_k=5)
+        candidates = shortlist_res.get("shortlist", [])
+        status = shortlist_res.get("status", "NO_GOVERNING_POLICY")
+        margin = shortlist_res.get("score_margin")
+        preselected_id = shortlist_res.get("preselected_policy_id")
+
+        scored_policies = []
+        for cand in candidates:
+            pid = cand["policy_id"]
+            pol_obj = self.retrieve_policy(pid)
+            pol_cat = getattr(pol_obj, "category", "") if pol_obj else ""
+            jurisdiction = (
+                getattr(pol_obj, "jurisdiction", "National")
+                if pol_obj
+                else ("National" if pid.startswith("NCD") else "Local")
+            )
+
+            # Direct quoted matching phrases from clinical record
+            matching_phrases = cand.get("matching_phrases", [])
+            # Also preserve lowercase matched terms for backward compatibility
+            matched_terms = [p.lower() for p in matching_phrases]
+
+            scored_policies.append({
+                "policy_id": pid,
+                "title": cand.get("policy_title", pid),
+                "jurisdiction": jurisdiction,
+                "category": pol_cat,
+                "relevance_score": cand.get("reranked_score", cand.get("unified_score", 0.0)),
+                "unified_score": cand.get("unified_score", 0.0),
+                "reranked_score": cand.get("reranked_score", 0.0),
+                "matched_terms": matched_terms[:8],
+                "matching_phrases": matching_phrases,
+                "criteria_count": cand.get("total_criteria_count", 0),
+                "supported_criteria_count": cand.get("supported_criteria_count", 0),
+                "coverage_ratio": cand.get("coverage_ratio", 0.0),
+                "coverage_display": cand.get("coverage_display", ""),
+                "status": status,
+                "score_margin": margin,
+                "preselected_policy_id": preselected_id,
+            })
+
+        return scored_policies
+
+    def _lexical_taxonomy_search(self, narrative: str) -> List[Dict[str, Any]]:
+        """
+        Internal lexical, title, category, and clinical taxonomy acronym scanner.
+        Supplements hybrid dense-lexical retrieval as Scorer 2 in candidate generation.
         """
         policies = []
         if self.db:

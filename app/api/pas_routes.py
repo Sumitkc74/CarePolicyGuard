@@ -62,26 +62,74 @@ def _evaluate_pas_claim(
     combined_narrative: str,
     db: Session
 ) -> PASClaimResponse:
-    # Identify applicable policy
-    target_policy_id = "NCD-20.4"
-    lower = combined_narrative.lower()
-    if "carotid" in lower or "cas" in lower or ("stent" in lower and "endarterectomy" in lower):
-        target_policy_id = "NCD-20.7"
-    elif "mitral" in lower or "regurgitation" in lower or "teer" in lower:
-        target_policy_id = "NCD-20.33"
-    elif "sacral" in lower or "incontinence" in lower:
-        target_policy_id = "LCD-L33829"
+    # Identify applicable policy (No silent default to NCD-20.4, Task 9)
+    target_policy_id = None
+    procedure_desc = ""
 
     # Check item CPT codes if provided
     if claim.item:
         for it in claim.item:
-            code = it.productOrService.get("coding", [{}])[0].get("code", "")
+            codings = it.productOrService.get("coding", [])
+            code = codings[0].get("code", "") if codings else ""
+            procedure_desc = it.productOrService.get("text", "") or code
             if code in ["37215", "37216"]:
                 target_policy_id = "NCD-20.7"
+                break
             elif code in ["33418", "33419"]:
                 target_policy_id = "NCD-20.33"
+                break
             elif code in ["33249", "33216"]:
                 target_policy_id = "NCD-20.4"
+                break
+
+    if not target_policy_id:
+        lower = combined_narrative.lower()
+        if "carotid" in lower or "cas" in lower or ("stent" in lower and "endarterectomy" in lower):
+            target_policy_id = "NCD-20.7"
+        elif "mitral" in lower or "regurgitation" in lower or "teer" in lower:
+            target_policy_id = "NCD-20.33"
+        elif "sacral" in lower or "incontinence" in lower:
+            target_policy_id = "LCD-L33829"
+
+    # If procedure code or narrative keywords do not identify policy, check shortlist service
+    if not target_policy_id:
+        from app.services.policy_shortlist_service import PolicyShortlistService
+        shortlist_res = PolicyShortlistService.compute_shortlist(combined_narrative, db=db, top_k=3)
+        if shortlist_res.get("status") == "PRESELECTED":
+            target_policy_id = shortlist_res.get("preselected_policy_id")
+
+    # If policy remains unidentified, return pended status without silently assuming NCD-20.4
+    if not target_policy_id:
+        claim_response_id = f"cr-{uuid.uuid4().hex[:12]}"
+        code_str = procedure_desc or "unspecified"
+        disposition = f"No governing Medicare policy identified for procedure {code_str}; manual policy selection required."
+        return PASClaimResponse(
+            id=claim_response_id,
+            type={"coding": [{"system": "http://terminology.hl7.org/CodeSystem/claim-type", "code": "professional", "display": "Professional"}]},
+            patient={"reference": f"Patient/{patient_id}"},
+            created=datetime.now(timezone.utc).isoformat(),
+            insurer={"reference": "Organization/CMS-MEDICARE"},
+            requestor={"reference": provider_ref},
+            outcome="pended",
+            disposition=disposition,
+            preAuthRef=None,
+            item=[
+                PASClaimItemResponse(
+                    itemSequence=1,
+                    adjudication=[
+                        PASAdjudicationDetail(
+                            category={"coding": [{"system": "http://terminology.hl7.org/CodeSystem/adjudication", "code": "pended", "display": "Pended for Policy Selection"}]},
+                            reason={"coding": [{"system": "http://terminology.hl7.org/CodeSystem/adjudication-reason", "code": "policy_unidentified", "display": "No Governing Policy Identified"}]}
+                        )
+                    ]
+                )
+            ],
+            adjudication_summary={
+                "policy_id": None,
+                "confidence_score": 0.0,
+                "missing_criteria": ["GOVERNING_POLICY_UNIDENTIFIED"]
+            }
+        )
 
     policy = db.query(MedicarePolicy).filter(MedicarePolicy.policy_id == target_policy_id).first()
     eval_result = evaluate_patient_against_policy(combined_narrative, policy)

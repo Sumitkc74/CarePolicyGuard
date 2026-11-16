@@ -1006,9 +1006,17 @@ class CriteriaEvaluationAgent:
 def evaluate_patient_against_policy(ehr_text: str, policy: Any) -> Dict[str, Any]:
     """
     Evaluates clinical narrative against Medicare coverage criteria for HL7 Da Vinci CRD CDS Hooks.
-    Returns determination ('APPROVED' or 'WARNING'), confidence score, rationale, and missing criteria.
+    Returns determination ('APPROVED' or 'WARNING' or 'DEFERRED_TO_HUMAN'), confidence score, rationale, and missing criteria.
+    No silent default to NCD-20.4 when policy is None (Task 9).
     """
-    policy_id = getattr(policy, "policy_id", str(policy)) if policy else "NCD-20.4"
+    if not policy:
+        return {
+            "determination": "DEFERRED_TO_HUMAN",
+            "confidence_score": 0.0,
+            "clinical_rationale": "Evaluation deferred to human review: No Medicare policy provided or identified for clinical narrative.",
+            "missing_criteria": ["GOVERNING_POLICY_UNSPECIFIED"],
+        }
+    policy_id = getattr(policy, "policy_id", str(policy))
     lower = ehr_text.lower()
 
     # ROUTE 1: CAROTID ARTERY STENTING (NCD 20.7)

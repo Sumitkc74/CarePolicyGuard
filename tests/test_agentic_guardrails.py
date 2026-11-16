@@ -252,9 +252,9 @@ def test_grounded_negative_wins_over_llm_verdict() -> None:
 
 
 def test_budget_exhaustion_halts() -> None:
-    # 1. LLM Calls > 3
+    # 1. LLM Calls > 8 (Task 6: v56 raised from 3 to 8)
     with pytest.raises(BudgetExhaustionHalt) as exc_calls:
-        AgenticGuardrails.check_budgets(llm_calls=4, elapsed_seconds=5.0, agent_turns=5, criterion_debate_rounds=1)
+        AgenticGuardrails.check_budgets(llm_calls=9, elapsed_seconds=5.0, agent_turns=5, criterion_debate_rounds=1)
     assert "LLM_CALLS" in str(exc_calls.value)
 
     # 2. Time > 60.0s (v53 parameter change from 30.0s to 60.0s for agentic mode)

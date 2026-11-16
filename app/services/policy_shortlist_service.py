@@ -112,8 +112,12 @@ class PolicyShortlistService:
             hr_ranks[pid] = rank
             hr_norm_scores[pid] = r.get("rrf_score", 0.0) / max_hr_score
 
-        # Scorer 2: PolicyRetrievalAgent lexical/semantic narrative scoring
-        res_pra = policy_retriever.search_policies_by_narrative(cleaned_text)
+        # Scorer 2: PolicyRetrievalAgent lexical/semantic narrative scoring (hand-weighted component)
+        res_pra = (
+            policy_retriever._lexical_taxonomy_search(cleaned_text)
+            if hasattr(policy_retriever, "_lexical_taxonomy_search")
+            else policy_retriever.search_policies_by_narrative(cleaned_text)
+        )
         pra_ranks: dict[str, int] = {}
         pra_norm_scores: dict[str, float] = {}
         pra_matched_terms: dict[str, list[str]] = {}

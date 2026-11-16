@@ -30,7 +30,7 @@ import app.services.hybrid_retriever as hr_module
 from app.services.policy_shortlist_service import PolicyShortlistService
 
 VIGNETTES_PATH = PROJECT_ROOT / "app" / "data" / "policies_extended" / "dev_vignettes_extended.json"
-OUTPUT_JSON_PATH = PROJECT_ROOT / "app" / "data" / "benchmarks" / "retrieval_v55_measurement.json"
+OUTPUT_JSON_PATH = PROJECT_ROOT / "app" / "data" / "benchmarks" / "retrieval_v56_measurement.json"
 
 
 def _evaluate_pass(vignettes: list[dict[str, Any]], use_legacy_projection: bool = False, disable_floor: bool = False) -> dict[str, Any]:
@@ -226,7 +226,7 @@ def run_retrieval_evaluation() -> dict[str, Any]:
     vocab_mismatch_case = next((c for c in cases_augmented if "WOUND-VAC-NEG" in c["vignette_id"]), None)
 
     summary = {
-        "benchmark_session": "v55-fix",
+        "benchmark_session": "v56",
         "timestamp": datetime.now(UTC).isoformat(),
         "total_cases": total_cases,
         "task_3_floor_settlement": {

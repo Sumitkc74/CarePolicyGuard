@@ -50,6 +50,65 @@ class MultiAgentVerificationPipeline:
         self.abstention_gate = CalibratedAbstentionGate(tau=settings.ABSTENTION_THRESHOLD)
         self.state_machine = ClinicalAdjudicationStateMachine(db=db, tau=settings.ABSTENTION_THRESHOLD)
 
+    def run_deterministic_fallback(
+        self,
+        criteria_defs: List[Dict[str, Any]],
+        sanitized_ehr: str,
+        gate_tau: float,
+        case_id: Optional[str] = None,
+    ) -> tuple[
+        AdjudicationDecision,
+        bool,
+        float,
+        float,
+        Optional[str],
+        Optional[str],
+        List[Any],
+        List[Any],
+    ]:
+        """
+        Deterministic fallback adjudication pipeline (Task 5).
+        Direct policy-as-data evaluation using DeclarativePolicyEngine, followed by
+        AdversarialVerificationAgent and CalibratedAbstentionGate.
+        Invoked if autonomous agents abstain, time out, or produce no gate-passing judgment.
+        """
+        from app.services.declarative_engine import DeclarativePolicyEngine
+        criteria_assessments = []
+        for crit in criteria_defs:
+            decl_crit = DeclarativePolicyEngine.compile_from_dict(crit)
+            assessment = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
+            criteria_assessments.append(assessment)
+
+        verification_audits, _ = self.verifier_agent.debate_and_verify(
+            assessments=criteria_assessments,
+            criteria_defs=criteria_defs,
+            ehr_narrative=sanitized_ehr,
+            evaluator_agent=self.evaluator_agent,
+            llm_proposer=self.llm_proposer,
+            max_rounds=1
+        )
+
+        gate = CalibratedAbstentionGate(tau=gate_tau)
+        (
+            decision,
+            abstention_status,
+            raw_aggregate_conf,
+            calibrated_aggregate_conf,
+            abstention_reason,
+            clinician_action_notes
+        ) = gate.evaluate(criteria_assessments, verification_audits)
+
+        return (
+            decision,
+            abstention_status,
+            raw_aggregate_conf,
+            calibrated_aggregate_conf,
+            abstention_reason,
+            clinician_action_notes,
+            criteria_assessments,
+            verification_audits,
+        )
+
     async def adjudicate(
         self,
         patient_id: str,
@@ -342,11 +401,15 @@ class MultiAgentVerificationPipeline:
             from app.core.llm_judge import ClinicalEquivalenceJudge, EquivalenceVerdict
             from app.core.agentic_guardrails import AgenticGuardrails, GuardrailViolationError, BudgetExhaustionHalt
             from app.services.declarative_engine import DeclarativePolicyEngine
+            from app.agents.toolbelt import AgentToolbelt
 
             # board is already initialized at start of case and has recorded POLICY_SHORTLIST and POLICY_CHOSEN
             judge = ClinicalEquivalenceJudge(max_time_per_case_seconds=60.0)
             judge.timeout_seconds = 30.0
             judge.reset_case_budget()
+            toolbelt = AgentToolbelt(db=self.db, concept_map=None)
+            fallback_activated = False
+            fallback_reason = None
 
             # Task 1 & 2: Agent 1 posts POLICY_SELECTED with score and margin to runner-up
             top_score = 1.0
@@ -373,6 +436,27 @@ class MultiAgentVerificationPipeline:
                     "retrieval_score": top_score,
                     "margin_to_runner_up": margin_to_runner_up,
                     "uncertainty_flag": (margin_to_runner_up < 0.10)
+                }
+            )
+
+            # Task 1: Agent 1 Case Coordinator posts initial plan
+            candidate_list = (retrieval_insights.get("candidates", []) if retrieval_insights else [])[:5]
+            cand_ids = [c.get("policy_id", "") for c in candidate_list]
+            board.post(
+                agent="Agent 1: Case Coordinator",
+                message_type=BoardMessageType.PLAN,
+                content=(
+                    f"Coordinator Initial Plan: Governing policy {policy_id} ('{policy_title}') selected. "
+                    f"Candidates considered: {', '.join(cand_ids) or policy_id}. "
+                    f"Execution strategy: Autonomous agentic toolbelt with two-sided adversarial debate. "
+                    f"Task assignment: Agent 2 to evaluate statutory criteria and argue for satisfaction."
+                ),
+                metadata={
+                    "coordinator": "Agent 1",
+                    "selected_policy_id": policy_id,
+                    "candidates": candidate_list,
+                    "execution_strategy": "two_sided_debate_with_toolbelt",
+                    "task_assignment": "Agent 2: Clinical Evaluator"
                 }
             )
 
@@ -411,7 +495,7 @@ class MultiAgentVerificationPipeline:
                         else:
                             missing_evidence_codes.append(ccode)
 
-            # Post Task 1 PLAN message to board
+            # Post Task 2 PLAN message to board (Agent 1 Case Coordinator ownership)
             plan_meta = {
                 "settled_deterministic": settled_codes,
                 "needs_judge": needs_judge_codes,
@@ -422,7 +506,9 @@ class MultiAgentVerificationPipeline:
                         else ("NEEDS_JUDGE" if c.get("criterion_code") in needs_judge_codes else "MISSING_EVIDENCE")
                     )
                     for c in criteria_defs
-                }
+                },
+                "coordinator": "Agent 1",
+                "execution_strategy": "two_sided_debate_with_toolbelt"
             }
             board.post(
                 agent="Agent 2: Clinical Evaluator",
@@ -431,7 +517,8 @@ class MultiAgentVerificationPipeline:
                     f"Adjudication Plan: {len(settled_codes)} settled deterministically "
                     f"({', '.join(settled_codes) or 'none'}), {len(needs_judge_codes)} need LLM judgment "
                     f"({', '.join(needs_judge_codes) or 'none'}), {len(missing_evidence_codes)} missing evidence "
-                    f"({', '.join(missing_evidence_codes) or 'none'})."
+                    f"({', '.join(missing_evidence_codes) or 'none'}). Execution strategy: Two-sided adversarial debate "
+                    f"with Agent 2 arguing for satisfaction and Agent 3 verifying/advocating via toolbelt."
                 ),
                 metadata=plan_meta
             )
@@ -460,6 +547,17 @@ class MultiAgentVerificationPipeline:
                     if assessment.status == DeterminationStatus.MET:
                         short_circuit_denial = True
                         denial_reason = f"Statutory exclusion {ccode} triggered: '{assessment.clinical_rationale}'"
+                        toolbelt.tool_attribution[ccode] = "deterministic_check"
+                        toolbelt._log_execution(
+                            agent="Agent 1",
+                            tool="deterministic_check",
+                            criterion_code=ccode,
+                            clinical_rationale="Evaluate exclusion criterion against note",
+                            inputs={"criterion_code": ccode},
+                            result={"status": "MET"},
+                            what_changed=f"Statutory exclusion {ccode} MET",
+                            duration_ms=0.0
+                        )
                         board.post(
                             agent="Agent 2: Clinical Evaluator",
                             message_type=BoardMessageType.ASSESSMENT_PROPOSED,
@@ -471,6 +569,17 @@ class MultiAgentVerificationPipeline:
                         criteria_assessments.append(assessment)
                         break
                     else:
+                        toolbelt.tool_attribution[ccode] = "deterministic_check"
+                        toolbelt._log_execution(
+                            agent="Agent 1",
+                            tool="deterministic_check",
+                            criterion_code=ccode,
+                            clinical_rationale="Evaluate exclusion criterion against note",
+                            inputs={"criterion_code": ccode},
+                            result={"status": "NOT_MET"},
+                            what_changed=f"Statutory exclusion {ccode} ruled out",
+                            duration_ms=0.0
+                        )
                         board.post(
                             agent="Agent 2: Clinical Evaluator",
                             message_type=BoardMessageType.ASSESSMENT_PROPOSED,
@@ -485,6 +594,17 @@ class MultiAgentVerificationPipeline:
                 if assessment.status == DeterminationStatus.MET:
                     sp = assessment.verified_spans[0] if assessment.verified_spans else None
                     sp_text = sp.source_text if sp else "Exact phrase"
+                    toolbelt.tool_attribution[ccode] = "deterministic_check"
+                    toolbelt._log_execution(
+                        agent="Agent 2",
+                        tool="deterministic_check",
+                        criterion_code=ccode,
+                        clinical_rationale="Deterministic check satisfied inclusion criterion",
+                        inputs={"criterion_code": ccode},
+                        result={"status": "MET"},
+                        what_changed=f"Inclusion criterion {ccode} satisfied deterministically",
+                        duration_ms=0.0
+                    )
                     board.post(
                         agent="Agent 2: Clinical Evaluator",
                         message_type=BoardMessageType.ASSESSMENT_PROPOSED,
@@ -498,6 +618,17 @@ class MultiAgentVerificationPipeline:
 
                 if assessment.status == DeterminationStatus.NOT_MET:
                     # Reconciliation Invariant: Proven negative is never overturned by an LLM
+                    toolbelt.tool_attribution[ccode] = "deterministic_check"
+                    toolbelt._log_execution(
+                        agent="Agent 2",
+                        tool="deterministic_check",
+                        criterion_code=ccode,
+                        clinical_rationale="Deterministic check verified negative finding",
+                        inputs={"criterion_code": ccode},
+                        result={"status": "NOT_MET"},
+                        what_changed=f"Inclusion criterion {ccode} evaluated NOT_MET deterministically",
+                        duration_ms=0.0
+                    )
                     board.post(
                         agent="Agent 2: Clinical Evaluator",
                         message_type=BoardMessageType.ASSESSMENT_PROPOSED,
@@ -576,6 +707,16 @@ class MultiAgentVerificationPipeline:
                         "status_code": crit_judgment.status_code
                     }
                 )
+                toolbelt._log_execution(
+                    agent="Agent 2",
+                    tool="judge_criterion",
+                    criterion_code=ccode,
+                    clinical_rationale="Evaluate criterion clinical equivalence using local LLM judge",
+                    inputs={"criterion_code": ccode},
+                    result={"status": crit_judgment.status, "quoted_evidence": crit_judgment.quoted_evidence[:80]},
+                    what_changed=f"Judge evaluated {ccode}: status={crit_judgment.status}",
+                    duration_ms=crit_judgment.elapsed_ms
+                )
 
                 if crit_judgment.status == "MET" and crit_judgment.quoted_evidence:
                     # Gate A: Verbatim grounding check
@@ -593,6 +734,14 @@ class MultiAgentVerificationPipeline:
                             message_type=BoardMessageType.CONCEDE,
                             content=f"Conceding challenge on {ccode}: Gate A ungrounded quote; withdrawing judgment.",
                             criterion_code=ccode
+                        )
+                        toolbelt.record_mind_change(
+                            agent="Agent 2",
+                            criterion=ccode,
+                            from_status="MET",
+                            to_status="INSUFFICIENT_EVIDENCE",
+                            reason=f"Gate A ungrounded quote: '{crit_judgment.quoted_evidence}' could not be located in narrative",
+                            evidence_span=crit_judgment.quoted_evidence
                         )
                     else:
                         ev_span = ClinicalEvidenceSpan(
@@ -625,6 +774,14 @@ class MultiAgentVerificationPipeline:
                                 message_type=BoardMessageType.CONCEDE,
                                 content=f"Conceding challenge on {ccode} judgment span '{sanitized_ehr[s:e]}': {failing_gate} failure acknowledged.",
                                 criterion_code=ccode
+                            )
+                            toolbelt.record_mind_change(
+                                agent="Agent 2",
+                                criterion=ccode,
+                                from_status="MET",
+                                to_status="INSUFFICIENT_EVIDENCE",
+                                reason=f"{failing_gate} failure acknowledged: {reason}",
+                                evidence_span=sanitized_ehr[s:e]
                             )
                         else:
                             # Task 3: Agent 3 Adversarial Counter-Reading Challenge via LLM
@@ -685,6 +842,14 @@ class MultiAgentVerificationPipeline:
                                         content=f"Conceding challenge on {ccode} due to operational budget exhaustion during {obj_type} defense.",
                                         criterion_code=ccode
                                     )
+                                    toolbelt.record_mind_change(
+                                        agent="Agent 2",
+                                        criterion=ccode,
+                                        from_status="MET",
+                                        to_status="INSUFFICIENT_EVIDENCE",
+                                        reason=f"Conceding challenge on {ccode} due to operational budget exhaustion during {obj_type} defense",
+                                        evidence_span=sanitized_ehr[s:e]
+                                    )
                                 else:
                                     # Call generate_defense_sync
                                     defense_res = judge.generate_defense_sync(
@@ -708,6 +873,7 @@ class MultiAgentVerificationPipeline:
 
                                     if defense_grounded:
                                         debated_criteria_outcomes[ccode] = "DEFENDED"
+                                        toolbelt.tool_attribution[ccode] = "judge_criterion"
                                         def_ev_span = ClinicalEvidenceSpan(
                                             source_text=sanitized_ehr[def_s:def_e],
                                             start_char=def_s,
@@ -745,9 +911,18 @@ class MultiAgentVerificationPipeline:
                                             criterion_code=ccode,
                                             metadata={"objection_type": obj_type, "defense_quote": def_quote}
                                         )
+                                        toolbelt.record_mind_change(
+                                            agent="Agent 2",
+                                            criterion=ccode,
+                                            from_status="MET",
+                                            to_status="INSUFFICIENT_EVIDENCE",
+                                            reason=f"Agent 2 defense failed to provide a valid grounded quote resolving {obj_type} objection",
+                                            evidence_span=def_quote or sanitized_ehr[s:e]
+                                        )
                             else:
                                 # No fatal objection or objection_type is NONE / empty
                                 debated_criteria_outcomes[ccode] = "DEFENDED"
+                                toolbelt.tool_attribution[ccode] = "judge_criterion"
                                 board.post(
                                     agent="Agent 2: Clinical Evaluator",
                                     message_type=BoardMessageType.DEFENSE,
@@ -795,6 +970,17 @@ class MultiAgentVerificationPipeline:
                                 deterministic_assessment=assessment
                             )
                             adv_quote = adv_res.advocacy_quote.strip()
+
+                            toolbelt._log_execution(
+                                agent="Agent 3",
+                                tool="advocate_for",
+                                criterion_code=ccode,
+                                clinical_rationale="Advocate for criterion satisfaction when otherwise failing",
+                                inputs={"criterion_code": ccode},
+                                result={"advocacy_quote": adv_quote},
+                                what_changed=f"Advocacy generated quote: {bool(adv_quote)}",
+                                duration_ms=adv_res.elapsed_ms
+                            )
 
                             board.post(
                                 agent="Agent 3: Adversarial Verifier",
@@ -846,6 +1032,15 @@ class MultiAgentVerificationPipeline:
                                         assessment.clinical_rationale = (
                                             f"Criterion satisfied via Agent 3 advocacy grounded quote: "
                                             f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res['reason']})."
+                                        )
+                                        toolbelt.tool_attribution[ccode] = "advocate_for"
+                                        toolbelt.record_mind_change(
+                                            agent="Agent 3",
+                                            criterion=ccode,
+                                            from_status="NOT_MET",
+                                            to_status="MET",
+                                            reason=f"Advocacy grounded quote passed Gate A, Gate B, and Gate C: '{sanitized_ehr[adv_s:adv_e]}'",
+                                            evidence_span=sanitized_ehr[adv_s:adv_e]
                                         )
                                         board.post(
                                             agent="Agent 2: Clinical Evaluator",
@@ -903,6 +1098,16 @@ class MultiAgentVerificationPipeline:
                             criterion=crit,
                             candidate_span_text=cand.source_text
                         )
+                        toolbelt._log_execution(
+                            agent="Agent 2",
+                            tool="search_spans",
+                            criterion_code=ccode,
+                            clinical_rationale="Candidate span fallback verification",
+                            inputs={"criterion_code": ccode, "candidate_span": cand.source_text},
+                            result={"verdict": judge_res.verdict.value},
+                            what_changed=f"Fallback span evaluated: verdict={judge_res.verdict.value}",
+                            duration_ms=judge_res.elapsed_ms
+                        )
                         board.post(
                             agent="Agent 2: Clinical Evaluator",
                             message_type=BoardMessageType.VERDICT,
@@ -927,7 +1132,15 @@ class MultiAgentVerificationPipeline:
                                 assessment.verified_spans = [ev_span]
                                 assessment.raw_confidence = 0.95
                                 assessment.clinical_rationale = f"Semantic equivalence verified: '{cand.source_text}' ({gate_res['reason']})."
-
+                                toolbelt.tool_attribution[ccode] = "search_spans"
+                                toolbelt.record_mind_change(
+                                    agent="Agent 2",
+                                    criterion=ccode,
+                                    from_status="INSUFFICIENT_EVIDENCE",
+                                    to_status="MET",
+                                    reason=f"Candidate span passed Gate B, Gate C, and Agent 3 verification: '{cand.source_text}'",
+                                    evidence_span=cand.source_text
+                                )
                                 board.post(
                                     agent="Agent 2: Clinical Evaluator",
                                     message_type=BoardMessageType.DEFENSE,
@@ -954,6 +1167,23 @@ class MultiAgentVerificationPipeline:
                                     content=f"Conceding challenge on {ccode} candidate span '{cand.source_text}': gate failure acknowledged; withdrawing candidate.",
                                     criterion_code=ccode
                                 )
+                                toolbelt.record_mind_change(
+                                    agent="Agent 2",
+                                    criterion=ccode,
+                                    from_status="MET",
+                                    to_status="INSUFFICIENT_EVIDENCE",
+                                    reason=f"Candidate span gate failure: {reason}",
+                                    evidence_span=cand.source_text
+                                )
+
+                # Agent 4 deferral ownership for unsatisfied criteria (Task 4)
+                if not promoted and assessment.status != DeterminationStatus.MET and not short_circuit_denial:
+                    toolbelt.defer(
+                        agent="Agent 4",
+                        criterion_code=ccode,
+                        reason=f"Genuine clinical ambiguity or missing documentation: {assessment.clinical_rationale}"
+                    )
+                    toolbelt.tool_attribution[ccode] = "defer"
 
                 criteria_assessments.append(assessment)
                 if budget_halt:
@@ -998,6 +1228,20 @@ class MultiAgentVerificationPipeline:
                                         content=f"Conceding {ca.criterion_code} after 2 rounds of debate; reverting to INSUFFICIENT_EVIDENCE.",
                                         criterion_code=ca.criterion_code
                                     )
+                                    toolbelt.record_mind_change(
+                                        agent="Agent 2",
+                                        criterion=ca.criterion_code,
+                                        from_status="MET",
+                                        to_status="INSUFFICIENT_EVIDENCE",
+                                        reason="Conceding criterion after 2 rounds of debate; verification flaw persists",
+                                        evidence_span=(ca.verified_spans[0].source_text if ca.verified_spans else None)
+                                    )
+                                    toolbelt.defer(
+                                        agent="Agent 4",
+                                        criterion_code=ca.criterion_code,
+                                        reason=f"Deferred following 2 rounds of debate: {audit.audit_notes}"
+                                    )
+                                    toolbelt.tool_attribution[ca.criterion_code] = "defer"
                                     ca.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
                                     ca.raw_confidence = 0.50
                             else:
@@ -1007,6 +1251,20 @@ class MultiAgentVerificationPipeline:
                                     content=f"Conceding challenge on {ca.criterion_code}: Grounding deficit acknowledged.",
                                     criterion_code=ca.criterion_code
                                 )
+                                toolbelt.record_mind_change(
+                                    agent="Agent 2",
+                                    criterion=ca.criterion_code,
+                                    from_status="MET",
+                                    to_status="INSUFFICIENT_EVIDENCE",
+                                    reason="Conceding challenge on criterion: Grounding deficit acknowledged",
+                                    evidence_span=None
+                                )
+                                toolbelt.defer(
+                                    agent="Agent 4",
+                                    criterion_code=ca.criterion_code,
+                                    reason=f"Deferred following grounding deficit: {audit.audit_notes}"
+                                )
+                                toolbelt.tool_attribution[ca.criterion_code] = "defer"
                                 ca.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
                                 ca.raw_confidence = 0.50
 
@@ -1255,7 +1513,7 @@ class MultiAgentVerificationPipeline:
             "total_latency_ms": round(llm_telemetry.get("total_latency_ms", 0.0), 2)
         }
 
-        # Task 3 (v51-fix): Surface routing counters and debate outcomes in agentic audit trail and metadata
+        # Task 3 (v51-fix) & Tasks 2, 7 (v56): Surface routing counters, debate outcomes, tool attribution, mind changes, tool logs, and fallback in audit trail and metadata
         if execution_mode == "agentic":
             agentic_audit_trail["judge_routing"] = {
                 "judge_calls_otherwise_deferring": judge_calls_otherwise_deferring if 'judge_calls_otherwise_deferring' in locals() else 0,
@@ -1263,10 +1521,20 @@ class MultiAgentVerificationPipeline:
                 "judge_calls_total_case": judge.case_call_count if 'judge' in locals() else 0,
                 "debated_criteria_outcomes": debated_criteria_outcomes if 'debated_criteria_outcomes' in locals() else {}
             }
+            agentic_audit_trail["tool_attribution"] = toolbelt.tool_attribution if 'toolbelt' in locals() else {}
+            agentic_audit_trail["mind_changes"] = [mc.model_dump() for mc in toolbelt.mind_changes] if 'toolbelt' in locals() else []
+            agentic_audit_trail["tool_logs"] = [rec.model_dump() for rec in toolbelt.execution_logs] if 'toolbelt' in locals() else []
+            agentic_audit_trail["fallback_activated"] = fallback_activated if 'fallback_activated' in locals() else False
+            agentic_audit_trail["fallback_reason"] = fallback_reason if 'fallback_reason' in locals() else None
+
             llm_proposal_metadata["judge_calls_otherwise_deferring"] = judge_calls_otherwise_deferring if 'judge_calls_otherwise_deferring' in locals() else 0
             llm_proposal_metadata["judge_calls_already_settled"] = judge_calls_already_settled if 'judge_calls_already_settled' in locals() else 0
             llm_proposal_metadata["judge_calls_total_case"] = judge.case_call_count if 'judge' in locals() else 0
             llm_proposal_metadata["debated_criteria_outcomes"] = debated_criteria_outcomes if 'debated_criteria_outcomes' in locals() else {}
+            llm_proposal_metadata["tool_attribution"] = toolbelt.tool_attribution if 'toolbelt' in locals() else {}
+            llm_proposal_metadata["mind_changes"] = [mc.model_dump() for mc in toolbelt.mind_changes] if 'toolbelt' in locals() else []
+            llm_proposal_metadata["fallback_activated"] = fallback_activated if 'fallback_activated' in locals() else False
+            llm_proposal_metadata["fallback_reason"] = fallback_reason if 'fallback_reason' in locals() else None
 
         # 6. Cryptographic Chain-of-Custody Seal (SHA-256)
         all_spans = []

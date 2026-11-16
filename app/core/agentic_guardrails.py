@@ -44,7 +44,8 @@ class AgenticGuardrails:
     Central deterministic guardrail engine governing all agent actions and transitions.
     """
 
-    MAX_LLM_CALLS_PER_CASE: int = 3
+    # Task 6 (v56): Raised from 3 to 8 calls per case to fit two-sided debate
+    MAX_LLM_CALLS_PER_CASE: int = 8
     MAX_LLM_TIME_PER_CASE_SECONDS: float = 60.0
     MAX_DEBATE_ROUNDS_PER_CRITERION: int = 2
     MAX_AGENT_TURNS_PER_CASE: int = 25

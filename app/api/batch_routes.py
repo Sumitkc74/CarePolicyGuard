@@ -151,7 +151,7 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                         row_lower.get("policy") or
                         row_lower.get("ncd") or
                         row_lower.get("lcd") or
-                        "NCD-20.4"
+                        "AUTO"
                     )
                     cpt = (
                         row_lower.get("requested_procedure_code") or
@@ -200,7 +200,7 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                                 row_lower.get("policy") or
                                 row_lower.get("ncd") or
                                 row_lower.get("lcd") or
-                                "NCD-20.4"
+                                "AUTO"
                             )
                             cpt = (
                                 row_lower.get("requested_procedure_code") or
@@ -234,7 +234,7 @@ def register_batch_route(api_router: APIRouter, ephemeral_packets, ephemeral_tex
                     for r_idx, item in enumerate(raw_items, 1):
                         items.append({
                             "patient_id": item.get("patient_id") or f"PT-JSON-{r_idx:03d}",
-                            "policy_id": item.get("policy_id") or "NCD-20.4",
+                            "policy_id": item.get("policy_id") or "AUTO",
                             "requested_procedure_code": item.get("requested_procedure_code") or "33249",
                             "clinical_narrative": item.get("clinical_narrative") or item.get("notes") or ""
                         })
