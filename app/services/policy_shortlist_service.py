@@ -180,6 +180,16 @@ class PolicyShortlistService:
 
         unified_candidates.sort(key=lambda x: x["unified_score"], reverse=True)
 
+        pre_top1 = unified_candidates[0]["policy_id"] if unified_candidates else None
+        pre_top2 = unified_candidates[1]["policy_id"] if len(unified_candidates) > 1 else None
+        pre_top1_score = unified_candidates[0]["unified_score"] if unified_candidates else None
+        pre_top2_score = unified_candidates[1]["unified_score"] if len(unified_candidates) > 1 else None
+        pre_margin = (
+            round(pre_top1_score - pre_top2_score, 4)
+            if (pre_top1_score is not None and pre_top2_score is not None)
+            else (1.0 if pre_top1 is not None else None)
+        )
+
         # ---------------------------------------------------------------------
         # 2. Criteria-Coverage Reranking and Matching Phrases (Task 2)
         # ---------------------------------------------------------------------
@@ -260,6 +270,17 @@ class PolicyShortlistService:
         # Sort: Primary by reranked_score, secondary by coverage_ratio
         evaluated_candidates.sort(key=lambda x: (x["reranked_score"], x["coverage_ratio"]), reverse=True)
 
+        post_top1 = evaluated_candidates[0]["policy_id"] if evaluated_candidates else None
+        post_top2 = evaluated_candidates[1]["policy_id"] if len(evaluated_candidates) > 1 else None
+        post_top1_score = evaluated_candidates[0]["reranked_score"] if evaluated_candidates else None
+        post_top2_score = evaluated_candidates[1]["reranked_score"] if len(evaluated_candidates) > 1 else None
+        post_margin = (
+            round(post_top1_score - post_top2_score, 4)
+            if (post_top1_score is not None and post_top2_score is not None)
+            else (1.0 if post_top1 is not None else None)
+        )
+        rerank_flipped_top1 = bool(pre_top1 and post_top1 and pre_top1 != post_top1)
+
         # Shortlist sizing: top_k qualifying candidates
         shortlist_size = min(max(1, top_k), len(evaluated_candidates))
         selected_candidates = evaluated_candidates[:shortlist_size]
@@ -283,6 +304,13 @@ class PolicyShortlistService:
                 "preselected_policy_title": None,
                 "preselection_margin": None,
                 "preselection_coverage_ratio": None,
+                "pre_rerank_top1_policy_id": pre_top1,
+                "pre_rerank_top2_policy_id": pre_top2,
+                "pre_rerank_margin": pre_margin,
+                "post_rerank_top1_policy_id": post_top1,
+                "post_rerank_top2_policy_id": post_top2,
+                "post_rerank_margin": post_margin,
+                "rerank_flipped_top1": rerank_flipped_top1,
                 "shortlist": [],
                 "candidates": [],
                 "score_margin": None,
@@ -330,6 +358,13 @@ class PolicyShortlistService:
             "preselected_policy_title": preselected_policy_title,
             "preselection_margin": margin,
             "preselection_coverage_ratio": top_cand["coverage_ratio"],
+            "pre_rerank_top1_policy_id": pre_top1,
+            "pre_rerank_top2_policy_id": pre_top2,
+            "pre_rerank_margin": pre_margin,
+            "post_rerank_top1_policy_id": post_top1,
+            "post_rerank_top2_policy_id": post_top2,
+            "post_rerank_margin": post_margin,
+            "rerank_flipped_top1": rerank_flipped_top1,
             "shortlist": shortlist,
             "candidates": shortlist,
             "score_margin": margin,

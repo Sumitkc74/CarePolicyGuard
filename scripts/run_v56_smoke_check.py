@@ -26,6 +26,7 @@ import logging
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 repo_root = Path(__file__).resolve().parent.parent
 if str(repo_root) not in sys.path:
@@ -107,7 +108,39 @@ def run_case(pipeline: MultiAgentVerificationPipeline, vignette: dict, requested
     }
 
 
+def build_merged_in_memory_map() -> tuple[Any, int, int]:
+    import app.core.concept_map as cm_mod
+    from app.core.concept_map import ConceptDefinition, ConceptMap, ConceptSource
+
+    merged_map = ConceptMap()
+    committed_count = merged_map.total_concepts
+
+    draft_file = repo_root / "app" / "data" / "concept_map" / "draft_concept_entries.json"
+    added_drafts = 0
+    if draft_file.exists():
+        with open(draft_file, "r", encoding="utf-8") as f:
+            drafts = json.load(f)
+        for d in drafts:
+            if d.get("governing_rule_check") == "PASS_EQUIVALENCE":
+                cdef = ConceptDefinition(
+                    concept_id=d["concept_id"],
+                    canonical_name=d["canonical_name"],
+                    domain=d["domain"],
+                    accepted_terms=d["accepted_terms"],
+                    prohibited_near_misses=d.get("prohibited_near_misses", []),
+                    source=ConceptSource.TASK1_ADJUDICATION_EXPANSION,
+                    source_reason=f"Unified draft: {d.get('governing_rule_rationale', '')}",
+                )
+                merged_map.register_concept(cdef)
+                added_drafts += 1
+
+    cm_mod._GLOBAL_CONCEPT_MAP = merged_map
+    logger.info("Merged ConceptMap assembled: %d committed + %d drafts = %d total", committed_count, added_drafts, merged_map.total_concepts)
+    return merged_map, committed_count, added_drafts
+
+
 def main() -> None:
+    build_merged_in_memory_map()
     vignettes_file = repo_root / "app" / "data" / "policies_extended" / "dev_vignettes_extended.json"
     with open(vignettes_file, "r", encoding="utf-8") as f:
         all_vignettes = json.load(f)

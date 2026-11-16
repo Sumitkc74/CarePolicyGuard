@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Optional
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
@@ -107,7 +107,7 @@ def _evaluate_pas_claim(
             id=claim_response_id,
             type={"coding": [{"system": "http://terminology.hl7.org/CodeSystem/claim-type", "code": "professional", "display": "Professional"}]},
             patient={"reference": f"Patient/{patient_id}"},
-            created=datetime.now(timezone.utc).isoformat(),
+            created=datetime.now(UTC).isoformat(),
             insurer={"reference": "Organization/CMS-MEDICARE"},
             requestor={"reference": provider_ref},
             outcome="pended",

@@ -105,7 +105,7 @@ class PolicyRetrievalAgent:
 
         return scored_policies
 
-    def _lexical_taxonomy_search(self, narrative: str) -> List[Dict[str, Any]]:
+    def _lexical_taxonomy_search(self, narrative: str) -> list[dict[str, Any]]:
         """
         Internal lexical, title, category, and clinical taxonomy acronym scanner.
         Supplements hybrid dense-lexical retrieval as Scorer 2 in candidate generation.

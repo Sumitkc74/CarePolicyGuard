@@ -52,19 +52,19 @@ class MultiAgentVerificationPipeline:
 
     def run_deterministic_fallback(
         self,
-        criteria_defs: List[Dict[str, Any]],
+        criteria_defs: list[dict[str, Any]],
         sanitized_ehr: str,
         gate_tau: float,
-        case_id: Optional[str] = None,
+        case_id: str | None = None,
     ) -> tuple[
         AdjudicationDecision,
         bool,
         float,
         float,
-        Optional[str],
-        Optional[str],
-        List[Any],
-        List[Any],
+        str | None,
+        str | None,
+        list[Any],
+        list[Any],
     ]:
         """
         Deterministic fallback adjudication pipeline (Task 5).
@@ -467,6 +467,7 @@ class MultiAgentVerificationPipeline:
             missing_evidence_codes: list[str] = []
             prelim_assessments: dict[str, Any] = {}
             candidate_spans_cache: dict[str, list[Any]] = {}
+            omission_flags: dict[str, bool] = {}
 
             # Exclusions checked first
             ordered_criteria = sorted(criteria_defs, key=lambda c: 0 if c.get("is_exclusion", False) else 1)
@@ -478,19 +479,59 @@ class MultiAgentVerificationPipeline:
                 ass = DeclarativePolicyEngine.evaluate(decl_crit, sanitized_ehr)
                 prelim_assessments[ccode] = ass
 
-                if is_excl:
-                    settled_codes.append(ccode)
+                if ass.status != DeterminationStatus.MET:
+                    has_omiss, _ = self.verifier_agent.audit_negative_omissions(ass, crit, sanitized_ehr)
+                    omission_flags[ccode] = has_omiss
                 else:
-                    if ass.status in (DeterminationStatus.MET, DeterminationStatus.NOT_MET):
+                    omission_flags[ccode] = False
+
+                if not is_excl and ass.status not in (DeterminationStatus.MET, DeterminationStatus.NOT_MET):
+                    cands = CandidateSpanExtractor.extract_candidates(
+                        ehr_narrative=sanitized_ehr,
+                        criterion=crit,
+                        max_candidates=3
+                    )
+                    candidate_spans_cache[ccode] = cands
+
+            # Statutory denial check: proven exclusion MET deterministically
+            has_met_exclusion = any(
+                crit.get("is_exclusion", False) and prelim_assessments[crit.get("criterion_code", "")].status == DeterminationStatus.MET
+                for crit in ordered_criteria
+            )
+
+            # Case is abstention-bound deterministically if:
+            # 1. No exclusion is MET (not a statutory denial)
+            # 2. AND (at least one mandatory inclusion is INSUFFICIENT_EVIDENCE or any criterion is omission-bound)
+            is_abstention_bound = (not has_met_exclusion) and any(
+                (not c.get("is_exclusion", False) and prelim_assessments[c.get("criterion_code", "")].status == DeterminationStatus.INSUFFICIENT_EVIDENCE)
+                or omission_flags.get(c.get("criterion_code", ""), False)
+                for c in ordered_criteria
+            )
+
+            for crit in ordered_criteria:
+                ccode = crit.get("criterion_code", "UNKNOWN")
+                is_excl = crit.get("is_exclusion", False)
+                ass = prelim_assessments[ccode]
+                has_omiss = omission_flags.get(ccode, False)
+
+                if is_excl:
+                    if ass.status == DeterminationStatus.MET:
                         settled_codes.append(ccode)
+                    elif is_abstention_bound and has_omiss:
+                        needs_judge_codes.append(ccode)
                     else:
-                        cands = CandidateSpanExtractor.extract_candidates(
-                            ehr_narrative=sanitized_ehr,
-                            criterion=crit,
-                            max_candidates=3
-                        )
-                        candidate_spans_cache[ccode] = cands
-                        if cands:
+                        settled_codes.append(ccode)
+                else:
+                    if ass.status == DeterminationStatus.MET:
+                        settled_codes.append(ccode)
+                    elif ass.status == DeterminationStatus.NOT_MET:
+                        if is_abstention_bound and has_omiss:
+                            needs_judge_codes.append(ccode)
+                        else:
+                            settled_codes.append(ccode)
+                    else:  # INSUFFICIENT_EVIDENCE
+                        cands = candidate_spans_cache.get(ccode, [])
+                        if is_abstention_bound or cands:
                             needs_judge_codes.append(ccode)
                         else:
                             missing_evidence_codes.append(ccode)
@@ -568,7 +609,7 @@ class MultiAgentVerificationPipeline:
                         )
                         criteria_assessments.append(assessment)
                         break
-                    else:
+                    elif ccode not in needs_judge_codes:
                         toolbelt.tool_attribution[ccode] = "deterministic_check"
                         toolbelt._log_execution(
                             agent="Agent 1",
@@ -591,7 +632,7 @@ class MultiAgentVerificationPipeline:
                         continue
 
                 # For inclusion criteria:
-                if assessment.status == DeterminationStatus.MET:
+                if not is_excl and assessment.status == DeterminationStatus.MET:
                     sp = assessment.verified_spans[0] if assessment.verified_spans else None
                     sp_text = sp.source_text if sp else "Exact phrase"
                     toolbelt.tool_attribution[ccode] = "deterministic_check"
@@ -616,7 +657,7 @@ class MultiAgentVerificationPipeline:
                     criteria_assessments.append(assessment)
                     continue
 
-                if assessment.status == DeterminationStatus.NOT_MET:
+                if not is_excl and assessment.status == DeterminationStatus.NOT_MET and ccode not in needs_judge_codes:
                     # Reconciliation Invariant: Proven negative is never overturned by an LLM
                     toolbelt.tool_attribution[ccode] = "deterministic_check"
                     toolbelt._log_execution(
@@ -639,9 +680,9 @@ class MultiAgentVerificationPipeline:
                     criteria_assessments.append(assessment)
                     continue
 
-                # If missing evidence (zero candidate spans extracted), do NOT burn LLM calls
+                # If missing evidence (zero candidate spans extracted), do NOT burn LLM calls unless routed to judge
                 candidate_spans = candidate_spans_cache.get(ccode, [])
-                if not candidate_spans:
+                if not candidate_spans and ccode not in needs_judge_codes:
                     board.post(
                         agent="Agent 2: Clinical Evaluator",
                         message_type=BoardMessageType.ASSESSMENT_PROPOSED,
@@ -937,9 +978,21 @@ class MultiAgentVerificationPipeline:
                                 assessment.clinical_rationale = f"Semantic equivalence verified via LLM judgment: '{sanitized_ehr[s:e]}'."
                                 promoted = True
 
+                if is_excl:
+                    if assessment.status == DeterminationStatus.MET:
+                        short_circuit_denial = True
+                        denial_reason = f"Statutory exclusion {ccode} triggered following LLM judge verification: '{assessment.clinical_rationale}'"
+                        criteria_assessments.append(assessment)
+                        break
+                    else:
+                        assessment.status = DeterminationStatus.NOT_MET
+                        toolbelt.tool_attribution[ccode] = "judge_criterion"
+                        criteria_assessments.append(assessment)
+                        continue
+
                 # Task 1 & Task 2 (v53): Agent 3 Advocacy & Capped Fallback
                 # If criterion-level judgment was NOT MET or INSUFFICIENT_EVIDENCE, Agent 3 acts as advocate
-                if not promoted and not budget_halt and ccode in needs_judge_codes:
+                if not is_excl and not promoted and not budget_halt and ccode in needs_judge_codes:
                     advocacy_attempted = False
                     # Only attempt advocacy if budget remains
                     if judge.case_call_count < AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
@@ -1194,6 +1247,8 @@ class MultiAgentVerificationPipeline:
                 for ca in criteria_assessments:
                     crit_dict = next((c for c in criteria_defs if c.get("criterion_code") == ca.criterion_code), {})
                     audit = self.verifier_agent.audit_assessment(ca, crit_dict, sanitized_ehr)
+                    if ca.criterion_code in needs_judge_codes and ca.is_exclusion and ca.status == DeterminationStatus.NOT_MET:
+                        audit.unverified_omission_flag = False
                     verification_audits.append(audit)
 
                     if ca.status == DeterminationStatus.MET and not ca.is_exclusion:
@@ -1293,7 +1348,7 @@ class MultiAgentVerificationPipeline:
                     agent="Agent 4: Abstention Gate",
                     message_type=BoardMessageType.HALT,
                     content=f"HALT: Case deferred to human clinician. Trigger reason: {abstention_reason}",
-                    metadata={"tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
+                    metadata={"halt_type": "OPERATIONAL_BUDGET", "tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
                 )
             else:
                 gate = CalibratedAbstentionGate(tau=gate_tau)
@@ -1311,7 +1366,7 @@ class MultiAgentVerificationPipeline:
                         agent="Agent 4: Abstention Gate",
                         message_type=BoardMessageType.HALT,
                         content=f"HALT: Case deferred to human clinician. Trigger reason: {abstention_reason}",
-                        metadata={"tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
+                        metadata={"halt_type": "ABSTENTION_GATE", "tau": gate_tau, "abstention_reason": abstention_reason, "sufficiency_score": calibrated_aggregate_conf}
                     )
                 else:
                     board.post(
@@ -1482,7 +1537,14 @@ class MultiAgentVerificationPipeline:
                 "policy_title": policy_title,
                 "auto_discovered": is_auto_policy,
                 "tool_used": "HybridPolicyRetriever (BM25 + Dense RRF)",
-                "top_candidates": (retrieval_insights.get("candidates", []) if retrieval_insights else [])[:5]
+                "top_candidates": (retrieval_insights.get("candidates", []) if retrieval_insights else [])[:5],
+                "pre_rerank_top1_policy_id": retrieval_insights.get("pre_rerank_top1_policy_id") if retrieval_insights else None,
+                "pre_rerank_top2_policy_id": retrieval_insights.get("pre_rerank_top2_policy_id") if retrieval_insights else None,
+                "pre_rerank_margin": retrieval_insights.get("pre_rerank_margin") if retrieval_insights else None,
+                "post_rerank_top1_policy_id": retrieval_insights.get("post_rerank_top1_policy_id") if retrieval_insights else None,
+                "post_rerank_top2_policy_id": retrieval_insights.get("post_rerank_top2_policy_id") if retrieval_insights else None,
+                "post_rerank_margin": retrieval_insights.get("post_rerank_margin") if retrieval_insights else None,
+                "rerank_flipped_top1": retrieval_insights.get("rerank_flipped_top1") if retrieval_insights else False,
             },
             "agent_2_tool_selection": agent2_tool_decisions,
             "agent_3_debate_rounds": agent3_debate_rounds,
