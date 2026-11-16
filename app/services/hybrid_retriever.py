@@ -2,7 +2,9 @@ import math
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
 from sqlalchemy.orm import Session
+
 from app.db.models import MedicarePolicy
 
 # Local biomedical embedding model (SapBERT offline)
@@ -13,7 +15,7 @@ _DEVICE = None
 
 _STORE_LOADED = False
 _STORE_MATRIX = None
-_STORE_LOOKUP: Dict[str, int] = {}
+_STORE_LOOKUP: dict[str, int] = {}
 
 
 def _get_sapbert_model():
@@ -21,7 +23,7 @@ def _get_sapbert_model():
     global _TOKENIZER, _MODEL, _DEVICE
     if _MODEL is None:
         import torch
-        from transformers import AutoTokenizer, AutoModel
+        from transformers import AutoModel, AutoTokenizer
         _DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         _TOKENIZER = AutoTokenizer.from_pretrained(_SAPBERT_MODEL_NAME, local_files_only=True)
         _MODEL = AutoModel.from_pretrained(_SAPBERT_MODEL_NAME, local_files_only=True)
@@ -42,7 +44,7 @@ def _load_vector_store():
                 _STORE_MATRIX = data["embeddings"]  # Shape: (204, 768), float32
                 chunk_ids = data["chunk_ids"]
                 _STORE_LOOKUP = {str(cid): idx for idx, cid in enumerate(chunk_ids)}
-            except Exception:
+            except (OSError, ValueError, KeyError):
                 _STORE_MATRIX = None
                 _STORE_LOOKUP = {}
         _STORE_LOADED = True
@@ -233,7 +235,7 @@ class DenseSemanticRetriever:
 
         if self.use_legacy_projection:
             q_vec = self._embed_text(query)
-            scored: List[Tuple[Dict[str, Any], float]] = []
+            scored = []
             for doc in documents:
                 doc_vec = self._embed_text(doc.get("content", ""))
                 sim = self._cosine_similarity(q_vec, doc_vec)

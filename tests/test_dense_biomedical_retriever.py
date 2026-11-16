@@ -15,7 +15,11 @@ from unittest.mock import patch
 
 import numpy as np
 
-from app.services.hybrid_retriever import BM25Retriever, DenseSemanticRetriever, HybridPolicyRetriever
+from app.services.hybrid_retriever import (
+    BM25Retriever,
+    DenseSemanticRetriever,
+    HybridPolicyRetriever,
+)
 from app.services.policy_shortlist_service import PolicyShortlistService
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -130,12 +134,14 @@ def test_zero_external_network_calls_at_runtime():
     """
     (e) Dense retriever enforces local_files_only=True and makes zero external HTTP calls.
     """
-    import urllib.request
     import http.client
+    import urllib.request
 
-    with patch.object(http.client.HTTPConnection, "connect", side_effect=RuntimeError("Network forbidden")):
-        with patch.object(urllib.request, "urlopen", side_effect=RuntimeError("Network forbidden")):
-            retriever = DenseSemanticRetriever()
-            vec = retriever._embed_text("diabetic foot ulcer Wagner grade 3 hyperbaric oxygen therapy")
-            assert len(vec) == 768
-            assert abs(math.sqrt(sum(x * x for x in vec)) - 1.0) < 1e-3
+    with (
+        patch.object(http.client.HTTPConnection, "connect", side_effect=RuntimeError("Network forbidden")),
+        patch.object(urllib.request, "urlopen", side_effect=RuntimeError("Network forbidden")),
+    ):
+        retriever = DenseSemanticRetriever()
+        vec = retriever._embed_text("diabetic foot ulcer Wagner grade 3 hyperbaric oxygen therapy")
+        assert len(vec) == 768
+        assert abs(math.sqrt(sum(x * x for x in vec)) - 1.0) < 1e-3

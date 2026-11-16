@@ -5,10 +5,10 @@ embeddings, and persists them to app/data/embeddings/policy_chunks_sapbert.npz
 along with build metadata.
 """
 
-import sys
 import json
+import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Add project root to sys.path
@@ -18,7 +18,8 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import numpy as np
 import torch
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel, AutoTokenizer
+
 from app.services.hybrid_retriever import HybridPolicyRetriever
 
 MODEL_NAME = "cambridgeltl/SapBERT-from-PubMedBERT-fulltext"
@@ -30,7 +31,7 @@ BATCH_SIZE = 32
 
 def build_dense_vector_store():
     start_time = time.perf_counter()
-    print(f"[v55-build] Initializing policy chunks from HybridPolicyRetriever...")
+    print("[v55-build] Initializing policy chunks from HybridPolicyRetriever...")
 
     retriever = HybridPolicyRetriever()
     chunks = retriever.chunks
@@ -105,7 +106,7 @@ def build_dense_vector_store():
         "dimension": int(matrix.shape[1]),
         "normalization": "L2",
         "chunk_count": chunk_count,
-        "built_at": datetime.now(timezone.utc).isoformat(),
+        "built_at": datetime.now(UTC).isoformat(),
         "build_duration_seconds": round(time.perf_counter() - start_time, 2),
         "device_used": str(device),
         "chunks": [

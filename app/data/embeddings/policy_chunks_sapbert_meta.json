@@ -3,8 +3,8 @@
   "dimension": 768,
   "normalization": "L2",
   "chunk_count": 204,
-  "built_at": "2026-11-15T08:54:49.604104+00:00",
-  "build_duration_seconds": 26.81,
+  "built_at": "2026-11-16T00:26:46.447371+00:00",
+  "build_duration_seconds": 25.9,
   "device_used": "cpu",
   "chunks": [
     {
