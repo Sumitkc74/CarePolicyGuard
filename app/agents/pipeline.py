@@ -404,7 +404,10 @@ class MultiAgentVerificationPipeline:
             from app.agents.toolbelt import AgentToolbelt
 
             # board is already initialized at start of case and has recorded POLICY_SHORTLIST and POLICY_CHOSEN
-            judge = ClinicalEquivalenceJudge(max_time_per_case_seconds=60.0)
+            judge = ClinicalEquivalenceJudge(
+                max_time_per_case_seconds=60.0,
+                max_calls_per_case=AgenticGuardrails.MAX_LLM_CALLS_PER_CASE,
+            )
             judge.timeout_seconds = 30.0
             judge.reset_case_budget()
             toolbelt = AgentToolbelt(db=self.db, concept_map=None)

@@ -154,7 +154,7 @@ class ClinicalEquivalenceJudge:
             logger.warning(f"Judge call budget exceeded ({self.case_call_count}/{self.max_calls_per_case}) for case.")
             return JudgeEvaluation(
                 verdict=EquivalenceVerdict.AMBIGUOUS,
-                rationale="Judge call budget exceeded (3 calls max per case); defers to human.",
+                rationale=f"Judge call budget exceeded ({self.max_calls_per_case} calls max per case); defers to human.",
                 elapsed_ms=0.0,
                 status_code="SKIPPED_BUDGET_EXHAUSTED"
             )
@@ -322,7 +322,7 @@ class ClinicalEquivalenceJudge:
             return CriterionJudgment(
                 status="MISSING",
                 quoted_evidence="",
-                rationale="Judge call budget exceeded (3 calls max per case); defers to human.",
+                rationale=f"Judge call budget exceeded ({self.max_calls_per_case} calls max per case); defers to human.",
                 confidence=0.50,
                 elapsed_ms=0.0,
                 status_code="SKIPPED_BUDGET_EXHAUSTED"

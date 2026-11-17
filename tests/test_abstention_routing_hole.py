@@ -146,3 +146,45 @@ def test_omission_bound_criterion_routes_to_judge():
         # Since exclusion was proven MET by the judge, the case is denied (not deferred)
         assert res.adjudication_decision == AdjudicationDecision.DENIED
         assert not res.abstention_status
+
+
+def test_pipeline_wires_authorized_judge_call_budget():
+    """
+    Task 1 (v61): Asserts that the pipeline constructs ClinicalEquivalenceJudge
+    with max_calls_per_case == AgenticGuardrails.MAX_LLM_CALLS_PER_CASE (8)
+    rather than defaulting to 3, passing without requiring an active LLM.
+    """
+    from app.core.agentic_guardrails import AgenticGuardrails
+
+    captured_instances = []
+    original_init = ClinicalEquivalenceJudge.__init__
+
+    def spy_init(self, *args, **kwargs):
+        original_init(self, *args, **kwargs)
+        captured_instances.append(self)
+
+    mock_judgment = CriterionJudgment(
+        status="NOT_MET",
+        quoted_evidence="",
+        rationale="Synthetic fast mock",
+        confidence=0.5,
+        elapsed_ms=1.0,
+        status_code="COMPLETED",
+    )
+
+    pipeline = MultiAgentVerificationPipeline(db=None)
+    with patch.object(ClinicalEquivalenceJudge, "__init__", spy_init), \
+         patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_judgment):
+        pipeline.adjudicate_sync(
+            patient_id="PT-BUDGET-TEST",
+            policy_id="LCD-KYPHO",
+            ehr_narrative="[SYNTHETIC TEST DATA] Short note.",
+            execution_mode="agentic",
+            save_record=False,
+        )
+
+    assert len(captured_instances) >= 1, "Pipeline must construct a ClinicalEquivalenceJudge"
+    judge = captured_instances[0]
+    assert judge.max_calls_per_case == AgenticGuardrails.MAX_LLM_CALLS_PER_CASE == 8
+    assert judge.max_time_per_case_seconds == 60.0
+

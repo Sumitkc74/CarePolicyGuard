@@ -82,7 +82,9 @@
       "category": "EMPTY_QUOTE",
       "verdict": "EVIDENCE_PRESENT_JUDGE_EXTRACTION_FAILURE",
       "criterion_description": "Patient reports that visual impairment significantly interferes with essential daily activities (driving, reading, navigating steps, personal safety).",
-      "verbatim_span": "Patient is no longer able to read standard book print even with updated bifocal glasses, creating significant difficulty with daily activities. ... progressive blurring and severe glare while driving at night.",
+      "verbatim_span": null,
+      "verbatim_span_fragment_1": "Patient is no longer able to read standard book print even with updated bifocal glasses, creating significant difficulty with daily activities.",
+      "verbatim_span_fragment_2": "progressive blurring and severe glare while driving at night.",
       "criterion_element_satisfied": "Visual impairment interfering with essential daily activities (inability to read standard print despite bifocals, disabling night glare while driving).",
       "missing_element": null,
       "advocate_output": "Agent 3 advocacy for CRIT-CAT-02: Advocacy call budget exceeded; cannot argue for satisfaction. (Quoted evidence: '').",
@@ -303,7 +305,7 @@
       "criterion_element": ">= 50% pain relief during temporary SCS trial of 3-7 days.",
       "concept_map_entries_consulted": [
         "CONCEPT-TEMPORARY-SCS-TRIAL-RELIEF (in draft)",
-        "CONCEPT-SKULL-BASE-SPINE-PROXIMITY (in draft, containing keyword 'spine')"
+        "CONCEPT-PROTON-PBT-01 (in draft: 'Skull Base, Spine, or Critical Structure Proximity', containing accepted term 'spinal cord')"
       ],
       "suggested_draft_concept": {
         "concept_id": "DRAFT-CONCEPT-SCS-TRIAL-80-PERCENT-RELIEF",
@@ -323,7 +325,7 @@
         "governing_rule_check": "PASS_EQUIVALENCE",
         "governing_rule_rationale": "Documented 80% pain relief during a 6-day trial exceeds the required >= 50% threshold and falls within the 3-7 day trial duration window."
       },
-      "root_cause": "Cross-domain token collision: the word 'spine' in 'spinal cord stimulator trial' collided with an SBRT draft concept ('Skull Base, Spine, or Critical Structure Proximity'), causing Gate C to flag the terms as belonging to disjoint concepts."
+      "root_cause": "Cross-domain token collision: the term 'spinal cord' in 'spinal cord stimulator trial' collided with a proton-beam draft concept (CONCEPT-PROTON-PBT-01, 'Skull Base, Spine, or Critical Structure Proximity'), causing Gate C to flag the terms as belonging to disjoint concepts."
     },
     {
       "vignette_id": "DEV-NCD-SGD-APP",

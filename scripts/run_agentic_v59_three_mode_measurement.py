@@ -1227,11 +1227,12 @@ def main() -> None:
             "passed": bool(det_reproduced and dec_reproduced),
         }
 
+        is_v61 = "v61" in str(args.output)
         summary = {
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
-                "benchmark_run": "v59 three-mode full measurement",
-                "parent_git_head": "c04665a",
+                "benchmark_run": "v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement",
+                "parent_git_head": "82c40b3" if is_v61 else "c04665a",
                 "database_used": "carepolicyguard.db",
                 "database_path": db_path,
                 "model": "qwen2.5:3b (local Ollama)",
