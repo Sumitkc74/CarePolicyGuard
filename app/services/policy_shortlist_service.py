@@ -285,11 +285,15 @@ class PolicyShortlistService:
         shortlist_size = min(max(1, top_k), len(evaluated_candidates))
         selected_candidates = evaluated_candidates[:shortlist_size]
 
-        # Re-assign sequential 1-based ranks
+        # Re-assign sequential 1-based ranks and populate pre/post margins on candidates
         shortlist: list[dict[str, Any]] = []
         for i, c in enumerate(selected_candidates, 1):
             c_copy = dict(c)
             c_copy["rank"] = i
+            c_copy["pre_margin"] = pre_margin
+            c_copy["post_margin"] = post_margin
+            c_copy["pre_rerank_margin"] = pre_margin
+            c_copy["post_rerank_margin"] = post_margin
             shortlist.append(c_copy)
 
         # ---------------------------------------------------------------------
@@ -307,9 +311,11 @@ class PolicyShortlistService:
                 "pre_rerank_top1_policy_id": pre_top1,
                 "pre_rerank_top2_policy_id": pre_top2,
                 "pre_rerank_margin": pre_margin,
+                "pre_margin": pre_margin,
                 "post_rerank_top1_policy_id": post_top1,
                 "post_rerank_top2_policy_id": post_top2,
                 "post_rerank_margin": post_margin,
+                "post_margin": post_margin,
                 "rerank_flipped_top1": rerank_flipped_top1,
                 "shortlist": [],
                 "candidates": [],
@@ -361,9 +367,11 @@ class PolicyShortlistService:
             "pre_rerank_top1_policy_id": pre_top1,
             "pre_rerank_top2_policy_id": pre_top2,
             "pre_rerank_margin": pre_margin,
+            "pre_margin": pre_margin,
             "post_rerank_top1_policy_id": post_top1,
             "post_rerank_top2_policy_id": post_top2,
             "post_rerank_margin": post_margin,
+            "post_margin": post_margin,
             "rerank_flipped_top1": rerank_flipped_top1,
             "shortlist": shortlist,
             "candidates": shortlist,

@@ -66,7 +66,7 @@ The v59 build successfully closes the routing hole that allowed cases with deter
 - In [app/agents/pipeline.py](file:///e:/Class/GitHub/CarePolicyGuard/app/agents/pipeline.py) and [scripts/run_agentic_v59_three_mode_measurement.py](file:///e:/Class/GitHub/CarePolicyGuard/scripts/run_agentic_v59_three_mode_measurement.py):
   - Split halt metrics into:
     - **Operational budget halts**: 0 across all 84 cases (no wall-clock > 60s or call limit 8 exhaustion).
-    - **Abstention gate halts**: 38 across 84 cases (36 insufficient evidence for mandatory criteria, 2 calibrated confidence below $\tau=0.80$).
+    - **Abstention gate halts**: 38 across 84 cases (36 insufficient evidence for mandatory criteria, 2 calibrated confidence below $\tau=0.85$).
 
 ### Task 5: Smoke Check & Full Three-Mode Benchmark
 - Ran 12-case smoke check in [scripts/run_v56_smoke_check.py](file:///e:/Class/GitHub/CarePolicyGuard/scripts/run_v56_smoke_check.py): confirmed KYPHO-01 rescue reproduced and PET-ONC executed through judge.

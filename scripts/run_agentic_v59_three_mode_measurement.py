@@ -1051,6 +1051,8 @@ def run_retrieval_sanity_check(vignettes: list[dict[str, Any]], db_session: Any)
                 "post_rerank_top1": post_top1,
                 "pre_margin": pre_margin,
                 "post_margin": post_margin,
+                "pre_rerank_margin": pre_margin,
+                "post_rerank_margin": post_margin,
                 "flipped_to_gold": is_gold_post,
             })
 
@@ -1065,9 +1067,11 @@ def run_retrieval_sanity_check(vignettes: list[dict[str, Any]], db_session: Any)
             "pre_rerank_top1_policy_id": pre_top1,
             "pre_rerank_top2_policy_id": shortlist_res.get("pre_rerank_top2_policy_id"),
             "pre_margin": pre_margin,
+            "pre_rerank_margin": pre_margin,
             "post_rerank_top1_policy_id": post_top1,
             "post_rerank_top2_policy_id": shortlist_res.get("post_rerank_top2_policy_id"),
             "post_margin": post_margin,
+            "post_rerank_margin": post_margin,
             "rerank_flipped_top1": flipped,
             "candidates": [
                 {
@@ -1076,6 +1080,10 @@ def run_retrieval_sanity_check(vignettes: list[dict[str, Any]], db_session: Any)
                     "unified_score": c.get("unified_score"),
                     "coverage_ratio": c.get("coverage_ratio"),
                     "reranked_score": c.get("reranked_score"),
+                    "pre_margin": c.get("pre_margin", pre_margin),
+                    "post_margin": c.get("post_margin", post_margin),
+                    "pre_rerank_margin": c.get("pre_rerank_margin", pre_margin),
+                    "post_rerank_margin": c.get("post_rerank_margin", post_margin),
                 }
                 for c in candidates
             ],
@@ -1151,6 +1159,11 @@ def main() -> None:
         default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v59_three_mode_run.json"),
         help="Path to output raw JSON",
     )
+    parser.add_argument(
+        "--retrieval-sanity-only",
+        action="store_true",
+        help="Only re-run the retrieval sanity check and update retrieval margins in output JSON",
+    )
     args = parser.parse_args()
 
     vignettes_file = ROOT_DIR / "app" / "data" / "policies_extended" / "dev_vignettes_extended.json"
@@ -1163,6 +1176,30 @@ def main() -> None:
     logger.info(f"Database session initialized against: {db_path}")
 
     try:
+        if args.retrieval_sanity_only:
+            out_file = Path(args.output)
+            if not out_file.exists():
+                raise FileNotFoundError(f"{out_file} not found")
+            with open(out_file, "r", encoding="utf-8") as f:
+                summary = json.load(f)
+
+            retrieval_sanity = run_retrieval_sanity_check(vignettes, db_session)
+            summary["retrieval_sanity"] = retrieval_sanity
+
+            selections_by_vid = {s["vignette_id"]: s for s in retrieval_sanity["pipeline_selections"]}
+            for case in summary.get("agentic_run", {}).get("cases", []):
+                vid = case.get("vignette_id")
+                s = selections_by_vid.get(vid)
+                if s:
+                    case["pre_margin"] = s.get("pre_margin")
+                    case["post_margin"] = s.get("post_margin")
+                    case["pre_rerank_margin"] = s.get("pre_margin")
+                    case["post_rerank_margin"] = s.get("post_margin")
+
+            with open(out_file, "w", encoding="utf-8") as f:
+                json.dump(summary, f, indent=2)
+            logger.info(f"Retrieval sanity check re-run complete. Output updated at: {out_file}")
+            return
         # 1. Deterministic Mode Run
         det_results = run_deterministic_mode(vignettes, db_session)
 
