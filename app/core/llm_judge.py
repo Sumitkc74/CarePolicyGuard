@@ -616,6 +616,117 @@ class ClinicalEquivalenceJudge:
                 status_code="ERROR"
             )
 
+    @classmethod
+    def select_most_relevant_span(
+        cls,
+        criterion: dict[str, Any],
+        note_text: str,
+        candidate_quote: str = "",
+    ) -> str:
+        """
+        Task 2 (v62): Refines advocate span selection to ensure the quote most directly
+        addresses the criterion's stated elements rather than secondary/peripheral fragments.
+        E.g. For inoperability criteria (CRIT-SBRT-01), selects the span establishing
+        inoperability and early-stage disease rather than isolated SUV numbers.
+        """
+        if not note_text:
+            return candidate_quote
+
+        cname = criterion.get("name", "")
+        cdesc = criterion.get("description", cname)
+        entity_names = criterion.get("entity_names", [])
+        keywords = criterion.get("keywords", [])
+
+        # Extract search elements and key clinical requirements
+        enames = " ".join(entity_names)
+        kws = " ".join(keywords)
+        req_text = f"{cname} {cdesc} {enames} {kws}".lower()
+
+        raw_sentences = re.split(r"(?<=[.!?\n])\s+", note_text.strip())
+        sentences: list[str] = []
+        for s in raw_sentences:
+            cleaned = s.strip()
+            # Strip standard clinical section header if present
+            cleaned = re.sub(
+                r"^(?:SUBJECTIVE|OBJECTIVE|ASSESSMENT\s*&\s*PLAN|ASSESSMENT|PLAN|HISTORY|HPI|EXAM):\s*",
+                "",
+                cleaned,
+                flags=re.IGNORECASE,
+            ).strip()
+            if len(cleaned) >= 5 and cleaned in note_text:
+                sentences.append(cleaned)
+            elif len(s.strip()) >= 5:
+                sentences.append(s.strip())
+
+        # Key requirement elements that take precedence over peripheral readings
+        priority_stems: list[str] = []
+        if "inoperab" in req_text:
+            priority_stems.append("inoperab")
+        if "oligometasta" in req_text:
+            priority_stems.append("oligometasta")
+        if "psycholog" in req_text:
+            priority_stems.append("psycholog")
+        if "edema" in req_text:
+            priority_stems.append("edema")
+        if "infection" in req_text:
+            priority_stems.append("infection")
+        if "claudication" in req_text or "stenosis" in req_text:
+            priority_stems.extend(["claudication", "stenosis", "ischemia"])
+
+        # Check if candidate_quote already covers priority stems
+        cand_norm = candidate_quote.lower()
+        if (
+            candidate_quote
+            and candidate_quote in note_text
+            and priority_stems
+            and all(stem in cand_norm for stem in priority_stems)
+        ):
+            return candidate_quote
+
+        req_words = set(re.findall(r"[a-z0-9]+", req_text)) - {
+            "and", "or", "for", "the", "of", "in", "with", "patient", "clinical", "prior", "authorization",
+            "must", "have", "has", "been", "to", "at", "by", "from", "criteria", "statutory", "requirement",
+        }
+
+        best_score = -100.0
+        best_span = candidate_quote
+
+        for sent in sentences:
+            sent_norm = sent.lower()
+            sent_words = set(re.findall(r"[a-z0-9]+", sent_norm))
+
+            # Base lexical overlap score
+            overlap = len(req_words & sent_words)
+            score = float(overlap)
+
+            # High priority bonus for satisfying core required stems
+            for stem in priority_stems:
+                if stem in sent_norm:
+                    score += 15.0
+
+            # Penalty for peripheral numbers when priority stems exist but are absent here
+            if (
+                priority_stems
+                and not any(stem in sent_norm for stem in priority_stems)
+                and any(k in sent_norm for k in ("suv", "max", "bp", "heart rate", "pulse", "fractions"))
+            ):
+                score -= 10.0
+
+            if score > best_score:
+                best_score = score
+                best_span = sent
+
+        if priority_stems and any(stem in best_span.lower() for stem in priority_stems):
+            return best_span
+
+        if candidate_quote and candidate_quote in note_text:
+            cand_words = set(re.findall(r"[a-z0-9]+", cand_norm))
+            cand_score = float(len(req_words & cand_words))
+            if cand_score >= best_score:
+                return candidate_quote
+
+        return best_span or candidate_quote
+
     def generate_advocacy_sync(
         self,
         criterion: dict[str, Any],
@@ -623,9 +734,10 @@ class ClinicalEquivalenceJudge:
         deterministic_assessment: Any | None = None
     ) -> AdvocacyResult:
         """
-        Task 1 (v53): When a criterion judge returns NOT_MET or INSUFFICIENT_EVIDENCE,
+        Task 1 (v53) / Task 2 (v62): When a criterion judge returns NOT_MET or INSUFFICIENT_EVIDENCE,
         Agent 3 acts as an advocate arguing FOR satisfaction by discovering clinical evidence,
         synonyms, paraphrases, or subtypes in the note supporting satisfaction.
+        Selects the verbatim span that most directly addresses the criterion's stated elements.
         Returns an AdvocacyResult (advocacy_quote + rationale).
         """
         t0 = time.perf_counter()
@@ -664,11 +776,13 @@ class ClinicalEquivalenceJudge:
             f"- Clinical Intent: {cintent}\n\n"
             f"FULL CLINICAL NOTE:\n\"\"\"\n{note_text}\n\"\"\"\n\n"
             f"TASK:\n"
-            f"1. Search the note for any documented medical finding, diagnostic report, treatment history, symptom, or synonym that satisfies the clinical intent of this requirement.\n"
-            f"2. If supporting evidence exists, extract the EXACT verbatim quote (advocacy_quote) from the note and provide a concise clinical rationale explaining how it satisfies the requirement.\n"
-            f"3. If the note truly contains no evidence supporting satisfaction, return advocacy_quote as an empty string (\"\") and explain that no supporting evidence exists.\n\n"
+            f"1. Identify the core required qualifying elements of the statutory requirement (such as disease stage, inoperability, objective thresholds, formal evaluations, or specific clinical conditions). Do NOT select secondary or peripheral fragments (such as isolated SUV numbers, imaging metrics, or vital signs) if a span directly addressing the core qualifying condition or status exists.\n"
+            f"2. Search the note for the verbatim span that most directly and comprehensively addresses the criterion's core stated elements. The quote must cover the central qualifying elements (e.g. for inoperability criteria, quote the documentation of inoperability or early-stage disease rather than isolated metabolic numbers).\n"
+            f"3. If supporting evidence exists, extract the EXACT verbatim quote (advocacy_quote) from the note and provide a concise clinical rationale explaining how it satisfies the requirement.\n"
+            f"4. If the note truly contains no evidence supporting satisfaction, return advocacy_quote as an empty string (\"\") and explain that no supporting evidence exists.\n\n"
             f"GOVERNING RULES:\n"
             f"- 'advocacy_quote' MUST be an exact character-for-character excerpt from the clinical note. Never invent or paraphrase the quote.\n"
+            f"- Prioritize the span that most directly addresses the criterion's mandatory qualifying elements.\n"
             f"- Output ONLY JSON matching this exact structure:\n"
             f"{{\n"
             f'  "advocacy_quote": "<verbatim excerpt from note or empty string>",\n'
@@ -716,6 +830,11 @@ class ClinicalEquivalenceJudge:
 
             quote = str(parsed.get("advocacy_quote", "")).strip()
             rationale = str(parsed.get("rationale", "No rationale provided.")).strip()
+
+            # Task 2 (v62): Refine quote to prioritize span addressing core criterion elements
+            refined_quote = self.select_most_relevant_span(criterion, note_text, candidate_quote=quote)
+            if refined_quote and refined_quote in note_text:
+                quote = refined_quote
 
             return AdvocacyResult(
                 advocacy_quote=quote,

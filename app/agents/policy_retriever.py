@@ -219,6 +219,9 @@ class PolicyRetrievalAgent:
                 # Ensure backward-compatible keywords list is always populated from entity_names
                 crit_dict["keywords"] = [k.strip().lower() for k in c.entity_names]
                 crit_dict["entity_names"] = list(c.entity_names)
+                crit_dict["policy_id"] = policy_id
+                crit_dict["category"] = decl.category
+                crit_dict["domain"] = decl.category
                 crit_list.append(crit_dict)
             policy_cache.set(cache_key, crit_list, ttl_seconds=3600)
             return crit_list
@@ -227,6 +230,7 @@ class PolicyRetrievalAgent:
         policy = self.retrieve_policy(policy_id)
         criteria_list = []
         if policy and hasattr(policy, "criteria") and policy.criteria:
+            p_cat = getattr(policy, "category", None)
             for c in policy.criteria:
                 kw_list = [k.strip().lower() for k in c.keywords.split(",") if k.strip()]
                 criteria_list.append({
@@ -239,7 +243,10 @@ class PolicyRetrievalAgent:
                     "required_temporal_window": c.required_temporal_window,
                     "keywords": kw_list,
                     "entity_names": kw_list,
-                    "min_score": c.min_score
+                    "min_score": c.min_score,
+                    "policy_id": policy_id,
+                    "category": p_cat,
+                    "domain": p_cat,
                 })
 
         policy_cache.set(cache_key, criteria_list, ttl_seconds=3600)

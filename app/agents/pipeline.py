@@ -799,7 +799,9 @@ class MultiAgentVerificationPipeline:
                             criterion=crit,
                             ehr_narrative=sanitized_ehr,
                             concept_map=None,
-                            verifier_agent=self.verifier_agent
+                            verifier_agent=self.verifier_agent,
+                            policy_domain=getattr(policy_obj, "category", None),
+                            policy_id=policy_id,
                         )
 
                         if not gate_res["passed"]:
@@ -995,7 +997,7 @@ class MultiAgentVerificationPipeline:
 
                 # Task 1 & Task 2 (v53): Agent 3 Advocacy & Capped Fallback
                 # If criterion-level judgment was NOT MET or INSUFFICIENT_EVIDENCE, Agent 3 acts as advocate
-                if not is_excl and not promoted and not budget_halt and ccode in needs_judge_codes:
+                if not is_excl and not promoted and not budget_halt and ccode in needs_judge_codes and crit_judgment.status != "MET" and debated_criteria_outcomes.get(ccode) != "CONCEDED":
                     advocacy_attempted = False
                     # Only attempt advocacy if budget remains
                     if judge.case_call_count < AgenticGuardrails.MAX_LLM_CALLS_PER_CASE:
@@ -1078,7 +1080,9 @@ class MultiAgentVerificationPipeline:
                                         criterion=crit,
                                         ehr_narrative=sanitized_ehr,
                                         concept_map=None,
-                                        verifier_agent=self.verifier_agent
+                                        verifier_agent=self.verifier_agent,
+                                        policy_domain=getattr(policy_obj, "category", None),
+                                        policy_id=policy_id,
                                     )
 
                                     if adv_gate_res["passed"]:
@@ -1180,7 +1184,9 @@ class MultiAgentVerificationPipeline:
                                 criterion=crit,
                                 ehr_narrative=sanitized_ehr,
                                 concept_map=None,
-                                verifier_agent=self.verifier_agent
+                                verifier_agent=self.verifier_agent,
+                                policy_domain=getattr(policy_obj, "category", None),
+                                policy_id=policy_id,
                             )
 
                             if gate_res["passed"]:

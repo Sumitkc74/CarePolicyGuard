@@ -100,13 +100,15 @@ class AgenticGuardrails:
         criterion: dict[str, Any],
         ehr_narrative: str,
         concept_map: ConceptMap | None = None,
-        verifier_agent: Any | None = None
+        verifier_agent: Any | None = None,
+        policy_domain: str | None = None,
+        policy_id: str | None = None,
     ) -> dict[str, Any]:
         """
         Passes a candidate span through the mandatory sequential gate chain:
         - Verbatim slice validation
         - Gate B: 5-dimension clinical semantics (experiencer, negation, modality)
-        - Gate C: ConceptMap equivalence verification
+        - Gate C: ConceptMap equivalence verification (scoped by policy domain)
         - Agent 3: Cross-examination challenge check
         No LLM output may bypass any gate in this chain.
         """
@@ -145,13 +147,32 @@ class AgenticGuardrails:
                 "reason": "Candidate span documents hypothetical or conditional findings."
             }
 
-        # Step 3: Gate C: ConceptMap equivalence check
+        # Step 3: Gate C: ConceptMap equivalence check (scoped by policy domain)
+        p_domain = policy_domain or criterion.get("category") or criterion.get("domain")
+        p_id = policy_id or criterion.get("policy_id")
+        if not p_domain and not p_id and "criterion_code" in criterion:
+            code_parts = str(criterion.get("criterion_code", "")).split("-")
+            if len(code_parts) >= 2 and code_parts[0] in ("CRIT", "EXCL"):
+                candidate_code = code_parts[1]
+                from app.services.declarative_engine import DeclarativePolicyEngine
+                for prefix in ("LCD-", "NCD-", "OPD-", ""):
+                    pol = DeclarativePolicyEngine.load_policy(f"{prefix}{candidate_code}")
+                    if pol:
+                        p_id = pol.policy_id
+                        p_domain = pol.category
+                        break
+
         candidate_crit_terms = [cname] + list(criterion.get("entity_names", [])) + list(criterion.get("keywords", []))
         concept_match_found = False
         concept_match_reason = "No matching concept definition"
 
         for crit_term in candidate_crit_terms:
-            is_equiv, equiv_reason = cmap.verify_equivalence(crit_term, candidate_span.source_text)
+            is_equiv, equiv_reason = cmap.verify_equivalence(
+                crit_term,
+                candidate_span.source_text,
+                domain=p_domain,
+                policy_id=p_id,
+            )
             if is_equiv:
                 concept_match_found = True
                 concept_match_reason = equiv_reason

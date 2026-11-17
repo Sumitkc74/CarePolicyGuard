@@ -318,6 +318,8 @@ class AgentToolbelt:
                     criterion=criterion,
                     ehr_narrative=note,
                     concept_map=cmap,
+                    policy_domain=criterion.get("category") or criterion.get("domain"),
+                    policy_id=criterion.get("policy_id"),
                 )
 
         duration_ms = (time.perf_counter() - t0) * 1000.0
@@ -445,6 +447,8 @@ class AgentToolbelt:
                     criterion=criterion,
                     ehr_narrative=note,
                     concept_map=cmap,
+                    policy_domain=criterion.get("category") or criterion.get("domain"),
+                    policy_id=criterion.get("policy_id"),
                 )
 
         duration_ms = (time.perf_counter() - t0) * 1000.0
@@ -521,6 +525,8 @@ class AgentToolbelt:
                     criterion=criterion,
                     ehr_narrative=note,
                     concept_map=cmap,
+                    policy_domain=criterion.get("category") or criterion.get("domain"),
+                    policy_id=criterion.get("policy_id"),
                 )
                 passed = gate_res.get("passed", False)
                 if passed:

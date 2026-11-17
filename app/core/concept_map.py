@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
@@ -192,16 +193,89 @@ class ConceptMap:
             if norm_inst:
                 self._term_to_concept_id[norm_inst] = concept.concept_id
 
-    def lookup_concept(self, term: str) -> ConceptDefinition | None:
-        """Finds concept definition for a given clinical term or synonym."""
+    @staticmethod
+    def is_concept_in_domain(
+        concept: ConceptDefinition,
+        domain: str | None = None,
+        policy_id: str | None = None,
+    ) -> bool:
+        """
+        Gate C Scoping Rule (v62):
+        Checks if concept belongs to the governing policy domain or policy ID.
+        Consults only concepts in the governing policy's domain (plus any concept
+        explicitly marked cross-domain). Prevents cross-domain collisions.
+        """
+        if not domain and not policy_id:
+            return True
+
+        # Check explicit cross-domain flag if present
+        if getattr(concept, "is_cross_domain", False) or getattr(concept, "cross_domain", False):
+            return True
+
+        cid = (concept.concept_id or "").upper()
+        cdom = (concept.domain or "").upper()
+
+        if policy_id:
+            raw_pid = policy_id.upper()
+            code = raw_pid.replace("LCD-", "").replace("NCD-", "").replace("OPD-", "")
+            main_code = code.split("-")[0]
+            if f"CONCEPT-{code}-" in cid or cid.startswith(f"CONCEPT-{main_code}-"):
+                return True
+            if code in cdom:
+                return True
+
+        if not domain:
+            return False
+
+        cd = (concept.domain or "").lower().replace("_", " ")
+        pd = domain.lower().replace("_", " ")
+        if cd == pd:
+            return True
+
+        stop_words = {
+            "and", "or", "for", "the", "of", "in", "policies",
+            "prior", "authorization", "medicare", "general", "lcd", "ncd", "opd",
+        }
+        c_tokens = set(re.findall(r"[a-z]+", cd)) - stop_words
+        p_tokens = set(re.findall(r"[a-z]+", pd)) - stop_words
+
+        alias_map = {
+            "spine pain": {"spine", "pain", "interventional", "neurosurgery", "surgery"},
+            "radiation oncology": {"radiation", "oncology", "radiotherapy"},
+            "oncology": {"oncology", "cancer", "radiation", "nuclear"},
+            "ophthalmology": {"ophthalmology", "plastic", "eye"},
+            "orthopedics": {"orthopedic", "orthopedics", "surgery", "podiatry", "foot", "ankle", "dmepos"},
+            "cardiology": {"cardiology", "cardiovascular", "electrophysiology", "heart"},
+            "sleep medicine": {"sleep", "respiratory", "dmepos"},
+            "wound care": {"wound", "care", "dmepos"},
+        }
+        for alias, tokens in alias_map.items():
+            if alias in cd and bool(tokens & p_tokens):
+                return True
+            if alias in pd and bool(tokens & c_tokens):
+                return True
+
+        return bool(c_tokens & p_tokens)
+
+    def lookup_concept(
+        self,
+        term: str,
+        domain: str | None = None,
+        policy_id: str | None = None,
+    ) -> ConceptDefinition | None:
+        """Finds concept definition for a given clinical term or synonym, optionally scoped by domain/policy."""
         norm_term = term.strip().lower()
         cid = self._term_to_concept_id.get(norm_term)
         if cid:
-            return self._concepts.get(cid)
+            concept = self._concepts.get(cid)
+            if concept and self.is_concept_in_domain(concept, domain=domain, policy_id=policy_id):
+                return concept
         # Check if term contains any indexed multi-word term or vice-versa
         for indexed_term, c_id in self._term_to_concept_id.items():
             if len(indexed_term) >= 4 and indexed_term in norm_term:
-                return self._concepts.get(c_id)
+                concept = self._concepts.get(c_id)
+                if concept and self.is_concept_in_domain(concept, domain=domain, policy_id=policy_id):
+                    return concept
         return None
 
     def get_terms_for_concept(self, concept_id_or_term: str) -> list[str]:
@@ -217,11 +291,14 @@ class ConceptMap:
     def verify_equivalence(
         self,
         criterion_term: str,
-        proposed_term: str
+        proposed_term: str,
+        domain: str | None = None,
+        policy_id: str | None = None,
     ) -> tuple[bool, str]:
         """
         The Map is the Verifier:
-        Checks if proposed_term and criterion_term belong to the same clinical concept.
+        Checks if proposed_term and criterion_term belong to the same clinical concept,
+        scoped by the governing policy's domain (Task 1 v62).
         Returns: (is_equivalent: bool, reason: str)
         Possible reasons:
         - "EQUIVALENCE_CONFIRMED": verified in concept map
@@ -231,9 +308,13 @@ class ConceptMap:
         crit_norm = criterion_term.strip().lower()
         prop_norm = proposed_term.strip().lower()
 
-        # Find concepts for both terms
-        crit_concept = self.lookup_concept(crit_norm)
-        prop_concept = self.lookup_concept(prop_norm)
+        # Find concepts for both terms within the policy domain
+        crit_concept = self.lookup_concept(crit_norm, domain=domain, policy_id=policy_id)
+        if not crit_concept:
+            # Fall back to unconstrained lookup for criterion term (as criterion belongs to governing policy)
+            crit_concept = self.lookup_concept(crit_norm)
+
+        prop_concept = self.lookup_concept(prop_norm, domain=domain, policy_id=policy_id)
 
         if not crit_concept:
             return False, f"NO_CONCEPT_MAP_ENTRY: Criterion term '{criterion_term}' is not indexed in concept map."

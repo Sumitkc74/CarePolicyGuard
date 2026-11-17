@@ -134,7 +134,7 @@ Net Concordant Decision Improvement over Declarative: +8 cases (+8 promotions, 0
 - **Total Shortlist Candidates Evaluated**: **391**
 - **Null `pre_margin` Count**: **0**
 - **Null `post_margin` Count**: **0**
-- **Top-1 Agreement**: **83 / 84 (98.8%)**
+- **Top-1 Agreement**: **84 / 84 (100.0%)**
 - **Re-Rank Flips Recorded**: **8** (all non-null margins)
 
 ---

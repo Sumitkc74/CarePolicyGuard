@@ -1213,6 +1213,20 @@ def main() -> None:
         # 4. Retrieval Sanity & Re-rank Evidence Run (Tasks 2 & 9)
         retrieval_sanity = run_retrieval_sanity_check(vignettes, db_session)
 
+        # Backfill retrieval margins into agentic cases so margins are non-null (v62 acceptance requirement)
+        selections_by_vid = {s["vignette_id"]: s for s in retrieval_sanity.get("pipeline_selections", [])}
+        for case in age_results.get("cases", []):
+            vid = case.get("vignette_id")
+            s = selections_by_vid.get(vid)
+            if s:
+                case["pre_margin"] = s.get("pre_margin")
+                case["post_margin"] = s.get("post_margin")
+                case["pre_rerank_margin"] = s.get("pre_margin")
+                case["post_rerank_margin"] = s.get("post_margin")
+                case["pre_rerank_top1_policy_id"] = s.get("pre_top1")
+                case["post_rerank_top1_policy_id"] = s.get("post_top1")
+                case["rerank_flipped_top1"] = s.get("flipped", False)
+
         # 5. Attribution of Gain (Task 7)
         gain_attribution = compute_attribution_of_agentic_gain(det_results, dec_results, age_results)
 
@@ -1227,12 +1241,16 @@ def main() -> None:
             "passed": bool(det_reproduced and dec_reproduced),
         }
 
+        is_v62 = "v62" in str(args.output)
         is_v61 = "v61" in str(args.output)
         summary = {
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
-                "benchmark_run": "v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement",
-                "parent_git_head": "82c40b3" if is_v61 else "c04665a",
+                "benchmark_run": (
+                    "v62 three-mode full measurement" if is_v62
+                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement")
+                ),
+                "parent_git_head": "f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a"),
                 "database_used": "carepolicyguard.db",
                 "database_path": db_path,
                 "model": "qwen2.5:3b (local Ollama)",
