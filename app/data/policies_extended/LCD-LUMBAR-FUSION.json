@@ -44,11 +44,11 @@
         "lumbar instability",
         "dynamic translation > 3mm"
       ],
-      "cms_document": "Medicare LCD Lumbar Spinal Fusion",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L37848 (MCD lcdid=37848)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Instability Criteria",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Operative indications studied included spondylolisthesis, instability, stenosis, scoliois, disc pathology or need for revision surgery due to nonunion, adjacent level disease or post-discectomy revision."
     },
     {
       "criterion_code": "CRIT-LUMB-02",
@@ -79,11 +79,11 @@
         "non-operative care",
         "90 days conservative therapy"
       ],
-      "cms_document": "Medicare LCD Lumbar Spinal Fusion",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L37848 (MCD lcdid=37848)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Conservative Therapy",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "One of the earliest large randomized trials of lumbar fusion in patients with low back pain was a study from Sweden in which 294 patients aged 25-65 with at least 2 years of low back pain with radicular pain were randomized to 1 of 3 surgical techniques versus conservative treatment based on physical rehabilitation (Fritzell, 2001)."
     },
     {
       "criterion_code": "CRIT-LUMB-EXCL-01",
@@ -112,24 +112,22 @@
         "non-specific back pain only",
         "uncomplicated discogenic back pain"
       ],
-      "cms_document": "Medicare LCD Lumbar Spinal Fusion",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L37848 (MCD lcdid=37848)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Axial Pain Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Surgical treatment of patients with low back pain and symptoms of nerve root involvement has been studied with both observational and randomized controlled trials with the highest quality evidence in the treatment of chronically painful conditions without spinal instability or evidence of neurologic compromise."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L37897 governs InVisionFirst Liquid Biopsy, whereas policy subject is Lumbar Spinal Fusion. Flagged as needing realignment.",
-    "real_cms_id": "LCD L37897",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "MolDX: Inivata\u2122, InVisionFirst\u00ae, Liquid Biopsy for Patients with Lung Cancer",
-    "mcd_actual_title": "MolDX: Inivata\u2122, InVisionFirst\u00ae, Liquid Biopsy for Patients with Lung Cancer",
-    "citation": "CMS MCD Document at Cited ID: MolDX: Inivata\u2122, InVisionFirst\u00ae, Liquid Biopsy for Patients with Lung Cancer",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=37897",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=37848. Replaces MISMATCH (previously cited L37897 was MolDX Liquid Biopsy).",
+    "real_cms_id": "LCD L37848 (MCD lcdid=37848)",
+    "authority": "Palmetto GBA",
+    "document_title": "Lumbar Spinal Fusion",
+    "citation": "CMS LCD L37848, Palmetto GBA",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=37848"
   }
 }

@@ -42,11 +42,11 @@
         "focal chondral defect size",
         "outerbridge grade iv lesion area"
       ],
-      "cms_document": "Medicare LCD Autologous Chondrocyte Implantation",
-      "source_section": "Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Defect Size",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "BENEFIT_STATUTE",
+      "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
     },
     {
       "criterion_code": "CRIT-ACI-02",
@@ -75,11 +75,11 @@
         "failed marrow stimulation",
         "prior knee debridement failure"
       ],
-      "cms_document": "Medicare LCD Autologous Chondrocyte Implantation",
-      "source_section": "Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 2: Prior Surgery",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "BENEFIT_STATUTE",
+      "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
     },
     {
       "criterion_code": "CRIT-ACI-EXCL-01",
@@ -108,22 +108,28 @@
         "tricompartmental osteoarthritis",
         "kellgren-lawrence grade 3 or 4"
       ],
-      "cms_document": "Medicare LCD Autologous Chondrocyte Implantation",
-      "source_section": "Exclusions",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Diffuse Arthritis Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "BENEFIT_STATUTE",
+      "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
-    "checked_date": "2026-11-05",
-    "notes": "No MCD document found at previously cited identifier L35024 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
-    "real_cms_id": null,
-    "authority": "Author Summary (No CMS source located)",
-    "document_title": null,
-    "citation": null,
-    "url": null
+    "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+    "checked_date": "2026-11-18",
+    "notes": "No national (NCD) or local (LCD) coverage determination exists in the Medicare Coverage Database. Covered under Medicare reasonable and necessary standard.",
+    "real_cms_id": "NONE",
+    "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+    "document_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+    "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Benefit Policy Manual Chapter 15",
+    "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+    "search_terms_tried": [
+      "chondrocyte",
+      "autologous chondrocyte",
+      "cartilage defect",
+      "maci"
+    ]
   }
 }

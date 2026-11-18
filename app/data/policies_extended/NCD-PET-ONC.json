@@ -44,11 +44,11 @@
         "solid tumor malignancy",
         "high probability lung nodule"
       ],
-      "cms_document": "CMS NCD Manual Section 220.6.17",
-      "source_section": "Indications",
+      "cms_document": "NCD 220.6.17 (MCD ncdid=331)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Biopsy Confirmation",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "All other solid tumors"
     },
     {
       "criterion_code": "CRIT-PTONC-02",
@@ -79,11 +79,11 @@
         "radiation therapy planning",
         "evaluating treatment response"
       ],
-      "cms_document": "CMS NCD Manual Section 220.6.17",
-      "source_section": "Indications",
+      "cms_document": "NCD 220.6.17 (MCD ncdid=331)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Management Impact",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Subsequent Treatment Strategy (formerly &ldquo;restaging&rdquo; & &ldquo;monitoring response to treatment&rdquo;"
     },
     {
       "criterion_code": "CRIT-PTONC-EXCL-01",
@@ -112,22 +112,22 @@
         "asymptomatic cancer surveillance",
         "no evidence of recurrence"
       ],
-      "cms_document": "CMS NCD Manual Section 220.6.17",
-      "source_section": "Exclusions",
+      "cms_document": "NCD 220.6.17 (MCD ncdid=331)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Routine Surveillance",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "CMS continues to believe that the evidence is adequate to determine that the results of FDG PET imaging are useful in determining the appropriate initial anti-tumor treatment strategy for beneficiaries with suspected cancer and improve health outcomes and thus are reasonable and necessary under \u00a71862(a)(1)(A) of the Social Security Act (the Act)."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/ncd?ncdid=331.",
     "real_cms_id": "NCD 220.6.17 (MCD ncdid=331)",
     "authority": "CMS National Coverage Determination",
     "document_title": "Positron Emission Tomography (FDG) for Oncologic Conditions",
-    "citation": "CMS MCD: Positron Emission Tomography (FDG) for Oncologic Conditions (NCD 220.6.17 (MCD ncdid=331))",
+    "citation": "CMS NCD 220.6.17, Publication 100-03, Medicare National Coverage Determinations Manual",
     "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=331"
   }
 }

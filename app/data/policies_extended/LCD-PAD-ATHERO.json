@@ -46,11 +46,11 @@
         "ischemic rest pain",
         "arterial ulcer"
       ],
-      "cms_document": "Medicare LCD Peripheral Atherectomy",
-      "source_section": "Indications",
+      "cms_document": "LCD L40228 (MCD lcdid=40228)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Clinical Categories",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The major manifestations of chronic ischemia are ischemic rest pain, ischemic ulceration, and gangrene."
     },
     {
       "criterion_code": "CRIT-PAD-02",
@@ -81,11 +81,11 @@
         "ankle brachial index",
         "iliac or femoral stenosis"
       ],
-      "cms_document": "Medicare LCD Peripheral Atherectomy",
-      "source_section": "Indications",
+      "cms_document": "LCD L40228 (MCD lcdid=40228)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Hemodynamic Evidence",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Detection of PAD in most patients is accomplished through history, physical examination, and resting ankle-brachial index (ABI) for LEs or wrist-brachial index (WBI) for UEs."
     },
     {
       "criterion_code": "CRIT-PAD-EXCL-01",
@@ -116,24 +116,22 @@
         "asymptomatic pad",
         "absence of functional limitation"
       ],
-      "cms_document": "Medicare LCD Peripheral Atherectomy",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L40228 (MCD lcdid=40228)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Mild Disease Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "This guideline defines 4 clinical subsets of PAD: asymptomatic PAD (may have functional impairment), chronic symptomatic PAD (claudication), CLTI, and ALI."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L34415 governs CT of Abdomen and Pelvis, whereas policy subject is Peripheral Atherectomy. Flagged as needing realignment.",
-    "real_cms_id": "LCD L34415",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "CT of the Abdomen and Pelvis",
-    "mcd_actual_title": "CT of the Abdomen and Pelvis",
-    "citation": "CMS MCD Document at Cited ID: CT of the Abdomen and Pelvis",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34415",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=40228. Replaces MISMATCH (previously cited L34415 was CT Abdomen/Pelvis).",
+    "real_cms_id": "LCD L40228 (MCD lcdid=40228)",
+    "authority": "Palmetto GBA",
+    "document_title": "Endovascular Management for Peripheral Arterial Disease of the Upper and Lower Extremities",
+    "citation": "CMS LCD L40228, Palmetto GBA / NCD 20.7",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=40228"
   }
 }

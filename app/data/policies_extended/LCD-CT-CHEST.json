@@ -46,11 +46,11 @@
         "hilar lymphadenopathy",
         "unresolved infiltrate"
       ],
-      "cms_document": "Medicare LCD Chest CT",
-      "source_section": "Indications",
+      "cms_document": "LCD L33459 (MCD lcdid=33459)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Radiographic Findings",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Evaluation of pulmonary, mediastinal, pleural and chest wall infections and their complications"
     },
     {
       "criterion_code": "CRIT-CTCH-02",
@@ -79,11 +79,11 @@
         "interstitial lung disease",
         "pulmonary fibrosis evaluation"
       ],
-      "cms_document": "Medicare LCD Chest CT",
-      "source_section": "Indications",
+      "cms_document": "LCD L33459 (MCD lcdid=33459)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: High Risk Symptoms",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "For characterizing and follow-up evaluation of interstitial and alveolar lung disease due to idiopathic, allergic, collagen-vascular, environmental or other causes"
     },
     {
       "criterion_code": "CRIT-CTCH-EXCL-01",
@@ -112,24 +112,22 @@
         "uncomplicated uri",
         "absence of chest x-ray"
       ],
-      "cms_document": "Medicare LCD Chest CT",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33459 (MCD lcdid=33459)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Uncomplicated Infection",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The chest x-ray and/or physical examination should be used to evaluate patients who present with signs and/or symptoms suggestive of chest pathology prior to proceeding to a CT scan."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L34417 governs 'CT of the Head', whereas policy subject is CT of the Chest with Contrast. Flagged as needing realignment.",
-    "real_cms_id": "LCD L34417",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "CT of the Head",
-    "mcd_actual_title": "CT of the Head",
-    "citation": "CMS MCD Document at Cited ID: CT of the Head",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34417",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=33459. Replaces MISMATCH (previously cited L34417 was CT of the Head).",
+    "real_cms_id": "LCD L33459 (MCD lcdid=33459)",
+    "authority": "Palmetto GBA",
+    "document_title": "Computerized Axial Tomography (CT), Thorax",
+    "citation": "CMS LCD L33459, Palmetto GBA",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33459"
   }
 }

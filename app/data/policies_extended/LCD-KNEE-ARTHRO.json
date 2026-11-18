@@ -44,11 +44,11 @@
         "mechanical knee symptoms",
         "positive mcmurray test"
       ],
-      "cms_document": "Medicare LCD Knee Arthroscopy",
-      "source_section": "Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Mechanical Symptoms",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "BENEFIT_STATUTE",
+      "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
     },
     {
       "criterion_code": "CRIT-KART-02",
@@ -79,11 +79,11 @@
         "displaced meniscal flap",
         "unstable meniscal tear"
       ],
-      "cms_document": "Medicare LCD Knee Arthroscopy",
-      "source_section": "Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 2: Imaging Criteria",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "BENEFIT_STATUTE",
+      "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
     },
     {
       "criterion_code": "CRIT-KART-EXCL-01",
@@ -112,22 +112,27 @@
         "severe tricompartmental osteoarthritis",
         "debridement for osteoarthritis only"
       ],
-      "cms_document": "Medicare LCD Knee Arthroscopy",
-      "source_section": "Exclusions",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Osteoarthritis Debridement Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "BENEFIT_STATUTE",
+      "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
-    "checked_date": "2026-11-05",
-    "notes": "No MCD document found at previously cited identifier L33968 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
-    "real_cms_id": null,
-    "authority": "Author Summary (No CMS source located)",
-    "document_title": null,
-    "citation": null,
-    "url": null
+    "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+    "checked_date": "2026-11-18",
+    "notes": "No active NCD or LCD exists in MCD. Covered under Medicare reasonable and necessary standard for orthopedic arthroscopy.",
+    "real_cms_id": "NONE",
+    "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+    "document_title": "Knee Arthroscopy and Meniscectomy",
+    "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Claims Processing Manual Chapter 12",
+    "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+    "search_terms_tried": [
+      "knee arthroscopy",
+      "meniscectomy",
+      "meniscus"
+    ]
   }
 }

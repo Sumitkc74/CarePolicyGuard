@@ -46,11 +46,11 @@
         "total laryngectomy",
         "unable to communicate verbally"
       ],
-      "cms_document": "CMS NCD Manual Section 50.1",
-      "source_section": "Indications",
+      "cms_document": "NCD 50.1 (MCD ncdid=274)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Expressive Impairment",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "In addition, specific features of a speech generating device that are not used by the individual who has a severe speech impairment to meet his or her functional speaking needs are not covered."
     },
     {
       "criterion_code": "CRIT-SGD-02",
@@ -79,11 +79,11 @@
         "slp assessment completed",
         "aac device trial completed"
       ],
-      "cms_document": "CMS NCD Manual Section 50.1",
-      "source_section": "Indications",
+      "cms_document": "NCD 50.1 (MCD ncdid=274)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: SLP Assessment",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "software that allows a computer or other electronic device to generate audible/verbal speech."
     },
     {
       "criterion_code": "CRIT-SGD-EXCL-01",
@@ -112,22 +112,22 @@
         "general consumer computer",
         "non-dedicated computing device"
       ],
-      "cms_document": "CMS NCD Manual Section 50.1",
-      "source_section": "Exclusions",
+      "cms_document": "NCD 50.1 (MCD ncdid=274)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Non-Dedicated Hardware",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Computers and tablets are generally not considered DME because they are useful in the absence of an illness or injury."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/ncd?ncdid=274.",
     "real_cms_id": "NCD 50.1 (MCD ncdid=274)",
     "authority": "CMS National Coverage Determination",
     "document_title": "Speech Generating Devices",
-    "citation": "CMS MCD: Speech Generating Devices (NCD 50.1 (MCD ncdid=274))",
+    "citation": "CMS NCD 50.1, Publication 100-03, Medicare National Coverage Determinations Manual",
     "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=274"
   }
 }

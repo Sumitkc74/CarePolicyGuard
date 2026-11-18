@@ -44,11 +44,11 @@
         "cervical cord compression",
         "nerve root impingement on mri"
       ],
-      "cms_document": "Medicare LCD ACDF",
-      "source_section": "Indications",
+      "cms_document": "LCD L39758 (MCD lcdid=39758)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Diagnostic Imaging",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Exceptions to conservative therapy requirement for decompression of symptomatic cervical nerve root impingement:"
     },
     {
       "criterion_code": "CRIT-ACDF-02",
@@ -79,11 +79,11 @@
         "conservative trial 6 weeks",
         "progressive motor deficit"
       ],
-      "cms_document": "Medicare LCD ACDF",
-      "source_section": "Indications",
+      "cms_document": "LCD L39758 (MCD lcdid=39758)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Conservative Care",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "In mild cases resolution with conservative therapy is possible and a trial of conservative treatment is indicated with education on progressive symptoms and intervention if worsening."
     },
     {
       "criterion_code": "CRIT-ACDF-EXCL-01",
@@ -112,22 +112,22 @@
         "axial neck pain without radiculopathy",
         "uncomplicated neck strain"
       ],
-      "cms_document": "Medicare LCD ACDF",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L39758 (MCD lcdid=39758)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Neck Pain Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Systematic review evaluating outcome for ACDF for axial neck pain with and without radiculopathy or myelopathy reported low quality evidence and the benefit of the surgery over time could not be established as compared to nonsurgical treatment options."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
-    "checked_date": "2026-11-05",
-    "notes": "No MCD document found at previously cited identifier L35452 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
-    "real_cms_id": null,
-    "authority": "Author Summary (No CMS source located)",
-    "document_title": null,
-    "citation": null,
-    "url": null
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=39758. Replaces UNVERIFIED_AUTHOR_SUMMARY.",
+    "real_cms_id": "LCD L39758 (MCD lcdid=39758)",
+    "authority": "Noridian Healthcare Solutions, LLC",
+    "document_title": "Cervical Fusion",
+    "citation": "CMS LCD L39758, Noridian Healthcare Solutions",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39758"
   }
 }

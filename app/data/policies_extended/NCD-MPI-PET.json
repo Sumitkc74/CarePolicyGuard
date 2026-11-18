@@ -44,11 +44,11 @@
         "anginal chest pain",
         "known coronary artery disease"
       ],
-      "cms_document": "CMS NCD Manual Section 220.6",
-      "source_section": "Indications",
+      "cms_document": "NCD 220.6.1 (MCD ncdid=292)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: CAD Risk",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Effective for services performed on or after October 1, 2003, PET scans performed at rest or with pharmacological stress used for noninvasive imaging of the perfusion of the heart for the diagnosis and management of patients with known or suspected coronary artery disease using the FDA-approved radiopharmaceutical ammonia N-13 are covered, provided the requirements below are met:"
     },
     {
       "criterion_code": "CRIT-PETM-02",
@@ -77,11 +77,11 @@
         "bmi",
         "obesity attenuation artifact"
       ],
-      "cms_document": "CMS NCD Manual Section 220.6",
-      "source_section": "Indications",
+      "cms_document": "NCD 220.6.1 (MCD ncdid=292)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Attenuation Justification",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Effective for services performed on or after October 1, 2003, PET scans performed at rest or with pharmacological stress used for noninvasive imaging of the perfusion of the heart for the diagnosis and management of patients with known or suspected coronary artery disease using the FDA-approved radiopharmaceutical ammonia N-13 are covered, provided the requirements below are met:"
     },
     {
       "criterion_code": "CRIT-PETM-EXCL-01",
@@ -110,24 +110,22 @@
         "low cad risk screening",
         "routine cardiac screening"
       ],
-      "cms_document": "CMS NCD Manual Section 220.6",
-      "source_section": "Exclusions",
+      "cms_document": "NCD 220.6.1 (MCD ncdid=292)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Screening Non-Coverage",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Effective for services performed on or after October 1, 2003, PET scans performed at rest or with pharmacological stress used for noninvasive imaging of the perfusion of the heart for the diagnosis and management of patients with known or suspected coronary artery disease using the FDA-approved radiopharmaceutical ammonia N-13 are covered, provided the requirements below are met:"
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD database primary key ncdid=214 corresponds to Section 160.10 'Telephone Transmission of EEGs', whereas policy subject is Cardiac PET. Flagged as needing realignment.",
-    "real_cms_id": "NCD Manual Section 160.10 (MCD ncdid=214)",
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/ncd?ncdid=292. Replaces MISMATCH (previously cited NCD 214 was Telephone Transmission of EEGs).",
+    "real_cms_id": "NCD 220.6.1 (MCD ncdid=292)",
     "authority": "CMS National Coverage Determination",
-    "document_title": "Telephone Transmission of EEGs",
-    "mcd_actual_title": "Telephone Transmission of EEGs",
-    "citation": "CMS MCD Document at Cited ID: Telephone Transmission of EEGs",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=214",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "document_title": "PET for Perfusion of the Heart",
+    "citation": "CMS NCD 220.6.1, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=292"
   }
 }

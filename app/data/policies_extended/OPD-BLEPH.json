@@ -44,11 +44,11 @@
         "field loss",
         "visual field deficit"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 1: Blepharoplasty Indications",
+      "cms_document": "LCD L34194 (MCD lcdid=34194)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Visual Field Testing",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "For the purposes of this policy, these surgeries (either individually or in the minimum combination required to achieve a satisfactory surgical outcome) are functional when overhanging skin or upper lid position secondary to dermatochalasis, blepharochalasis, blepharoptosis, or pseudoptosis is sufficiently low to produce a visually-significant field restriction considered by this policy to be approximately 30 degrees or less from fixation."
     },
     {
       "criterion_code": "CRIT-BLEPH-02",
@@ -77,11 +77,11 @@
         "marginal reflex distance",
         "lid margin reflex distance"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 1: Blepharoplasty Indications",
+      "cms_document": "LCD L34194 (MCD lcdid=34194)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Photographic Criteria",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "A margin reflex distance (MRD sometimes referred to as MRD1)) of 2.0 mm or less."
     },
     {
       "criterion_code": "CRIT-BLEPH-EXCL-01",
@@ -112,22 +112,22 @@
         "aesthetic appearance only",
         "absence of visual symptoms"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 2: Exclusions",
+      "cms_document": "LCD L34194 (MCD lcdid=34194)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Cosmetic Surgery Non-Coverage",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Note, however, the fact that this policy excludes reconstructive surgery does not relieve the physician of the obligation to document in the medical record reasonable evidence defending the medical necessity of a given procedure, including but not limited to an appropriate patient complaint that would impact their ability to perform tasks of daily living (or, in the absence of a specific complaint, a statement that the repair is needed to prevent anticipated future damage to ocular structures), an appropriate physical exam delineating the anatomical issues to be addressed, appropriate supplemental testing, appropriate photographic documentation clearly demonstrating to a qualified third-party the anatomical issues to be addressed, and appropriate operative notes and consents."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "Service is listed under the OPD prior-authorization program under 42 CFR § 419.80 (program-level evidence, not a coverage determination). Not verified against an MCD document.",
-    "real_cms_id": "42 CFR § 419.80 - 419.89",
-    "authority": "CMS Hospital Outpatient Department (OPD) Prior Authorization Program",
-    "document_title": "Prior Authorization for Certain Hospital Outpatient Department (OPD) Services",
-    "citation": "CMS MCD: Prior Authorization for Certain Hospital Outpatient Department (OPD) Services (42 CFR § 419.80 - 419.89)",
-    "url": "https://www.cms.gov/data-research/monitoring-programs/medicare-fee-service-compliance-programs/prior-authorization-and-pre-claim-review-initiatives/prior-authorization-certain-hospital-outpatient-department-opd-services"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=34194. Governed in conjunction with 42 CFR \u00a7 419.80 OPD Prior Authorization.",
+    "real_cms_id": "LCD L34194 (MCD lcdid=34194)",
+    "authority": "Noridian Healthcare Solutions, LLC",
+    "document_title": "Blepharoplasty, Eyelid Surgery, and Brow Lift",
+    "citation": "CMS LCD L34194, Noridian Healthcare Solutions / 42 CFR \u00a7 419.80",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34194"
   }
 }

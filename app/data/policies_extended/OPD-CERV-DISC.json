@@ -44,11 +44,11 @@
         "nerve root compression",
         "cervical disc herniation on mri"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 6: Cervical Arthroplasty Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Clinical Presentation",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "STATUTORY_RULE",
+      "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
     },
     {
       "criterion_code": "CRIT-CERV-02",
@@ -79,11 +79,11 @@
         "conservative therapy trial",
         "analgesic trial"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 6: Cervical Arthroplasty Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 2: Conservative Therapy",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "STATUTORY_RULE",
+      "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
     },
     {
       "criterion_code": "CRIT-CERV-EXCL-01",
@@ -114,24 +114,27 @@
         "cervical instability",
         "segmental kyphosis"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 6: Exclusions",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "STATUTORY_RULE",
+      "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD database primary key ncdid=311 corresponds to Nesiritide for Heart Failure, whereas policy subject is Cervical Artificial Disc Replacement. Flagged as needing realignment.",
-    "real_cms_id": "NCD Manual Section (MCD ncdid=311)",
-    "authority": "CMS National Coverage Determination",
-    "document_title": "Nesiritide for Treatment of Heart Failure Patients",
-    "mcd_actual_title": "Nesiritide for Treatment of Heart Failure Patients",
-    "citation": "CMS MCD Document at Cited ID: Nesiritide for Treatment of Heart Failure Patients",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=311",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+    "checked_date": "2026-11-18",
+    "notes": "No active NCD or LCD exists in MCD (NCD 150.10 exists solely for Lumbar Artificial Disc). Previously cited NCD 311 was Nesiritide. Governed directly by OPD Prior Authorization under 42 CFR \u00a7 419.80.",
+    "real_cms_id": "NONE",
+    "authority": "Hospital Outpatient Department (OPD) Prior Authorization (42 CFR \u00a7 419.80)",
+    "document_title": "Cervical Artificial Disc Arthroplasty",
+    "citation": "42 CFR \u00a7 419.80 - 419.89; CMS Outpatient Prospective Payment System (OPPS) Final Rule",
+    "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-419/subpart-H/section-419.80",
+    "search_terms_tried": [
+      "cervical artificial disc",
+      "disc arthroplasty",
+      "cervical disc"
+    ]
   }
 }

@@ -42,11 +42,11 @@
         "trial pain reduction",
         "temporary stimulation relief"
       ],
-      "cms_document": "CMS NCD Manual Section 160.7",
-      "source_section": "Coverage Indications",
+      "cms_document": "NCD 160.7 (MCD ncdid=240)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Preliminary Trial",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Demonstration of pain relief with a temporarily implanted electrode precedes permanent implantation."
     },
     {
       "criterion_code": "CRIT-SCS-02",
@@ -77,11 +77,11 @@
         "mental health clearance",
         "psychological evaluation performed"
       ],
-      "cms_document": "CMS NCD Manual Section 160.7",
-      "source_section": "Coverage Indications",
+      "cms_document": "NCD 160.7 (MCD ncdid=240)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Psychological Clearance",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "(Such screening must include psychological, as well as physical evaluation);"
     },
     {
       "criterion_code": "CRIT-SCS-EXCL-01",
@@ -112,22 +112,22 @@
         "untreated psychosis",
         "severe cognitive impairment"
       ],
-      "cms_document": "CMS NCD Manual Section 160.7",
-      "source_section": "Exclusions",
+      "cms_document": "NCD 160.7 (MCD ncdid=240)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Two general classifications of electrical nerve stimulators are employed to treat chronic intractable pain: peripheral nerve stimulators and central nervous system stimulators."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/ncd?ncdid=240.",
     "real_cms_id": "NCD 160.7 (MCD ncdid=240)",
     "authority": "CMS National Coverage Determination",
     "document_title": "Electrical Nerve Stimulators",
-    "citation": "CMS MCD: Electrical Nerve Stimulators (NCD 160.7 (MCD ncdid=240))",
+    "citation": "CMS NCD 160.7, Publication 100-03, Medicare National Coverage Determinations Manual",
     "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=240"
   }
 }

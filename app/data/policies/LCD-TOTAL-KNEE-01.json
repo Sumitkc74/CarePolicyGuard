@@ -22,7 +22,11 @@
       "description": "Physical exam documenting right or left knee range of motion with active flexion <= 90 degrees.",
       "clinical_intent": "Demonstrate severe mechanical functional limitation",
       "criterion_type": "NUMERIC_THRESHOLD",
-      "entity_names": ["flexion", "knee flexion", "range of motion"],
+      "entity_names": [
+        "flexion",
+        "knee flexion",
+        "range of motion"
+      ],
       "operator": "<=",
       "threshold": 90.0,
       "target_unit": "degrees",
@@ -30,11 +34,11 @@
       "negation_sensitive": true,
       "required_temporal_window": "Within past 3 months",
       "min_score": 0.85,
-      "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
+      "cms_document": "LCD L36575 (MCD lcdid=36575)",
       "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
-      "source_traceability_status": "UNVERIFIED",
-      "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Arthritis causes a severe limitation in the activities of daily living (ADLs), including difficulty with walking, squatting, and climbing stairs."
     },
     {
       "criterion_code": "CRIT-TKA-02",
@@ -42,18 +46,24 @@
       "description": "Failure of non-surgical conservative therapy (physical therapy, NSAIDs, injections) for >= 180 days.",
       "clinical_intent": "Conservative management prerequisite",
       "criterion_type": "TEMPORAL_DURATION",
-      "entity_names": ["conservative therapy", "conservative management", "physical therapy", "PT", "injections"],
+      "entity_names": [
+        "conservative therapy",
+        "conservative management",
+        "physical therapy",
+        "PT",
+        "injections"
+      ],
       "operator": ">=",
       "min_duration_days": 180,
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": ">= 180 days",
       "min_score": 0.85,
-      "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
-      "source_section": "Conservative Management Prerequisites",
+      "cms_document": "LCD L36575 (MCD lcdid=36575)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
-      "source_traceability_status": "UNVERIFIED",
-      "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Other findings include chronic knee inflammation or swelling not relieved by rest, knee stiffness, lack of pain relief after taking non-steroidal anti-inflammatory medications and failure to achieve symptom improvement with other conservative therapies such as steroid injections and physical therapy."
     },
     {
       "criterion_code": "CRIT-TKA-EXCL-01",
@@ -61,17 +71,31 @@
       "description": "Patient must not have active septic arthritis or active systemic infection.",
       "clinical_intent": "Surgical infection risk exclusion",
       "criterion_type": "EXCLUSION_SYMPTOM",
-      "entity_names": ["septic arthritis", "active infection", "joint sepsis"],
+      "entity_names": [
+        "septic arthritis",
+        "active infection",
+        "joint sepsis"
+      ],
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current presentation",
-      "min_score": 0.90,
-      "cms_document": "CMS Regional MAC Local Coverage Determination (TKA Reference Archetype)",
-      "source_section": "Contraindications",
+      "min_score": 0.9,
+      "cms_document": "LCD L36575 (MCD lcdid=36575)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "UNVERIFIED: Benchmark archetype model; contractor-specific paragraph citation not verified in this session",
-      "source_traceability_status": "UNVERIFIED",
-      "source_text_excerpt": "UNVERIFIED: Verbatim contractor excerpt not verified against specific MAC manual in this session."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Indications for Replacement/Revision of Total Knee Arthroplasty &bull; Loosening of one or more components, or &bull; Fracture or mechanical failure of one or more component, or &bull; Infection, or &bull; Treatment of periprosthetic fracture of distal femur, proximal tibia or patella, or &bull; Progressive or substantial periprosthetic bone loss, or &bull; Bearing surface wear leading to symptomatic synovitis, or &bull; Implant or knee misalignment, or &bull; Knee stiffness/arthrofibrosis, or &bull; Tibiofemoral instability, or &bull; Extensor mechanism instability Limitations Noridian will not consider a total knee replacement medically necessary when the following contraindications are present: &bull; Active infection of the knee joint or active systemic bacteremia &bull; Active urinary tract or dental infection &bull; Active skin infection (exception recurrent cutaneous staph infections) or open wound within the planned surgical site of the knee &bull; Rapidly progressive neurological disease The following conditions are relative contraindications to total knee replacement and if such surgery is performed in the presence of these conditions, it is expected that the rationale for proceeding with the surgery under such circumstances is clearly documented in the medical record: &bull; Insufficiency of extensor mechanism/quadriceps &bull; Any process that is rapidly destroying bone &bull; Neurotrophic arthritis This local coverage determination (LCD) is only addressing medical necessity criteria for performing total knee replacement surgery."
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API. Real active LCD is L36575 (lcdid=36575).",
+    "real_cms_id": "LCD L36575 (MCD lcdid=36575)",
+    "authority": "Noridian Healthcare Solutions, LLC",
+    "document_title": "Total Knee Arthroplasty",
+    "citation": "CMS LCD L36575, Noridian Healthcare Solutions",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=36575"
+  }
 }

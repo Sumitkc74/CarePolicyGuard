@@ -44,11 +44,11 @@
         "trial pain relief",
         "positive intrathecal trial"
       ],
-      "cms_document": "CMS NCD Manual Section 160.18",
-      "source_section": "Coverage Indications",
+      "cms_document": "NCD 280.14 (MCD ncdid=223)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Preliminary Trial",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The patient's history must indicate that he/she would not respond adequately to noninvasive methods of pain control, such as systemic opioids (including attempts to eliminate physical and behavioral abnormalities which may cause an exaggerated reaction to pain); and a preliminary trial of intraspinal opioid drug administration must be undertaken with a temporary intrathecal/epidural catheter to substantiate adequately acceptable pain relief and degree of side effects (including effects on the activities of daily living) and patient acceptance."
     },
     {
       "criterion_code": "CRIT-PUMP-02",
@@ -79,11 +79,11 @@
         "intractable chronic pain",
         "failure of oral opioids"
       ],
-      "cms_document": "CMS NCD Manual Section 160.18",
-      "source_section": "Coverage Indications",
+      "cms_document": "NCD 280.14 (MCD ncdid=223)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Systemic Failure",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The patient's history must indicate that he/she would not respond adequately to noninvasive methods of pain control, such as systemic opioids (including attempts to eliminate physical and behavioral abnormalities which may cause an exaggerated reaction to pain); and a preliminary trial of intraspinal opioid drug administration must be undertaken with a temporary intrathecal/epidural catheter to substantiate adequately acceptable pain relief and degree of side effects (including effects on the activities of daily living) and patient acceptance."
     },
     {
       "criterion_code": "CRIT-PUMP-EXCL-01",
@@ -114,22 +114,22 @@
         "meningitis",
         "localized pocket infection"
       ],
-      "cms_document": "CMS NCD Manual Section 160.18",
-      "source_section": "Exclusions",
+      "cms_document": "NCD 280.14 (MCD ncdid=223)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Who have an active infection;or,"
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/ncd?ncdid=223.",
     "real_cms_id": "NCD 280.14 (MCD ncdid=223)",
     "authority": "CMS National Coverage Determination",
     "document_title": "Infusion Pumps",
-    "citation": "CMS MCD: Infusion Pumps (NCD 280.14 (MCD ncdid=223))",
+    "citation": "CMS NCD 280.14, Publication 100-03, Medicare National Coverage Determinations Manual",
     "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=223"
   }
 }

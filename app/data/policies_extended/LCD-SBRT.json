@@ -44,11 +44,11 @@
         "oligometastatic disease <= 3 lesions",
         "t1n0m0 lung cancer"
       ],
-      "cms_document": "Medicare LCD Stereotactic Body Radiation Therapy",
-      "source_section": "Indications",
+      "cms_document": "LCD L35076 (MCD lcdid=35076)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Oncologic Indications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Limitations for SRS/SBRT (for Cranial and Spinal Lesions): SRS is not considered medically necessary under the following circumstances:"
     },
     {
       "criterion_code": "CRIT-SBRT-02",
@@ -77,11 +77,11 @@
         "stereotactic immobilization",
         "respiratory gating plan"
       ],
-      "cms_document": "Medicare LCD Stereotactic Body Radiation Therapy",
-      "source_section": "Indications",
+      "cms_document": "LCD L35076 (MCD lcdid=35076)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Technical Specifications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Thus, reliable immobilization or repositioning systems must often be combined with devices capable of decreasing organ motion or accounting for organ motion e.g."
     },
     {
       "criterion_code": "CRIT-SBRT-EXCL-01",
@@ -110,22 +110,22 @@
         "greater than 3 metastatic lesions",
         "widespread metastasis"
       ],
-      "cms_document": "Medicare LCD Stereotactic Body Radiation Therapy",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L35076 (MCD lcdid=35076)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Metastatic brain or spine lesions, with stable systemic disease, Karnofsky Performance Status 40 or greater (or expected to return to 70 or greater with treatment), and otherwise reasonable survival expectations, OR an Eastern Cooperative Oncology Group (ECOG) Performance Status of 3 or less (or expected to return to 2 or less with treatment)."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
-    "checked_date": "2026-11-05",
-    "notes": "No MCD document found at previously cited identifier L34678 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
-    "real_cms_id": null,
-    "authority": "Author Summary (No CMS source located)",
-    "document_title": null,
-    "citation": null,
-    "url": null
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=35076. Replaces UNVERIFIED_AUTHOR_SUMMARY.",
+    "real_cms_id": "LCD L35076 (MCD lcdid=35076)",
+    "authority": "Wellpoint Federal",
+    "document_title": "Stereotactic Radiation Therapy: Stereotactic Radiosurgery (SRS) and Stereotactic Body Radiation Therapy (SBRT)",
+    "citation": "CMS LCD L35076, Wellpoint Federal",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=35076"
   }
 }

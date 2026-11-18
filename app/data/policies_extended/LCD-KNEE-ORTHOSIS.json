@@ -44,11 +44,11 @@
         "acl tear with instability",
         "abnormal pivot shift"
       ],
-      "cms_document": "DME MAC LCD Knee Orthoses",
-      "source_section": "Indications",
+      "cms_document": "LCD L33318 (MCD lcdid=33318)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Physical Exam",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The beneficiary is ambulatory and has objective knee instability that must be supported by documentation of a physical examination including the joint laxity test(s) performed (see the POLICY SPECIFIC DOCUMENTATION REQUIREMENTS section in the LCD-related Policy Article; refer to the Group 4 ICD-10 Codes in the LCD-related Policy Article); or,"
     },
     {
       "criterion_code": "CRIT-KORTH-02",
@@ -79,11 +79,11 @@
         "severe varus deformity > 15 degrees",
         "custom brace justification"
       ],
-      "cms_document": "DME MAC LCD Knee Orthoses",
-      "source_section": "Indications",
+      "cms_document": "LCD L33318 (MCD lcdid=33318)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Custom Justification",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "For knee orthoses definitions of off-the-shelf and custom fitted, refer to the CODING GUIDELINES section in the LCD-related Policy Article."
     },
     {
       "criterion_code": "CRIT-KORTH-EXCL-01",
@@ -112,22 +112,22 @@
         "temporary immobilizer needed",
         "absence of chronic instability"
       ],
-      "cms_document": "DME MAC LCD Knee Orthoses",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33318 (MCD lcdid=33318)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Short-term Immobilization",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "A contracture is distinguished from the temporary loss of range of motion of a joint following injury, surgery, casting, or other immobilization."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L33318",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=33318.",
+    "real_cms_id": "LCD L33318 (MCD lcdid=33318)",
     "authority": "DME MAC (Noridian / CGS)",
     "document_title": "Knee Orthoses",
-    "citation": "CMS MCD: Knee Orthoses (LCD L33318)",
+    "citation": "CMS LCD L33318, DME MAC Contractors",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33318"
   }
 }

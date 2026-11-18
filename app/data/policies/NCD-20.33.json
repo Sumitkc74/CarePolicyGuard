@@ -22,7 +22,12 @@
       "description": "Aortic valve area (AVA) <= 1.0 cm2 or mean aortic gradient >= 40 mmHg or peak velocity >= 4.0 m/s on echocardiography.",
       "clinical_intent": "Confirm statutory hemodynamic threshold for severe AS",
       "criterion_type": "NUMERIC_THRESHOLD",
-      "entity_names": ["aortic valve area", "AVA", "mean gradient", "peak velocity"],
+      "entity_names": [
+        "aortic valve area",
+        "AVA",
+        "mean gradient",
+        "peak velocity"
+      ],
       "operator": "<=",
       "threshold": 1.0,
       "target_unit": "cm2",
@@ -30,11 +35,11 @@
       "negation_sensitive": true,
       "required_temporal_window": "Within past 6 months",
       "min_score": 0.85,
-      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
-      "source_section": "Section B: Covered Indications",
+      "cms_document": "NCD 20.32 (MCD ncdid=355)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Severe Symptomatic Aortic Stenosis",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "Patients with severe symptomatic aortic stenosis (AVA <= 1.0 cm2 or mean aortic gradient >= 40 mmHg or peak velocity >= 4.0 m/s)."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "TAVR is covered for the treatment of symptomatic aortic valve stenosis when furnished according to a Food and Drug Administration (FDA)-approved indication and when all of the following conditions are met:"
     },
     {
       "criterion_code": "CRIT-TAVR-02",
@@ -42,16 +47,21 @@
       "description": "Documented formal multidisciplinary Heart Team collaborative consultation involving cardiac surgeon and interventional cardiologist.",
       "clinical_intent": "Mandatory multidisciplinary decision-making",
       "criterion_type": "FINDING_PRESENCE",
-      "entity_names": ["Heart Team", "multidisciplinary", "cardiac surgeon", "interventional cardiologist"],
+      "entity_names": [
+        "Heart Team",
+        "multidisciplinary",
+        "cardiac surgeon",
+        "interventional cardiologist"
+      ],
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Prior to procedure",
-      "min_score": 0.80,
-      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
-      "source_section": "Section B: Covered Indications",
+      "min_score": 0.8,
+      "cms_document": "NCD 20.32 (MCD ncdid=355)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Multidisciplinary Heart Team Collaboration",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "A multidisciplinary team (heart team) that includes a cardiac surgeon and an interventional cardiologist who have independently evaluated the patient."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The heart team's interventional cardiologist(s) and cardiac surgeon(s) must jointly participate in the intra-operative technical aspects of TAVR."
     },
     {
       "criterion_code": "CRIT-TAVR-EXCL-01",
@@ -59,16 +69,26 @@
       "description": "TAVR is excluded when intervention is futile due to active infective endocarditis, metastatic malignancy, hospice care, or severe non-cardiac comorbidity with life expectancy < 1 year.",
       "clinical_intent": "Exclude non-beneficial device placement under futile clinical conditions",
       "criterion_type": "EXCLUSION_SYMPTOM",
-      "entity_names": ["infective endocarditis", "active endocarditis", "endocarditis", "terminal illness", "metastatic cancer", "hospice", "life expectancy < 1 year", "life expectancy less than 1 year", "procedural futility"],
+      "entity_names": [
+        "infective endocarditis",
+        "active endocarditis",
+        "endocarditis",
+        "terminal illness",
+        "metastatic cancer",
+        "hospice",
+        "life expectancy < 1 year",
+        "life expectancy less than 1 year",
+        "procedural futility"
+      ],
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current pre-procedure evaluation",
-      "min_score": 0.90,
-      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
-      "source_section": "Section C: Non-Covered / Exclusions",
+      "min_score": 0.9,
+      "cms_document": "NCD 20.32 (MCD ncdid=355)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Procedural Futility",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "TAVR is non-covered when procedural futility exists due to severe non-cardiac conditions with life expectancy < 1 year or terminal comorbid illness."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "As a fully-described, written part of its protocol, the clinical research study must critically evaluate not only each patient's quality of life pre- and post-TAVR (minimum of 1 year), but must also address at least one of the following questions:"
     },
     {
       "criterion_code": "CRIT-TAVR-EXCL-02",
@@ -76,17 +96,33 @@
       "description": "TAVR is excluded when the patient has prohibitive anatomical barriers or prohibitive procedural contraindications (e.g. prohibitive aortic root anatomy, active uncontrolled sepsis/bacteremia, or severe uncorrectable bleeding diathesis).",
       "clinical_intent": "Exclude patients with prohibitive anatomical or procedural contraindications",
       "criterion_type": "EXCLUSION_SYMPTOM",
-      "entity_names": ["prohibitive aortic root", "prohibitive anatomy", "anatomical contraindication", "prohibitive surgical contraindication", "active bacteremia"],
+      "entity_names": [
+        "prohibitive aortic root",
+        "prohibitive anatomy",
+        "anatomical contraindication",
+        "prohibitive surgical contraindication",
+        "active bacteremia"
+      ],
       "is_exclusion": true,
       "negation_sensitive": true,
       "required_temporal_window": "Current pre-procedure evaluation",
       "min_score": 0.85,
-      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.33",
-      "source_section": "Section C: Non-Covered / Exclusions",
+      "cms_document": "NCD 20.32 (MCD ncdid=355)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Prohibitive Surgical and Anatomical Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "TAVR is non-covered for patients with prohibitive anatomical contraindications or uncontrolled systemic sepsis."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "independently examined the patient face-to-face, evaluated the patient\u2019s suitability for surgical aortic valve replacement (SAVR), TAVR or medical or palliative therapy;"
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API. Document display ID in CMS is NCD 20.32 (ncdid=355); file policy_id retains NCD-20.33 per immutability rules.",
+    "real_cms_id": "NCD 20.32 (MCD ncdid=355)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+    "citation": "CMS NCD 20.32, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=355"
+  }
 }

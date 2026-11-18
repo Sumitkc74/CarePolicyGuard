@@ -44,11 +44,11 @@
         "migraine frequency",
         "headache days"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 2: Botulinum Toxin Indications",
+      "cms_document": "LCD L39832 (MCD lcdid=39832)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Migraine Frequency",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "In the pooled analysis of the PREEMPT trials, onabotulinumtoxinA resulted in a modest but statistically significant additional reduction of 2 headache days per month over placebo."
     },
     {
       "criterion_code": "CRIT-BOTOX-02",
@@ -83,11 +83,11 @@
         "amitriptyline",
         "preventive drug trial"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 2: Botulinum Toxin Indications",
+      "cms_document": "LCD L39832 (MCD lcdid=39832)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Medication Trials",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "107 Most patients (approximately 64%) had received at least 1 prior migraine preventive medication, with 35% having failed at least 3 preventatives."
     },
     {
       "criterion_code": "CRIT-BOTOX-EXCL-01",
@@ -116,24 +116,22 @@
         "fewer than 15 headache days",
         "tension headache only"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 2: Botulinum Toxin Exclusions",
+      "cms_document": "LCD L39832 (MCD lcdid=39832)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Episodic Non-Coverage",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "116 At 6 months, Botox &#174; significantly lowered headache days per month by 13 days versus only 1 day for placebo."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L33942 governs Physical Therapy - Home Health, whereas policy subject is Botulinum Toxin Injections. Flagged as needing realignment.",
-    "real_cms_id": "LCD L33942",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "Physical Therapy - Home Health",
-    "mcd_actual_title": "Physical Therapy - Home Health",
-    "citation": "CMS MCD Document at Cited ID: Physical Therapy - Home Health",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33942",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=39832. Replaces MISMATCH (previously cited L33942 was Physical Therapy).",
+    "real_cms_id": "LCD L39832 (MCD lcdid=39832)",
+    "authority": "Wellpoint Federal",
+    "document_title": "Botulinum Toxin Injections",
+    "citation": "CMS LCD L39832, Wellpoint Federal / 42 CFR \u00a7 419.80",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39832"
   }
 }

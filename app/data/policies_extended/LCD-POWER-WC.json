@@ -46,11 +46,11 @@
         "severe multiple sclerosis",
         "muscular dystrophy"
       ],
-      "cms_document": "DME MAC LCD Power Mobility Devices",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L33789 (MCD lcdid=33789)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: MRADL Deficit",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "23 Based upon the primary health indication of enrollees (Muscular dystrophy &#8211; 14%; Polio &#8211; 14%; Inclusion body myositis &#8211; 9%; Cerebral palsy &#8211; 14%; Multiple sclerosis &#8211; 9%; Osteogenesis imperfecta &#8211; 9%; Other &#8211; 32%), participants were estimated to be predominantly Group 3 PWC users."
     },
     {
       "criterion_code": "CRIT-PWC-02",
@@ -81,11 +81,11 @@
         "certified atp evaluation",
         "pt/ot evaluation completed"
       ],
-      "cms_document": "DME MAC LCD Power Mobility Devices",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L33789 (MCD lcdid=33789)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: ATP Assessment",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The beneficiary has had a specialty evaluation that was performed by a licensed/certified medical professional (LCMP), such as a physical therapist (PT) or occupational therapist (OT), or practitioner who has specific training and experience in rehabilitation wheelchair evaluations and that documents the medical necessity for the wheelchair and its special features including seat elevation (refer to the documentation requirements section)."
     },
     {
       "criterion_code": "CRIT-PWC-EXCL-01",
@@ -114,22 +114,22 @@
         "able to ambulate inside home",
         "leisure community transport only"
       ],
-      "cms_document": "DME MAC LCD Power Mobility Devices",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33789 (MCD lcdid=33789)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: In-Home Use Mandate",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "If a POV will be used inside the home and coverage criteria A-I are not met, it will be denied as not reasonable and necessary."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L33789",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=33789.",
+    "real_cms_id": "LCD L33789 (MCD lcdid=33789)",
     "authority": "DME MAC (Noridian / CGS)",
     "document_title": "Power Mobility Devices",
-    "citation": "CMS MCD: Power Mobility Devices (LCD L33789)",
+    "citation": "CMS LCD L33789, DME MAC Contractors",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33789"
   }
 }

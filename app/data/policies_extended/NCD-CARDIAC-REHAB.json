@@ -46,11 +46,11 @@
         "chronic heart failure lvef <= 35%",
         "coronary stent within 12 months"
       ],
-      "cms_document": "CMS NCD Manual Section 20.10",
-      "source_section": "Indications",
+      "cms_document": "NCD 20.10.1 (MCD ncdid=359)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Qualifying Conditions",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Acute myocardial infarction within the preceding 12 months"
     },
     {
       "criterion_code": "CRIT-CREH-02",
@@ -79,11 +79,11 @@
         "cardiac rehab prescription",
         "physician-directed exercise plan"
       ],
-      "cms_document": "CMS NCD Manual Section 20.10",
-      "source_section": "Indications",
+      "cms_document": "NCD 20.10.1 (MCD ncdid=359)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Treatment Plan",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Effective for dates of service on and after February 18, 2014, CMS has determined that the evidence is sufficient to expand coverage for cardiac rehabilitation services under 42 CFR &sect;410.49(b)(1)(vii) to beneficiaries with stable, chronic heart failure, defined as patients with left ventricular ejection fraction of 35% or less and New York Heart Association (NYHA) class II to IV symptoms despite being on optimal heart failure therapy for at least six weeks."
     },
     {
       "criterion_code": "CRIT-CREH-EXCL-01",
@@ -114,24 +114,22 @@
         "critical aortic stenosis",
         "uncontrolled ventricular tachycardia"
       ],
-      "cms_document": "CMS NCD Manual Section 20.10",
-      "source_section": "Exclusions",
+      "cms_document": "NCD 20.10.1 (MCD ncdid=359)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Exercise Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Effective for dates of service on and after February 18, 2014, CMS has determined that the evidence is sufficient to expand coverage for cardiac rehabilitation services under 42 CFR &sect;410.49(b)(1)(vii) to beneficiaries with stable, chronic heart failure, defined as patients with left ventricular ejection fraction of 35% or less and New York Heart Association (NYHA) class II to IV symptoms despite being on optimal heart failure therapy for at least six weeks."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD database primary key ncdid=164 corresponds to NCD 220.11 'Thermography', whereas policy subject is Cardiac Rehabilitation. NCD 20.10 was retired into 42 CFR \u00a7 410.49. Flagged as needing realignment.",
-    "real_cms_id": "NCD Manual Section 220.11 (MCD ncdid=164)",
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/ncd?ncdid=359. Replaces MISMATCH (previously cited NCD 164 was Thermography).",
+    "real_cms_id": "NCD 20.10.1 (MCD ncdid=359)",
     "authority": "CMS National Coverage Determination",
-    "document_title": "Thermography",
-    "mcd_actual_title": "Thermography",
-    "citation": "CMS MCD Document at Cited ID: Thermography",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=164",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "document_title": "Cardiac Rehabilitation Programs for Chronic Heart Failure",
+    "citation": "CMS NCD 20.10.1, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=359"
   }
 }

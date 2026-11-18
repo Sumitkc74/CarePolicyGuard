@@ -44,11 +44,11 @@
         "reflux duration",
         "duplex ultrasound reflux"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 5: Vein Ablation Indications",
+      "cms_document": "LCD L34082 (MCD lcdid=34082)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Duplex Ultrasound",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Limitations: Duplex ultrasound is often used in conjunction with other non-invasive physiologic testing to define the anatomy and physiology of the varicose vein network prior to injection or surgical intervention."
     },
     {
       "criterion_code": "CRIT-VEIN-02",
@@ -79,11 +79,11 @@
         "compression therapy",
         "20-30 mmhg stockings"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 5: Vein Ablation Indications",
+      "cms_document": "LCD L34082 (MCD lcdid=34082)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Compression Trial",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "the use of graduated compression stockings."
     },
     {
       "criterion_code": "CRIT-VEIN-EXCL-01",
@@ -114,22 +114,22 @@
         "cosmetic sclerotherapy",
         "asymptomatic spider veins"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 5: Exclusions",
+      "cms_document": "LCD L34082 (MCD lcdid=34082)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Cosmetic Vein Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Spider veins (telangiectases) are dilated capillary veins that are most often treated for cosmetic purposes."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L34082",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=34082.",
+    "real_cms_id": "LCD L34082 (MCD lcdid=34082)",
     "authority": "Noridian Healthcare Solutions, LLC",
     "document_title": "Varicose Veins of the Lower Extremity, Treatment of",
-    "citation": "CMS MCD: Varicose Veins of the Lower Extremity, Treatment of (LCD L34082)",
+    "citation": "CMS LCD L34082, Noridian Healthcare Solutions",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34082"
   }
 }

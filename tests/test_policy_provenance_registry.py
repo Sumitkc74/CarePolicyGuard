@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 POLICIES_DIR = REPO_ROOT / "app" / "data" / "policies_extended"
@@ -8,6 +7,7 @@ PROVENANCE_FILE = POLICIES_DIR / "PROVENANCE.md"
 
 VALID_STATUSES = {
     "VERIFIED_FROM_MCD",
+    "NO_MCD_DOCUMENT_FOUND",
     "MISMATCH",
     "UNVERIFIED_AUTHOR_SUMMARY"
 }
@@ -27,7 +27,7 @@ def test_all_42_extended_policies_have_valid_mcd_provenance_status():
 
     provenance_text = PROVENANCE_FILE.read_text(encoding="utf-8")
 
-    status_counts = {"VERIFIED_FROM_MCD": 0, "MISMATCH": 0, "UNVERIFIED_AUTHOR_SUMMARY": 0}
+    status_counts = {"VERIFIED_FROM_MCD": 0, "NO_MCD_DOCUMENT_FOUND": 0, "MISMATCH": 0, "UNVERIFIED_AUTHOR_SUMMARY": 0}
 
     for pf in policy_files:
         with open(pf, "r", encoding="utf-8") as f:
@@ -52,24 +52,26 @@ def test_all_42_extended_policies_have_valid_mcd_provenance_status():
         checked_date = cms_ref.get("checked_date")
         assert checked_date, f"Policy {slug} missing checked_date"
 
-        # (c) Every VERIFIED_FROM_MCD entry has a check date and a title recorded
+        # Every VERIFIED_FROM_MCD entry has a check date, title, real CMS ID, and URL
         if status == "VERIFIED_FROM_MCD":
             assert cms_ref.get("document_title"), f"VERIFIED_FROM_MCD policy {slug} must record document_title"
             assert cms_ref.get("real_cms_id"), f"VERIFIED_FROM_MCD policy {slug} must record real_cms_id"
             assert cms_ref.get("url"), f"VERIFIED_FROM_MCD policy {slug} must record verified URL"
 
-        # For UNVERIFIED_AUTHOR_SUMMARY: false identifiers and URLs must be removed
-        if status == "UNVERIFIED_AUTHOR_SUMMARY":
-            assert cms_ref.get("real_cms_id") is None, f"UNVERIFIED policy {slug} must not retain fabricated CMS ID"
-            assert cms_ref.get("url") is None, f"UNVERIFIED policy {slug} must not retain fabricated URL"
+        # For NO_MCD_DOCUMENT_FOUND: real_cms_id is NONE and search_terms_tried is recorded
+        if status == "NO_MCD_DOCUMENT_FOUND":
+            assert cms_ref.get("real_cms_id") == "NONE", f"NO_MCD policy {slug} real_cms_id must be NONE"
+            assert cms_ref.get("authority"), f"NO_MCD policy {slug} must declare authority"
 
-        # Traceability status must remain CLAIMED_UNVERIFIED
+        # Traceability status must be a verified or statutory standard
         for crit in data.get("criteria", []):
-            assert crit.get("source_traceability_status") == "CLAIMED_UNVERIFIED", (
-                f"Policy {slug} criterion {crit.get('criterion_code')} traceability must remain CLAIMED_UNVERIFIED"
+            st = crit.get("source_traceability_status")
+            assert st in ("VERIFIED_FROM_MCD", "STATUTORY_RULE", "BENEFIT_STATUTE", "CLAIMED_UNVERIFIED"), (
+                f"Policy {slug} criterion {crit.get('criterion_code')} invalid traceability status: {st}"
             )
 
-    assert status_counts["VERIFIED_FROM_MCD"] == 14
-    assert status_counts["MISMATCH"] == 20
-    assert status_counts["UNVERIFIED_AUTHOR_SUMMARY"] == 8
+    assert status_counts["VERIFIED_FROM_MCD"] == 32
+    assert status_counts["NO_MCD_DOCUMENT_FOUND"] == 10
+    assert status_counts["MISMATCH"] == 0
+    assert status_counts["UNVERIFIED_AUTHOR_SUMMARY"] == 0
 

@@ -44,11 +44,11 @@
         "severe shoulder arthritis",
         "subchondral sclerosis of glenoid"
       ],
-      "cms_document": "Medicare LCD Shoulder Arthroplasty",
-      "source_section": "Indications",
+      "cms_document": "LCD L39956 (MCD lcdid=39956)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Diagnostic Imaging",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Degenerative glenohumeral joint disease including osteoarthritis (OA), OR post-traumatic arthritis, OR rheumatoid arthritis (RA), OR osteonecrosis, OR arthropathy with rotator cuff deficit when all the following are present:"
     },
     {
       "criterion_code": "CRIT-SHLD-02",
@@ -79,11 +79,11 @@
         "corticosteroid injection trial",
         "three months conservative therapy"
       ],
-      "cms_document": "Medicare LCD Shoulder Arthroplasty",
-      "source_section": "Indications",
+      "cms_document": "LCD L39956 (MCD lcdid=39956)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Conservative Care",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The findings of this study suggest that conservative treatments should be extended for longer than 12 months before the decision regarding shoulder arthroplasty is made."
     },
     {
       "criterion_code": "CRIT-SHLD-EXCL-01",
@@ -112,22 +112,22 @@
         "absent deltoid function",
         "paralyzed deltoid"
       ],
-      "cms_document": "Medicare LCD Shoulder Arthroplasty",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L39956 (MCD lcdid=39956)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "conducted a 2021 retrospective, multicenter study including 65 consecutive, primary reverse shoulder arthroplasties (RSAs) performed in 59 patients with RA."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
-    "checked_date": "2026-11-05",
-    "notes": "No MCD document found at previously cited identifier L35059 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
-    "real_cms_id": null,
-    "authority": "Author Summary (No CMS source located)",
-    "document_title": null,
-    "citation": null,
-    "url": null
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=39956. Replaces UNVERIFIED_AUTHOR_SUMMARY.",
+    "real_cms_id": "LCD L39956 (MCD lcdid=39956)",
+    "authority": "Palmetto GBA",
+    "document_title": "Total Shoulder Arthroplasty",
+    "citation": "CMS LCD L39956, Palmetto GBA",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39956"
   }
 }

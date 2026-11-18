@@ -46,11 +46,11 @@
         "red flag symptoms",
         "history of cancer"
       ],
-      "cms_document": "Medicare LCD Lumbar Spine MRI",
-      "source_section": "Indications",
+      "cms_document": "LCD L34220 (MCD lcdid=34220)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Clinical Indications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Therefore, spinal imaging tests are not generally necessary during the first month of symptoms except when a \"red flag\" (suggesting a medically emergent condition) is noted on the medical history and physical examination."
     },
     {
       "criterion_code": "CRIT-MRIL-02",
@@ -79,11 +79,11 @@
         "lumbar x-ray completed",
         "preceding x-ray"
       ],
-      "cms_document": "Medicare LCD Lumbar Spine MRI",
-      "source_section": "Indications",
+      "cms_document": "LCD L34220 (MCD lcdid=34220)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Plain Film Radiography",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Typically, this will be the MRI interpretation and report that is performed simultaneously with the evaluation and management of the patient."
     },
     {
       "criterion_code": "CRIT-MRIL-EXCL-01",
@@ -112,22 +112,22 @@
         "uncomplicated muscular back strain",
         "no neurological deficit"
       ],
-      "cms_document": "Medicare LCD Lumbar Spine MRI",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L34220 (MCD lcdid=34220)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Acute Uncomplicated Back Pain",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Eighty (80) to ninety (90) percent of patients with low back pain improve one month after symptom onset even without treatment."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
-    "checked_date": "2026-11-05",
-    "notes": "No MCD document found at previously cited identifier L34421 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
-    "real_cms_id": null,
-    "authority": "Author Summary (No CMS source located)",
-    "document_title": null,
-    "citation": null,
-    "url": null
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=34220. Replaces UNVERIFIED_AUTHOR_SUMMARY.",
+    "real_cms_id": "LCD L34220 (MCD lcdid=34220)",
+    "authority": "Noridian Healthcare Solutions, LLC",
+    "document_title": "Lumbar MRI",
+    "citation": "CMS LCD L34220, Noridian Healthcare Solutions",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34220"
   }
 }

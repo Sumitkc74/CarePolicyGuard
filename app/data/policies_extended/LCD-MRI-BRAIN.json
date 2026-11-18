@@ -46,11 +46,11 @@
         "hemiparesis",
         "suspected stroke"
       ],
-      "cms_document": "Medicare LCD Brain MRI",
-      "source_section": "Indications",
+      "cms_document": "LCD L34425 (MCD lcdid=34425)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Neurological Findings",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "In addition, neck MRI may be useful for the management of conditions involving the neck, including lesions involving the mouth, throat or neck; suspicious masses/tumors found on another imaging modality that needs additional clarification; neck masses or lymphadenopathy; infections of the face, neck or neck spaces involving any of the fascial planes; neurological conditions such as Bell&rsquo;s palsy, hemifacial spasm or other neuropathies; and suspected thyroid or parathyroid neoplasms."
     },
     {
       "criterion_code": "CRIT-MRIB-02",
@@ -81,11 +81,11 @@
         "progressive severe headache",
         "headache with focal signs"
       ],
-      "cms_document": "Medicare LCD Brain MRI",
-      "source_section": "Indications",
+      "cms_document": "LCD L34425 (MCD lcdid=34425)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Headache Red Flags",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Sinus MRI may be required to detect abnormalities and conditions such as rhinosinusitis with suspicion of fungal infections, clinical suspicion of orbital or intracranial complications, suspected mass based upon exam, nasal endoscopy or previous imaging and for conditions such as anosmia or osteomyelitis."
     },
     {
       "criterion_code": "CRIT-MRIB-EXCL-01",
@@ -114,24 +114,22 @@
         "typical migraine without red flags",
         "long-standing unchanged headache"
       ],
-      "cms_document": "Medicare LCD Brain MRI",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L34425 (MCD lcdid=34425)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Stable Headache Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "CT scanning remains the study of choice for the imaging evaluation of acute and chronic inflammatory diseases of the sinonasal cavities."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L34419 governs Serum Homocysteine Level, whereas policy subject is Brain MRI. Flagged as needing realignment.",
-    "real_cms_id": "LCD L34419",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "Homocysteine Level, Serum",
-    "mcd_actual_title": "Homocysteine Level, Serum",
-    "citation": "CMS MCD Document at Cited ID: Homocysteine Level, Serum",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34419",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=34425. Replaces MISMATCH (previously cited L34419 was Homocysteine Level).",
+    "real_cms_id": "LCD L34425 (MCD lcdid=34425)",
+    "authority": "Palmetto GBA",
+    "document_title": "Magnetic Resonance Imaging of the Head and Neck",
+    "citation": "CMS LCD L34425, Palmetto GBA / NCD 220.2",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34425"
   }
 }

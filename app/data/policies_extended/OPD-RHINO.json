@@ -44,11 +44,11 @@
         "chronic nasal obstruction",
         "difficulty nasal breathing"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 4: Rhinoplasty Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Symptom Duration",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "STATUTORY_RULE",
+      "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
     },
     {
       "criterion_code": "CRIT-RHINO-02",
@@ -79,11 +79,11 @@
         "nasal steroid spray trial",
         "medical management trial"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 4: Rhinoplasty Indications",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 2: Medical Therapy",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "STATUTORY_RULE",
+      "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
     },
     {
       "criterion_code": "CRIT-RHINO-EXCL-01",
@@ -114,22 +114,27 @@
         "aesthetic rhinoplasty only",
         "no airway obstruction"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 4: Exclusions",
+      "cms_document": "NONE (Statutory Authority)",
+      "source_section": "Governing Federal Regulation / Benefit Standard",
       "source_paragraph": "Paragraph 1: Cosmetic Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "STATUTORY_RULE",
+      "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "Service is listed under the OPD prior-authorization program under 42 CFR § 419.80 (program-level evidence, not a coverage determination). Not verified against an MCD document.",
-    "real_cms_id": "42 CFR § 419.80 - 419.89",
-    "authority": "CMS Hospital Outpatient Department (OPD) Prior Authorization Program",
-    "document_title": "Prior Authorization for Certain Hospital Outpatient Department (OPD) Services",
-    "citation": "CMS MCD: Prior Authorization for Certain Hospital Outpatient Department (OPD) Services (42 CFR § 419.80 - 419.89)",
-    "url": "https://www.cms.gov/data-research/monitoring-programs/medicare-fee-service-compliance-programs/prior-authorization-and-pre-claim-review-initiatives/prior-authorization-certain-hospital-outpatient-department-opd-services"
+    "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+    "checked_date": "2026-11-18",
+    "notes": "No active NCD or LCD exists in MCD. Hospital Outpatient Department procedure governed directly by Prior Authorization under 42 CFR \u00a7 419.80 - 419.89.",
+    "real_cms_id": "NONE",
+    "authority": "Hospital Outpatient Department (OPD) Prior Authorization (42 CFR \u00a7 419.80)",
+    "document_title": "Rhinoplasty and Septoplasty",
+    "citation": "42 CFR \u00a7 419.80 - 419.89; CMS Outpatient Prospective Payment System (OPPS) Final Rule",
+    "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-419/subpart-H/section-419.80",
+    "search_terms_tried": [
+      "rhinoplasty",
+      "septoplasty",
+      "nasal obstruction"
+    ]
   }
 }

@@ -44,11 +44,11 @@
         "chronic diabetic foot ulcer",
         "dehisced surgical wound"
       ],
-      "cms_document": "DME MAC LCD Negative Pressure Wound Therapy",
-      "source_section": "Indications",
+      "cms_document": "LCD L33821 (MCD lcdid=33821)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Wound Classification",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Ulcers and Wounds in the Home Setting: The beneficiary has a chronic Stage 3 or 4 pressure ulcer (see Appendices Section), neuropathic (for example, diabetic) ulcer, venous or arterial insufficiency ulcer, or a chronic (being present for at least 30 days) ulcer of mixed etiology."
     },
     {
       "criterion_code": "CRIT-VAC-02",
@@ -77,11 +77,11 @@
         "30 days standard wound care",
         "dressing changes for 30 days"
       ],
-      "cms_document": "DME MAC LCD Negative Pressure Wound Therapy",
-      "source_section": "Indications",
+      "cms_document": "LCD L33821 (MCD lcdid=33821)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Conventional Care",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "This shall be done to ensure that the refilled item remains reasonable and necessary, existing supplies are expected to end, and to confirm any changes or modifications to the order."
     },
     {
       "criterion_code": "CRIT-VAC-EXCL-01",
@@ -110,22 +110,22 @@
         "necrotic eschar in wound bed",
         "exposed vessels in wound"
       ],
-      "cms_document": "DME MAC LCD Negative Pressure Wound Therapy",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33821 (MCD lcdid=33821)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The presence in the wound of necrotic tissue with eschar, if debridement is not attempted;"
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L33821",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=33821.",
+    "real_cms_id": "LCD L33821 (MCD lcdid=33821)",
     "authority": "DME MAC (Noridian / CGS)",
     "document_title": "Negative Pressure Wound Therapy Pumps",
-    "citation": "CMS MCD: Negative Pressure Wound Therapy Pumps (LCD L33821)",
+    "citation": "CMS LCD L33821, DME MAC Contractors",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33821"
   }
 }

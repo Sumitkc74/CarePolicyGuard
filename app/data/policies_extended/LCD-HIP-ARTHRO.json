@@ -44,11 +44,11 @@
         "subchondral sclerosis",
         "tonnis grade 2 or 3"
       ],
-      "cms_document": "Medicare LCD Total Hip Arthroplasty",
-      "source_section": "Indications",
+      "cms_document": "LCD L34163 (MCD lcdid=34163)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Radiographic Criteria",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Radiographic supported evidence or when conventional radiography is not adequate, magnetic resonance imaging (MRI) and/or computed tomography (CT) (in situations when MRI is non-diagnostic or not able to be performed) supported evidence (subchondral cysts, subchondral sclerosis, periarticular osteophytes, joint subluxation, severe joint space narrowing, avascular necrosis); AND"
     },
     {
       "criterion_code": "CRIT-HIP-02",
@@ -79,11 +79,11 @@
         "hip injection trial",
         "90 days conservative care"
       ],
-      "cms_document": "Medicare LCD Total Hip Arthroplasty",
-      "source_section": "Indications",
+      "cms_document": "LCD L34163 (MCD lcdid=34163)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Conservative Therapy",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "If appropriate, history of unsuccessful conservative therapy (non-surgical medical management) that is clearly addressed in the pre-procedure medical record."
     },
     {
       "criterion_code": "CRIT-HIP-EXCL-01",
@@ -112,24 +112,22 @@
         "active hip infection",
         "joint sepsis"
       ],
-      "cms_document": "Medicare LCD Total Hip Arthroplasty",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L34163 (MCD lcdid=34163)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Infection Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Total hip replacement surgery is most often performed due to severe pain caused by osteoarthritis (degenerative arthritis) of the hip joint."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L34032 governs Debridement Services, whereas policy subject is Total Hip Arthroplasty (THA). Flagged as needing realignment.",
-    "real_cms_id": "LCD L34032",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "Debridement Services",
-    "mcd_actual_title": "Debridement Services",
-    "citation": "CMS MCD Document at Cited ID: Debridement Services",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34032",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=34163. Replaces MISMATCH (previously cited L34032 was Debridement Services).",
+    "real_cms_id": "LCD L34163 (MCD lcdid=34163)",
+    "authority": "Noridian Healthcare Solutions, LLC",
+    "document_title": "Total Hip Arthroplasty",
+    "citation": "CMS LCD L34163, Noridian Healthcare Solutions",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34163"
   }
 }

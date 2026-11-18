@@ -42,11 +42,11 @@
         "luminal diameter stenosis",
         "angiographic stenosis"
       ],
-      "cms_document": "Medicare LCD Percutaneous Coronary Intervention",
-      "source_section": "Indications",
+      "cms_document": "LCD L33623 (MCD lcdid=33623)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Stenosis Threshold",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "patients with restenosis of a coronary artery previously treated with intracoronary stent or other revascularization procedure"
     },
     {
       "criterion_code": "CRIT-PCI-02",
@@ -77,11 +77,11 @@
         "ccs class iii angina",
         "angina despite medical therapy"
       ],
-      "cms_document": "Medicare LCD Percutaneous Coronary Intervention",
-      "source_section": "Indications",
+      "cms_document": "LCD L33623 (MCD lcdid=33623)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Anginal Symptoms",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "In addition to medical therapy and coronary bypass surgery, percutaneous coronary intervention has emerged as a primary option for the management of patients with acute coronary syndromes and selected patients with chronic angina."
     },
     {
       "criterion_code": "CRIT-PCI-EXCL-01",
@@ -112,24 +112,22 @@
         "ffr greater than 0.80",
         "hemodynamically insignificant lesion"
       ],
-      "cms_document": "Medicare LCD Percutaneous Coronary Intervention",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33623 (MCD lcdid=33623)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Non-Significant Lesion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Intracoronary ultrasound may be separately covered when needed to assess the extent of coronary stenosis if equivocal on angiography, or when needed to assess the patency and integrity of a coronary artery post-intervention."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L34411 governs Blepharoplasty/Eyelid Surgery, whereas policy subject is PCI with Stents. Flagged as needing realignment.",
-    "real_cms_id": "LCD L34411",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "Blepharoplasty, Eyelid Surgery, and Brow Lift",
-    "mcd_actual_title": "Blepharoplasty, Eyelid Surgery, and Brow Lift",
-    "citation": "CMS MCD Document at Cited ID: Blepharoplasty, Eyelid Surgery, and Brow Lift",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34411",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=33623. Replaces MISMATCH (previously cited L34411 was Blepharoplasty).",
+    "real_cms_id": "LCD L33623 (MCD lcdid=33623)",
+    "authority": "Wellpoint Federal",
+    "document_title": "Percutaneous Coronary Intervention",
+    "citation": "CMS LCD L33623, Wellpoint Federal",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33623"
   }
 }

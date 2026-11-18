@@ -53,11 +53,11 @@
         "brainstem",
         "spinal cord"
       ],
-      "cms_document": "Medicare LCD Proton Beam Therapy",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L33937 (MCD lcdid=33937)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Group 1 Indications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Benign or malignant conditions otherwise not suitable for intensity modulated radiation therapy (IMRT) or 3- dimensional conformal therapy involving the base of the skull or axial skeleton, including but not limited to chordomas and chondrosarcomas."
     },
     {
       "criterion_code": "CRIT-PBT-02",
@@ -86,11 +86,11 @@
         "photon tolerance exceeded",
         "dosimetric comparison completed"
       ],
-      "cms_document": "Medicare LCD Proton Beam Therapy",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L33937 (MCD lcdid=33937)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Comparative Dosimetry",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Specifically, the record must address the lower risk to normal tissue, the lower risk of disease recurrence, and the advantages of the treatment over IMRT or 3-dimensional conformal Dosimetric evidence of reduced normal tissue toxicity and/or improved tumor control must be maintained."
     },
     {
       "criterion_code": "CRIT-PBT-EXCL-01",
@@ -119,22 +119,22 @@
         "diffuse metastatic disease",
         "terminal cancer prognosis"
       ],
-      "cms_document": "Medicare LCD Proton Beam Therapy",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33937 (MCD lcdid=33937)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "In general, proton beam radiotherapy is not indicated for cancers that are widely disseminated, such as leukemias, have hematogenous metastases or as a short-term palliative procedure."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "UNVERIFIED_AUTHOR_SUMMARY",
-    "checked_date": "2026-11-05",
-    "notes": "No MCD document found at previously cited identifier L34676 (redirects to 'Invalid LCD Version' / 0 search results). Labeled as author summary with no CMS source located.",
-    "real_cms_id": null,
-    "authority": "Author Summary (No CMS source located)",
-    "document_title": null,
-    "citation": null,
-    "url": null
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=33937. Replaces UNVERIFIED_AUTHOR_SUMMARY.",
+    "real_cms_id": "LCD L33937 (MCD lcdid=33937)",
+    "authority": "First Coast Service Options, Inc.",
+    "document_title": "Proton Beam Radiotherapy",
+    "citation": "CMS LCD L33937, First Coast Service Options",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33937"
   }
 }

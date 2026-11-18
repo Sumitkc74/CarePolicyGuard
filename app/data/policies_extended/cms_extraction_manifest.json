@@ -1,0 +1,1726 @@
+{
+  "generated_date": "2026-11-18",
+  "total_policies": 50,
+  "verified_from_mcd_count": 40,
+  "no_mcd_document_count": 10,
+  "policies": {
+    "LCD-L33829": {
+      "policy_id": "LCD-L33829",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33718 (MCD lcdid=33718)",
+      "document_title": "Positive Airway Pressure (PAP) Devices for the Treatment of Obstructive Sleep Apnea",
+      "authority": "DME MAC Jurisdiction (Noridian / CGS)",
+      "citation": "CMS LCD L33718, DME MAC Contractors",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33718",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CPAP-01",
+          "name": "Diagnostic Polysomnography (AHI/RDI)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33718 (MCD lcdid=33718)",
+          "source_text_excerpt": "The apnea-hypopnea index (AHI) is defined as the average number of episodes of apnea and hypopnea per hour of sleep without the use of a positive airway pressure device."
+        },
+        {
+          "criterion_code": "CRIT-CPAP-02",
+          "name": "Face-to-Face Clinical Evaluation",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33718 (MCD lcdid=33718)",
+          "source_text_excerpt": "In-person clinical re-evaluation by the treating practitioner with documentation that symptoms of obstructive sleep apnea are improved; and,"
+        }
+      ]
+    },
+    "LCD-TOTAL-KNEE-01": {
+      "policy_id": "LCD-TOTAL-KNEE-01",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L36575 (MCD lcdid=36575)",
+      "document_title": "Total Knee Arthroplasty",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L36575, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=36575",
+      "effective_date": "09/07/2016",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-TKA-01",
+          "name": "Severe Flexion Limitation (<= 90 degrees)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36575 (MCD lcdid=36575)",
+          "source_text_excerpt": "Arthritis causes a severe limitation in the activities of daily living (ADLs), including difficulty with walking, squatting, and climbing stairs."
+        },
+        {
+          "criterion_code": "CRIT-TKA-02",
+          "name": "Failure of Conservative Therapy Duration",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36575 (MCD lcdid=36575)",
+          "source_text_excerpt": "Other findings include chronic knee inflammation or swelling not relieved by rest, knee stiffness, lack of pain relief after taking non-steroidal anti-inflammatory medications and failure to achieve symptom improvement with other conservative therapies such as steroid injections and physical therapy."
+        },
+        {
+          "criterion_code": "CRIT-TKA-EXCL-01",
+          "name": "Active Joint Infection Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36575 (MCD lcdid=36575)",
+          "source_text_excerpt": "Indications for Replacement/Revision of Total Knee Arthroplasty &bull; Loosening of one or more components, or &bull; Fracture or mechanical failure of one or more component, or &bull; Infection, or &bull; Treatment of periprosthetic fracture of distal femur, proximal tibia or patella, or &bull; Progressive or substantial periprosthetic bone loss, or &bull; Bearing surface wear leading to symptomatic synovitis, or &bull; Implant or knee misalignment, or &bull; Knee stiffness/arthrofibrosis, or &bull; Tibiofemoral instability, or &bull; Extensor mechanism instability Limitations Noridian will not consider a total knee replacement medically necessary when the following contraindications are present: &bull; Active infection of the knee joint or active systemic bacteremia &bull; Active urinary tract or dental infection &bull; Active skin infection (exception recurrent cutaneous staph infections) or open wound within the planned surgical site of the knee &bull; Rapidly progressive neurological disease The following conditions are relative contraindications to total knee replacement and if such surgery is performed in the presence of these conditions, it is expected that the rationale for proceeding with the surgery under such circumstances is clearly documented in the medical record: &bull; Insufficiency of extensor mechanism/quadriceps &bull; Any process that is rapidly destroying bone &bull; Neurotrophic arthritis This local coverage determination (LCD) is only addressing medical necessity criteria for performing total knee replacement surgery."
+        }
+      ]
+    },
+    "NCD-20.29": {
+      "policy_id": "NCD-20.29",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.29 (MCD ncdid=12)",
+      "document_title": "Hyperbaric Oxygen Therapy",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 20.29, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=12",
+      "effective_date": "04/03/2017",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-HBOT-01",
+          "name": "Severe Diabetic Wound Wagner Grade 3 or Higher",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.29 (MCD ncdid=12)",
+          "source_text_excerpt": "Patient has a wound classified as Wagner grade III or higher; and"
+        },
+        {
+          "criterion_code": "CRIT-HBOT-02",
+          "name": "Failure of >= 30 Days Standard Conservative Wound Therapy",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.29 (MCD ncdid=12)",
+          "source_text_excerpt": "The use of HBO therapy is covered as adjunctive therapy only after there are no measurable signs of healing for at least 30 &#8211;days of treatment with standard wound therapy and must be used in addition to standard wound care."
+        },
+        {
+          "criterion_code": "CRIT-HBOT-03",
+          "name": "Lower Extremity Vascular Assessment",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.29 (MCD ncdid=12)",
+          "source_text_excerpt": "Patient has type I or type II diabetes and has a lower extremity wound that is due to diabetes;"
+        }
+      ]
+    },
+    "NCD-20.33": {
+      "policy_id": "NCD-20.33",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.32 (MCD ncdid=355)",
+      "document_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 20.32, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=355",
+      "effective_date": "06/21/2019",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-TAVR-01",
+          "name": "Severe Aortic Stenosis Hemodynamic Threshold",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.32 (MCD ncdid=355)",
+          "source_text_excerpt": "TAVR is covered for the treatment of symptomatic aortic valve stenosis when furnished according to a Food and Drug Administration (FDA)-approved indication and when all of the following conditions are met:"
+        },
+        {
+          "criterion_code": "CRIT-TAVR-02",
+          "name": "Heart Team Consultation",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.32 (MCD ncdid=355)",
+          "source_text_excerpt": "The heart team's interventional cardiologist(s) and cardiac surgeon(s) must jointly participate in the intra-operative technical aspects of TAVR."
+        },
+        {
+          "criterion_code": "CRIT-TAVR-EXCL-01",
+          "name": "Procedural Futility Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.32 (MCD ncdid=355)",
+          "source_text_excerpt": "As a fully-described, written part of its protocol, the clinical research study must critically evaluate not only each patient's quality of life pre- and post-TAVR (minimum of 1 year), but must also address at least one of the following questions:"
+        },
+        {
+          "criterion_code": "CRIT-TAVR-EXCL-02",
+          "name": "Prohibitive Surgical or Anatomical Contraindication Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.32 (MCD ncdid=355)",
+          "source_text_excerpt": "independently examined the patient face-to-face, evaluated the patient\u2019s suitability for surgical aortic valve replacement (SAVR), TAVR or medical or palliative therapy;"
+        }
+      ]
+    },
+    "NCD-20.4": {
+      "policy_id": "NCD-20.4",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.4 (MCD ncdid=110)",
+      "document_title": "Implantable Cardioverter Defibrillators (ICDs)",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 20.4, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=110",
+      "effective_date": "07/31/2023",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-ICD-01",
+          "name": "Severe LV Systolic Dysfunction (LVEF <= 35%)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.4 (MCD ncdid=110)",
+          "source_text_excerpt": "Patients with a prior MI and a measured left ventricular ejection fraction (LVEF) &le; 0.30."
+        },
+        {
+          "criterion_code": "CRIT-ICD-02",
+          "name": "Heart Failure Functional Classification (NYHA II/III)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.4 (MCD ncdid=110)",
+          "source_text_excerpt": "New York Heart Association (NYHA) classification IV heart failure; or,"
+        },
+        {
+          "criterion_code": "CRIT-ICD-03",
+          "name": "Guideline-Directed Medical Therapy Duration (>=90 Days)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.4 (MCD ncdid=110)",
+          "source_text_excerpt": "Patients who have severe, non-ischemic, dilated cardiomyopathy but no personal history of sustained VT or cardiac arrest due to VF, and have NYHA Class II or III heart failure, LVEF &le; 35%, been on optimal medical therapy for at least 3 months."
+        },
+        {
+          "criterion_code": "CRIT-ICD-04",
+          "name": "Cardiomyopathy Etiology & Revascularization Timeline",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.4 (MCD ncdid=110)",
+          "source_text_excerpt": "Patients who have severe, non-ischemic, dilated cardiomyopathy but no personal history of sustained VT or cardiac arrest due to VF, and have NYHA Class II or III heart failure, LVEF &le; 35%, been on optimal medical therapy for at least 3 months."
+        },
+        {
+          "criterion_code": "CRIT-ICD-EXCL-01",
+          "name": "Cardiogenic Shock or Terminal Illness Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.4 (MCD ncdid=110)",
+          "source_text_excerpt": "with a likelihood of survival less than 1 year; or,"
+        }
+      ]
+    },
+    "NCD-20.7": {
+      "policy_id": "NCD-20.7",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.7 (MCD ncdid=201)",
+      "document_title": "Percutaneous Transluminal Angioplasty (PTA)",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 20.7, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=201",
+      "effective_date": "10/11/2023",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CAS-01",
+          "name": "Severe Carotid Stenosis (>= 70% Symptomatic or >= 80% Asymptomatic)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.7 (MCD ncdid=201)",
+          "source_text_excerpt": "Patients with asymptomatic carotid artery stenosis &ge;70%."
+        },
+        {
+          "criterion_code": "CRIT-CAS-02",
+          "name": "Documented High Surgical Risk for Carotid Endarterectomy (CEA)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.7 (MCD ncdid=201)",
+          "source_text_excerpt": "Discussion of all treatment options including carotid endarterectomy (CEA), CAS (which includes transcarotid artery revascularization (TCAR), and optimal medical therapy (OMT))."
+        },
+        {
+          "criterion_code": "CRIT-CAS-03",
+          "name": "Mandatory FDA-Approved Embolic Protection Device (EPD)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.7 (MCD ncdid=201)",
+          "source_text_excerpt": "Effective October 11, 2023, CMS covers PTA of the carotid artery concurrent with stenting with the placement of an FDA-approved carotid stent with an FDA-approved or cleared embolic protection device, for Medicare beneficiaries under the following conditions:"
+        }
+      ]
+    },
+    "NCD-220.13": {
+      "policy_id": "NCD-220.13",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.34 (MCD ncdid=367)",
+      "document_title": "Percutaneous Left Atrial Appendage Closure (LAAC)",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 20.34, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=367",
+      "effective_date": "02/08/2016",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-LAAC-01",
+          "name": "Non-Valvular Atrial Fibrillation with High Stroke Risk (CHA2DS2-VASc >= 3)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.34 (MCD ncdid=367)",
+          "source_text_excerpt": "Patients with atrial fibrillation (AF), an irregular heartbeat, are at an increased risk of stroke."
+        },
+        {
+          "criterion_code": "CRIT-LAAC-02",
+          "name": "Contraindication to Long-Term Oral Anticoagulation (HAS-BLED >= 3)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.34 (MCD ncdid=367)",
+          "source_text_excerpt": "A suitability for short-term warfarin but deemed unable to take long-term oral anticoagulation following the conclusion of shared decision making, as LAAC is only covered as a second line therapy to oral anticoagulants."
+        },
+        {
+          "criterion_code": "CRIT-LAAC-03",
+          "name": "Pre-Procedural Imaging Verifying Absence of LA Thrombus",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.34 (MCD ncdid=367)",
+          "source_text_excerpt": "The left atrial appendage (LAA) is a tubular structure that opens into the left atrium and has been shown to be one potential source for blood clots that can cause strokes."
+        }
+      ]
+    },
+    "NCD-240.2": {
+      "policy_id": "NCD-240.2",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 240.2 (MCD ncdid=169)",
+      "document_title": "Home Use of Oxygen",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 240.2, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=169",
+      "effective_date": "09/27/2021",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-O2-01",
+          "name": "Resting Hypoxemia (PaO2 <= 55 mmHg or SpO2 <= 88%)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 240.2 (MCD ncdid=169)",
+          "source_text_excerpt": "In this case, supplemental oxygen is provided for during exercise if the use of oxygen improves the hypoxemia that was demonstrated during exercise when the patient was breathing room air."
+        },
+        {
+          "criterion_code": "CRIT-O2-02",
+          "name": "Clinical Stability at Evaluation",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 240.2 (MCD ncdid=169)",
+          "source_text_excerpt": "Oxygen therapy and oxygen equipment is covered in the home for acute or chronic conditions, short- or long- term, when the patient exhibits hypoxemia as defined below."
+        },
+        {
+          "criterion_code": "CRIT-O2-EXCL-01",
+          "name": "Acute Reversible Etiology Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 240.2 (MCD ncdid=169)",
+          "source_text_excerpt": "Oxygen therapy and oxygen equipment is covered in the home for acute or chronic conditions, short- or long- term, when the patient exhibits hypoxemia as defined below."
+        }
+      ]
+    },
+    "LCD-ACDF": {
+      "policy_id": "LCD-ACDF",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L39758 (MCD lcdid=39758)",
+      "document_title": "Cervical Fusion",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L39758, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39758",
+      "effective_date": "07/07/2024",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-ACDF-01",
+          "name": "Correlating Cervical Disc Herniation or Osteophyte on MRI",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39758 (MCD lcdid=39758)",
+          "source_text_excerpt": "Exceptions to conservative therapy requirement for decompression of symptomatic cervical nerve root impingement:"
+        },
+        {
+          "criterion_code": "CRIT-ACDF-02",
+          "name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39758 (MCD lcdid=39758)",
+          "source_text_excerpt": "In mild cases resolution with conservative therapy is possible and a trial of conservative treatment is indicated with education on progressive symptoms and intervention if worsening."
+        },
+        {
+          "criterion_code": "CRIT-ACDF-EXCL-01",
+          "name": "Neck Pain Only Without Neuropathy Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39758 (MCD lcdid=39758)",
+          "source_text_excerpt": "Systematic review evaluating outcome for ACDF for axial neck pain with and without radiculopathy or myelopathy reported low quality evidence and the benefit of the surgery over time could not be established as compared to nonsurgical treatment options."
+        }
+      ]
+    },
+    "LCD-ACI": {
+      "policy_id": "LCD-ACI",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+      "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+      "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Benefit Policy Manual Chapter 15",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "chondrocyte",
+        "autologous chondrocyte",
+        "cartilage defect",
+        "maci"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-ACI-01",
+          "name": "Focal Chondral Defect Surface Area (1.5 to 10.0 cm2)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-ACI-02",
+          "name": "Prior Debridement or Marrow Stimulation Failure",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-ACI-EXCL-01",
+          "name": "Generalized Severe Tricompartmental Osteoarthritis Exclusion",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        }
+      ]
+    },
+    "LCD-CT-CHEST": {
+      "policy_id": "LCD-CT-CHEST",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33459 (MCD lcdid=33459)",
+      "document_title": "Computerized Axial Tomography (CT), Thorax",
+      "authority": "Palmetto GBA",
+      "citation": "CMS LCD L33459, Palmetto GBA",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33459",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CTCH-01",
+          "name": "Abnormal Chest Radiograph (Solitary Nodule > 6 mm or Mass)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33459 (MCD lcdid=33459)",
+          "source_text_excerpt": "Evaluation of pulmonary, mediastinal, pleural and chest wall infections and their complications"
+        },
+        {
+          "criterion_code": "CRIT-CTCH-02",
+          "name": "Unexplained Hemoptysis or Interstitial Lung Disease Evaluation",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33459 (MCD lcdid=33459)",
+          "source_text_excerpt": "For characterizing and follow-up evaluation of interstitial and alveolar lung disease due to idiopathic, allergic, collagen-vascular, environmental or other causes"
+        },
+        {
+          "criterion_code": "CRIT-CTCH-EXCL-01",
+          "name": "Uncomplicated Acute Bronchitis Without Radiograph Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33459 (MCD lcdid=33459)",
+          "source_text_excerpt": "The chest x-ray and/or physical examination should be used to evaluate patients who present with signs and/or symptoms suggestive of chest pathology prior to proceeding to a CT scan."
+        }
+      ]
+    },
+    "LCD-ESI": {
+      "policy_id": "LCD-ESI",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L36920 (MCD lcdid=36920)",
+      "document_title": "Epidural Steroid Injections for Pain Management",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L36920, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=36920",
+      "effective_date": "05/04/2017",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-ESI-01",
+          "name": "Radicular Nerve Root Pain with Correlating Signs",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36920 (MCD lcdid=36920)",
+          "source_text_excerpt": "Non-Radicular Back Pain - The radiating non-neuropathic pain which is not causally related to a spinal nerve root irritation and does not produce reproducible neuropathic symptoms in an objective dermatomal pattern."
+        },
+        {
+          "criterion_code": "CRIT-ESI-02",
+          "name": "Conservative Therapy Trial Failure (>= 4 Weeks)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36920 (MCD lcdid=36920)",
+          "source_text_excerpt": "Conservative management may improve pain and function and is considered the standard of care in the acute phase."
+        },
+        {
+          "criterion_code": "CRIT-ESI-EXCL-01",
+          "name": "Non-Radicular Mechanical Back Pain Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36920 (MCD lcdid=36920)",
+          "source_text_excerpt": "Non-Radicular Back Pain - The radiating non-neuropathic pain which is not causally related to a spinal nerve root irritation and does not produce reproducible neuropathic symptoms in an objective dermatomal pattern."
+        }
+      ]
+    },
+    "LCD-EVAR": {
+      "policy_id": "LCD-EVAR",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+      "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+      "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Claims Processing Manual Chapter 3",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "endovascular repair",
+        "abdominal aortic aneurysm",
+        "evar",
+        "endograft"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-EVAR-01",
+          "name": "Abdominal Aortic Aneurysm Diameter (>= 5.5 cm in Men / >= 5.0 cm in Women)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-EVAR-02",
+          "name": "Suitable Proximal Neck Landing Zone Anatomy",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-EVAR-EXCL-01",
+          "name": "Small Stable Aneurysm (< 5.0 cm) Exclusion",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        }
+      ]
+    },
+    "LCD-FACET": {
+      "policy_id": "LCD-FACET",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L38773 (MCD lcdid=38773)",
+      "document_title": "Facet Joint Interventions for Pain Management",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L38773, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=38773",
+      "effective_date": "05/02/2021",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-FACET-01",
+          "name": "Diagnostic Medial Branch Block Relief (>= 80%)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L38773 (MCD lcdid=38773)",
+          "source_text_excerpt": "The Greater Manchester EUR Policy Statement on Facet Injections no longer commissioned IA facet injections and recommended medial branches nerve blocks for diagnostic evaluation for RFA 12 ."
+        },
+        {
+          "criterion_code": "CRIT-FACET-02",
+          "name": "Chronic Axial Pain Duration (>= 3 Months)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L38773 (MCD lcdid=38773)",
+          "source_text_excerpt": "NASS Guidelines state that therapeutic medial branch RFA is a validated treatment for facet mediated pain, and repeat procedures are equally successful if the response to the initial RFA lasted at least three months."
+        },
+        {
+          "criterion_code": "CRIT-FACET-EXCL-01",
+          "name": "Radiculopathy or Acute Fracture Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L38773 (MCD lcdid=38773)",
+          "source_text_excerpt": "Radiculopathy - Radiating neuropathic pain causally related to the spinal nerve root irritation, which extends distally producing neuropathic pain in a dermatomal pattern."
+        }
+      ]
+    },
+    "LCD-HALLUX": {
+      "policy_id": "LCD-HALLUX",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Hallux Valgus Correction (Bunionectomy)",
+      "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+      "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Benefit Policy Manual Chapter 15 \u00a7 290",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "hallux",
+        "hallux valgus",
+        "bunionectomy",
+        "bunion"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-HAL-01",
+          "name": "Hallux Valgus Angle (> 15 Degrees on Weight-Bearing Radiographs)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-HAL-02",
+          "name": "Conservative Footwear and Orthotic Trial Failure (>= 3 Months)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-HAL-EXCL-01",
+          "name": "Asymptomatic Cosmetic Bunionectomy Exclusion",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        }
+      ]
+    },
+    "LCD-HIP-ARTHRO": {
+      "policy_id": "LCD-HIP-ARTHRO",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L34163 (MCD lcdid=34163)",
+      "document_title": "Total Hip Arthroplasty",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L34163, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34163",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-HIP-01",
+          "name": "Advanced Radiographic Hip Osteoarthritis",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34163 (MCD lcdid=34163)",
+          "source_text_excerpt": "Radiographic supported evidence or when conventional radiography is not adequate, magnetic resonance imaging (MRI) and/or computed tomography (CT) (in situations when MRI is non-diagnostic or not able to be performed) supported evidence (subchondral cysts, subchondral sclerosis, periarticular osteophytes, joint subluxation, severe joint space narrowing, avascular necrosis); AND"
+        },
+        {
+          "criterion_code": "CRIT-HIP-02",
+          "name": "Conservative Non-Surgical Management Trial (>= 3 Months)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34163 (MCD lcdid=34163)",
+          "source_text_excerpt": "If appropriate, history of unsuccessful conservative therapy (non-surgical medical management) that is clearly addressed in the pre-procedure medical record."
+        },
+        {
+          "criterion_code": "CRIT-HIP-EXCL-01",
+          "name": "Active Joint Infection Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34163 (MCD lcdid=34163)",
+          "source_text_excerpt": "Total hip replacement surgery is most often performed due to severe pain caused by osteoarthritis (degenerative arthritis) of the hip joint."
+        }
+      ]
+    },
+    "LCD-HIP-SCOOP": {
+      "policy_id": "LCD-HIP-SCOOP",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
+      "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+      "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Claims Processing Manual Chapter 12",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "hip arthroscopy",
+        "femoroacetabular",
+        "labral tear",
+        "fai"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-FAI-01",
+          "name": "Cam/Pincer Impingement on Radiographs (Alpha Angle > 55 deg)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-FAI-02",
+          "name": "Conservative Physical Therapy Trial Failure (>= 3 Months)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-FAI-EXCL-01",
+          "name": "Advanced Hip Osteoarthritis (Tonnis Grade >= 2)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        }
+      ]
+    },
+    "LCD-IMRT": {
+      "policy_id": "LCD-IMRT",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+      "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+      "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Benefit Policy Manual Chapter 15 \u00a7 80",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "intensity-modulated",
+        "imrt",
+        "intensity modulated radiation therapy"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-IMRT-01",
+          "name": "Head and Neck, Prostate, or CNS Malignancy Near Critical Organs",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-IMRT-02",
+          "name": "Dosimetric Proof of 3D Conformal Inadequacy",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-IMRT-EXCL-01",
+          "name": "Simple Palliative Bone Metastases Exclusion",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        }
+      ]
+    },
+    "LCD-KNEE-ARTHRO": {
+      "policy_id": "LCD-KNEE-ARTHRO",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Knee Arthroscopy and Meniscectomy",
+      "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+      "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Claims Processing Manual Chapter 12",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "knee arthroscopy",
+        "meniscectomy",
+        "meniscus"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-KART-01",
+          "name": "Documented Mechanical Symptoms (Locking or Catching)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-KART-02",
+          "name": "Unstable Meniscal Tear Confirmed on MRI",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-KART-EXCL-01",
+          "name": "Advanced End-Stage Osteoarthritis Exclusion (Debridement Only)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        }
+      ]
+    },
+    "LCD-KNEE-ORTHOSIS": {
+      "policy_id": "LCD-KNEE-ORTHOSIS",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33318 (MCD lcdid=33318)",
+      "document_title": "Knee Orthoses",
+      "authority": "DME MAC (Noridian / CGS)",
+      "citation": "CMS LCD L33318, DME MAC Contractors",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33318",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-KORTH-01",
+          "name": "Documented Objective Knee Laxity or Ligamentous Deficiency",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33318 (MCD lcdid=33318)",
+          "source_text_excerpt": "The beneficiary is ambulatory and has objective knee instability that must be supported by documentation of a physical examination including the joint laxity test(s) performed (see the POLICY SPECIFIC DOCUMENTATION REQUIREMENTS section in the LCD-related Policy Article; refer to the Group 4 ICD-10 Codes in the LCD-related Policy Article); or,"
+        },
+        {
+          "criterion_code": "CRIT-KORTH-02",
+          "name": "Medical Justification for Custom vs Prefabricated Device",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33318 (MCD lcdid=33318)",
+          "source_text_excerpt": "For knee orthoses definitions of off-the-shelf and custom fitted, refer to the CODING GUIDELINES section in the LCD-related Policy Article."
+        },
+        {
+          "criterion_code": "CRIT-KORTH-EXCL-01",
+          "name": "Temporary Post-Operative Immobilizer Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33318 (MCD lcdid=33318)",
+          "source_text_excerpt": "A contracture is distinguished from the temporary loss of range of motion of a joint following injury, surgery, casting, or other immobilization."
+        }
+      ]
+    },
+    "LCD-KYPHO": {
+      "policy_id": "LCD-KYPHO",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33569 (MCD lcdid=33569)",
+      "document_title": "Percutaneous Vertebral Augmentation (PVA) for Osteoporotic Vertebral Compression Fracture (VCF)",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L33569, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33569",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-KYPHO-01",
+          "name": "Severe Pain Score (NRS/VAS >= 6/10)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33569 (MCD lcdid=33569)",
+          "source_text_excerpt": "Hospitalized with severe pain (Numeric Rating Scale (NRS) or Visual Analog Scale (VAS) pain score &#8805; 8) 4-7"
+        },
+        {
+          "criterion_code": "CRIT-KYPHO-02",
+          "name": "Acute Edema on MRI Confirming Recent Compression Fracture",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33569 (MCD lcdid=33569)",
+          "source_text_excerpt": "Acute (&lt; 6 weeks) or subacute (6-12 weeks) osteoporotic VCF (T1 &#8211; L5), based on symptom onset, and documented by advanced imaging (bone marrow edema on MRI or bone-scan/SPECT/CT uptake) 1-3,10,25,27"
+        },
+        {
+          "criterion_code": "CRIT-KYPHO-EXCL-01",
+          "name": "Active Spinal Infection or Chronic Healed Fracture Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33569 (MCD lcdid=33569)",
+          "source_text_excerpt": "Osteomyelitis, discitis, active systemic or surgical site infection"
+        }
+      ]
+    },
+    "LCD-LUMBAR-DECOMP": {
+      "policy_id": "LCD-LUMBAR-DECOMP",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 150.13 (MCD ncdid=358)",
+      "document_title": "Percutaneous Image-Guided Lumbar Decompression for Lumbar Spinal Stenosis",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 150.13, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=358",
+      "effective_date": "12/07/2016",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-LDEC-01",
+          "name": "Severe Central or Foraminal Stenosis on MRI/CT",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 150.13 (MCD ncdid=358)",
+          "source_text_excerpt": "Endoscopically assisted laminotomy/laminectomy, which requires open and direct visualization, as well as other open lumbar decompression procedures for LSS are not within the scope of this NCD and coverage is at contractor discretion."
+        },
+        {
+          "criterion_code": "CRIT-LDEC-02",
+          "name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 150.13 (MCD ncdid=358)",
+          "source_text_excerpt": "Does PILD provide a clinically meaningful improvement of function (e.g., reduced acute and post-acute hospitalizations, nursing home care or inpatient rehabilitation services) and/or quality of life in Medicare beneficiaries with LSS compared to other treatments?"
+        },
+        {
+          "criterion_code": "CRIT-LDEC-EXCL-01",
+          "name": "Absence of Neurologic Symptoms Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 150.13 (MCD ncdid=358)",
+          "source_text_excerpt": "The eligibility requirements, both inclusion and exclusion criteria that were specified in the CMS-approved RCT protocol, must be maintained in the new prospective, longitudinal study."
+        }
+      ]
+    },
+    "LCD-LUMBAR-FUSION": {
+      "policy_id": "LCD-LUMBAR-FUSION",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L37848 (MCD lcdid=37848)",
+      "document_title": "Lumbar Spinal Fusion",
+      "authority": "Palmetto GBA",
+      "citation": "CMS LCD L37848, Palmetto GBA",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=37848",
+      "effective_date": "05/06/2019",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-LUMB-01",
+          "name": "Documented Spondylolisthesis or Instability (Grade >= 1 or > 3mm)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L37848 (MCD lcdid=37848)",
+          "source_text_excerpt": "Operative indications studied included spondylolisthesis, instability, stenosis, scoliois, disc pathology or need for revision surgery due to nonunion, adjacent level disease or post-discectomy revision."
+        },
+        {
+          "criterion_code": "CRIT-LUMB-02",
+          "name": "Conservative Non-Operative Care Trial (>= 90 Days)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L37848 (MCD lcdid=37848)",
+          "source_text_excerpt": "One of the earliest large randomized trials of lumbar fusion in patients with low back pain was a study from Sweden in which 294 patients aged 25-65 with at least 2 years of low back pain with radicular pain were randomized to 1 of 3 surgical techniques versus conservative treatment based on physical rehabilitation (Fritzell, 2001)."
+        },
+        {
+          "criterion_code": "CRIT-LUMB-EXCL-01",
+          "name": "Isolated Low Back Pain Without Instability Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L37848 (MCD lcdid=37848)",
+          "source_text_excerpt": "Surgical treatment of patients with low back pain and symptoms of nerve root involvement has been studied with both observational and randomized controlled trials with the highest quality evidence in the treatment of chronically painful conditions without spinal instability or evidence of neurologic compromise."
+        }
+      ]
+    },
+    "LCD-MRI-BRAIN": {
+      "policy_id": "LCD-MRI-BRAIN",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L34425 (MCD lcdid=34425)",
+      "document_title": "Magnetic Resonance Imaging of the Head and Neck",
+      "authority": "Palmetto GBA",
+      "citation": "CMS LCD L34425, Palmetto GBA / NCD 220.2",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34425",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-MRIB-01",
+          "name": "Focal Neurological Deficit or New Onset Seizure",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34425 (MCD lcdid=34425)",
+          "source_text_excerpt": "In addition, neck MRI may be useful for the management of conditions involving the neck, including lesions involving the mouth, throat or neck; suspicious masses/tumors found on another imaging modality that needs additional clarification; neck masses or lymphadenopathy; infections of the face, neck or neck spaces involving any of the fascial planes; neurological conditions such as Bell&rsquo;s palsy, hemifacial spasm or other neuropathies; and suspected thyroid or parathyroid neoplasms."
+        },
+        {
+          "criterion_code": "CRIT-MRIB-02",
+          "name": "Progressive Headache with Red Flags or Abnormal Exam",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34425 (MCD lcdid=34425)",
+          "source_text_excerpt": "Sinus MRI may be required to detect abnormalities and conditions such as rhinosinusitis with suspicion of fungal infections, clinical suspicion of orbital or intracranial complications, suspected mass based upon exam, nasal endoscopy or previous imaging and for conditions such as anosmia or osteomyelitis."
+        },
+        {
+          "criterion_code": "CRIT-MRIB-EXCL-01",
+          "name": "Typical Chronic Stable Headache Without Red Flags Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34425 (MCD lcdid=34425)",
+          "source_text_excerpt": "CT scanning remains the study of choice for the imaging evaluation of acute and chronic inflammatory diseases of the sinonasal cavities."
+        }
+      ]
+    },
+    "LCD-MRI-LUMBAR": {
+      "policy_id": "LCD-MRI-LUMBAR",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L34220 (MCD lcdid=34220)",
+      "document_title": "Lumbar MRI",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L34220, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34220",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-MRIL-01",
+          "name": "Radicular Deficit After 6 Weeks Conservative Care or Red Flag",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34220 (MCD lcdid=34220)",
+          "source_text_excerpt": "Therefore, spinal imaging tests are not generally necessary during the first month of symptoms except when a \"red flag\" (suggesting a medically emergent condition) is noted on the medical history and physical examination."
+        },
+        {
+          "criterion_code": "CRIT-MRIL-02",
+          "name": "Preceding Plain Lumbar Radiograph Evaluation",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34220 (MCD lcdid=34220)",
+          "source_text_excerpt": "Typically, this will be the MRI interpretation and report that is performed simultaneously with the evaluation and management of the patient."
+        },
+        {
+          "criterion_code": "CRIT-MRIL-EXCL-01",
+          "name": "Acute Uncomplicated Low Back Pain (< 6 Weeks) Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34220 (MCD lcdid=34220)",
+          "source_text_excerpt": "Eighty (80) to ninety (90) percent of patients with low back pain improve one month after symptom onset even without treatment."
+        }
+      ]
+    },
+    "LCD-PAD-ATHERO": {
+      "policy_id": "LCD-PAD-ATHERO",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L40228 (MCD lcdid=40228)",
+      "document_title": "Endovascular Management for Peripheral Arterial Disease of the Upper and Lower Extremities",
+      "authority": "Palmetto GBA",
+      "citation": "CMS LCD L40228, Palmetto GBA / NCD 20.7",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=40228",
+      "effective_date": "04/12/2026",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PAD-01",
+          "name": "Severe Claudication (Rutherford 3) or Critical Limb Ischemia (Rutherford 4-6)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L40228 (MCD lcdid=40228)",
+          "source_text_excerpt": "The major manifestations of chronic ischemia are ischemic rest pain, ischemic ulceration, and gangrene."
+        },
+        {
+          "criterion_code": "CRIT-PAD-02",
+          "name": "Arterial Hemodynamic Stenosis (>= 70% on Angiography or ABI <= 0.70)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L40228 (MCD lcdid=40228)",
+          "source_text_excerpt": "Detection of PAD in most patients is accomplished through history, physical examination, and resting ankle-brachial index (ABI) for LEs or wrist-brachial index (WBI) for UEs."
+        },
+        {
+          "criterion_code": "CRIT-PAD-EXCL-01",
+          "name": "Mild Claudication or Asymptomatic PAD Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L40228 (MCD lcdid=40228)",
+          "source_text_excerpt": "This guideline defines 4 clinical subsets of PAD: asymptomatic PAD (may have functional impairment), chronic symptomatic PAD (claudication), CLTI, and ALI."
+        }
+      ]
+    },
+    "LCD-PCI": {
+      "policy_id": "LCD-PCI",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33623 (MCD lcdid=33623)",
+      "document_title": "Percutaneous Coronary Intervention",
+      "authority": "Wellpoint Federal",
+      "citation": "CMS LCD L33623, Wellpoint Federal",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33623",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PCI-01",
+          "name": "Epicardial Coronary Stenosis (>= 70% or FFR <= 0.80)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33623 (MCD lcdid=33623)",
+          "source_text_excerpt": "patients with restenosis of a coronary artery previously treated with intracoronary stent or other revascularization procedure"
+        },
+        {
+          "criterion_code": "CRIT-PCI-02",
+          "name": "Refractory Angina Despite Optimal Medical Therapy (GDMT)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33623 (MCD lcdid=33623)",
+          "source_text_excerpt": "In addition to medical therapy and coronary bypass surgery, percutaneous coronary intervention has emerged as a primary option for the management of patients with acute coronary syndromes and selected patients with chronic angina."
+        },
+        {
+          "criterion_code": "CRIT-PCI-EXCL-01",
+          "name": "Hemodynamically Insignificant Stenosis (< 50%) Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33623 (MCD lcdid=33623)",
+          "source_text_excerpt": "Intracoronary ultrasound may be separately covered when needed to assess the extent of coronary stenosis if equivocal on angiography, or when needed to assess the patency and integrity of a coronary artery post-intervention."
+        }
+      ]
+    },
+    "LCD-POWER-WC": {
+      "policy_id": "LCD-POWER-WC",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33789 (MCD lcdid=33789)",
+      "document_title": "Power Mobility Devices",
+      "authority": "DME MAC (Noridian / CGS)",
+      "citation": "CMS LCD L33789, DME MAC Contractors",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33789",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PWC-01",
+          "name": "Severe Neurologic or Myopathic Mobility Limitation (MRADLs)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33789 (MCD lcdid=33789)",
+          "source_text_excerpt": "23 Based upon the primary health indication of enrollees (Muscular dystrophy &#8211; 14%; Polio &#8211; 14%; Inclusion body myositis &#8211; 9%; Cerebral palsy &#8211; 14%; Multiple sclerosis &#8211; 9%; Osteogenesis imperfecta &#8211; 9%; Other &#8211; 32%), participants were estimated to be predominantly Group 3 PWC users."
+        },
+        {
+          "criterion_code": "CRIT-PWC-02",
+          "name": "Specialty Evaluation by Licensed PT/OT and Certified ATP",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33789 (MCD lcdid=33789)",
+          "source_text_excerpt": "The beneficiary has had a specialty evaluation that was performed by a licensed/certified medical professional (LCMP), such as a physical therapist (PT) or occupational therapist (OT), or practitioner who has specific training and experience in rehabilitation wheelchair evaluations and that documents the medical necessity for the wheelchair and its special features including seat elevation (refer to the documentation requirements section)."
+        },
+        {
+          "criterion_code": "CRIT-PWC-EXCL-01",
+          "name": "Outdoor-Only Need Without Home Mobility Deficit Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33789 (MCD lcdid=33789)",
+          "source_text_excerpt": "If a POV will be used inside the home and coverage criteria A-I are not met, it will be denied as not reasonable and necessary."
+        }
+      ]
+    },
+    "LCD-PROTON": {
+      "policy_id": "LCD-PROTON",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33937 (MCD lcdid=33937)",
+      "document_title": "Proton Beam Radiotherapy",
+      "authority": "First Coast Service Options, Inc.",
+      "citation": "CMS LCD L33937, First Coast Service Options",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33937",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PBT-01",
+          "name": "Skull Base, Spine Chordoma, or Critical Structure Proximity",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33937 (MCD lcdid=33937)",
+          "source_text_excerpt": "Benign or malignant conditions otherwise not suitable for intensity modulated radiation therapy (IMRT) or 3- dimensional conformal therapy involving the base of the skull or axial skeleton, including but not limited to chordomas and chondrosarcomas."
+        },
+        {
+          "criterion_code": "CRIT-PBT-02",
+          "name": "Comparative Dosimetric Treatment Plan Demonstrating Sparing",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33937 (MCD lcdid=33937)",
+          "source_text_excerpt": "Specifically, the record must address the lower risk to normal tissue, the lower risk of disease recurrence, and the advantages of the treatment over IMRT or 3-dimensional conformal Dosimetric evidence of reduced normal tissue toxicity and/or improved tumor control must be maintained."
+        },
+        {
+          "criterion_code": "CRIT-PBT-EXCL-01",
+          "name": "Widespread Distant Metastases Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33937 (MCD lcdid=33937)",
+          "source_text_excerpt": "In general, proton beam radiotherapy is not indicated for cancers that are widely disseminated, such as leukemias, have hematogenous metastases or as a short-term palliative procedure."
+        }
+      ]
+    },
+    "LCD-RAD-NIV": {
+      "policy_id": "LCD-RAD-NIV",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33800 (MCD lcdid=33800)",
+      "document_title": "Respiratory Assist Devices",
+      "authority": "DME MAC (Noridian / CGS)",
+      "citation": "CMS LCD L33800, DME MAC Contractors",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33800",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-NIV-01",
+          "name": "Daytime Hypercapnia (Arterial PaCO2 >= 52 mm Hg)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33800 (MCD lcdid=33800)",
+          "source_text_excerpt": "An arterial blood gas PaCO2, done while awake and breathing the beneficiary&#8217;s prescribed FIO2 is greater than or equal to 45 mm Hg, or"
+        },
+        {
+          "criterion_code": "CRIT-NIV-02",
+          "name": "Prior CPAP Trial Failure or Severe Hypoventilation Syndrome",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33800 (MCD lcdid=33800)",
+          "source_text_excerpt": "A RAD (E0470, E0471) is covered for those beneficiaries with one of the following clinical disorders: restrictive thoracic disorders (i.e., neuromuscular diseases or severe thoracic cage abnormalities), CSA or CompSA, hypoventilation syndrome, or chronic respiratory failure (CRF) consequent to chronic obstructive pulmonary disease (COPD), as described in the following section."
+        },
+        {
+          "criterion_code": "CRIT-NIV-EXCL-01",
+          "name": "Simple Obstructive Sleep Apnea Without Hypoventilation Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33800 (MCD lcdid=33800)",
+          "source_text_excerpt": "- For diagnosis of CSA, the central apnea-central hypopnea index (CAHI) is defined as the average number of episodes of central apnea and central hypopnea per hour of sleep without the use of a positive airway pressure device."
+        }
+      ]
+    },
+    "LCD-ROTATOR-CUFF": {
+      "policy_id": "LCD-ROTATOR-CUFF",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Rotator Cuff Repair (Open or Arthroscopic)",
+      "authority": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A)",
+      "citation": "Social Security Act \u00a7 1862(a)(1)(A); Medicare Claims Processing Manual Chapter 12",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-411",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "rotator cuff",
+        "shoulder repair",
+        "rotator cuff repair"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-RC-01",
+          "name": "Full-Thickness or High-Grade Rotator Cuff Tear on MRI",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-RC-02",
+          "name": "Conservative Therapy Trial Failure (>= 3 Months)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        },
+        {
+          "criterion_code": "CRIT-RC-EXCL-01",
+          "name": "Severe Irreversible Muscle Fatty Infiltration (Goutallier Grade 4)",
+          "source_traceability_status": "BENEFIT_STATUTE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Title XVIII of the Social Security Act \u00a7 1862(a)(1)(A) excludes items and services which are not reasonable and necessary for the diagnosis or treatment of illness or injury or to improve the functioning of a malformed body member."
+        }
+      ]
+    },
+    "LCD-SBRT": {
+      "policy_id": "LCD-SBRT",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L35076 (MCD lcdid=35076)",
+      "document_title": "Stereotactic Radiation Therapy: Stereotactic Radiosurgery (SRS) and Stereotactic Body Radiation Therapy (SBRT)",
+      "authority": "Wellpoint Federal",
+      "citation": "CMS LCD L35076, Wellpoint Federal",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=35076",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-SBRT-01",
+          "name": "Early-Stage NSCLC (T1-T2N0M0) or Oligometastases (<= 3 Lesions)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L35076 (MCD lcdid=35076)",
+          "source_text_excerpt": "Limitations for SRS/SBRT (for Cranial and Spinal Lesions): SRS is not considered medically necessary under the following circumstances:"
+        },
+        {
+          "criterion_code": "CRIT-SBRT-02",
+          "name": "Rigid Immobilization and Organ Motion Management Plan",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L35076 (MCD lcdid=35076)",
+          "source_text_excerpt": "Thus, reliable immobilization or repositioning systems must often be combined with devices capable of decreasing organ motion or accounting for organ motion e.g."
+        },
+        {
+          "criterion_code": "CRIT-SBRT-EXCL-01",
+          "name": "Polymetastatic Disease (> 3 Lesions) Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L35076 (MCD lcdid=35076)",
+          "source_text_excerpt": "Metastatic brain or spine lesions, with stable systemic disease, Karnofsky Performance Status 40 or greater (or expected to return to 70 or greater with treatment), and otherwise reasonable survival expectations, OR an Eastern Cooperative Oncology Group (ECOG) Performance Status of 3 or less (or expected to return to 2 or less with treatment)."
+        }
+      ]
+    },
+    "LCD-SHOULDER-ARTHRO": {
+      "policy_id": "LCD-SHOULDER-ARTHRO",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L39956 (MCD lcdid=39956)",
+      "document_title": "Total Shoulder Arthroplasty",
+      "authority": "Palmetto GBA",
+      "citation": "CMS LCD L39956, Palmetto GBA",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39956",
+      "effective_date": "03/27/2025",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-SHLD-01",
+          "name": "Advanced Glenohumeral Arthropathy or Cuff Tear Arthropathy",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39956 (MCD lcdid=39956)",
+          "source_text_excerpt": "Degenerative glenohumeral joint disease including osteoarthritis (OA), OR post-traumatic arthritis, OR rheumatoid arthritis (RA), OR osteonecrosis, OR arthropathy with rotator cuff deficit when all the following are present:"
+        },
+        {
+          "criterion_code": "CRIT-SHLD-02",
+          "name": "Conservative Therapy Trial Failure (>= 3 Months)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39956 (MCD lcdid=39956)",
+          "source_text_excerpt": "The findings of this study suggest that conservative treatments should be extended for longer than 12 months before the decision regarding shoulder arthroplasty is made."
+        },
+        {
+          "criterion_code": "CRIT-SHLD-EXCL-01",
+          "name": "Paralyzed Deltoid Muscle Exclusion for Reverse Shoulder",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39956 (MCD lcdid=39956)",
+          "source_text_excerpt": "conducted a 2021 retrospective, multicenter study including 65 consecutive, primary reverse shoulder arthroplasties (RSAs) performed in 59 patients with RA."
+        }
+      ]
+    },
+    "LCD-WOUND-VAC": {
+      "policy_id": "LCD-WOUND-VAC",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33821 (MCD lcdid=33821)",
+      "document_title": "Negative Pressure Wound Therapy Pumps",
+      "authority": "DME MAC (Noridian / CGS)",
+      "citation": "CMS LCD L33821, DME MAC Contractors",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33821",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-VAC-01",
+          "name": "Stage III/IV Pressure Ulcer, Diabetic Ulcer, or Dehisced Wound",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33821 (MCD lcdid=33821)",
+          "source_text_excerpt": "Ulcers and Wounds in the Home Setting: The beneficiary has a chronic Stage 3 or 4 pressure ulcer (see Appendices Section), neuropathic (for example, diabetic) ulcer, venous or arterial insufficiency ulcer, or a chronic (being present for at least 30 days) ulcer of mixed etiology."
+        },
+        {
+          "criterion_code": "CRIT-VAC-02",
+          "name": "Conventional Wound Care Trial Failure (>= 30 Days)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33821 (MCD lcdid=33821)",
+          "source_text_excerpt": "This shall be done to ensure that the refilled item remains reasonable and necessary, existing supplies are expected to end, and to confirm any changes or modifications to the order."
+        },
+        {
+          "criterion_code": "CRIT-VAC-EXCL-01",
+          "name": "Untreated Osteomyelitis or Necrotic Eschar Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33821 (MCD lcdid=33821)",
+          "source_text_excerpt": "The presence in the wound of necrotic tissue with eschar, if debridement is not attempted;"
+        }
+      ]
+    },
+    "NCD-CARDIAC-REHAB": {
+      "policy_id": "NCD-CARDIAC-REHAB",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.10.1 (MCD ncdid=359)",
+      "document_title": "Cardiac Rehabilitation Programs for Chronic Heart Failure",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 20.10.1, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=359",
+      "effective_date": "02/18/2014",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CREH-01",
+          "name": "Qualifying Cardiac Event (Post-MI, CABG, Valve, or LVEF <= 35%)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.10.1 (MCD ncdid=359)",
+          "source_text_excerpt": "Acute myocardial infarction within the preceding 12 months"
+        },
+        {
+          "criterion_code": "CRIT-CREH-02",
+          "name": "Physician-Prescribed Individualized Exercise Treatment Plan",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.10.1 (MCD ncdid=359)",
+          "source_text_excerpt": "Effective for dates of service on and after February 18, 2014, CMS has determined that the evidence is sufficient to expand coverage for cardiac rehabilitation services under 42 CFR &sect;410.49(b)(1)(vii) to beneficiaries with stable, chronic heart failure, defined as patients with left ventricular ejection fraction of 35% or less and New York Heart Association (NYHA) class II to IV symptoms despite being on optimal heart failure therapy for at least six weeks."
+        },
+        {
+          "criterion_code": "CRIT-CREH-EXCL-01",
+          "name": "Unstable High-Risk Cardiac Condition Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.10.1 (MCD ncdid=359)",
+          "source_text_excerpt": "Effective for dates of service on and after February 18, 2014, CMS has determined that the evidence is sufficient to expand coverage for cardiac rehabilitation services under 42 CFR &sect;410.49(b)(1)(vii) to beneficiaries with stable, chronic heart failure, defined as patients with left ventricular ejection fraction of 35% or less and New York Heart Association (NYHA) class II to IV symptoms despite being on optimal heart failure therapy for at least six weeks."
+        }
+      ]
+    },
+    "NCD-CATARACT": {
+      "policy_id": "NCD-CATARACT",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L39905 (MCD lcdid=39905)",
+      "document_title": "Cataract Surgery",
+      "authority": "WPS Insurance Corporation",
+      "citation": "CMS LCD L39905, WPS Insurance Corporation / NCD 80.10",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39905",
+      "effective_date": "10/13/2024",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CAT-01",
+          "name": "Best Corrected Visual Acuity (<= 20/50 Snellen) or Severe Glare",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39905 (MCD lcdid=39905)",
+          "source_text_excerpt": "Patients considered for the study had significant bilateral cataracts causing visual impairment not correctable by glasses, best corrected visual acuity (BCVA) score worse than 0.7, an unacceptable glare, polyopia, or overall reduced vision quality due to cataracts."
+        },
+        {
+          "criterion_code": "CRIT-CAT-02",
+          "name": "Documented Impairment in Activities of Daily Living (ADLs)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39905 (MCD lcdid=39905)",
+          "source_text_excerpt": "The cataract is causing visual impairment that is not correctable with a tolerable change in glasses or contact lenses, resulting in the inability to perform Activities of Daily Living such as, but not limited to, driving, reading, watching television, and/or meeting vocational or recreational needs, 4 OR"
+        },
+        {
+          "criterion_code": "CRIT-CAT-EXCL-01",
+          "name": "Glasses Sufficient or Purely Refractive Lens Exchange Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39905 (MCD lcdid=39905)",
+          "source_text_excerpt": "We received additional documentation from a provider for clear lens extraction for treatment of PACD, but that literature was not included as it was out of the scope of this LCD."
+        }
+      ]
+    },
+    "NCD-CCTA": {
+      "policy_id": "NCD-CCTA",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L33947 (MCD lcdid=33947)",
+      "document_title": "Cardiac Computed Tomography (CCT) and Coronary Computed Tomography Angiography (CCTA)",
+      "authority": "CGS Administrators, LLC",
+      "citation": "CMS LCD L33947, CGS Administrators",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33947",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CCTA-01",
+          "name": "Intermediate CAD Probability and Target Heart Rate (< 65 bpm)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33947 (MCD lcdid=33947)",
+          "source_text_excerpt": "Current available body of evidence demonstrates that CCTA can reliably rule out the presence of significant coronary artery disease (CAD) in patients with a low to intermediate probability of having CAD and can reliably achieve a high degree of diagnostic accuracy and technical performance necessary to replace conventional angiography."
+        },
+        {
+          "criterion_code": "CRIT-CCTA-02",
+          "name": "Inconclusive Prior Stress Testing or Equivocal Biomarkers",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33947 (MCD lcdid=33947)",
+          "source_text_excerpt": "Patients with known disease may have had remote invasive angiography and/or stress testing to evaluate prior events or symptoms."
+        },
+        {
+          "criterion_code": "CRIT-CCTA-EXCL-01",
+          "name": "Severe Tachyarrhythmia or Severe Renal Impairment Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L33947 (MCD lcdid=33947)",
+          "source_text_excerpt": "Pulmonary vein catheter ablation can isolate electrical activity from the pulmonary veins and allow for the elimination of recurrent atrial fibrillation."
+        }
+      ]
+    },
+    "NCD-MPI-PET": {
+      "policy_id": "NCD-MPI-PET",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 220.6.1 (MCD ncdid=292)",
+      "document_title": "PET for Perfusion of the Heart",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 220.6.1, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=292",
+      "effective_date": "04/03/2009",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PETM-01",
+          "name": "Intermediate-to-High Pre-Test CAD Probability",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 220.6.1 (MCD ncdid=292)",
+          "source_text_excerpt": "Effective for services performed on or after October 1, 2003, PET scans performed at rest or with pharmacological stress used for noninvasive imaging of the perfusion of the heart for the diagnosis and management of patients with known or suspected coronary artery disease using the FDA-approved radiopharmaceutical ammonia N-13 are covered, provided the requirements below are met:"
+        },
+        {
+          "criterion_code": "CRIT-PETM-02",
+          "name": "Suboptimal SPECT Imaging or Severe Obesity (BMI >= 35 kg/m2)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 220.6.1 (MCD ncdid=292)",
+          "source_text_excerpt": "Effective for services performed on or after October 1, 2003, PET scans performed at rest or with pharmacological stress used for noninvasive imaging of the perfusion of the heart for the diagnosis and management of patients with known or suspected coronary artery disease using the FDA-approved radiopharmaceutical ammonia N-13 are covered, provided the requirements below are met:"
+        },
+        {
+          "criterion_code": "CRIT-PETM-EXCL-01",
+          "name": "Low Risk Asymptomatic Screening Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 220.6.1 (MCD ncdid=292)",
+          "source_text_excerpt": "Effective for services performed on or after October 1, 2003, PET scans performed at rest or with pharmacological stress used for noninvasive imaging of the perfusion of the heart for the diagnosis and management of patients with known or suspected coronary artery disease using the FDA-approved radiopharmaceutical ammonia N-13 are covered, provided the requirements below are met:"
+        }
+      ]
+    },
+    "NCD-PACEMAKER": {
+      "policy_id": "NCD-PACEMAKER",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.8 (MCD ncdid=238)",
+      "document_title": "Cardiac Pacemakers",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 20.8, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=238",
+      "effective_date": "08/13/2013",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PACE-01",
+          "name": "High-Grade AV Block or Symptomatic Sinus Pauses (>= 3.0 Seconds)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.8 (MCD ncdid=238)",
+          "source_text_excerpt": "161, Issued: 02-06-14, Effective: 08-13-13, Implementation: 07-07-14)"
+        },
+        {
+          "criterion_code": "CRIT-PACE-02",
+          "name": "Absence of Reversible Etiologies",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.8 (MCD ncdid=238)",
+          "source_text_excerpt": "161, Issued: 02-06-14, Effective: 08-13-13, Implementation: 07-07-14)"
+        },
+        {
+          "criterion_code": "CRIT-PACE-EXCL-01",
+          "name": "Asymptomatic First-Degree AV Block Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 20.8 (MCD ncdid=238)",
+          "source_text_excerpt": "161, Issued: 02-06-14, Effective: 08-13-13, Implementation: 07-07-14)"
+        }
+      ]
+    },
+    "NCD-PET-ONC": {
+      "policy_id": "NCD-PET-ONC",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 220.6.17 (MCD ncdid=331)",
+      "document_title": "Positron Emission Tomography (FDG) for Oncologic Conditions",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 220.6.17, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=331",
+      "effective_date": "06/11/2013",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PTONC-01",
+          "name": "Histologically Confirmed Malignancy or High-Probability Solitary Nodule",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 220.6.17 (MCD ncdid=331)",
+          "source_text_excerpt": "All other solid tumors"
+        },
+        {
+          "criterion_code": "CRIT-PTONC-02",
+          "name": "Clinical Staging Impact on Intended Treatment Strategy",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 220.6.17 (MCD ncdid=331)",
+          "source_text_excerpt": "Subsequent Treatment Strategy (formerly &ldquo;restaging&rdquo; & &ldquo;monitoring response to treatment&rdquo;"
+        },
+        {
+          "criterion_code": "CRIT-PTONC-EXCL-01",
+          "name": "Routine Surveillance in Asymptomatic Remission Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 220.6.17 (MCD ncdid=331)",
+          "source_text_excerpt": "CMS continues to believe that the evidence is adequate to determine that the results of FDG PET imaging are useful in determining the appropriate initial anti-tumor treatment strategy for beneficiaries with suspected cancer and improve health outcomes and thus are reasonable and necessary under \u00a71862(a)(1)(A) of the Social Security Act (the Act)."
+        }
+      ]
+    },
+    "NCD-PUMP": {
+      "policy_id": "NCD-PUMP",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 280.14 (MCD ncdid=223)",
+      "document_title": "Infusion Pumps",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 280.14, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=223",
+      "effective_date": "12/17/2004",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PUMP-01",
+          "name": "Successful Intrathecal Preliminary Trial Response",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 280.14 (MCD ncdid=223)",
+          "source_text_excerpt": "The patient's history must indicate that he/she would not respond adequately to noninvasive methods of pain control, such as systemic opioids (including attempts to eliminate physical and behavioral abnormalities which may cause an exaggerated reaction to pain); and a preliminary trial of intraspinal opioid drug administration must be undertaken with a temporary intrathecal/epidural catheter to substantiate adequately acceptable pain relief and degree of side effects (including effects on the activities of daily living) and patient acceptance."
+        },
+        {
+          "criterion_code": "CRIT-PUMP-02",
+          "name": "Intolerable Side Effects or Failure of Systemic Analgesics",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 280.14 (MCD ncdid=223)",
+          "source_text_excerpt": "The patient's history must indicate that he/she would not respond adequately to noninvasive methods of pain control, such as systemic opioids (including attempts to eliminate physical and behavioral abnormalities which may cause an exaggerated reaction to pain); and a preliminary trial of intraspinal opioid drug administration must be undertaken with a temporary intrathecal/epidural catheter to substantiate adequately acceptable pain relief and degree of side effects (including effects on the activities of daily living) and patient acceptance."
+        },
+        {
+          "criterion_code": "CRIT-PUMP-EXCL-01",
+          "name": "Active Systemic Sepsis Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 280.14 (MCD ncdid=223)",
+          "source_text_excerpt": "Who have an active infection;or,"
+        }
+      ]
+    },
+    "NCD-SCS": {
+      "policy_id": "NCD-SCS",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 160.7 (MCD ncdid=240)",
+      "document_title": "Electrical Nerve Stimulators",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 160.7, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=240",
+      "effective_date": "08/07/1995",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-SCS-01",
+          "name": "Temporary Trial Pain Reduction (>= 50%)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 160.7 (MCD ncdid=240)",
+          "source_text_excerpt": "Demonstration of pain relief with a temporarily implanted electrode precedes permanent implantation."
+        },
+        {
+          "criterion_code": "CRIT-SCS-02",
+          "name": "Formal Psychological Evaluation Clearance",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 160.7 (MCD ncdid=240)",
+          "source_text_excerpt": "(Such screening must include psychological, as well as physical evaluation);"
+        },
+        {
+          "criterion_code": "CRIT-SCS-EXCL-01",
+          "name": "Active Substance Abuse or Untreated Psychosis Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 160.7 (MCD ncdid=240)",
+          "source_text_excerpt": "Two general classifications of electrical nerve stimulators are employed to treat chronic intractable pain: peripheral nerve stimulators and central nervous system stimulators."
+        }
+      ]
+    },
+    "NCD-SGD": {
+      "policy_id": "NCD-SGD",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 50.1 (MCD ncdid=274)",
+      "document_title": "Speech Generating Devices",
+      "authority": "CMS National Coverage Determination",
+      "citation": "CMS NCD 50.1, Publication 100-03, Medicare National Coverage Determinations Manual",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=274",
+      "effective_date": "07/29/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-SGD-01",
+          "name": "Severe Expressive Speech Impairment Precluding Daily Communication",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 50.1 (MCD ncdid=274)",
+          "source_text_excerpt": "In addition, specific features of a speech generating device that are not used by the individual who has a severe speech impairment to meet his or her functional speaking needs are not covered."
+        },
+        {
+          "criterion_code": "CRIT-SGD-02",
+          "name": "Formal Evaluation by Licensed Speech-Language Pathologist (SLP)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 50.1 (MCD ncdid=274)",
+          "source_text_excerpt": "software that allows a computer or other electronic device to generate audible/verbal speech."
+        },
+        {
+          "criterion_code": "CRIT-SGD-EXCL-01",
+          "name": "Non-Dedicated Personal Computer / Tablet Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "NCD 50.1 (MCD ncdid=274)",
+          "source_text_excerpt": "Computers and tablets are generally not considered DME because they are useful in the absence of an illness or injury."
+        }
+      ]
+    },
+    "OPD-BLEPH": {
+      "policy_id": "OPD-BLEPH",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L34194 (MCD lcdid=34194)",
+      "document_title": "Blepharoplasty, Eyelid Surgery, and Brow Lift",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L34194, Noridian Healthcare Solutions / 42 CFR \u00a7 419.80",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34194",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-BLEPH-01",
+          "name": "Visual Field Restriction (>= 30% or 12 Degrees)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34194 (MCD lcdid=34194)",
+          "source_text_excerpt": "For the purposes of this policy, these surgeries (either individually or in the minimum combination required to achieve a satisfactory surgical outcome) are functional when overhanging skin or upper lid position secondary to dermatochalasis, blepharochalasis, blepharoptosis, or pseudoptosis is sufficiently low to produce a visually-significant field restriction considered by this policy to be approximately 30 degrees or less from fixation."
+        },
+        {
+          "criterion_code": "CRIT-BLEPH-02",
+          "name": "Marginal Reflex Distance 1 (MRD1 <= 2.0 mm)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34194 (MCD lcdid=34194)",
+          "source_text_excerpt": "A margin reflex distance (MRD sometimes referred to as MRD1)) of 2.0 mm or less."
+        },
+        {
+          "criterion_code": "CRIT-BLEPH-EXCL-01",
+          "name": "Purely Cosmetic Eyelid Surgery Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34194 (MCD lcdid=34194)",
+          "source_text_excerpt": "Note, however, the fact that this policy excludes reconstructive surgery does not relieve the physician of the obligation to document in the medical record reasonable evidence defending the medical necessity of a given procedure, including but not limited to an appropriate patient complaint that would impact their ability to perform tasks of daily living (or, in the absence of a specific complaint, a statement that the repair is needed to prevent anticipated future damage to ocular structures), an appropriate physical exam delineating the anatomical issues to be addressed, appropriate supplemental testing, appropriate photographic documentation clearly demonstrating to a qualified third-party the anatomical issues to be addressed, and appropriate operative notes and consents."
+        }
+      ]
+    },
+    "OPD-BOTOX": {
+      "policy_id": "OPD-BOTOX",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L39832 (MCD lcdid=39832)",
+      "document_title": "Botulinum Toxin Injections",
+      "authority": "Wellpoint Federal",
+      "citation": "CMS LCD L39832, Wellpoint Federal / 42 CFR \u00a7 419.80",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39832",
+      "effective_date": "02/22/2026",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-BOTOX-01",
+          "name": "Chronic Migraine Frequency (>= 15 Days/Month)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39832 (MCD lcdid=39832)",
+          "source_text_excerpt": "In the pooled analysis of the PREEMPT trials, onabotulinumtoxinA resulted in a modest but statistically significant additional reduction of 2 headache days per month over placebo."
+        },
+        {
+          "criterion_code": "CRIT-BOTOX-02",
+          "name": "Oral Prophylactic Medication Trial Failure (>= 2 Classes)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39832 (MCD lcdid=39832)",
+          "source_text_excerpt": "107 Most patients (approximately 64%) had received at least 1 prior migraine preventive medication, with 35% having failed at least 3 preventatives."
+        },
+        {
+          "criterion_code": "CRIT-BOTOX-EXCL-01",
+          "name": "Episodic Migraine Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L39832 (MCD lcdid=39832)",
+          "source_text_excerpt": "116 At 6 months, Botox &#174; significantly lowered headache days per month by 13 days versus only 1 day for placebo."
+        }
+      ]
+    },
+    "OPD-CERV-DISC": {
+      "policy_id": "OPD-CERV-DISC",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Cervical Artificial Disc Arthroplasty",
+      "authority": "Hospital Outpatient Department (OPD) Prior Authorization (42 CFR \u00a7 419.80)",
+      "citation": "42 CFR \u00a7 419.80 - 419.89; CMS Outpatient Prospective Payment System (OPPS) Final Rule",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-419/subpart-H/section-419.80",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "cervical artificial disc",
+        "disc arthroplasty",
+        "cervical disc"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-CERV-01",
+          "name": "Symptomatic Cervical Radiculopathy or Myelopathy",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        },
+        {
+          "criterion_code": "CRIT-CERV-02",
+          "name": "Conservative Therapy Trial Failure (>= 6 Weeks)",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        },
+        {
+          "criterion_code": "CRIT-CERV-EXCL-01",
+          "name": "Severe Facet Joint Spondylosis Exclusion",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        }
+      ]
+    },
+    "OPD-PANNI": {
+      "policy_id": "OPD-PANNI",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Panniculectomy and Abdominoplasty",
+      "authority": "Hospital Outpatient Department (OPD) Prior Authorization (42 CFR \u00a7 419.80)",
+      "citation": "42 CFR \u00a7 419.80 - 419.89; CMS Outpatient Prospective Payment System (OPPS) Final Rule",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-419/subpart-H/section-419.80",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "panniculectomy",
+        "abdominoplasty",
+        "pannus"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-PANNI-01",
+          "name": "Severe Apron/Pannus (Hanging Below Pubis Symphysis)",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        },
+        {
+          "criterion_code": "CRIT-PANNI-02",
+          "name": "Refractory Intertrigo / Dermatitis (>= 3 Months Medical Therapy)",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        },
+        {
+          "criterion_code": "CRIT-PANNI-EXCL-01",
+          "name": "Cosmetic Body Contouring Exclusion",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        }
+      ]
+    },
+    "OPD-RHINO": {
+      "policy_id": "OPD-RHINO",
+      "provenance_status": "NO_MCD_DOCUMENT_FOUND",
+      "real_cms_id": "NONE",
+      "document_title": "Rhinoplasty and Septoplasty",
+      "authority": "Hospital Outpatient Department (OPD) Prior Authorization (42 CFR \u00a7 419.80)",
+      "citation": "42 CFR \u00a7 419.80 - 419.89; CMS Outpatient Prospective Payment System (OPPS) Final Rule",
+      "url": "https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-419/subpart-H/section-419.80",
+      "effective_date": "N/A (Statutory Authority)",
+      "search_terms_tried": [
+        "rhinoplasty",
+        "septoplasty",
+        "nasal obstruction"
+      ],
+      "criteria": [
+        {
+          "criterion_code": "CRIT-RHINO-01",
+          "name": "Chronic Nasal Airway Obstruction (>= 6 Months)",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        },
+        {
+          "criterion_code": "CRIT-RHINO-02",
+          "name": "Conservative Medical Therapy Trial Failure (>= 4 Weeks)",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        },
+        {
+          "criterion_code": "CRIT-RHINO-EXCL-01",
+          "name": "Cosmetic Nasal Reshaping Exclusion",
+          "source_traceability_status": "STATUTORY_RULE",
+          "cms_document": "NONE (Statutory Authority)",
+          "source_text_excerpt": "Hospital Outpatient Department (OPD) services subject to prior authorization under 42 CFR \u00a7 419.80 - 419.89. Medicare requires documented medical necessity to establish that the service is functional/reconstructive rather than cosmetic."
+        }
+      ]
+    },
+    "OPD-SI-FUSION": {
+      "policy_id": "OPD-SI-FUSION",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L36000 (MCD lcdid=36000)",
+      "document_title": "Percutaneous minimally invasive fusion/stabilization of the sacroiliac joint for the treatment of back pain",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L36000, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=36000",
+      "effective_date": "12/17/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-SI-01",
+          "name": "Diagnostic SI Block Pain Relief (>= 75%)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36000 (MCD lcdid=36000)",
+          "source_text_excerpt": "g) At least 75% reduction of pain for the expected duration of the anesthetic used following an image-guided, contrast-enhanced SIJ injection on 2 separate occasions."
+        },
+        {
+          "criterion_code": "CRIT-SI-02",
+          "name": "Positive SI Joint Provocation Tests (>= 3 Tests)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36000 (MCD lcdid=36000)",
+          "source_text_excerpt": "d)&#160;Positive response to the thigh thrust test OR compression test AND 2 of the following additional provocative tests: Gaenslen&#8217;s test, Distraction test, Patrick&#8217;s sign;"
+        },
+        {
+          "criterion_code": "CRIT-SI-EXCL-01",
+          "name": "Active Systemic Infection Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L36000 (MCD lcdid=36000)",
+          "source_text_excerpt": "Systemic arthropathy such as ankylosing spondylitis or rheumatoid arthritis; Generalized pain behavior (e.g."
+        }
+      ]
+    },
+    "OPD-VEIN": {
+      "policy_id": "OPD-VEIN",
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "LCD L34082 (MCD lcdid=34082)",
+      "document_title": "Varicose Veins of the Lower Extremity, Treatment of",
+      "authority": "Noridian Healthcare Solutions, LLC",
+      "citation": "CMS LCD L34082, Noridian Healthcare Solutions",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34082",
+      "effective_date": "10/01/2015",
+      "criteria": [
+        {
+          "criterion_code": "CRIT-VEIN-01",
+          "name": "Venous Reflux Duration (>= 500 ms on Duplex Ultrasound)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34082 (MCD lcdid=34082)",
+          "source_text_excerpt": "Limitations: Duplex ultrasound is often used in conjunction with other non-invasive physiologic testing to define the anatomy and physiology of the varicose vein network prior to injection or surgical intervention."
+        },
+        {
+          "criterion_code": "CRIT-VEIN-02",
+          "name": "Graduated Compression Stocking Trial (>= 3 Months)",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34082 (MCD lcdid=34082)",
+          "source_text_excerpt": "the use of graduated compression stockings."
+        },
+        {
+          "criterion_code": "CRIT-VEIN-EXCL-01",
+          "name": "Asymptomatic Spider Vein Telangiectasia Exclusion",
+          "source_traceability_status": "VERIFIED_FROM_MCD",
+          "cms_document": "LCD L34082 (MCD lcdid=34082)",
+          "source_text_excerpt": "Spider veins (telangiectases) are dilated capillary veins that are most often treated for cosmetic purposes."
+        }
+      ]
+    }
+  }
+}

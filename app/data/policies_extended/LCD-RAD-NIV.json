@@ -44,11 +44,11 @@
         "daytime paco2",
         "hypercapnia"
       ],
-      "cms_document": "DME MAC LCD Respiratory Assist Devices",
-      "source_section": "Indications",
+      "cms_document": "LCD L33800 (MCD lcdid=33800)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Arterial PaCO2",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "An arterial blood gas PaCO2, done while awake and breathing the beneficiary&#8217;s prescribed FIO2 is greater than or equal to 45 mm Hg, or"
     },
     {
       "criterion_code": "CRIT-NIV-02",
@@ -79,11 +79,11 @@
         "als ventilatory support",
         "thoracic restrictive disease"
       ],
-      "cms_document": "DME MAC LCD Respiratory Assist Devices",
-      "source_section": "Indications",
+      "cms_document": "LCD L33800 (MCD lcdid=33800)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: CPAP Failure",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "A RAD (E0470, E0471) is covered for those beneficiaries with one of the following clinical disorders: restrictive thoracic disorders (i.e., neuromuscular diseases or severe thoracic cage abnormalities), CSA or CompSA, hypoventilation syndrome, or chronic respiratory failure (CRF) consequent to chronic obstructive pulmonary disease (COPD), as described in the following section."
     },
     {
       "criterion_code": "CRIT-NIV-EXCL-01",
@@ -112,22 +112,22 @@
         "absence of hypercapnia",
         "normocapnic sleep apnea"
       ],
-      "cms_document": "DME MAC LCD Respiratory Assist Devices",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33800 (MCD lcdid=33800)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Simple OSA Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "- For diagnosis of CSA, the central apnea-central hypopnea index (CAHI) is defined as the average number of episodes of central apnea and central hypopnea per hour of sleep without the use of a positive airway pressure device."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L33800",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=33800.",
+    "real_cms_id": "LCD L33800 (MCD lcdid=33800)",
     "authority": "DME MAC (Noridian / CGS)",
     "document_title": "Respiratory Assist Devices",
-    "citation": "CMS MCD: Respiratory Assist Devices (LCD L33800)",
+    "citation": "CMS LCD L33800, DME MAC Contractors",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33800"
   }
 }

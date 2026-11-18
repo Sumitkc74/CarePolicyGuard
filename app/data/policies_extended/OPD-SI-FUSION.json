@@ -42,11 +42,11 @@
         "si joint injection relief",
         "sacroiliac block pain reduction"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 7: SI Joint Fusion Indications",
+      "cms_document": "LCD L36000 (MCD lcdid=36000)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Diagnostic Block",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "g) At least 75% reduction of pain for the expected duration of the anesthetic used following an image-guided, contrast-enhanced SIJ injection on 2 separate occasions."
     },
     {
       "criterion_code": "CRIT-SI-02",
@@ -77,11 +77,11 @@
         "faber test",
         "thigh thrust test"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 7: SI Joint Fusion Indications",
+      "cms_document": "LCD L36000 (MCD lcdid=36000)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Physical Exam",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "d)&#160;Positive response to the thigh thrust test OR compression test AND 2 of the following additional provocative tests: Gaenslen&#8217;s test, Distraction test, Patrick&#8217;s sign;"
     },
     {
       "criterion_code": "CRIT-SI-EXCL-01",
@@ -110,22 +110,22 @@
         "pelvic osteomyelitis",
         "untreated ankylosing spondylitis"
       ],
-      "cms_document": "CMS OPD Prior Authorization Program Guide",
-      "source_section": "Section 7: Exclusions",
+      "cms_document": "LCD L36000 (MCD lcdid=36000)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Systemic arthropathy such as ankylosing spondylitis or rheumatoid arthritis; Generalized pain behavior (e.g."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L36000",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=36000.",
+    "real_cms_id": "LCD L36000 (MCD lcdid=36000)",
     "authority": "Noridian Healthcare Solutions, LLC",
     "document_title": "Percutaneous minimally invasive fusion/stabilization of the sacroiliac joint for the treatment of back pain",
-    "citation": "CMS MCD: Percutaneous minimally invasive fusion/stabilization of the sacroiliac joint for the treatment of back pain (LCD L36000)",
+    "citation": "CMS LCD L36000, Noridian Healthcare Solutions",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=36000"
   }
 }

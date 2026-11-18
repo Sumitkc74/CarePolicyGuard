@@ -17,9 +17,10 @@ Proves:
 
 import json
 from pathlib import Path
-import pytest
-from app.agents.policy_retriever import PolicyRetrievalAgent
 
+import pytest
+
+from app.agents.policy_retriever import PolicyRetrievalAgent
 
 POLICIES_DIR = Path(__file__).resolve().parent.parent / "app" / "data" / "policies"
 ALL_POLICY_FILES = list(POLICIES_DIR.glob("*.json"))
@@ -69,14 +70,14 @@ def test_all_criteria_carry_complete_traceability_fields(policy_file):
 
     for crit in criteria:
         code = crit.get("criterion_code", "UNKNOWN")
-        assert "cms_document" in crit and crit["cms_document"], f"{policy_file.name} [{code}] missing cms_document"
-        assert "source_section" in crit and crit["source_section"], f"{policy_file.name} [{code}] missing source_section"
-        assert "source_paragraph" in crit and crit["source_paragraph"], f"{policy_file.name} [{code}] missing source_paragraph"
+        assert crit.get("cms_document"), f"{policy_file.name} [{code}] missing cms_document"
+        assert crit.get("source_section"), f"{policy_file.name} [{code}] missing source_section"
+        assert crit.get("source_paragraph"), f"{policy_file.name} [{code}] missing source_paragraph"
         assert "source_traceability_status" in crit, f"{policy_file.name} [{code}] missing source_traceability_status"
-        assert crit["source_traceability_status"] in ("CLAIMED_UNVERIFIED", "UNVERIFIED"), (
-            f"{policy_file.name} [{code}] must be CLAIMED_UNVERIFIED or UNVERIFIED, got {crit['source_traceability_status']}"
+        assert crit["source_traceability_status"] in ("VERIFIED_FROM_MCD", "CLAIMED_UNVERIFIED", "UNVERIFIED"), (
+            f"{policy_file.name} [{code}] must be VERIFIED_FROM_MCD, CLAIMED_UNVERIFIED or UNVERIFIED, got {crit['source_traceability_status']}"
         )
-        assert "source_text_excerpt" in crit and crit["source_text_excerpt"], f"{policy_file.name} [{code}] missing source_text_excerpt"
+        assert crit.get("source_text_excerpt"), f"{policy_file.name} [{code}] missing source_text_excerpt"
 
         # If archetype unverified, it must carry an explicit note
         if crit["source_traceability_status"] == "UNVERIFIED":

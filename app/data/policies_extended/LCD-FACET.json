@@ -42,11 +42,11 @@
         "diagnostic mbb relief",
         "facet block pain reduction"
       ],
-      "cms_document": "Medicare LCD Facet Joint Interventions",
-      "source_section": "Indications",
+      "cms_document": "LCD L38773 (MCD lcdid=38773)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Diagnostic Relief",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The Greater Manchester EUR Policy Statement on Facet Injections no longer commissioned IA facet injections and recommended medial branches nerve blocks for diagnostic evaluation for RFA 12 ."
     },
     {
       "criterion_code": "CRIT-FACET-02",
@@ -77,11 +77,11 @@
         "chronic low back pain",
         "three months pain duration"
       ],
-      "cms_document": "Medicare LCD Facet Joint Interventions",
-      "source_section": "Indications",
+      "cms_document": "LCD L38773 (MCD lcdid=38773)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Pain Chronicity",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "NASS Guidelines state that therapeutic medial branch RFA is a validated treatment for facet mediated pain, and repeat procedures are equally successful if the response to the initial RFA lasted at least three months."
     },
     {
       "criterion_code": "CRIT-FACET-EXCL-01",
@@ -112,22 +112,22 @@
         "spinal malignancy",
         "acute vertebral collapse"
       ],
-      "cms_document": "Medicare LCD Facet Joint Interventions",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L38773 (MCD lcdid=38773)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Radiculopathy - Radiating neuropathic pain causally related to the spinal nerve root irritation, which extends distally producing neuropathic pain in a dermatomal pattern."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L38773",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=38773.",
+    "real_cms_id": "LCD L38773 (MCD lcdid=38773)",
     "authority": "Noridian Healthcare Solutions, LLC",
     "document_title": "Facet Joint Interventions for Pain Management",
-    "citation": "CMS MCD: Facet Joint Interventions for Pain Management (LCD L38773)",
+    "citation": "CMS LCD L38773, Noridian Healthcare Solutions",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=38773"
   }
 }

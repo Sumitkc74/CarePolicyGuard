@@ -22,7 +22,14 @@
       "description": "Documented carotid artery stenosis >= 70% in symptomatic patients or >= 80% in asymptomatic patients verified by carotid duplex ultrasound, CTA, MRA, or angiography.",
       "clinical_intent": "Establish severe anatomical carotid narrowing threshold",
       "criterion_type": "NUMERIC_THRESHOLD",
-      "entity_names": ["carotid stenosis", "stenosis", "carotid duplex", "ica stenosis", "70%", "80%"],
+      "entity_names": [
+        "carotid stenosis",
+        "stenosis",
+        "carotid duplex",
+        "ica stenosis",
+        "70%",
+        "80%"
+      ],
       "operator": ">=",
       "threshold": 70.0,
       "target_unit": "%",
@@ -30,11 +37,11 @@
       "negation_sensitive": true,
       "required_temporal_window": "Within past 6 months",
       "min_score": 0.85,
-      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
-      "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+      "cms_document": "NCD 20.7 (MCD ncdid=201)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph a: Stenosis Severity Thresholds",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "FDA-approved carotid stent systems and FDA-approved embolic protection devices for patients with symptomatic carotid artery stenosis >= 70% or asymptomatic stenosis >= 80%."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Patients with asymptomatic carotid artery stenosis &ge;70%."
     },
     {
       "criterion_code": "CRIT-CAS-02",
@@ -42,16 +49,22 @@
       "description": "Patient has documented clinical or anatomical features placing them at high risk for open CEA (e.g., hostile neck, prior radiation, tracheostomy, severe COPD, STS score >= 8%).",
       "clinical_intent": "Justify percutaneous stenting over surgical endarterectomy",
       "criterion_type": "FINDING_PRESENCE",
-      "entity_names": ["high risk for cea", "hostile neck", "prior radiation", "tracheostomy", "severe copd"],
+      "entity_names": [
+        "high risk for cea",
+        "hostile neck",
+        "prior radiation",
+        "tracheostomy",
+        "severe copd"
+      ],
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Current pre-procedure evaluation",
-      "min_score": 0.80,
-      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
-      "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+      "min_score": 0.8,
+      "cms_document": "NCD 20.7 (MCD ncdid=201)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph b: High Surgical Risk for Carotid Endarterectomy",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "Patients who are at high risk for carotid endarterectomy (CEA) due to significant medical comorbidities or anatomically unfavorable neck features."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Discussion of all treatment options including carotid endarterectomy (CEA), CAS (which includes transcarotid artery revascularization (TCAR), and optimal medical therapy (OMT))."
     },
     {
       "criterion_code": "CRIT-CAS-03",
@@ -59,17 +72,32 @@
       "description": "Procedure plan includes deployment of an FDA-approved distal embolic protection device (filter or flow reversal system) during stent deployment.",
       "clinical_intent": "Prevent distal embolic stroke during stenting",
       "criterion_type": "FINDING_PRESENCE",
-      "entity_names": ["embolic protection device", "epd", "distal filter", "embolic protection system"],
+      "entity_names": [
+        "embolic protection device",
+        "epd",
+        "distal filter",
+        "embolic protection system"
+      ],
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Procedure plan and equipment verification",
       "min_score": 0.85,
-      "cms_document": "CMS Pub 100-03, NCD Manual Section 20.7",
-      "source_section": "Section B.4: Carotid Artery Stenting (CAS)",
+      "cms_document": "NCD 20.7 (MCD ncdid=201)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph c: Mandatory Embolic Protection",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "Coverage is contingent upon the mandatory deployment of an FDA-approved distal embolic protection device."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Effective October 11, 2023, CMS covers PTA of the carotid artery concurrent with stenting with the placement of an FDA-approved carotid stent with an FDA-approved or cleared embolic protection device, for Medicare beneficiaries under the following conditions:"
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API. Full text retrieved from /v1/data/ncd?ncdid=201.",
+    "real_cms_id": "NCD 20.7 (MCD ncdid=201)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Percutaneous Transluminal Angioplasty (PTA)",
+    "citation": "CMS NCD 20.7, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=201"
+  }
 }

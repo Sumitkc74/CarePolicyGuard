@@ -44,11 +44,11 @@
         "vas score",
         "nrs pain score"
       ],
-      "cms_document": "Medicare LCD Vertebral Augmentation",
-      "source_section": "Indications",
+      "cms_document": "LCD L33569 (MCD lcdid=33569)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Pain Severity",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Hospitalized with severe pain (Numeric Rating Scale (NRS) or Visual Analog Scale (VAS) pain score &#8805; 8) 4-7"
     },
     {
       "criterion_code": "CRIT-KYPHO-02",
@@ -79,11 +79,11 @@
         "stir hyperintensity",
         "subacute vertebral fracture"
       ],
-      "cms_document": "Medicare LCD Vertebral Augmentation",
-      "source_section": "Indications",
+      "cms_document": "LCD L33569 (MCD lcdid=33569)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Imaging Criteria",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Acute (&lt; 6 weeks) or subacute (6-12 weeks) osteoporotic VCF (T1 &#8211; L5), based on symptom onset, and documented by advanced imaging (bone marrow edema on MRI or bone-scan/SPECT/CT uptake) 1-3,10,25,27"
     },
     {
       "criterion_code": "CRIT-KYPHO-EXCL-01",
@@ -116,22 +116,22 @@
         "chronic healed fracture",
         "absence of bone marrow edema"
       ],
-      "cms_document": "Medicare LCD Vertebral Augmentation",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33569 (MCD lcdid=33569)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Osteomyelitis, discitis, active systemic or surgical site infection"
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
     "provenance_status": "VERIFIED_FROM_MCD",
-    "checked_date": "2026-11-05",
-    "notes": "Verified against CMS MCD. Identifier and document title match clinical subject.",
-    "real_cms_id": "LCD L33569",
-    "authority": "Palmetto GBA / Noridian",
+    "checked_date": "2026-11-18",
+    "notes": "Re-verified active MCD document via CMS Coverage API /v1/data/lcd?lcdid=33569.",
+    "real_cms_id": "LCD L33569 (MCD lcdid=33569)",
+    "authority": "Noridian Healthcare Solutions, LLC",
     "document_title": "Percutaneous Vertebral Augmentation (PVA) for Osteoporotic Vertebral Compression Fracture (VCF)",
-    "citation": "CMS MCD: Percutaneous Vertebral Augmentation (PVA) for Osteoporotic Vertebral Compression Fracture (VCF) (LCD L33569)",
+    "citation": "CMS LCD L33569, Noridian Healthcare Solutions",
     "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33569"
   }
 }

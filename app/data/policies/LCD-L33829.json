@@ -22,7 +22,13 @@
       "description": "Documented overnight diagnostic polysomnography demonstrating AHI or RDI >= 15 events/hr, or AHI 5-14 accompanied by documented comorbid symptoms (hypertension, excessive daytime sleepiness, stroke, ischemic heart disease).",
       "clinical_intent": "Confirm objective sleep apnea severity meeting statutory threshold",
       "criterion_type": "NUMERIC_THRESHOLD",
-      "entity_names": ["AHI", "apnea-hypopnea index", "RDI", "polysomnography", "sleep study"],
+      "entity_names": [
+        "AHI",
+        "apnea-hypopnea index",
+        "RDI",
+        "polysomnography",
+        "sleep study"
+      ],
       "operator": ">=",
       "threshold": 15.0,
       "target_unit": "events/hr",
@@ -30,11 +36,11 @@
       "negation_sensitive": true,
       "required_temporal_window": "Diagnostic sleep study",
       "min_score": 0.85,
-      "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
-      "source_section": "Coverage Indications, Limitations, and/or Medical Necessity - Initial Coverage",
+      "cms_document": "LCD L33718 (MCD lcdid=33718)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: AHI or RDI >= 15 events/hr, or AHI/RDI >= 5 and <= 14 with documented comorbid hypertension, stroke, or daytime sleepiness",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "An initial positive airway pressure device is covered for beneficiaries with an AHI or RDI >= 15 events per hour, or an AHI or RDI >= 5 and <= 14 events per hour with documented symptoms of excessive daytime sleepiness, impaired cognition, mood disorders, or insomnia, or documented hypertension, ischemic heart disease, or history of stroke."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The apnea-hypopnea index (AHI) is defined as the average number of episodes of apnea and hypopnea per hour of sleep without the use of a positive airway pressure device."
     },
     {
       "criterion_code": "CRIT-CPAP-02",
@@ -42,17 +48,32 @@
       "description": "Documented in-person face-to-face clinical evaluation by prescribing clinician prior to the diagnostic sleep study.",
       "clinical_intent": "Mandatory clinical pre-test evaluation",
       "criterion_type": "FINDING_PRESENCE",
-      "entity_names": ["face-to-face", "in-person", "clinical evaluation", "sleep specialist consultation"],
+      "entity_names": [
+        "face-to-face",
+        "in-person",
+        "clinical evaluation",
+        "sleep specialist consultation"
+      ],
       "is_exclusion": false,
       "negation_sensitive": true,
       "required_temporal_window": "Prior to diagnostic sleep study",
-      "min_score": 0.80,
-      "cms_document": "CMS DME MAC LCD L33829 (Positive Airway Pressure Devices for OSA)",
-      "source_section": "General Requirements",
+      "min_score": 0.8,
+      "cms_document": "LCD L33718 (MCD lcdid=33718)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph A: Face-to-Face Clinical Evaluation",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": "Prior to the sleep test, the beneficiary must have a face-to-face clinical evaluation by the treating physician or practitioner to assess the patient for obstructive sleep apnea."
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "In-person clinical re-evaluation by the treating practitioner with documentation that symptoms of obstructive sleep apnea are improved; and,"
     }
   ],
-  "statutory_waiting_periods": []
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API. Active final LCD for PAP devices is L33718 (lcdid=33718); file policy_id retains LCD-L33829.",
+    "real_cms_id": "LCD L33718 (MCD lcdid=33718)",
+    "authority": "DME MAC Jurisdiction (Noridian / CGS)",
+    "document_title": "Positive Airway Pressure (PAP) Devices for the Treatment of Obstructive Sleep Apnea",
+    "citation": "CMS LCD L33718, DME MAC Contractors",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33718"
+  }
 }

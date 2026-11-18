@@ -428,9 +428,8 @@ def trigger_cms_sync(
             detail=f"Access denied: Role '{current_user.role}' is not authorized to execute CMS policy synchronization. Requires Admin role."
         )
     """
-    Automated Background CMS Sync (Method 2):
-    Pulls latest transmittal records from the CMS Medicare Coverage Database (MCD) feed,
-    detects criteria/threshold revisions, and updates local carepolicyguard.db.
+    Synchronizes local carepolicyguard.db policies and criteria with the canonical
+    verified Medicare policy catalog using the authoritative seed_policies routine.
     """
     try:
         report = sync_cms_policies(db=db, force_update=force)

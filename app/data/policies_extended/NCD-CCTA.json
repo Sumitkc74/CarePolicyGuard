@@ -42,11 +42,11 @@
         "sinus rhythm heart rate < 65",
         "stable anginal equivalent"
       ],
-      "cms_document": "CMS NCD Manual Section 220.1",
-      "source_section": "Indications",
+      "cms_document": "LCD L33947 (MCD lcdid=33947)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Pre-test Probability",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Current available body of evidence demonstrates that CCTA can reliably rule out the presence of significant coronary artery disease (CAD) in patients with a low to intermediate probability of having CAD and can reliably achieve a high degree of diagnostic accuracy and technical performance necessary to replace conventional angiography."
     },
     {
       "criterion_code": "CRIT-CCTA-02",
@@ -75,11 +75,11 @@
         "equivocal stress echo",
         "unable to exercise"
       ],
-      "cms_document": "CMS NCD Manual Section 220.1",
-      "source_section": "Indications",
+      "cms_document": "LCD L33947 (MCD lcdid=33947)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Stress Testing",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Patients with known disease may have had remote invasive angiography and/or stress testing to evaluate prior events or symptoms."
     },
     {
       "criterion_code": "CRIT-CCTA-EXCL-01",
@@ -110,24 +110,22 @@
         "egfr less than 30",
         "severe contrast allergy"
       ],
-      "cms_document": "CMS NCD Manual Section 220.1",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L33947 (MCD lcdid=33947)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Contraindications",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Pulmonary vein catheter ablation can isolate electrical activity from the pulmonary veins and allow for the elimination of recurrent atrial fibrillation."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD database primary key ncdid=227 corresponds to Section 280.7 'Hospital Beds', whereas policy subject is CCTA. Flagged as needing realignment.",
-    "real_cms_id": "NCD Manual Section 280.7 (MCD ncdid=227)",
-    "authority": "CMS National Coverage Determination",
-    "document_title": "Hospital Beds",
-    "mcd_actual_title": "Hospital Beds",
-    "citation": "CMS MCD Document at Cited ID: Hospital Beds",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=227",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=33947. Replaces MISMATCH (previously cited NCD 227 was Hospital Beds).",
+    "real_cms_id": "LCD L33947 (MCD lcdid=33947)",
+    "authority": "CGS Administrators, LLC",
+    "document_title": "Cardiac Computed Tomography (CCT) and Coronary Computed Tomography Angiography (CCTA)",
+    "citation": "CMS LCD L33947, CGS Administrators",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=33947"
   }
 }

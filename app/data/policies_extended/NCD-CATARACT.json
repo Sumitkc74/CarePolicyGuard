@@ -46,11 +46,11 @@
         "snellen 20/70",
         "severe disabling glare"
       ],
-      "cms_document": "CMS NCD Manual Section 10.1",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L39905 (MCD lcdid=39905)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Visual Acuity",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Patients considered for the study had significant bilateral cataracts causing visual impairment not correctable by glasses, best corrected visual acuity (BCVA) score worse than 0.7, an unacceptable glare, polyopia, or overall reduced vision quality due to cataracts."
     },
     {
       "criterion_code": "CRIT-CAT-02",
@@ -81,11 +81,11 @@
         "visual impairment limiting adls",
         "difficulty seeing steps"
       ],
-      "cms_document": "CMS NCD Manual Section 10.1",
-      "source_section": "Coverage Indications",
+      "cms_document": "LCD L39905 (MCD lcdid=39905)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Functional ADL Deficit",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The cataract is causing visual impairment that is not correctable with a tolerable change in glasses or contact lenses, resulting in the inability to perform Activities of Daily Living such as, but not limited to, driving, reading, watching television, and/or meeting vocational or recreational needs, 4 OR"
     },
     {
       "criterion_code": "CRIT-CAT-EXCL-01",
@@ -114,22 +114,22 @@
         "purely refractive lens exchange",
         "asymptomatic cataract"
       ],
-      "cms_document": "CMS NCD Manual Section 10.1",
-      "source_section": "Exclusions",
+      "cms_document": "LCD L39905 (MCD lcdid=39905)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Refractive Surgery Non-Coverage",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "We received additional documentation from a provider for clear lens extraction for treatment of PACD, but that literature was not included as it was out of the scope of this LCD."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at NCD 10.1 governs 'Use of Visual Tests Prior to and General Anesthesia during Cataract Surgery', whereas policy subject is Cataract Extraction with Intraocular Lens (IOL) Implantation. Flagged as failing title-match rule; requires re-alignment.",
-    "real_cms_id": "NCD 10.1 (MCD ncdid=60)",
-    "authority": "CMS National Coverage Determination",
-    "document_title": "Use of Visual Tests Prior to and General Anesthesia during Cataract Surgery",
-    "citation": "CMS MCD: Use of Visual Tests Prior to and General Anesthesia during Cataract Surgery (NCD 10.1 (MCD ncdid=60))",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=60"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/lcd?lcdid=39905. Replaces MISMATCH (previously cited NCD 60 was preoperative visual testing, not surgery).",
+    "real_cms_id": "LCD L39905 (MCD lcdid=39905)",
+    "authority": "WPS Insurance Corporation",
+    "document_title": "Cataract Surgery",
+    "citation": "CMS LCD L39905, WPS Insurance Corporation / NCD 80.10",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=39905"
   }
 }

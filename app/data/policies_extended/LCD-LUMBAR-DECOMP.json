@@ -44,11 +44,11 @@
         "foraminal stenosis",
         "moderate to severe stenosis on mri"
       ],
-      "cms_document": "Medicare LCD Lumbar Decompression",
-      "source_section": "Indications",
+      "cms_document": "NCD 150.13 (MCD ncdid=358)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Imaging Criteria",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Endoscopically assisted laminotomy/laminectomy, which requires open and direct visualization, as well as other open lumbar decompression procedures for LSS are not within the scope of this NCD and coverage is at contractor discretion."
     },
     {
       "criterion_code": "CRIT-LDEC-02",
@@ -85,11 +85,11 @@
         "nsaids",
         "analgesics"
       ],
-      "cms_document": "Medicare LCD Lumbar Decompression",
-      "source_section": "Indications",
+      "cms_document": "NCD 150.13 (MCD ncdid=358)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 2: Conservative Care",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Does PILD provide a clinically meaningful improvement of function (e.g., reduced acute and post-acute hospitalizations, nursing home care or inpatient rehabilitation services) and/or quality of life in Medicare beneficiaries with LSS compared to other treatments?"
     },
     {
       "criterion_code": "CRIT-LDEC-EXCL-01",
@@ -120,24 +120,22 @@
         "no claudication",
         "no radiculopathy"
       ],
-      "cms_document": "Medicare LCD Lumbar Decompression",
-      "source_section": "Exclusions",
+      "cms_document": "NCD 150.13 (MCD ncdid=358)",
+      "source_section": "Indications and Limitations of Coverage",
       "source_paragraph": "Paragraph 1: Asymptomatic Exclusion",
-      "source_traceability_status": "CLAIMED_UNVERIFIED",
-      "source_text_excerpt": null
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "The eligibility requirements, both inclusion and exclusion criteria that were specified in the CMS-approved RCT protocol, must be maintained in the new prospective, longitudinal study."
     }
   ],
   "statutory_waiting_periods": [],
   "cms_reference": {
-    "provenance_status": "MISMATCH",
-    "checked_date": "2026-11-05",
-    "notes": "MCD document at L35081 governs NCS/EMG, whereas policy subject is Lumbar Laminectomy and Decompression. Flagged as needing realignment.",
-    "real_cms_id": "LCD L35081",
-    "authority": "Medicare Administrative Contractor (MAC)",
-    "document_title": "Nerve Conduction Studies and Electromyography",
-    "mcd_actual_title": "Nerve Conduction Studies and Electromyography",
-    "citation": "CMS MCD Document at Cited ID: Nerve Conduction Studies and Electromyography",
-    "url": "https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=35081",
-    "alignment_flag": "NEEDS_REALIGNMENT"
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Verified from official CMS Coverage API /v1/data/ncd?ncdid=358. Replaces MISMATCH (previously cited L35081 was Nerve Conduction Studies).",
+    "real_cms_id": "NCD 150.13 (MCD ncdid=358)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Percutaneous Image-Guided Lumbar Decompression for Lumbar Spinal Stenosis",
+    "citation": "CMS NCD 150.13, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=358"
   }
 }
