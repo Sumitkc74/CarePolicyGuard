@@ -586,7 +586,7 @@ def run_agentic_mode(
                 case_advocacy_rejections += 1
                 total_advocacy_rejections += 1
                 fg = meta.get("failing_gate") or meta.get("gate")
-                if meta.get("empty_quote"):
+                if meta.get("empty_quote") or not adv_q or adv_q.strip() == "":
                     advocacy_rejections_empty_quote += 1
                     case_advocacy_empty += 1
                     block_reason = "Empty quote (no supporting evidence)"
@@ -1241,16 +1241,18 @@ def main() -> None:
             "passed": bool(det_reproduced and dec_reproduced),
         }
 
+        is_v63 = "v63" in str(args.output)
         is_v62 = "v62" in str(args.output)
         is_v61 = "v61" in str(args.output)
         summary = {
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
                 "benchmark_run": (
-                    "v62 three-mode full measurement" if is_v62
-                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement")
+                    "v63 three-mode full measurement" if is_v63
+                    else ("v62 three-mode full measurement" if is_v62
+                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement"))
                 ),
-                "parent_git_head": "f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a"),
+                "parent_git_head": "c305e65" if is_v63 else ("f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a")),
                 "database_used": "carepolicyguard.db",
                 "database_path": db_path,
                 "model": "qwen2.5:3b (local Ollama)",

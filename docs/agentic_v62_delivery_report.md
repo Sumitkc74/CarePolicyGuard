@@ -33,12 +33,12 @@ The v62 release completes architectural scoping of Gate C matching to governing 
 ### Four-Number Safety Comparison Table
 All metrics recomputed directly from committed evidence in [app/data/benchmarks/agentic_v62_three_mode_run.json](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/agentic_v62_three_mode_run.json):
 
-| Execution Mode | Concordant Decisions (Accuracy) | False Approvals (Safety) | False Denials | Safe Deferrals (Abstentions) | Synonymy Resolved (Target 19) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Deterministic Mode** (Committed 12 Concepts, 0 LLM calls) | **37 / 84 (44.0% dev)** | **0** | 2 | 45 | 0 / 19 (0.0% dev) |
-| **Declarative Mode** (Committed 12 Concepts, LLM Proposer) | **39 / 84 (46.4% dev)** | **0** | 0 | 45 | 0 / 19 (0.0% dev) |
-| **Agentic Mode v61** (Merged 131 Concepts, 8-Call Budget) | **47 / 84 (56.0% dev)** | **0** | 0 | 37 | 9 / 19 (47.4% dev) |
-| **Agentic Mode v62** (Merged 131 Concepts, Scoped Gate C + Span Refine) | **48 / 84 (57.1% dev)** | **0** | **0** | **36** | **10 / 19 (52.6% dev)** |
+| Execution Mode | Decisions (Approved / Denied / Deferred) | Concordant Decisions (Accuracy) | False Approvals (Safety) | False Denials | Safe Deferrals (Abstentions) | Synonymy Resolved (Target 19) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Deterministic Mode** (Committed 12 Concepts, 0 LLM calls) | 17 / 22 / 45 | **37 / 84 (44.0% dev)** | **0** | 2 | 45 | 0 / 19 (0.0% dev) |
+| **Declarative Mode** (Committed 12 Concepts, LLM Proposer) | 19 / 20 / 45 | **39 / 84 (46.4% dev)** | **0** | 0 | 45 | 0 / 19 (0.0% dev) |
+| **Agentic Mode v61** (Merged 131 Concepts, 8-Call Budget) | 29 / 18 / 37 | **47 / 84 (56.0% dev)** | **0** | 0 | 37 | 9 / 19 (47.4% dev) |
+| **Agentic Mode v62** (Merged 131 Concepts, Scoped Gate C + Span Refine) | 30 / 18 / 36 | **48 / 84 (57.1% dev)** | **0** | **0** | **36** | **10 / 19 (52.6% dev)** |
 
 ---
 
@@ -60,14 +60,16 @@ In v61, five budget-cleared criteria ran but were blocked at Gate C. Below is th
 
 ### 1. `CRIT-SBRT-01` (`DEV-LCD-SBRT-APP`)
 - **Outcome**: **RESCUED** (Promoted to `MET`)
-- **Mechanism**: Advocate span selection prioritized inoperability and staging elements over the isolated metric `"SUV max 8.4"`. The advocate quoted `"Medically inoperable early-stage non-small cell lung cancer."`. Gate C verified equivalence under `CONCEPT-LUNG-CANCER`.
+- **Verbatim Quote**: `"Medically inoperable early-stage non-small cell lung cancer."` (slice `[630:690]`)
+- **Mechanism**: Advocate span selection prioritized inoperability and staging elements over the isolated metric `"SUV max 8.4"`. The advocate quoted `"Medically inoperable early-stage non-small cell lung cancer."` at character slice `[630:690]`. Gate C verified equivalence under `CONCEPT-LUNG-CANCER`.
 - **Transcript Evidence**:
   > `[#07] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-SBRT-01`  
   > `Content: Defense of CRIT-SBRT-01: Grounded advocacy quote 'Medically inoperable early-stage non-small cell lung cancer.' passed Gate A, Gate B, and Gate C. Promoting CRIT-SBRT-01 to MET.`
 
 ### 2. `CRIT-SCS-02` (`DEV-NCD-SCS-APP`)
 - **Outcome**: Still failing, but **cross-domain collision completely eliminated**.
-- **Mechanism**: In v61, Gate C suffered a false collision where `"spinal cord"` in the SCS note matched `CONCEPT-PROTON-PBT-01` (`Skull Base, Spine, or Critical Structure Proximity`, Radiation Oncology). With domain scoping, the proton concept was excluded from candidate evaluation under `NCD-SCS` (Interventional Pain / Neurosurgery). The criterion was evaluated purely within its governing domain. It remains un-promoted because the unmapped phrase `"Pre-procedure psychological evaluation completed and cleared"` requires human attestation to activate the corresponding draft concept map entry.
+- **Verbatim Quote**: `"Patient completed a 6-day temporary percutaneous spinal cord stimulator trial, documenting 80% pain relief and significant increase in daily walking distance."`
+- **Mechanism**: In v61, Gate C suffered a false collision where `"spinal cord"` in the SCS note matched `CONCEPT-PROTON-PBT-01` (`Skull Base, Spine, or Critical Structure Proximity`, Radiation Oncology). With domain scoping, the proton concept was excluded from candidate evaluation under `NCD-SCS` (Interventional Pain / Neurosurgery). The criterion was evaluated purely within its governing domain. It remains un-promoted because the advocate quoted the stimulator trial text instead of psychological clearance, and Gate C rejected it as no matching concept definition.
 - **Transcript Evidence**:
   > `[#13] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-SCS-02`  
   > `Content: Advocacy on CRIT-SCS-02 rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).`  
@@ -75,21 +77,24 @@ In v61, five budget-cleared criteria ran but were blocked at Gate C. Below is th
 
 ### 3. `CRIT-KYPHO-02` (`DEV-LCD-KYPHO-APP`)
 - **Outcome**: Still failing.
-- **Mechanism**: Within the `Interventional Radiology / Spine Surgery` domain, the clinical note documented acute fracture with bone edema, but the specific phrasing had no matching accepted synonym in the committed concept map.
+- **Verbatim Quote**: `"Severe focal spinous process percussion tenderness at T12. Thoracic spine MRI shows 35% height loss of T12 with intense hyperintensity on STIR imaging..."`
+- **Mechanism**: Within the `Interventional Radiology / Spine Surgery` domain, the clinical note documented acute fracture with STIR hyperintensity, but the phrasing did not match an accepted synonym for refractory pain or fracture edema under the committed concept map.
 - **Transcript Evidence**:
   > `[#15] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-KYPHO-02`  
   > `Content: Advocacy on CRIT-KYPHO-02 rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).`
 
 ### 4. `CRIT-PAD-02` (`DEV-LCD-PAD-ATHERO-APP`)
 - **Outcome**: Still failing.
-- **Mechanism**: In `Vascular Surgery / Interventional Cardiology`, `CRIT-PAD-02` ("Lower Extremity Arterial Stenosis") remains an unmapped concept in the committed dictionary.
+- **Verbatim Quote**: `"Right lower extremity arterial duplex ultrasound demonstrates 85% focal stenosis in the proximal superficial femoral artery with monophasic waveform distally."`
+- **Mechanism**: In `Vascular Surgery / Interventional Cardiology`, `CRIT-PAD-02` evaluated duplex 85% focal stenosis, which does not match an approved synonym in the committed concept dictionary.
 - **Transcript Evidence**:
   > `[#15] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-PAD-02`  
   > `Content: Advocacy on CRIT-PAD-02 rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: No matching concept definition.).`
 
 ### 5. `CRIT-CAT-02` (`DEV-NCD-CATARACT-APP`)
 - **Outcome**: Still failing.
-- **Mechanism**: The advocate quoted disability reading standard print, which was evaluated within Ophthalmology against `CRIT-CAT-02` (`Visual Impairment ADLs`). Gate C correctly distinguished ADL impairment from lens opacity (`CONCEPT-VISUAL-IMPAIRMENT` vs `CONCEPT-CATARACT-LENS-OPACITY`).
+- **Verbatim Quote**: `"Visually significant cataract in right eye causing substantial impairment of activities of daily living refractory to spectacles."`
+- **Mechanism**: The advocate quoted the ADL impairment text, which was evaluated within Ophthalmology against `CRIT-CAT-02` (`Visual Impairment ADLs`). Gate C distinguished the ADL impairment concept from lens opacity (`CONCEPT-VISUAL-IMPAIRMENT` vs `CONCEPT-CATARACT-LENS-OPACITY`).
 - **Transcript Evidence**:
   > `[#15] [Agent 3: Adversarial Verifier] -> CHALLENGE | Criterion: CRIT-CAT-02`  
   > `Content: Advocacy on CRIT-CAT-02 rejected by GATE_C_MAP_CHECK (ConceptMap equivalence rejected: NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('Visual Impairment ADLs' vs 'Cataract and Lens Opacity')..).`
@@ -118,6 +123,10 @@ Two-Sided Debate Dynamics:
   - Decisions Changed by Debate: 0
 
 Budget & Latency Telemetry:
+  - Total Decisions: Approved 30 (35.7%), Denied 18 (21.4%), Deferred 36 (42.9%) [Concordant: 48 (57.1%)]
+  - Autonomous Approvals: 30 (35.7%), Denials: 18 (21.4%)
+  - Judge Calls: 64 total across 84 cases (mean 0.76 calls/case, formula: total_judge_calls / 84)
+  - Agent Turns: 180 total across 84 cases (mean 2.14 turns/case, formula: sum(turns_taken) / 84 using turns_taken field across Agent 2 and Agent 3)
   - Operational Budget Halts: 0
   - Abstention Gate Halts: 36 (34 missing mandatory criteria, 2 confidence below tau=0.85)
   - Mean Judge Latency: 15.04 s (max: 20.10 s)
@@ -134,12 +143,12 @@ Budget & Latency Telemetry:
 - **Declarative**: 0 / 84
 - **Agentic**: 0 / 84
 
-### Legitimate Omissions (True Negative Control Set)
-All 4 statutory omission negative controls continue to safely defer to a human clinician:
-1. `DEV-LCD-MRI-BRAIN-NEG` (`LCD-MRI-BRAIN`): Expected `DENIED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral)
-2. `DEV-LCD-MRI-LUMBAR-NEG` (`LCD-MRI-LUMBAR`): Expected `DENIED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral)
-3. `DEV-NCD-CCTA-NEG` (`NCD-CCTA`): Expected `DENIED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral)
-4. `DEV-NCD-PACEMAKER-NEG` (`NCD-PACEMAKER`): Expected `DENIED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral)
+### Legitimate Omissions (True Positive Cases with Omitted Elements)
+All 4 omission controls continue to safely defer to a human clinician:
+1. `DEV-LCD-MRI-BRAIN-APP` (`LCD-MRI-BRAIN`): Expected `APPROVED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral; omitted red flags requirement)
+2. `DEV-LCD-MRI-LUMBAR-APP` (`LCD-MRI-LUMBAR`): Expected `APPROVED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral; omitted 6-week conservative trial)
+3. `DEV-NCD-CCTA-APP` (`NCD-CCTA`): Expected `APPROVED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral; omitted intermediate CAD risk documentation)
+4. `DEV-NCD-PACEMAKER-APP` (`NCD-PACEMAKER`): Expected `APPROVED` → Actual: `DEFERRED_TO_HUMAN` (Safe Deferral; omitted reversible cause documentation)
 
 ---
 

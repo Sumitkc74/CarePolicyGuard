@@ -832,9 +832,10 @@ class ClinicalEquivalenceJudge:
             rationale = str(parsed.get("rationale", "No rationale provided.")).strip()
 
             # Task 2 (v62): Refine quote to prioritize span addressing core criterion elements
-            refined_quote = self.select_most_relevant_span(criterion, note_text, candidate_quote=quote)
-            if refined_quote and refined_quote in note_text:
-                quote = refined_quote
+            if quote:
+                refined_quote = self.select_most_relevant_span(criterion, note_text, candidate_quote=quote)
+                if refined_quote and refined_quote in note_text:
+                    quote = refined_quote
 
             return AdvocacyResult(
                 advocacy_quote=quote,
