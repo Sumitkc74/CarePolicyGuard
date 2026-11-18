@@ -2844,52 +2844,6 @@ function updatePolicyStep2Preview() {
         `;
     }
 }
-    const patElem = document.getElementById("step2-patient-id");
-    const listElem = document.getElementById("step2-requirements-list");
-
-    if (idElem) idElem.textContent = policyId;
-    if (patElem) {
-        if (currentNoteMode === "actual") {
-            patElem.textContent = `Patient Identifier: ${patientId} (Actual Clinical Consultation Note)`;
-        } else {
-            patElem.textContent = `Sample Case: Synthetic Test Record (${patientId})`;
-        }
-    }
-
-    if (policyId === "NCD-20.4") {
-        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-blue"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path><path d="M3.5 12h3l2-4 3 8 2-5 2 2h4"></path></svg></span>`;
-        if (titleElem) titleElem.textContent = "Implantable Automatic Defibrillators";
-        if (listElem) listElem.innerHTML = `
-            <span class="rule-chip">LVEF &le; 35%</span>
-            <span class="rule-chip">NYHA Class II or III</span>
-            <span class="rule-chip">GDMT &ge; 90 days</span>
-            <span class="rule-chip">No MI within 40 days</span>
-        `;
-    } else if (policyId === "LCD-L33829") {
-        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-cyan"><svg viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path></svg></span>`;
-        if (titleElem) titleElem.textContent = "PAP Devices for Sleep Apnea";
-        if (listElem) listElem.innerHTML = `
-            <span class="rule-chip">Diagnostic Polysomnogram</span>
-            <span class="rule-chip">AHI &ge; 15/hr (or &ge; 5 with symptoms)</span>
-            <span class="rule-chip">Face-to-face evaluation</span>
-        `;
-    } else if (policyId === "NCD-20.29") {
-        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-amber"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg></span>`;
-        if (titleElem) titleElem.textContent = "Hyperbaric Oxygen for Diabetic Wounds";
-        if (listElem) listElem.innerHTML = `
-            <span class="rule-chip">Diabetic lower extremity wound</span>
-            <span class="rule-chip">Wagner Grade III or higher</span>
-            <span class="rule-chip">Failed 30-day conventional care</span>
-        `;
-    } else {
-        if (badgeIcon) badgeIcon.innerHTML = `<span class="med-icon icon-lg icon-blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>`;
-        if (titleElem) titleElem.textContent = "Medicare Coverage Determination";
-        if (listElem) listElem.innerHTML = `
-            <span class="rule-chip">Documented clinical necessity</span>
-            <span class="rule-chip">Prior conservative therapy</span>
-        `;
-    }
-}
 
 function goToWizardScreen(stepNumber) {
     if (stepNumber < 1) stepNumber = 1;
