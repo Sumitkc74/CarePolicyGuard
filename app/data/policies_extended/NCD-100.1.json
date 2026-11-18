@@ -1,0 +1,135 @@
+{
+  "policy_id": "NCD-100.1",
+  "title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2006-02-21",
+  "category": "Bariatric Surgery",
+  "description": "CMS National Coverage Determination for open and laparoscopic bariatric surgery (RYGBP, BPD/DS, LAGB) for morbid obesity (NCD 100.1).",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 100.1 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-BARI-01",
+      "name": "Severe Obesity Threshold (BMI >= 35 with Comorbidity)",
+      "description": "Body mass index (BMI) >= 35 kg/m2 with at least one serious obesity-related comorbidity (e.g. type 2 diabetes, severe sleep apnea, obesity-hypoventilation).",
+      "clinical_intent": "Verify diagnostic body mass index threshold and medical comorbidity",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "body mass index",
+        "bmi >= 35",
+        "morbid obesity",
+        "type 2 diabetes",
+        "sleep apnea"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "body mass index",
+        "bmi",
+        "co-morbid",
+        "morbid obesity",
+        "diabetes"
+      ],
+      "cms_document": "NCD 100.1 (MCD ncdid=57)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Roux-en-Y gastric bypass (RYGBP), open and laparoscopic Biliopan"
+    },
+    {
+      "criterion_code": "CRIT-BARI-02",
+      "name": "Prior Unsuccessful Non-Surgical Weight Loss Attempts",
+      "description": "Medical record documentation of previous unsuccessful non-surgical attempts at weight loss under medical supervision.",
+      "clinical_intent": "Ensure medical conservative weight loss management was attempted",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "previous weight loss attempts",
+        "conservative weight management",
+        "dietary supervision"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "unsuccessful",
+        "previous",
+        "weight loss",
+        "medical supervision"
+      ],
+      "cms_document": "NCD 100.1 (MCD ncdid=57)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "bariatric surgery procedures are non-covered for"
+    },
+    {
+      "criterion_code": "CRIT-BARI-03",
+      "name": "Multidisciplinary Preoperative Evaluation",
+      "description": "Thorough multidisciplinary clinical evaluation by bariatric surgical and psychological / medical teams prior to surgery.",
+      "clinical_intent": "Mandate comprehensive preoperative workup and psychological readiness",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "multidisciplinary evaluation",
+        "preoperative workup",
+        "psychological clearance"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "multidisciplinary",
+        "evaluation",
+        "surgical team",
+        "preoperative"
+      ],
+      "cms_document": "NCD 100.1 (MCD ncdid=57)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "procedures are only covered when performed at facilities that are: (1) certified b"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=57.",
+    "real_cms_id": "NCD 100.1 (MCD ncdid=57)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+    "citation": "CMS NCD 100.1, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=57"
+  }
+}

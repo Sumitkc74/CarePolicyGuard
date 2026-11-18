@@ -1,6 +1,6 @@
-import pytest
-from app.services.hybrid_retriever import DenseSemanticRetriever, HybridPolicyRetriever
 from app.services.declarative_engine import DeclarativePolicyEngine
+from app.services.hybrid_retriever import DenseSemanticRetriever, HybridPolicyRetriever
+
 
 def test_dense_concept_retriever_fires_for_all_clinical_domains():
     """
@@ -69,11 +69,11 @@ def test_hybrid_policy_retriever_fallback_indexes_all_50_policies_when_db_empty(
     retriever = HybridPolicyRetriever(db=None)
 
     all_policies = DeclarativePolicyEngine.get_all_policies()
-    assert len(all_policies) == 50, f"Expected 50 declarative policies, found {len(all_policies)}"
+    assert len(all_policies) == 60, f"Expected 60 declarative policies, found {len(all_policies)}"
 
     indexed_policy_ids = {chunk["policy_id"] for chunk in retriever.chunks}
     for pol in all_policies:
         assert pol.policy_id in indexed_policy_ids, f"Policy {pol.policy_id} missing from fallback index"
 
-    assert len(indexed_policy_ids) == 50
+    assert len(indexed_policy_ids) == 60
 

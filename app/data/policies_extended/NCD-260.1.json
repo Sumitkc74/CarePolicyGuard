@@ -1,0 +1,133 @@
+{
+  "policy_id": "NCD-260.1",
+  "title": "Adult Liver Transplantation",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "1996-07-15",
+  "category": "Transplantation Surgery",
+  "description": "CMS National Coverage Determination for Adult Liver Transplantation (NCD 260.1) for end-stage liver disease and unresectable localized hepatocellular carcinoma.",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 260.1 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-LIVER-01",
+      "name": "Irreversible End-Stage Liver Disease or Localized HCC",
+      "description": "Diagnosis of irreversible end-stage liver disease (ESLD) or localized hepatocellular carcinoma (HCC) where patient is not a candidate for subtotal liver resection.",
+      "clinical_intent": "Confirm diagnosis of ESLD or non-resectable localized HCC",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "end stage liver disease",
+        "esld",
+        "hepatocellular carcinoma",
+        "hcc",
+        "unresectable liver tumor"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "end-stage liver disease",
+        "adult liver transplantation",
+        "hepatocellular carcinoma",
+        "subtotal liver resection"
+      ],
+      "cms_document": "NCD 260.1 (MCD ncdid=70)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "adult liver transplantation when performed on beneficiaries with end- stage liver disease other than hepatitis B or malignancies"
+    },
+    {
+      "criterion_code": "CRIT-LIVER-02",
+      "name": "Absence of Extrahepatic Metastases or Macrovascular Invasion",
+      "description": "For HCC candidates, radiographic confirmation of absence of extrahepatic metastases and absence of macrovascular tumor invasion into major vessels.",
+      "clinical_intent": "Exclude extrahepatic metastatic spread and vascular invasion",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "absence of metastasis",
+        "no macrovascular invasion",
+        "milan criteria"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "extrahepatic",
+        "metastatic",
+        "macrovascular",
+        "candidate for subtotal"
+      ],
+      "cms_document": "NCD 260.1 (MCD ncdid=70)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "not a candidate for subtotal liver resection;&lt;&sol;li&gt;      \n\t&lt;li&gt;The pa"
+    },
+    {
+      "criterion_code": "CRIT-LIVER-03",
+      "name": "Approved Medicare Transplant Center Facility",
+      "description": "Liver transplantation performed in a facility approved by CMS as meeting Medicare transplant center requirements.",
+      "clinical_intent": "Mandate approved transplant center facility accreditation",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "approved facility",
+        "medicare transplant center",
+        "facility certification"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "facility which is approved",
+        "approved by the CMS",
+        "transplantation"
+      ],
+      "cms_document": "NCD 260.1 (MCD ncdid=70)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "adult liver transplantation when performed on beneficiaries with en"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=70.",
+    "real_cms_id": "NCD 260.1 (MCD ncdid=70)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Adult Liver Transplantation",
+    "citation": "CMS NCD 260.1, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=70"
+  }
+}

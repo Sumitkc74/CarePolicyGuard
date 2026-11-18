@@ -1,7 +1,7 @@
 {
   "generated_date": "2026-11-18",
-  "total_policies": 50,
-  "verified_from_mcd_count": 40,
+  "total_policies": 60,
+  "verified_from_mcd_count": 50,
   "no_mcd_document_count": 10,
   "policies": {
     "LCD-L33829": {
@@ -1719,6 +1719,286 @@
           "source_traceability_status": "VERIFIED_FROM_MCD",
           "cms_document": "LCD L34082 (MCD lcdid=34082)",
           "source_text_excerpt": "Spider veins (telangiectases) are dilated capillary veins that are most often treated for cosmetic purposes."
+        }
+      ]
+    },
+    "NCD-50.3": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 50.3 (MCD ncdid=245)",
+      "document_title": "Cochlear Implantation",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=245",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-COCH-01",
+          "name": "Bilateral Moderate-to-Profound Sensorineural Hearing Loss",
+          "excerpt": "bilateral moderate-to-profound sensorineural hearing impairment with l",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-COCH-02",
+          "name": "Speech Recognition Score Threshold (<= 40% to 60%)",
+          "excerpt": "test scores of less than or equal to 60% correct in the best-aided listening",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-COCH-03",
+          "name": "Cognitive Ability and Rehabilitation Suitability",
+          "excerpt": "Cognitive ability to use auditory clues and a willingness to undergo an extende",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-240.4": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 240.4 (MCD ncdid=226)",
+      "document_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=226",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-CPAP-01",
+          "name": "Documented AHI or RDI >= 15 Events/Hour (or >= 5 with Comorbidities)",
+          "excerpt": "events per hour, or&lt;&sol;li&gt; \r\n\t&lt;li&gt;AHI or",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-CPAP-02",
+          "name": "Initial 12-Week Trial and Clinical Benefit Reassessment",
+          "excerpt": "Coverage of CPAP is initially limited to a 12-week period to identify beneficiaries diagnosed wit",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-CPAP-03",
+          "name": "Patient Device Education",
+          "excerpt": "provider of CPAP must conduct education of the beneficiary prior to the use of the CPAP device to",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-100.1": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 100.1 (MCD ncdid=57)",
+      "document_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=57",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-BARI-01",
+          "name": "Severe Obesity Threshold (BMI >= 35 with Comorbidity)",
+          "excerpt": "Roux-en-Y gastric bypass (RYGBP), open and laparoscopic Biliopan",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-BARI-02",
+          "name": "Prior Unsuccessful Non-Surgical Weight Loss Attempts",
+          "excerpt": "bariatric surgery procedures are non-covered for",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-BARI-03",
+          "name": "Multidisciplinary Preoperative Evaluation",
+          "excerpt": "procedures are only covered when performed at facilities that are: (1) certified b",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-160.24": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 160.24 (MCD ncdid=279)",
+      "document_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=279",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-DBS-01",
+          "name": "Diagnosis of Refractory Essential Tremor or Parkinsonian Tremor",
+          "excerpt": "Diagnosis of ET based on postural or kinetic tremors of hand(s) without other neurologic sig",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-DBS-02",
+          "name": "Severe Disabling Tremor Rating Score",
+          "excerpt": "Marked disabling tremor of at least level 3 or 4 on the Fahn-Tolosa-Marin Clinical Tremor Rating Scale (or equiva",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-DBS-03",
+          "name": "Cognitive Suitability and Cooperative Operative Ability",
+          "excerpt": "Willingness and ability to cooperate during conscious operative procedure, as well as during post-surgical evalua",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-210.3": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 210.3 (MCD ncdid=281)",
+      "document_title": "Colorectal Cancer Screening Tests",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=281",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-CRC-01",
+          "name": "Beneficiary Age Eligibility (>= 45 to 50 Years)",
+          "excerpt": "early detection of colorectal cancer. This means that Medicare will cover on",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-CRC-02",
+          "name": "Screening Modality Compliance (FOBT / Colonoscopy / FIT-DNA)",
+          "excerpt": "Medicare covers one screening FOBT per annum for the early detection of colorectal c",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-CRC-03",
+          "name": "Asymptomatic Clinical Status",
+          "excerpt": "early detection of colorectal cancer. This means that Medicare will cover on",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-260.1": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 260.1 (MCD ncdid=70)",
+      "document_title": "Adult Liver Transplantation",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=70",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-LIVER-01",
+          "name": "Irreversible End-Stage Liver Disease or Localized HCC",
+          "excerpt": "adult liver transplantation when performed on beneficiaries with end- stage liver disease other than hepatitis B or malignancies",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-LIVER-02",
+          "name": "Absence of Extrahepatic Metastases or Macrovascular Invasion",
+          "excerpt": "not a candidate for subtotal liver resection;&lt;&sol;li&gt;      \n\t&lt;li&gt;The pa",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-LIVER-03",
+          "name": "Approved Medicare Transplant Center Facility",
+          "excerpt": "adult liver transplantation when performed on beneficiaries with en",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-160.18": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 160.18 (MCD ncdid=230)",
+      "document_title": "Vagus Nerve Stimulation (VNS)",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=230",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-VNS-01",
+          "name": "Medically Refractory Partial Onset Seizures",
+          "excerpt": "medically refractory partial onset seizures for whom surgery is not recommended or for whom surgery has failed.&lt;&sol",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-VNS-02",
+          "name": "Failure of Optimal Antiepileptic Drug Regimens",
+          "excerpt": "VNS is reasonable and necessary for patients with medically refractory partial onset seizures for whom surgery",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-VNS-03",
+          "name": "FDA-Approved Implantable VNS Device",
+          "excerpt": "VNS is reasonable and necessary for patients with medically refractory partial onset seizures for whom surgery",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-20.19": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 20.19 (MCD ncdid=254)",
+      "document_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=254",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-ABPM-01",
+          "name": "Suspected White Coat or Masked Hypertension",
+          "excerpt": "suspected white coat hypertension, which is defined as average office BP of systolic BP &amp;gt; 130 mm Hg but &",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-ABPM-02",
+          "name": "24-Hour Continuous Monitoring Device Capability",
+          "excerpt": "capable of producing standardized plots of BP measurements for 24 hours with daytime and night-time windows and",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-ABPM-03",
+          "name": "Frequency Limit (Once Per Year)",
+          "excerpt": "For eligible patients, ABPM is covered once per year.&lt;&sol;p&gt;\r\n\r\n&lt;p&gt;&lt;strong&g",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-30.3.3": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 30.3.3 (MCD ncdid=373)",
+      "document_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=373",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-ACUP-01",
+          "name": "Chronic Lower Back Pain Duration >= 12 Weeks",
+          "excerpt": "Lasting 12 weeks or longer;&lt;&sol;li&gt;\n&lt;li&gt;nonspecific,",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-ACUP-02",
+          "name": "Nonspecific Etiology (Absence of Systemic/Surgical Cause)",
+          "excerpt": "nonspecific, in that it has no identifiable systemic cause (i.e., not associated with metastatic,",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-ACUP-03",
+          "name": "Session Utilization Limit (Up to 12 Visits in 90 Days)",
+          "excerpt": "Up to 12 visits in 90 days are covered for Medicare beneficiaries under the following circumstance:&lt;&s",
+          "status": "VERIFIED_FROM_MCD"
+        }
+      ]
+    },
+    "NCD-110.23": {
+      "provenance_status": "VERIFIED_FROM_MCD",
+      "real_cms_id": "NCD 110.23 (MCD ncdid=366)",
+      "document_title": "Stem Cell Transplantation",
+      "contractor": "CMS National",
+      "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=366",
+      "criteria_count": 3,
+      "criteria_evidence": [
+        {
+          "code": "CRIT-HSCT-01",
+          "name": "Diagnosis of Eligible Hematologic Malignancy or Aplastic Anemia",
+          "excerpt": "treatment of leukemia, leukemia in remission, or aplastic anemia when it is reasonable and necessary,&lt",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-HSCT-02",
+          "name": "Risk Stratification Score (IPSS Intermediate-2 or High for MDS)",
+          "excerpt": "International Prognostic Scoring System (IPSS), or&lt;&sol;li&gt;\n&lt;li&gt;&amp;ge; 4",
+          "status": "VERIFIED_FROM_MCD"
+        },
+        {
+          "code": "CRIT-HSCT-03",
+          "name": "Standard Organ Function Workup and Suitable Donor Match",
+          "excerpt": "Allogeneic Hematopoietic Stem Cell Transplantation (HSCT)&lt;&sol;strong&gt;&lt;&sol;p&gt;\n\n&lt;o",
+          "status": "VERIFIED_FROM_MCD"
         }
       ]
     }

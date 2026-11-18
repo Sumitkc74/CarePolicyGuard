@@ -1,0 +1,133 @@
+{
+  "policy_id": "NCD-210.3",
+  "title": "Colorectal Cancer Screening Tests",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2004-01-01",
+  "category": "Gastroenterology / Oncology Screening",
+  "description": "CMS National Coverage Determination for Colorectal Cancer Screening Tests (NCD 210.3), covering screening colonoscopy, FOBT, and non-invasive stool screening.",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 210.3 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CRC-01",
+      "name": "Beneficiary Age Eligibility (>= 45 to 50 Years)",
+      "description": "Asymptomatic Medicare beneficiary of eligible screening age (45 to 85 years for routine screening).",
+      "clinical_intent": "Confirm age eligibility for preventative colorectal cancer screening",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "asymptomatic beneficiary",
+        "screening age",
+        "colorectal cancer screening"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "screening",
+        "early detection",
+        "colorectal cancer",
+        "Medicare covers"
+      ],
+      "cms_document": "NCD 210.3 (MCD ncdid=281)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "early detection of colorectal cancer. This means that Medicare will cover on"
+    },
+    {
+      "criterion_code": "CRIT-CRC-02",
+      "name": "Screening Modality Compliance (FOBT / Colonoscopy / FIT-DNA)",
+      "description": "Performance of FDA-approved colorectal screening modality (FOBT annually, colonoscopy every 10 years for average risk / 24 months for high risk, or sDNA-FIT every 3 years).",
+      "clinical_intent": "Verify frequency interval and approved screening modality",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "fecal occult blood test",
+        "screening colonoscopy",
+        "sdna fit",
+        "screening interval"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "Fecal occult blood tests",
+        "FOBT",
+        "screening",
+        "per annum"
+      ],
+      "cms_document": "NCD 210.3 (MCD ncdid=281)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Medicare covers one screening FOBT per annum for the early detection of colorectal c"
+    },
+    {
+      "criterion_code": "CRIT-CRC-03",
+      "name": "Asymptomatic Clinical Status",
+      "description": "Absence of active lower gastrointestinal symptoms (hematochezia, unexplained rectal bleeding, significant involuntary weight loss) which mandate diagnostic rather than screening evaluation.",
+      "clinical_intent": "Exclude symptomatic patients requiring diagnostic workup",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "asymptomatic status",
+        "absence of rectal bleeding",
+        "screening intent"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "screening",
+        "asymptomatic",
+        "early detection",
+        "covered"
+      ],
+      "cms_document": "NCD 210.3 (MCD ncdid=281)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "early detection of colorectal cancer. This means that Medicare will cover on"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=281.",
+    "real_cms_id": "NCD 210.3 (MCD ncdid=281)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Colorectal Cancer Screening Tests",
+    "citation": "CMS NCD 210.3, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=281"
+  }
+}

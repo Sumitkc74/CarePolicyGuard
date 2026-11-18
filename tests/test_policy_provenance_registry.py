@@ -21,9 +21,9 @@ def test_provenance_registry_exists_and_contains_summary():
     assert "UNVERIFIED_AUTHOR_SUMMARY" in content
     assert "SUMMARIZED_FROM_CMS_MCD" not in content, "Old blanket status SUMMARIZED_FROM_CMS_MCD must not remain"
 
-def test_all_42_extended_policies_have_valid_mcd_provenance_status():
+def test_all_52_extended_policies_have_valid_mcd_provenance_status():
     policy_files = sorted([f for f in POLICIES_DIR.glob("*.json") if f.stem.startswith(("LCD-", "NCD-", "OPD-"))])
-    assert len(policy_files) == 42, f"Expected 42 extended policies, found {len(policy_files)}"
+    assert len(policy_files) == 52, f"Expected 52 extended policies, found {len(policy_files)}"
 
     provenance_text = PROVENANCE_FILE.read_text(encoding="utf-8")
 
@@ -70,7 +70,7 @@ def test_all_42_extended_policies_have_valid_mcd_provenance_status():
                 f"Policy {slug} criterion {crit.get('criterion_code')} invalid traceability status: {st}"
             )
 
-    assert status_counts["VERIFIED_FROM_MCD"] == 32
+    assert status_counts["VERIFIED_FROM_MCD"] == 42
     assert status_counts["NO_MCD_DOCUMENT_FOUND"] == 10
     assert status_counts["MISMATCH"] == 0
     assert status_counts["UNVERIFIED_AUTHOR_SUMMARY"] == 0

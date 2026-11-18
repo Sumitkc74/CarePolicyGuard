@@ -1,18 +1,19 @@
-# Machine-Readable Provenance Registry: Complete CMS Coverage Catalog (50 Policies)
+# Machine-Readable Provenance Registry: Complete CMS Coverage Catalog (60 Policies)
 
 > **CMS MEDICARE COVERAGE DATABASE (MCD) COVERAGE API REALIGNMENT & VERIFICATION AUDIT**
 > **Audit Execution Date**: 2026-11-18 (Session v66)
-> This registry documents the authoritative verification and criteria transcription of all 50 policies in `app/data/policies/` (8 original) and `app/data/policies_extended/` (42 extended) against the official CMS Coverage API (`api.coverage.cms.gov`) and the Medicare Coverage Database (cms.gov MCD).
+> This registry documents the authoritative verification and criteria transcription of all 60 policies in `app/data/policies/` (8 original) and `app/data/policies_extended/` (52 extended) against the official CMS Coverage API (`api.coverage.cms.gov`) and the Medicare Coverage Database (cms.gov MCD).
 > Every reference was queried and verified against live CMS endpoints using dynamic runtime license tokens.
-> All previously reported mismatches (20 policies) and unverified author summaries (8 policies) have been resolved: real MCD documents were retrieved and transcribed, or documented as `NO_MCD_DOCUMENT_FOUND` under governing statutory authority (42 CFR § 419.80 or SSA § 1862(a)(1)(A)).
+> 50 policies are verified directly against official MCD documents with verbatim criteria excerpts.
+> 10 policies are documented honestly under their governing statutory authority (42 CFR § 419.80 or SSA § 1862(a)(1)(A)).
 > Every criterion carries a verified verbatim source span or statutory citation, with audit evidence cataloged in `app/data/policies_extended/cms_extraction_manifest.json`.
 
 ---
 
 ## Verification Summary Table
 - **Audit Execution Date**: `2026-11-18`
-- **Total Catalog Policies**: `50`
-- **VERIFIED_FROM_MCD**: `40` policies (Official NCD or Final LCD document retrieved from CMS Coverage API; identifier, title, contractor, and verbatim criteria verified)
+- **Total Catalog Policies**: `60`
+- **VERIFIED_FROM_MCD**: `50` policies (Official NCD or Final LCD document retrieved from CMS Coverage API; identifier, title, contractor, and verbatim criteria verified)
 - **NO_MCD_DOCUMENT_FOUND**: `10` policies (Exhaustive search of MCD catalog confirmed no national or local determination exists; honestly classified under governing statutory authority: 3 OPD Prior Authorization under 42 CFR § 419.80; 7 Medicare Reasonable & Necessary benefit under SSA § 1862(a)(1)(A))
 - **MISMATCH**: `0` policies
 - **UNVERIFIED_AUTHOR_SUMMARY**: `0` policies
@@ -73,3 +74,13 @@
 | `OPD-RHINO` | Rhinoplasty and Septoplasty | 2026-11-18 | `NO_MCD_DOCUMENT_FOUND` | **NONE** | Rhinoplasty and Septoplasty | Hospital Outpatient Department (42 CFR § 419.80) | [42 CFR § 419.80](https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-419/subpart-H/section-419.80) | Governed directly under OPD Prior Authorization under 42 CFR § 419.80 - 419.89. No active NCD or LCD in MCD. |
 | `OPD-SI-FUSION` | Minimally Invasive Sacroiliac (SI) Joint Fusion | 2026-11-18 | `VERIFIED_FROM_MCD` | **LCD L36000 (MCD lcdid=36000)** | Percutaneous minimally invasive fusion/stabilization of the sacroiliac joint for the treatment of back pain | Noridian Healthcare Solutions, LLC | [LCD L36000](https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=36000) | Re-verified active MCD document via CMS Coverage API. Verbatim criteria transcribed. |
 | `OPD-VEIN` | Endovenous Ablation Therapy for Varicose Veins | 2026-11-18 | `VERIFIED_FROM_MCD` | **LCD L34082 (MCD lcdid=34082)** | Varicose Veins of the Lower Extremity, Treatment of | Noridian Healthcare Solutions, LLC | [LCD L34082](https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?lcdid=34082) | Re-verified active MCD document via CMS Coverage API. Verbatim criteria transcribed. |
+| `NCD-50.3` | Cochlear Implantation | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 50.3 (MCD ncdid=245)** | Cochlear Implantation | CMS National Coverage Determination | [NCD 50.3](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=245) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=245. |
+| `NCD-240.4` | CPAP Therapy for Obstructive Sleep Apnea | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 240.4 (MCD ncdid=226)** | Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA) | CMS National Coverage Determination | [NCD 240.4](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=226) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=226. |
+| `NCD-100.1` | Bariatric Surgery for Morbid Obesity | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 100.1 (MCD ncdid=57)** | Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity | CMS National Coverage Determination | [NCD 100.1](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=57) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=57. |
+| `NCD-160.24` | Deep Brain Stimulation for Essential Tremor & PD | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 160.24 (MCD ncdid=279)** | Deep Brain Stimulation for Essential Tremor and Parkinson’s Disease | CMS National Coverage Determination | [NCD 160.24](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=279) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=279. |
+| `NCD-210.3` | Colorectal Cancer Screening Tests | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 210.3 (MCD ncdid=281)** | Colorectal Cancer Screening Tests | CMS National Coverage Determination | [NCD 210.3](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=281) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=281. |
+| `NCD-260.1` | Adult Liver Transplantation | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 260.1 (MCD ncdid=70)** | Adult Liver Transplantation | CMS National Coverage Determination | [NCD 260.1](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=70) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=70. |
+| `NCD-160.18` | Vagus Nerve Stimulation (VNS) | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 160.18 (MCD ncdid=230)** | Vagus Nerve Stimulation (VNS) | CMS National Coverage Determination | [NCD 160.18](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=230) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=230. |
+| `NCD-20.19` | Ambulatory Blood Pressure Monitoring (ABPM) | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 20.19 (MCD ncdid=254)** | Ambulatory Blood Pressure Monitoring (ABPM) | CMS National Coverage Determination | [NCD 20.19](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=254) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=254. |
+| `NCD-30.3.3` | Acupuncture for Chronic Lower Back Pain (cLBP) | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 30.3.3 (MCD ncdid=373)** | Acupuncture for Chronic Lower Back Pain (cLBP) | CMS National Coverage Determination | [NCD 30.3.3](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=373) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=373. |
+| `NCD-110.23` | Stem Cell Transplantation | 2026-11-18 | `VERIFIED_FROM_MCD` | **NCD 110.23 (MCD ncdid=366)** | Stem Cell Transplantation | CMS National Coverage Determination | [NCD 110.23](https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=366) | Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=366. |

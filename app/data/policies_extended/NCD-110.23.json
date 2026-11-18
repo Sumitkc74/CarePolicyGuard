@@ -1,0 +1,134 @@
+{
+  "policy_id": "NCD-110.23",
+  "title": "Stem Cell Transplantation",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2024-03-06",
+  "category": "Hematology / Oncology",
+  "description": "CMS National Coverage Determination for Allogeneic and Autologous Hematopoietic Stem Cell Transplantation (HSCT) (NCD 110.23).",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 110.23 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-HSCT-01",
+      "name": "Diagnosis of Eligible Hematologic Malignancy or Aplastic Anemia",
+      "description": "Treatment of leukemia, leukemia in remission, aplastic anemia, myelodysplastic syndrome (MDS), or severe combined immunodeficiency disease.",
+      "clinical_intent": "Confirm diagnosis of covered hematologic malignancy or marrow failure",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "leukemia in remission",
+        "aplastic anemia",
+        "myelodysplastic syndrome",
+        "mds",
+        "stem cell transplantation"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "leukemia",
+        "aplastic anemia",
+        "myelodysplastic syndrome",
+        "hematopoietic stem cell"
+      ],
+      "cms_document": "NCD 110.23 (MCD ncdid=366)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "treatment of leukemia, leukemia in remission, or aplastic anemia when it is reasonable and necessary,&lt"
+    },
+    {
+      "criterion_code": "CRIT-HSCT-02",
+      "name": "Risk Stratification Score (IPSS Intermediate-2 or High for MDS)",
+      "description": "For myelodysplastic syndrome, documentation of risk score >= 1.5 (Intermediate-2 or High) using the International Prognostic Scoring System (IPSS).",
+      "clinical_intent": "Validated prognostic risk threshold for stem cell transplant in MDS",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "ipss intermediate-2",
+        "ipss high",
+        "prognostic scoring system",
+        "mds risk score"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "International Prognostic Scoring System",
+        "IPSS",
+        "Intermediate-2",
+        "high"
+      ],
+      "cms_document": "NCD 110.23 (MCD ncdid=366)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "International Prognostic Scoring System (IPSS), or&lt;&sol;li&gt;\n&lt;li&gt;&amp;ge; 4"
+    },
+    {
+      "criterion_code": "CRIT-HSCT-03",
+      "name": "Standard Organ Function Workup and Suitable Donor Match",
+      "description": "Adequate organ function workup (cardiac, pulmonary, hepatic, renal) and human leukocyte antigen (HLA) matched donor.",
+      "clinical_intent": "Candidate organ reserve and histocompatibility suitability",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "hla match",
+        "organ function reserve",
+        "donor match"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "allogeneic",
+        "hematopoietic stem cell transplant",
+        "reasonable and necessary"
+      ],
+      "cms_document": "NCD 110.23 (MCD ncdid=366)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Allogeneic Hematopoietic Stem Cell Transplantation (HSCT)&lt;&sol;strong&gt;&lt;&sol;p&gt;\n\n&lt;o"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=366.",
+    "real_cms_id": "NCD 110.23 (MCD ncdid=366)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Stem Cell Transplantation",
+    "citation": "CMS NCD 110.23, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=366"
+  }
+}

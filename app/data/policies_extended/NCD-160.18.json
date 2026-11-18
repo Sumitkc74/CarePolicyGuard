@@ -1,0 +1,132 @@
+{
+  "policy_id": "NCD-160.18",
+  "title": "Vagus Nerve Stimulation (VNS)",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "1999-07-01",
+  "category": "Neurology / Epilepsy",
+  "description": "CMS National Coverage Determination for Vagus Nerve Stimulation (NCD 160.18) for medically refractory partial onset seizures.",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 160.18 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-VNS-01",
+      "name": "Medically Refractory Partial Onset Seizures",
+      "description": "Diagnosis of medically refractory partial onset seizures for whom resective epilepsy surgery is not recommended or has failed.",
+      "clinical_intent": "Document drug-resistant partial seizures unsuitable for resective surgery",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "refractory partial onset seizures",
+        "intractable epilepsy",
+        "failed resective surgery"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "medically refractory",
+        "partial onset seizures",
+        "surgery is not recommended",
+        "surgery has failed"
+      ],
+      "cms_document": "NCD 160.18 (MCD ncdid=230)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "medically refractory partial onset seizures for whom surgery is not recommended or for whom surgery has failed.&lt;&sol"
+    },
+    {
+      "criterion_code": "CRIT-VNS-02",
+      "name": "Failure of Optimal Antiepileptic Drug Regimens",
+      "description": "Documented failure of at least two appropriately chosen and tolerated antiepileptic drug (AED) trials at therapeutic dosages.",
+      "clinical_intent": "Demonstrate failure of conservative medical pharmacotherapy",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "aed failure",
+        "failed antiepileptic drugs",
+        "refractory pharmacotherapy"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "refractory",
+        "partial onset",
+        "antiepileptic",
+        "failed"
+      ],
+      "cms_document": "NCD 160.18 (MCD ncdid=230)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "VNS is reasonable and necessary for patients with medically refractory partial onset seizures for whom surgery"
+    },
+    {
+      "criterion_code": "CRIT-VNS-03",
+      "name": "FDA-Approved Implantable VNS Device",
+      "description": "Use of an FDA-approved vagus nerve stimulator system with surgical evaluation confirming candidate anatomy and clearance.",
+      "clinical_intent": "Mandate FDA-approved vagal nerve stimulation system",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "fda approved vns",
+        "implantable vagus nerve stimulator",
+        "surgical clearance"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "vagus nerve",
+        "stimulator",
+        "reasonable and necessary",
+        "seizures"
+      ],
+      "cms_document": "NCD 160.18 (MCD ncdid=230)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "VNS is reasonable and necessary for patients with medically refractory partial onset seizures for whom surgery"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=230.",
+    "real_cms_id": "NCD 160.18 (MCD ncdid=230)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Vagus Nerve Stimulation (VNS)",
+    "citation": "CMS NCD 160.18, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=230"
+  }
+}

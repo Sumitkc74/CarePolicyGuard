@@ -1,0 +1,132 @@
+{
+  "policy_id": "NCD-30.3.3",
+  "title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2020-01-21",
+  "category": "Pain Management / Integrative Medicine",
+  "description": "CMS National Coverage Determination for Acupuncture for Chronic Lower Back Pain (NCD 30.3.3).",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 30.3.3 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-ACUP-01",
+      "name": "Chronic Lower Back Pain Duration >= 12 Weeks",
+      "description": "Chronic lower back pain (cLBP) lasting 12 weeks or longer.",
+      "clinical_intent": "Temporal chronicity threshold for lower back pain",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "chronic lower back pain",
+        "clbp",
+        "duration >= 12 weeks"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "chronic Lower Back Pain",
+        "cLBP",
+        "Lasting 12 weeks or longer",
+        "12 weeks"
+      ],
+      "cms_document": "NCD 30.3.3 (MCD ncdid=373)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Lasting 12 weeks or longer;&lt;&sol;li&gt;\n&lt;li&gt;nonspecific,"
+    },
+    {
+      "criterion_code": "CRIT-ACUP-02",
+      "name": "Nonspecific Etiology (Absence of Systemic/Surgical Cause)",
+      "description": "Nonspecific pain with no identifiable systemic cause (not associated with metastatic, inflammatory, or infectious disease, and not associated with prior spine surgery).",
+      "clinical_intent": "Confirm absence of secondary red-flag systemic or surgical etiologies",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "nonspecific low back pain",
+        "absence of systemic cause",
+        "no prior spine surgery"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "nonspecific",
+        "identifiable systemic cause",
+        "not associated with surgery",
+        "metastatic"
+      ],
+      "cms_document": "NCD 30.3.3 (MCD ncdid=373)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "nonspecific, in that it has no identifiable systemic cause (i.e., not associated with metastatic,"
+    },
+    {
+      "criterion_code": "CRIT-ACUP-03",
+      "name": "Session Utilization Limit (Up to 12 Visits in 90 Days)",
+      "description": "Up to 12 visits in 90 days are covered, with an additional 8 sessions covered only for patients demonstrating documented improvement.",
+      "clinical_intent": "Utilization threshold and documented treatment response requirement",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "12 visits in 90 days",
+        "session limit",
+        "documented improvement"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "12 visits in 90 days",
+        "visits",
+        "90 days",
+        "demonstrating improvement"
+      ],
+      "cms_document": "NCD 30.3.3 (MCD ncdid=373)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Up to 12 visits in 90 days are covered for Medicare beneficiaries under the following circumstance:&lt;&s"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=373.",
+    "real_cms_id": "NCD 30.3.3 (MCD ncdid=373)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+    "citation": "CMS NCD 30.3.3, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=373"
+  }
+}

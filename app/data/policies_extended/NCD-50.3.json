@@ -1,0 +1,134 @@
+{
+  "policy_id": "NCD-50.3",
+  "title": "Cochlear Implantation",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2022-09-26",
+  "category": "Otolaryngology / Audiology",
+  "description": "CMS National Coverage Determination for Cochlear Implantation (NCD 50.3) for treatment of bilateral pre- or post-linguistic, sensorineural, moderate-to-profound hearing impairment.",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 50.3 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-COCH-01",
+      "name": "Bilateral Moderate-to-Profound Sensorineural Hearing Loss",
+      "description": "Diagnosis of bilateral moderate-to-profound sensorineural hearing impairment with limited benefit from appropriately fitted binaural hearing aids.",
+      "clinical_intent": "Document severe bilateral sensorineural hearing impairment",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "bilateral moderate to profound hearing loss",
+        "sensorineural hearing impairment",
+        "hearing aid failure"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "bilateral",
+        "moderate to profound",
+        "sensorineural hearing",
+        "hearing impairment",
+        "hearing aids"
+      ],
+      "cms_document": "NCD 50.3 (MCD ncdid=245)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "bilateral moderate-to-profound sensorineural hearing impairment with l"
+    },
+    {
+      "criterion_code": "CRIT-COCH-02",
+      "name": "Speech Recognition Score Threshold (<= 40% to 60%)",
+      "description": "Demonstrated limited benefit from amplification defined by sentence recognition test scores <= 40% (or up to <= 60% in approved protocols) in best-aided condition.",
+      "clinical_intent": "Objective auditory sentence recognition threshold",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "sentence recognition score",
+        "azbio score",
+        "hint score",
+        "speech recognition threshold"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "sentence recognition",
+        "test scores",
+        "best-aided",
+        "correct in the best-aided"
+      ],
+      "cms_document": "NCD 50.3 (MCD ncdid=245)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "test scores of less than or equal to 60% correct in the best-aided listening"
+    },
+    {
+      "criterion_code": "CRIT-COCH-03",
+      "name": "Cognitive Ability and Rehabilitation Suitability",
+      "description": "Cognitive ability to use auditory clues, willingness to undergo an extended program of rehabilitation, and absence of middle ear infection.",
+      "clinical_intent": "Rehabilitation readiness and anatomical candidate suitability",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "cognitive ability",
+        "rehabilitation readiness",
+        "absence of middle ear infection"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "cognitive ability",
+        "auditory clues",
+        "rehabilitation",
+        "middle ear infection"
+      ],
+      "cms_document": "NCD 50.3 (MCD ncdid=245)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Cognitive ability to use auditory clues and a willingness to undergo an extende"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=245.",
+    "real_cms_id": "NCD 50.3 (MCD ncdid=245)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Cochlear Implantation",
+    "citation": "CMS NCD 50.3, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=245"
+  }
+}

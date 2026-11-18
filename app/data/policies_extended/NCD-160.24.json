@@ -1,0 +1,132 @@
+{
+  "policy_id": "NCD-160.24",
+  "title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2003-04-01",
+  "category": "Neurology / Neurosurgery",
+  "description": "CMS National Coverage Determination for unilateral or bilateral deep brain stimulation (DBS) for medically refractory tremor in essential tremor and Parkinson's disease (NCD 160.24).",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 160.24 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-DBS-01",
+      "name": "Diagnosis of Refractory Essential Tremor or Parkinsonian Tremor",
+      "description": "Diagnosis of essential tremor based on postural or kinetic tremors of hand(s) without other neurologic signs, or diagnosis of idiopathic Parkinson's disease with disabling tremor.",
+      "clinical_intent": "Confirm clinical diagnosis of medically refractory tremor",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "essential tremor",
+        "parkinsonian tremor",
+        "idiopathic parkinson disease"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "essential tremor",
+        "parkinsonian tremor",
+        "kinetic tremors",
+        "postural"
+      ],
+      "cms_document": "NCD 160.24 (MCD ncdid=279)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Diagnosis of ET based on postural or kinetic tremors of hand(s) without other neurologic sig"
+    },
+    {
+      "criterion_code": "CRIT-DBS-02",
+      "name": "Severe Disabling Tremor Rating Score",
+      "description": "Marked disabling tremor of at least level 3 or 4 on the Fahn-Tolosa-Marin Clinical Tremor Rating Scale (or equivalent scale) refractory to optimal pharmacotherapy.",
+      "clinical_intent": "Objective severity threshold on validated clinical tremor rating scale",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "fahn-tolosa-marin score",
+        "tremor scale level 3 or 4",
+        "refractory tremor"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "disabling tremor",
+        "level 3 or 4",
+        "Fahn-Tolosa-Marin",
+        "refractory"
+      ],
+      "cms_document": "NCD 160.24 (MCD ncdid=279)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Marked disabling tremor of at least level 3 or 4 on the Fahn-Tolosa-Marin Clinical Tremor Rating Scale (or equiva"
+    },
+    {
+      "criterion_code": "CRIT-DBS-03",
+      "name": "Cognitive Suitability and Cooperative Operative Ability",
+      "description": "Willingness and ability to cooperate during conscious operative procedure, as well as during post-surgical evaluations and programming adjustments.",
+      "clinical_intent": "Confirm cognitive competence and willingness for intraoperative testing and programming",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "operative cooperation",
+        "cognitive suitability",
+        "absence of dementia"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "cooperate",
+        "conscious operative",
+        "programming adjustments",
+        "willingness"
+      ],
+      "cms_document": "NCD 160.24 (MCD ncdid=279)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Willingness and ability to cooperate during conscious operative procedure, as well as during post-surgical evalua"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=279.",
+    "real_cms_id": "NCD 160.24 (MCD ncdid=279)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+    "citation": "CMS NCD 160.24, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=279"
+  }
+}

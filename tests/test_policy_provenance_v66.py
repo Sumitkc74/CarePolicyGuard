@@ -26,10 +26,10 @@ def test_no_fake_cms_transmittal_feed():
     )
 
 
-def test_all_50_policies_provenance_structure():
-    """Validates provenance schema and verification statuses across all 50 policies."""
+def test_all_60_policies_provenance_structure():
+    """Validates provenance schema and verification statuses across all 60 policies."""
     policies = DeclarativePolicyEngine.get_all_policies()
-    assert len(policies) == 50, f"Expected 50 policies, got {len(policies)}"
+    assert len(policies) == 60, f"Expected 60 policies, got {len(policies)}"
 
     verified_count = 0
     no_mcd_count = 0
@@ -66,12 +66,12 @@ def test_all_50_policies_provenance_structure():
             assert ref.get("authority"), f"Policy {pid} must declare governing authority"
             assert ref.get("citation"), f"Policy {pid} must declare statutory citation"
 
-    assert verified_count == 40, f"Expected 40 VERIFIED_FROM_MCD policies, got {verified_count}"
+    assert verified_count == 50, f"Expected 50 VERIFIED_FROM_MCD policies, got {verified_count}"
     assert no_mcd_count == 10, f"Expected 10 NO_MCD_DOCUMENT_FOUND policies, got {no_mcd_count}"
 
 
 def test_criteria_source_traceability():
-    """Validates that all criteria across all 50 policies have non-empty verbatim excerpts."""
+    """Validates that all criteria across all 60 policies have non-empty verbatim excerpts."""
     policies = DeclarativePolicyEngine.get_all_policies()
     total_criteria = 0
 
@@ -89,7 +89,7 @@ def test_criteria_source_traceability():
                 f"Criterion {code} in {pol.policy_id} must have non-empty source_text_excerpt"
             )
 
-    assert total_criteria >= 140, f"Expected >= 140 criteria, found {total_criteria}"
+    assert total_criteria >= 170, f"Expected >= 170 criteria, found {total_criteria}"
 
 
 def test_extraction_manifest_integrity():
@@ -100,7 +100,7 @@ def test_extraction_manifest_integrity():
     with open(manifest_path, encoding="utf-8") as f:
         manifest = json.load(f)
 
-    assert manifest.get("total_policies") == 50
-    assert manifest.get("verified_from_mcd_count") == 40
+    assert manifest.get("total_policies") == 60
+    assert manifest.get("verified_from_mcd_count") == 50
     assert manifest.get("no_mcd_document_count") == 10
-    assert len(manifest.get("policies", {})) == 50
+    assert len(manifest.get("policies", {})) == 60

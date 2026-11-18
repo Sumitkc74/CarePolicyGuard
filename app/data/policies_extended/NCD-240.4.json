@@ -1,0 +1,133 @@
+{
+  "policy_id": "NCD-240.4",
+  "title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+  "jurisdiction": "National Coverage Determination (CMS)",
+  "effective_date": "2008-03-13",
+  "category": "Pulmonary / Sleep Medicine",
+  "description": "CMS National Coverage Determination for CPAP therapy in adult patients with obstructive sleep apnea (NCD 240.4).",
+  "policy_version": "2026.1",
+  "change_log": [
+    {
+      "version": "2026.1",
+      "date": "2026-11-18",
+      "author": "CMS MCD Coverage API",
+      "summary": "Transcribed from CMS NCD 240.4 via official Coverage API."
+    }
+  ],
+  "criteria": [
+    {
+      "criterion_code": "CRIT-CPAP-01",
+      "name": "Documented AHI or RDI >= 15 Events/Hour (or >= 5 with Comorbidities)",
+      "description": "Polysomnography or unattended home sleep monitoring confirming AHI or RDI >= 15 events per hour, or AHI/RDI between 5 and 14 with documented excessive daytime sleepiness, hypertension, or ischemic heart disease.",
+      "clinical_intent": "Diagnostic severity threshold for obstructive sleep apnea",
+      "criterion_type": "NUMERIC_THRESHOLD",
+      "entity_names": [
+        "apnea hypopnea index",
+        "ahi",
+        "respiratory disturbance index",
+        "rdi",
+        "sleep apnea"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "apnea-hypopnea index",
+        "ahi",
+        "events per hour",
+        "excessive daytime sleepiness"
+      ],
+      "cms_document": "NCD 240.4 (MCD ncdid=226)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "events per hour, or&lt;&sol;li&gt; \r\n\t&lt;li&gt;AHI or"
+    },
+    {
+      "criterion_code": "CRIT-CPAP-02",
+      "name": "Initial 12-Week Trial and Clinical Benefit Reassessment",
+      "description": "Initial coverage is limited to a 12-week trial period; continued coverage requires documented clinical improvement and adherence.",
+      "clinical_intent": "Verify adherence and symptom improvement during initial trial",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "12-week trial",
+        "cpap adherence",
+        "symptom improvement"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "12-week period",
+        "clinical improvement",
+        "adherence",
+        "beneficiaries diagnosed with OSA"
+      ],
+      "cms_document": "NCD 240.4 (MCD ncdid=226)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "Coverage of CPAP is initially limited to a 12-week period to identify beneficiaries diagnosed wit"
+    },
+    {
+      "criterion_code": "CRIT-CPAP-03",
+      "name": "Patient Device Education",
+      "description": "The provider of CPAP must conduct education of the beneficiary prior to the use of the CPAP device to ensure proper use.",
+      "clinical_intent": "Mandatory patient device orientation and instructional education",
+      "criterion_type": "FINDING_PRESENCE",
+      "entity_names": [
+        "cpap education",
+        "beneficiary education",
+        "device instruction"
+      ],
+      "operator": null,
+      "threshold": null,
+      "target_unit": null,
+      "ordinal_allowed": null,
+      "min_duration_days": null,
+      "is_exclusion": false,
+      "negation_sensitive": true,
+      "required_temporal_window": "Clinical progress note or diagnostic report",
+      "icd10_preconditions": [],
+      "cpt_preconditions": [],
+      "min_score": 0.85,
+      "keywords": [
+        "provider of CPAP",
+        "education of the beneficiary",
+        "prior to the use"
+      ],
+      "cms_document": "NCD 240.4 (MCD ncdid=226)",
+      "source_section": "Indications and Limitations of Coverage",
+      "source_paragraph": "B. Nationally Covered Indications",
+      "source_traceability_status": "VERIFIED_FROM_MCD",
+      "source_text_excerpt": "provider of CPAP must conduct education of the beneficiary prior to the use of the CPAP device to"
+    }
+  ],
+  "statutory_waiting_periods": [],
+  "cms_reference": {
+    "provenance_status": "VERIFIED_FROM_MCD",
+    "checked_date": "2026-11-18",
+    "notes": "Transcribed active MCD document via CMS Coverage API /v1/data/ncd?ncdid=226.",
+    "real_cms_id": "NCD 240.4 (MCD ncdid=226)",
+    "authority": "CMS National Coverage Determination",
+    "document_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+    "citation": "CMS NCD 240.4, Publication 100-03, Medicare National Coverage Determinations Manual",
+    "url": "https://www.cms.gov/medicare-coverage-database/view/ncd.aspx?ncdid=226"
+  }
+}
