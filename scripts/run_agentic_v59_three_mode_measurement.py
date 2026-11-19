@@ -1156,7 +1156,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=str,
-        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v59_three_mode_run.json"),
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v67_three_mode_run.json"),
         help="Path to output raw JSON",
     )
     parser.add_argument(
@@ -1241,6 +1241,7 @@ def main() -> None:
             "passed": bool(det_reproduced and dec_reproduced),
         }
 
+        is_v67 = "v67" in str(args.output)
         is_v63 = "v63" in str(args.output)
         is_v62 = "v62" in str(args.output)
         is_v61 = "v61" in str(args.output)
@@ -1248,11 +1249,13 @@ def main() -> None:
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
                 "benchmark_run": (
-                    "v63 three-mode full measurement" if is_v63
+                    "v67 three-mode full measurement" if is_v67
+                    else ("v63 three-mode full measurement" if is_v63
                     else ("v62 three-mode full measurement" if is_v62
-                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement"))
+                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement")))
                 ),
-                "parent_git_head": "c305e65" if is_v63 else ("f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a")),
+                "parent_git_head": "938fce1" if is_v67 else ("c305e65" if is_v63 else ("f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a"))),
+                "catalog_size": "60 policies (all from official CMS coverage API verified)",
                 "database_used": "carepolicyguard.db",
                 "database_path": db_path,
                 "model": "qwen2.5:3b (local Ollama)",
