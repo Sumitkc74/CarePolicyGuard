@@ -139,7 +139,15 @@ class PolicyRetrievalAgent:
 
             # 2. Key phrases in policy description
             pol_title = getattr(pol, "title", "") or ""
-            stop_words = {"with", "from", "that", "this", "care", "left", "right", "other", "device", "devices", "therapy", "coverage", "procedure", "procedures", "patient", "chronic", "mild", "normal"}
+            stop_words = {
+                "with", "from", "that", "this", "care", "left", "right", "other",
+                "device", "devices", "therapy", "coverage", "procedure", "procedures",
+                "patient", "chronic", "mild", "normal", "condition", "conditions",
+                "treatment", "treatments", "related", "associated", "management",
+                "evaluation", "services", "service", "without", "comprehensive",
+                "bilateral", "unilateral", "screening", "test", "tests", "testing",
+                "monitoring"
+            }
             desc_words = [w for w in re.findall(r'\b[a-z]{4,}\b', pol_title.lower()) if w not in stop_words]
             for dw in desc_words:
                 if re.search(r'\b' + re.escape(dw) + r'\b', cleaned_text):
@@ -159,10 +167,9 @@ class PolicyRetrievalAgent:
                     kw_list = [k.strip().lower() for k in raw_kw if k.strip()]
 
                 for kw in kw_list:
-                    if len(kw) <= 3:
-                        matched = bool(re.search(r'\b' + re.escape(kw) + r'\b', cleaned_text))
-                    else:
-                        matched = (kw in cleaned_text)
+                    if kw in stop_words:
+                        continue
+                    matched = bool(re.search(r'\b' + re.escape(kw) + r'\b', cleaned_text))
                     if matched:
                         score += 1.0
                         if kw not in matched_terms:
@@ -171,10 +178,10 @@ class PolicyRetrievalAgent:
             # 4. Clinical Taxonomy Acronym and Synonym Cross-Referencing
             tax_terms = CLINICAL_TAXONOMY_MAP.get(pol.policy_id, [])
             for tt in tax_terms:
-                if len(tt) <= 4:
-                    matched = bool(re.search(r'\b' + re.escape(tt) + r'\b', cleaned_text))
-                else:
-                    matched = (tt in cleaned_text)
+                tt_clean = tt.strip().lower()
+                if tt_clean in stop_words:
+                    continue
+                matched = bool(re.search(r'\b' + re.escape(tt_clean) + r'\b', cleaned_text))
                 if matched:
                     score += 3.0
                     if tt not in matched_terms:

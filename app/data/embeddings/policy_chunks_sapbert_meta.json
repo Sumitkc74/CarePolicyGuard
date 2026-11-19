@@ -2,9 +2,9 @@
   "model_name": "cambridgeltl/SapBERT-from-PubMedBERT-fulltext",
   "dimension": 768,
   "normalization": "L2",
-  "chunk_count": 204,
-  "built_at": "2026-11-16T00:26:46.447371+00:00",
-  "build_duration_seconds": 25.9,
+  "chunk_count": 242,
+  "built_at": "2026-11-19T02:13:50.088963+00:00",
+  "build_duration_seconds": 29.95,
   "device_used": "cpu",
   "chunks": [
     {
@@ -19,14 +19,14 @@
       "policy_id": "LCD-L33829",
       "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
       "section": "Criterion: CRIT-CPAP-01",
-      "content_preview": "CRIT-CPAP-01 Diagnostic Polysomnography (AHI/RDI) Apnea-Hypopnea Index (AHI) or Respiratory Disturbance Index (RDI) >= 1"
+      "content_preview": "CRIT-CPAP-01 Diagnostic Polysomnography (AHI/RDI) Documented overnight diagnostic polysomnography demonstrating AHI or R"
     },
     {
       "chunk_id": "LCD-L33829::Criterion: CRIT-CPAP-02",
       "policy_id": "LCD-L33829",
       "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
       "section": "Criterion: CRIT-CPAP-02",
-      "content_preview": "CRIT-CPAP-02 Face-to-Face Clinical Evaluation A face-to-face clinical evaluation conducted by the prescribing physician "
+      "content_preview": "CRIT-CPAP-02 Face-to-Face Clinical Evaluation Documented in-person face-to-face clinical evaluation by prescribing clini"
     },
     {
       "chunk_id": "LCD-TOTAL-KNEE-01::Indications & Coverage Summary",
@@ -89,7 +89,7 @@
       "policy_id": "NCD-20.33",
       "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
       "section": "Indications & Coverage Summary",
-      "content_preview": "NCD-20.33 Transcatheter Aortic Valve Replacement (TAVR) Cardiology / Interventional Cardiology CMS coverage for Transcat"
+      "content_preview": "NCD-20.33 Transcatheter Aortic Valve Replacement (TAVR) Cardiology / Interventional Cardiology CMS coverage for TAVR in "
     },
     {
       "chunk_id": "NCD-20.33::Criterion: CRIT-TAVR-01",
@@ -120,25 +120,11 @@
       "content_preview": "CRIT-TAVR-EXCL-02 Prohibitive Surgical or Anatomical Contraindication Exclusion TAVR is excluded when the patient has pr"
     },
     {
-      "chunk_id": "NCD-20.33::Criterion: CRIT-TEER-01",
-      "policy_id": "NCD-20.33",
-      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
-      "section": "Criterion: CRIT-TEER-01",
-      "content_preview": "CRIT-TEER-01 Severe Mitral Regurgitation (Grade 3+ to 4+) Documented moderate-to-severe (Grade 3+) or severe (Grade 4+) "
-    },
-    {
-      "chunk_id": "NCD-20.33::Criterion: CRIT-TEER-02",
-      "policy_id": "NCD-20.33",
-      "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
-      "section": "Criterion: CRIT-TEER-02",
-      "content_preview": "CRIT-TEER-02 Multidisciplinary Heart Team Consensus Independent evaluation by a cardiac surgeon and an interventional ca"
-    },
-    {
       "chunk_id": "NCD-20.4::Indications & Coverage Summary",
       "policy_id": "NCD-20.4",
       "policy_title": "Implantable Automatic Defibrillators (ICDs)",
       "section": "Indications & Coverage Summary",
-      "content_preview": "NCD-20.4 Implantable Automatic Defibrillators (ICDs) Cardiology / Electrophysiology CMS National Coverage Determination "
+      "content_preview": "NCD-20.4 Implantable Automatic Defibrillators (ICDs) Cardiology / Electrophysiology CMS coverage policy for primary and "
     },
     {
       "chunk_id": "NCD-20.4::Criterion: CRIT-ICD-01",
@@ -166,7 +152,7 @@
       "policy_id": "NCD-20.4",
       "policy_title": "Implantable Automatic Defibrillators (ICDs)",
       "section": "Criterion: CRIT-ICD-04",
-      "content_preview": "CRIT-ICD-04 Cardiomyopathy Etiology & Revascularization Timeline At least 40 days must have elapsed post-myocardial infa"
+      "content_preview": "CRIT-ICD-04 Cardiomyopathy Etiology & Revascularization Timeline Ischemic cardiomyopathy >= 40 days post-MI or >= 90 day"
     },
     {
       "chunk_id": "NCD-20.4::Criterion: CRIT-ICD-EXCL-01",
@@ -986,6 +972,286 @@
       "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
       "section": "Criterion: CRIT-VAC-EXCL-01",
       "content_preview": "CRIT-VAC-EXCL-01 Untreated Osteomyelitis or Necrotic Eschar Exclusion Active untreated osteomyelitis in wound bed, necro"
+    },
+    {
+      "chunk_id": "NCD-100.1::Indications & Coverage Summary",
+      "policy_id": "NCD-100.1",
+      "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-100.1 Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity Bariatric Surgery CMS Nation"
+    },
+    {
+      "chunk_id": "NCD-100.1::Criterion: CRIT-BARI-01",
+      "policy_id": "NCD-100.1",
+      "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+      "section": "Criterion: CRIT-BARI-01",
+      "content_preview": "CRIT-BARI-01 Severe Obesity Threshold (BMI >= 35 with Comorbidity) Body mass index (BMI) >= 35 kg/m2 with at least one s"
+    },
+    {
+      "chunk_id": "NCD-100.1::Criterion: CRIT-BARI-02",
+      "policy_id": "NCD-100.1",
+      "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+      "section": "Criterion: CRIT-BARI-02",
+      "content_preview": "CRIT-BARI-02 Prior Unsuccessful Non-Surgical Weight Loss Attempts Medical record documentation of previous unsuccessful "
+    },
+    {
+      "chunk_id": "NCD-100.1::Criterion: CRIT-BARI-03",
+      "policy_id": "NCD-100.1",
+      "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+      "section": "Criterion: CRIT-BARI-03",
+      "content_preview": "CRIT-BARI-03 Multidisciplinary Preoperative Evaluation Thorough multidisciplinary clinical evaluation by bariatric surgi"
+    },
+    {
+      "chunk_id": "NCD-110.23::Indications & Coverage Summary",
+      "policy_id": "NCD-110.23",
+      "policy_title": "Stem Cell Transplantation",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-110.23 Stem Cell Transplantation Hematology / Oncology CMS National Coverage Determination for Allogeneic and Autolo"
+    },
+    {
+      "chunk_id": "NCD-110.23::Criterion: CRIT-HSCT-01",
+      "policy_id": "NCD-110.23",
+      "policy_title": "Stem Cell Transplantation",
+      "section": "Criterion: CRIT-HSCT-01",
+      "content_preview": "CRIT-HSCT-01 Diagnosis of Eligible Hematologic Malignancy or Aplastic Anemia Treatment of leukemia, leukemia in remissio"
+    },
+    {
+      "chunk_id": "NCD-110.23::Criterion: CRIT-HSCT-02",
+      "policy_id": "NCD-110.23",
+      "policy_title": "Stem Cell Transplantation",
+      "section": "Criterion: CRIT-HSCT-02",
+      "content_preview": "CRIT-HSCT-02 Risk Stratification Score (IPSS Intermediate-2 or High for MDS) For myelodysplastic syndrome, documentation"
+    },
+    {
+      "chunk_id": "NCD-110.23::Criterion: CRIT-HSCT-03",
+      "policy_id": "NCD-110.23",
+      "policy_title": "Stem Cell Transplantation",
+      "section": "Criterion: CRIT-HSCT-03",
+      "content_preview": "CRIT-HSCT-03 Standard Organ Function Workup and Suitable Donor Match Adequate organ function workup (cardiac, pulmonary,"
+    },
+    {
+      "chunk_id": "NCD-160.18::Indications & Coverage Summary",
+      "policy_id": "NCD-160.18",
+      "policy_title": "Vagus Nerve Stimulation (VNS)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-160.18 Vagus Nerve Stimulation (VNS) Neurology / Epilepsy CMS National Coverage Determination for Vagus Nerve Stimul"
+    },
+    {
+      "chunk_id": "NCD-160.18::Criterion: CRIT-VNS-01",
+      "policy_id": "NCD-160.18",
+      "policy_title": "Vagus Nerve Stimulation (VNS)",
+      "section": "Criterion: CRIT-VNS-01",
+      "content_preview": "CRIT-VNS-01 Medically Refractory Partial Onset Seizures Diagnosis of medically refractory partial onset seizures for who"
+    },
+    {
+      "chunk_id": "NCD-160.18::Criterion: CRIT-VNS-02",
+      "policy_id": "NCD-160.18",
+      "policy_title": "Vagus Nerve Stimulation (VNS)",
+      "section": "Criterion: CRIT-VNS-02",
+      "content_preview": "CRIT-VNS-02 Failure of Optimal Antiepileptic Drug Regimens Documented failure of at least two appropriately chosen and t"
+    },
+    {
+      "chunk_id": "NCD-160.18::Criterion: CRIT-VNS-03",
+      "policy_id": "NCD-160.18",
+      "policy_title": "Vagus Nerve Stimulation (VNS)",
+      "section": "Criterion: CRIT-VNS-03",
+      "content_preview": "CRIT-VNS-03 FDA-Approved Implantable VNS Device Use of an FDA-approved vagus nerve stimulator system with surgical evalu"
+    },
+    {
+      "chunk_id": "NCD-160.24::Indications & Coverage Summary",
+      "policy_id": "NCD-160.24",
+      "policy_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-160.24 Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease Neurology / Neurosurgery CMS National Cov"
+    },
+    {
+      "chunk_id": "NCD-160.24::Criterion: CRIT-DBS-01",
+      "policy_id": "NCD-160.24",
+      "policy_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+      "section": "Criterion: CRIT-DBS-01",
+      "content_preview": "CRIT-DBS-01 Diagnosis of Refractory Essential Tremor or Parkinsonian Tremor Diagnosis of essential tremor based on postu"
+    },
+    {
+      "chunk_id": "NCD-160.24::Criterion: CRIT-DBS-02",
+      "policy_id": "NCD-160.24",
+      "policy_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+      "section": "Criterion: CRIT-DBS-02",
+      "content_preview": "CRIT-DBS-02 Severe Disabling Tremor Rating Score Marked disabling tremor of at least level 3 or 4 on the Fahn-Tolosa-Mar"
+    },
+    {
+      "chunk_id": "NCD-160.24::Criterion: CRIT-DBS-03",
+      "policy_id": "NCD-160.24",
+      "policy_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+      "section": "Criterion: CRIT-DBS-03",
+      "content_preview": "CRIT-DBS-03 Cognitive Suitability and Cooperative Operative Ability Willingness and ability to cooperate during consciou"
+    },
+    {
+      "chunk_id": "NCD-20.19::Indications & Coverage Summary",
+      "policy_id": "NCD-20.19",
+      "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-20.19 Ambulatory Blood Pressure Monitoring (ABPM) Cardiology / Diagnostic Testing CMS National Coverage Determinatio"
+    },
+    {
+      "chunk_id": "NCD-20.19::Criterion: CRIT-ABPM-01",
+      "policy_id": "NCD-20.19",
+      "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+      "section": "Criterion: CRIT-ABPM-01",
+      "content_preview": "CRIT-ABPM-01 Suspected White Coat or Masked Hypertension Suspected white coat hypertension defined as average office BP "
+    },
+    {
+      "chunk_id": "NCD-20.19::Criterion: CRIT-ABPM-02",
+      "policy_id": "NCD-20.19",
+      "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+      "section": "Criterion: CRIT-ABPM-02",
+      "content_preview": "CRIT-ABPM-02 24-Hour Continuous Monitoring Device Capability Device capable of producing standardized plots of BP measur"
+    },
+    {
+      "chunk_id": "NCD-20.19::Criterion: CRIT-ABPM-03",
+      "policy_id": "NCD-20.19",
+      "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+      "section": "Criterion: CRIT-ABPM-03",
+      "content_preview": "CRIT-ABPM-03 Frequency Limit (Once Per Year) For eligible patients, ABPM is covered once per year for diagnosis and mana"
+    },
+    {
+      "chunk_id": "NCD-210.3::Indications & Coverage Summary",
+      "policy_id": "NCD-210.3",
+      "policy_title": "Colorectal Cancer Screening Tests",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-210.3 Colorectal Cancer Screening Tests Gastroenterology / Oncology Screening CMS National Coverage Determination fo"
+    },
+    {
+      "chunk_id": "NCD-210.3::Criterion: CRIT-CRC-01",
+      "policy_id": "NCD-210.3",
+      "policy_title": "Colorectal Cancer Screening Tests",
+      "section": "Criterion: CRIT-CRC-01",
+      "content_preview": "CRIT-CRC-01 Beneficiary Age Eligibility (>= 45 to 50 Years) Asymptomatic Medicare beneficiary of eligible screening age "
+    },
+    {
+      "chunk_id": "NCD-210.3::Criterion: CRIT-CRC-02",
+      "policy_id": "NCD-210.3",
+      "policy_title": "Colorectal Cancer Screening Tests",
+      "section": "Criterion: CRIT-CRC-02",
+      "content_preview": "CRIT-CRC-02 Screening Modality Compliance (FOBT / Colonoscopy / FIT-DNA) Performance of FDA-approved colorectal screenin"
+    },
+    {
+      "chunk_id": "NCD-210.3::Criterion: CRIT-CRC-03",
+      "policy_id": "NCD-210.3",
+      "policy_title": "Colorectal Cancer Screening Tests",
+      "section": "Criterion: CRIT-CRC-03",
+      "content_preview": "CRIT-CRC-03 Asymptomatic Clinical Status Absence of active lower gastrointestinal symptoms (hematochezia, unexplained re"
+    },
+    {
+      "chunk_id": "NCD-240.4::Indications & Coverage Summary",
+      "policy_id": "NCD-240.4",
+      "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-240.4 Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA) Pulmonary / Sleep Medicin"
+    },
+    {
+      "chunk_id": "NCD-240.4::Criterion: CRIT-CPAP-01",
+      "policy_id": "NCD-240.4",
+      "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+      "section": "Criterion: CRIT-CPAP-01",
+      "content_preview": "CRIT-CPAP-01 Documented AHI or RDI >= 15 Events/Hour (or >= 5 with Comorbidities) Polysomnography or unattended home sle"
+    },
+    {
+      "chunk_id": "NCD-240.4::Criterion: CRIT-CPAP-02",
+      "policy_id": "NCD-240.4",
+      "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+      "section": "Criterion: CRIT-CPAP-02",
+      "content_preview": "CRIT-CPAP-02 Initial 12-Week Trial and Clinical Benefit Reassessment Initial coverage is limited to a 12-week trial peri"
+    },
+    {
+      "chunk_id": "NCD-240.4::Criterion: CRIT-CPAP-03",
+      "policy_id": "NCD-240.4",
+      "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+      "section": "Criterion: CRIT-CPAP-03",
+      "content_preview": "CRIT-CPAP-03 Patient Device Education The provider of CPAP must conduct education of the beneficiary prior to the use of"
+    },
+    {
+      "chunk_id": "NCD-260.1::Indications & Coverage Summary",
+      "policy_id": "NCD-260.1",
+      "policy_title": "Adult Liver Transplantation",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-260.1 Adult Liver Transplantation Transplantation Surgery CMS National Coverage Determination for Adult Liver Transp"
+    },
+    {
+      "chunk_id": "NCD-260.1::Criterion: CRIT-LIVER-01",
+      "policy_id": "NCD-260.1",
+      "policy_title": "Adult Liver Transplantation",
+      "section": "Criterion: CRIT-LIVER-01",
+      "content_preview": "CRIT-LIVER-01 Irreversible End-Stage Liver Disease or Localized HCC Diagnosis of irreversible end-stage liver disease (E"
+    },
+    {
+      "chunk_id": "NCD-260.1::Criterion: CRIT-LIVER-02",
+      "policy_id": "NCD-260.1",
+      "policy_title": "Adult Liver Transplantation",
+      "section": "Criterion: CRIT-LIVER-02",
+      "content_preview": "CRIT-LIVER-02 Absence of Extrahepatic Metastases or Macrovascular Invasion For HCC candidates, radiographic confirmation"
+    },
+    {
+      "chunk_id": "NCD-260.1::Criterion: CRIT-LIVER-03",
+      "policy_id": "NCD-260.1",
+      "policy_title": "Adult Liver Transplantation",
+      "section": "Criterion: CRIT-LIVER-03",
+      "content_preview": "CRIT-LIVER-03 Approved Medicare Transplant Center Facility Liver transplantation performed in a facility approved by CMS"
+    },
+    {
+      "chunk_id": "NCD-30.3.3::Indications & Coverage Summary",
+      "policy_id": "NCD-30.3.3",
+      "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-30.3.3 Acupuncture for Chronic Lower Back Pain (cLBP) Pain Management / Integrative Medicine CMS National Coverage D"
+    },
+    {
+      "chunk_id": "NCD-30.3.3::Criterion: CRIT-ACUP-01",
+      "policy_id": "NCD-30.3.3",
+      "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+      "section": "Criterion: CRIT-ACUP-01",
+      "content_preview": "CRIT-ACUP-01 Chronic Lower Back Pain Duration >= 12 Weeks Chronic lower back pain (cLBP) lasting 12 weeks or longer. Key"
+    },
+    {
+      "chunk_id": "NCD-30.3.3::Criterion: CRIT-ACUP-02",
+      "policy_id": "NCD-30.3.3",
+      "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+      "section": "Criterion: CRIT-ACUP-02",
+      "content_preview": "CRIT-ACUP-02 Nonspecific Etiology (Absence of Systemic/Surgical Cause) Nonspecific pain with no identifiable systemic ca"
+    },
+    {
+      "chunk_id": "NCD-30.3.3::Criterion: CRIT-ACUP-03",
+      "policy_id": "NCD-30.3.3",
+      "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+      "section": "Criterion: CRIT-ACUP-03",
+      "content_preview": "CRIT-ACUP-03 Session Utilization Limit (Up to 12 Visits in 90 Days) Up to 12 visits in 90 days are covered, with an addi"
+    },
+    {
+      "chunk_id": "NCD-50.3::Indications & Coverage Summary",
+      "policy_id": "NCD-50.3",
+      "policy_title": "Cochlear Implantation",
+      "section": "Indications & Coverage Summary",
+      "content_preview": "NCD-50.3 Cochlear Implantation Otolaryngology / Audiology CMS National Coverage Determination for Cochlear Implantation "
+    },
+    {
+      "chunk_id": "NCD-50.3::Criterion: CRIT-COCH-01",
+      "policy_id": "NCD-50.3",
+      "policy_title": "Cochlear Implantation",
+      "section": "Criterion: CRIT-COCH-01",
+      "content_preview": "CRIT-COCH-01 Bilateral Moderate-to-Profound Sensorineural Hearing Loss Diagnosis of bilateral moderate-to-profound senso"
+    },
+    {
+      "chunk_id": "NCD-50.3::Criterion: CRIT-COCH-02",
+      "policy_id": "NCD-50.3",
+      "policy_title": "Cochlear Implantation",
+      "section": "Criterion: CRIT-COCH-02",
+      "content_preview": "CRIT-COCH-02 Speech Recognition Score Threshold (<= 40% to 60%) Demonstrated limited benefit from amplification defined "
+    },
+    {
+      "chunk_id": "NCD-50.3::Criterion: CRIT-COCH-03",
+      "policy_id": "NCD-50.3",
+      "policy_title": "Cochlear Implantation",
+      "section": "Criterion: CRIT-COCH-03",
+      "content_preview": "CRIT-COCH-03 Cognitive Ability and Rehabilitation Suitability Cognitive ability to use auditory clues, willingness to un"
     },
     {
       "chunk_id": "NCD-CARDIAC-REHAB::Indications & Coverage Summary",

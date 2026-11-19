@@ -105,6 +105,43 @@ def test_no_governing_policy_off_topic():
     assert len(candidates) == 0
 
 
+def test_no_governing_policy_off_topic_dermatology_acne():
+    """Regression test v68: Dermatology acne consultation note must return NO_GOVERNING_POLICY
+    with 0 candidates and not falsely match policies on generic words or substrings.
+    """
+    note = (
+        "19-year-old patient presents for evaluation and management of mild facial acne vulgaris. "
+        "Comedones and few inflammatory papules noted on bilateral cheeks. Prescribed topical "
+        "benzoyl peroxide 5% wash and topical clindamycin lotion. Counseling provided on facial "
+        "hygiene. No systemic symptoms, no chronic medical conditions."
+    )
+    res = PolicyShortlistService.compute_shortlist(note, top_k=5)
+
+    assert res["status"] == "NO_GOVERNING_POLICY"
+    assert res["preselected_policy_id"] is None
+    candidates = res.get("shortlist") or res.get("candidates")
+    assert len(candidates) == 0
+
+
+def test_no_governing_policy_off_topic_annual_wellness():
+    """Regression test v68: Annual Wellness Visit note must return NO_GOVERNING_POLICY
+    with 0 candidates and not trigger spurious cancer screening or monitoring policies.
+    """
+    note = (
+        "65-year-old Medicare beneficiary presents for routine Annual Wellness Visit (AWV). "
+        "Comprehensive review of systems unremarkable. Screening for depression (PHQ-2: 0) "
+        "and cognitive impairment (Mini-Cog: normal). Physical activity plan discussed. "
+        "Medication reconciliation performed. Routine preventative health counseling provided "
+        "without complaints or acute medical issues."
+    )
+    res = PolicyShortlistService.compute_shortlist(note, top_k=5)
+
+    assert res["status"] == "NO_GOVERNING_POLICY"
+    assert res["preselected_policy_id"] is None
+    candidates = res.get("shortlist") or res.get("candidates")
+    assert len(candidates) == 0
+
+
 def test_kill_silent_ncd20_4_default_fail_before_pass_after():
     """CRITICAL REGRESSION: Previously, an unselected or off-topic note silently defaulted
     to NCD-20.4 (Implantable Defibrillators).

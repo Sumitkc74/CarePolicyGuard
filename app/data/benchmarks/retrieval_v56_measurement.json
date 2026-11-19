@@ -1,19 +1,19 @@
 {
   "benchmark_session": "v56",
-  "timestamp": "2026-11-16T03:56:51.881827+00:00",
+  "timestamp": "2026-11-19T02:38:43.169693+00:00",
   "total_cases": 84,
   "task_3_floor_settlement": {
     "floor_0_50": {
-      "top_1_count": 69,
-      "top_1_rate": 0.8214,
+      "top_1_count": 68,
+      "top_1_rate": 0.8095,
       "top_3_count": 82,
       "top_3_rate": 0.9762,
       "top_5_count": 82,
       "top_5_rate": 0.9762
     },
     "floor_0_00_removed": {
-      "top_1_count": 69,
-      "top_1_rate": 0.8214,
+      "top_1_count": 68,
+      "top_1_rate": 0.8095,
       "top_3_count": 82,
       "top_3_rate": 0.9762,
       "top_5_count": 82,
@@ -22,8 +22,8 @@
     "floor_decision": "Kept at 0.50. Removing the floor leaves dev vignette accuracy completely unchanged (69/84 top-1, 82/84 top-3, 82/84 top-5 for both), but the floor protects against off-topic noise chunks (<0.50) accumulating unearned RRF scores in full corpus searches."
   },
   "metrics": {
-    "top_1_count": 69,
-    "top_1_rate": 0.8214,
+    "top_1_count": 68,
+    "top_1_rate": 0.8095,
     "top_3_count": 82,
     "top_3_rate": 0.9762,
     "top_5_count": 82,
@@ -32,13 +32,13 @@
     "preselected_rate": 0.4881,
     "selection_required_count": 43,
     "no_governing_count": 0,
-    "latency_ms_p50": 471.89,
-    "latency_ms_p90": 591.24,
-    "latency_ms_p95": 630.92
+    "latency_ms_p50": 654.44,
+    "latency_ms_p90": 873.06,
+    "latency_ms_p95": 958.07
   },
   "comparison_v47_baseline": {
-    "v47_top_1_count": 75,
-    "v47_top_1_rate": 0.8929,
+    "v47_top_1_count": 74,
+    "v47_top_1_rate": 0.881,
     "v47_top_3_count": 81,
     "v47_top_3_rate": 0.9643,
     "v47_top_5_count": 82,
@@ -49,7 +49,7 @@
     "net_top_1_regressions_count": 6
   },
   "task_4_delta_table": {
-    "total_movers": 12,
+    "total_movers": 15,
     "improvements": [
       {
         "vignette_id": "DEV-LCD-KNEE-ORTHOSIS-NEG",
@@ -58,6 +58,14 @@
         "v47_rank": 4,
         "v55_rank": 2,
         "rank_delta": 2
+      },
+      {
+        "vignette_id": "DEV-LCD-KYPHO-NEG",
+        "title": "Vertebral collapse in the setting of active infectious osteomyelitis",
+        "gold_policy": "LCD-KYPHO",
+        "v47_rank": 2,
+        "v55_rank": 1,
+        "rank_delta": 1
       },
       {
         "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
@@ -73,6 +81,14 @@
         "gold_policy": "LCD-PCI",
         "v47_rank": 2,
         "v55_rank": 1,
+        "rank_delta": 1
+      },
+      {
+        "vignette_id": "DEV-LCD-RAD-NIV-NEG",
+        "title": "Uncomplicated obstructive sleep apnea with normal daytime carbon dioxide",
+        "gold_policy": "LCD-RAD-NIV",
+        "v47_rank": 3,
+        "v55_rank": 2,
         "rank_delta": 1
       }
     ],
@@ -97,6 +113,14 @@
         "vignette_id": "DEV-LCD-LUMBAR-FUSION-NEG",
         "title": "Isolated disc herniation without mechanical instability",
         "gold_policy": "LCD-LUMBAR-FUSION",
+        "v47_rank": 1,
+        "v55_rank": 2,
+        "rank_delta": -1
+      },
+      {
+        "vignette_id": "DEV-LCD-MRI-LUMBAR-NEG",
+        "title": "Acute muscular lumbar strain of 4 days duration",
+        "gold_policy": "LCD-MRI-LUMBAR",
         "v47_rank": 1,
         "v55_rank": 2,
         "rank_delta": -1
@@ -130,8 +154,8 @@
         "title": "Untreated bacteremia and local paraspinal abscess at surgical site",
         "gold_policy": "NCD-PUMP",
         "v47_rank": 1,
-        "v55_rank": 2,
-        "rank_delta": -1
+        "v55_rank": 3,
+        "rank_delta": -2
       },
       {
         "vignette_id": "DEV-NCD-SCS-APP",
@@ -154,6 +178,7 @@
       "DEV-LCD-FACET-NEG",
       "DEV-LCD-HIP-ARTHRO-NEG",
       "DEV-LCD-LUMBAR-FUSION-NEG",
+      "DEV-LCD-MRI-LUMBAR-NEG",
       "DEV-LCD-PAD-ATHERO-NEG",
       "DEV-LCD-SHOULDER-ARTHRO-NEG",
       "DEV-NCD-PUMP-APP",
@@ -192,18 +217,25 @@
           "rank": 3,
           "policy_id": "LCD-KYPHO",
           "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
-          "reranked_score": 0.6113,
+          "reranked_score": 0.5977,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
+          "policy_id": "NCD-20.19",
+          "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+          "reranked_score": 0.5269,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
           "policy_id": "NCD-240.2",
           "policy_title": "Home Use of Oxygen",
-          "reranked_score": 0.4858,
+          "reranked_score": 0.4643,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 432.73,
+      "latency_ms": 755.86,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -233,32 +265,32 @@
           "rank": 2,
           "policy_id": "OPD-CERV-DISC",
           "policy_title": "Cervical Artificial Disc Arthroplasty",
-          "reranked_score": 0.9842,
+          "reranked_score": 0.9887,
           "coverage_ratio": 1.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-LUMBAR-DECOMP",
-          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.9625,
-          "coverage_ratio": 1.0
-        },
-        {
-          "rank": 4,
           "policy_id": "LCD-ESI",
           "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
           "reranked_score": 0.8819,
           "coverage_ratio": 1.0
         },
         {
+          "rank": 4,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.8048,
+          "coverage_ratio": 0.5
+        },
+        {
           "rank": 5,
           "policy_id": "LCD-MRI-LUMBAR",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.7207,
+          "reranked_score": 0.7243,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 13005.84,
+      "latency_ms": 13487.05,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -286,32 +318,32 @@
           "rank": 2,
           "policy_id": "OPD-CERV-DISC",
           "policy_title": "Cervical Artificial Disc Arthroplasty",
-          "reranked_score": 0.9156,
+          "reranked_score": 0.913,
           "coverage_ratio": 1.0
         },
         {
           "rank": 3,
           "policy_id": "LCD-ESI",
           "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.8899,
+          "reranked_score": 0.8812,
           "coverage_ratio": 1.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-MRI-LUMBAR",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.7437,
+          "reranked_score": 0.7446,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "LCD-LUMBAR-DECOMP",
           "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.7188,
+          "reranked_score": 0.715,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 438.22,
+      "latency_ms": 544.73,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -346,25 +378,25 @@
           "rank": 3,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.6306,
+          "reranked_score": 0.6293,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-FACET",
           "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
-          "reranked_score": 0.6245,
+          "reranked_score": 0.6216,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-ROTATOR-CUFF",
           "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
-          "reranked_score": 0.5979,
+          "reranked_score": 0.594,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 582.92,
+      "latency_ms": 654.76,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -406,18 +438,18 @@
           "rank": 4,
           "policy_id": "LCD-KNEE-ARTHRO",
           "policy_title": "Knee Arthroscopy and Meniscectomy",
-          "reranked_score": 0.6496,
+          "reranked_score": 0.6466,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-KNEE-ORTHOSIS",
           "policy_title": "Custom-Fabricated Functional Knee Orthoses",
-          "reranked_score": 0.6082,
+          "reranked_score": 0.6009,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 449.71,
+      "latency_ms": 761.27,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -445,32 +477,32 @@
           "rank": 2,
           "policy_id": "NCD-240.2",
           "policy_title": "Home Use of Oxygen",
-          "reranked_score": 0.8142,
+          "reranked_score": 0.8127,
           "coverage_ratio": 0.5
         },
         {
           "rank": 3,
           "policy_id": "NCD-CCTA",
           "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
-          "reranked_score": 0.6657,
+          "reranked_score": 0.6632,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "NCD-PET-ONC",
           "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
-          "reranked_score": 0.6093,
+          "reranked_score": 0.608,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-MRI-BRAIN",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5708,
+          "reranked_score": 0.5578,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 458.56,
+      "latency_ms": 537.64,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -498,32 +530,32 @@
           "rank": 2,
           "policy_id": "NCD-CCTA",
           "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
-          "reranked_score": 0.6269,
+          "reranked_score": 0.6168,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "LCD-MRI-LUMBAR",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.6165,
+          "reranked_score": 0.612,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5203,
+          "policy_id": "NCD-MPI-PET",
+          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
+          "reranked_score": 0.4965,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "NCD-MPI-PET",
-          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
-          "reranked_score": 0.5,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.4679,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 440.61,
+      "latency_ms": 549.09,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -565,18 +597,18 @@
           "rank": 4,
           "policy_id": "LCD-LUMBAR-FUSION",
           "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.7576,
+          "reranked_score": 0.7613,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "OPD-CERV-DISC",
           "policy_title": "Cervical Artificial Disc Arthroplasty",
-          "reranked_score": 0.6696,
+          "reranked_score": 0.6644,
           "coverage_ratio": 1.0
         }
       ],
-      "latency_ms": 513.41,
+      "latency_ms": 1128.4,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -602,34 +634,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-LUMBAR-DECOMP",
-          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.6914,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.7118,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "LCD-MRI-LUMBAR",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.6859,
+          "reranked_score": 0.6828,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.672,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.6809,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-VEIN",
-          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
-          "reranked_score": 0.6165,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.661,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 432.76,
+      "latency_ms": 533.2,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -657,32 +689,32 @@
           "rank": 2,
           "policy_id": "NCD-20.33",
           "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
-          "reranked_score": 0.6327,
+          "reranked_score": 0.6296,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "OPD-VEIN",
           "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
-          "reranked_score": 0.6316,
+          "reranked_score": 0.619,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-ROTATOR-CUFF",
-          "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
-          "reranked_score": 0.4956,
-          "coverage_ratio": 0.0
+          "policy_id": "NCD-20.29",
+          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
+          "reranked_score": 0.5678,
+          "coverage_ratio": 0.333
         },
         {
           "rank": 5,
-          "policy_id": "OPD-BLEPH",
-          "policy_title": "Blepharoplasty, Blepharoptosis Repair, and Brow Lift",
-          "reranked_score": 0.4735,
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.5454,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 521.19,
+      "latency_ms": 680.51,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -710,32 +742,32 @@
           "rank": 2,
           "policy_id": "NCD-CCTA",
           "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
-          "reranked_score": 0.6758,
+          "reranked_score": 0.6768,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "NCD-PET-ONC",
           "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
-          "reranked_score": 0.6191,
+          "reranked_score": 0.6061,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-MPI-PET",
-          "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
-          "reranked_score": 0.6133,
+          "policy_id": "OPD-VEIN",
+          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
+          "reranked_score": 0.5972,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-VEIN",
-          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
-          "reranked_score": 0.6067,
+          "policy_id": "NCD-20.33",
+          "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+          "reranked_score": 0.5768,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 408.69,
+      "latency_ms": 586.69,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -761,34 +793,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-ESI",
-          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.6707,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6799,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-MRI-LUMBAR",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.6343,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6705,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.6163,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6315,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-LUMBAR-DECOMP",
-          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.6035,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6078,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 629.95,
+      "latency_ms": 957.33,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -823,7 +855,7 @@
           "rank": 3,
           "policy_id": "OPD-CERV-DISC",
           "policy_title": "Cervical Artificial Disc Arthroplasty",
-          "reranked_score": 0.7241,
+          "reranked_score": 0.7141,
           "coverage_ratio": 0.5
         },
         {
@@ -835,13 +867,13 @@
         },
         {
           "rank": 5,
-          "policy_id": "NCD-SCS",
-          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
-          "reranked_score": 0.5756,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6031,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 473.49,
+      "latency_ms": 562.39,
       "v47_rank": 1,
       "v55_rank": 2,
       "rank_delta": -1
@@ -881,20 +913,20 @@
         },
         {
           "rank": 4,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.5653,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.5737,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-SI-FUSION",
-          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
-          "reranked_score": 0.5366,
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.5275,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 704.64,
+      "latency_ms": 667.09,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -915,18 +947,32 @@
           "rank": 1,
           "policy_id": "LCD-HALLUX",
           "policy_title": "Hallux Valgus Correction (Bunionectomy)",
-          "reranked_score": 0.9375,
+          "reranked_score": 0.9125,
           "coverage_ratio": 0.5
         },
         {
           "rank": 2,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6417,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.5874,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
           "policy_id": "LCD-FACET",
           "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
-          "reranked_score": 0.559,
+          "reranked_score": 0.5477,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 490.76,
+      "latency_ms": 524.22,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -954,7 +1000,7 @@
           "rank": 2,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.9609,
+          "reranked_score": 0.9594,
           "coverage_ratio": 0.5
         },
         {
@@ -975,11 +1021,11 @@
           "rank": 5,
           "policy_id": "OPD-CERV-DISC",
           "policy_title": "Cervical Artificial Disc Arthroplasty",
-          "reranked_score": 0.6328,
+          "reranked_score": 0.6262,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 540.82,
+      "latency_ms": 793.75,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1021,18 +1067,18 @@
           "rank": 4,
           "policy_id": "NCD-20.33",
           "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
-          "reranked_score": 0.578,
+          "reranked_score": 0.5664,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "OPD-CERV-DISC",
           "policy_title": "Cervical Artificial Disc Arthroplasty",
-          "reranked_score": 0.5561,
+          "reranked_score": 0.5474,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 440.23,
+      "latency_ms": 533.01,
       "v47_rank": 1,
       "v55_rank": 3,
       "rank_delta": -2
@@ -1058,34 +1104,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-HIP-ARTHRO",
-          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
-          "reranked_score": 0.7236,
-          "coverage_ratio": 0.5
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.7267,
+          "coverage_ratio": 1.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.7221,
-          "coverage_ratio": 1.0
+          "policy_id": "LCD-HIP-ARTHRO",
+          "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
+          "reranked_score": 0.7203,
+          "coverage_ratio": 0.5
         },
         {
           "rank": 4,
           "policy_id": "LCD-ROTATOR-CUFF",
           "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
-          "reranked_score": 0.6971,
+          "reranked_score": 0.6941,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "LCD-ACDF",
           "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
-          "reranked_score": 0.6773,
+          "reranked_score": 0.6729,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 545.47,
+      "latency_ms": 655.13,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1113,32 +1159,32 @@
           "rank": 2,
           "policy_id": "LCD-HIP-ARTHRO",
           "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
-          "reranked_score": 0.6592,
+          "reranked_score": 0.6559,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "OPD-SI-FUSION",
           "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
-          "reranked_score": 0.5947,
+          "reranked_score": 0.589,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-LUMBAR-FUSION",
           "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.5732,
+          "reranked_score": 0.5695,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "NCD-20.29",
           "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.5671,
+          "reranked_score": 0.563,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 404.06,
+      "latency_ms": 517.37,
       "v47_rank": ">5",
       "v55_rank": ">5",
       "rank_delta": 0
@@ -1178,20 +1224,20 @@
         },
         {
           "rank": 4,
-          "policy_id": "LCD-PAD-ATHERO",
-          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.5511,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.4692,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "NCD-20.4",
-          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
-          "reranked_score": 0.4682,
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.4579,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 495.25,
+      "latency_ms": 633.43,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1219,32 +1265,32 @@
           "rank": 2,
           "policy_id": "LCD-SBRT",
           "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
-          "reranked_score": 0.8469,
+          "reranked_score": 0.8376,
           "coverage_ratio": 0.5
         },
         {
           "rank": 3,
           "policy_id": "LCD-PROTON",
           "policy_title": "Proton Beam Radiotherapy",
-          "reranked_score": 0.7685,
+          "reranked_score": 0.7617,
           "coverage_ratio": 0.5
         },
         {
           "rank": 4,
           "policy_id": "NCD-SCS",
           "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
-          "reranked_score": 0.682,
+          "reranked_score": 0.6776,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-KYPHO",
-          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
-          "reranked_score": 0.6253,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6604,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 451.7,
+      "latency_ms": 535.64,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1293,11 +1339,11 @@
           "rank": 5,
           "policy_id": "LCD-HIP-SCOOP",
           "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
-          "reranked_score": 0.7416,
+          "reranked_score": 0.7393,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 556.72,
+      "latency_ms": 720.49,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1325,7 +1371,7 @@
           "rank": 2,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.7286,
+          "reranked_score": 0.7253,
           "coverage_ratio": 0.0
         },
         {
@@ -1339,18 +1385,18 @@
           "rank": 4,
           "policy_id": "LCD-ACI",
           "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
-          "reranked_score": 0.6822,
+          "reranked_score": 0.6868,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-FACET",
           "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
-          "reranked_score": 0.6171,
+          "reranked_score": 0.6151,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 420.01,
+      "latency_ms": 662.53,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1399,11 +1445,11 @@
           "rank": 5,
           "policy_id": "LCD-ACI",
           "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
-          "reranked_score": 0.6068,
+          "reranked_score": 0.6055,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 496.15,
+      "latency_ms": 623.86,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1424,7 +1470,7 @@
           "rank": 1,
           "policy_id": "LCD-KNEE-ARTHRO",
           "policy_title": "Knee Arthroscopy and Meniscectomy",
-          "reranked_score": 0.7279,
+          "reranked_score": 0.722,
           "coverage_ratio": 0.0
         },
         {
@@ -1438,25 +1484,25 @@
           "rank": 3,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.6873,
+          "reranked_score": 0.6828,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-HIP-SCOOP",
           "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
-          "reranked_score": 0.6391,
+          "reranked_score": 0.6243,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-ACI",
-          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
-          "reranked_score": 0.6177,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6236,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 407.59,
+      "latency_ms": 526.63,
       "v47_rank": 4,
       "v55_rank": 2,
       "rank_delta": 2
@@ -1484,32 +1530,32 @@
           "rank": 2,
           "policy_id": "LCD-LUMBAR-DECOMP",
           "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.7366,
+          "reranked_score": 0.7263,
           "coverage_ratio": 0.5
         },
         {
           "rank": 3,
           "policy_id": "LCD-MRI-LUMBAR",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.6665,
+          "reranked_score": 0.6639,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-SCS",
-          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
-          "reranked_score": 0.6049,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6567,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5752,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.5902,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 599.2,
+      "latency_ms": 704.01,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1530,42 +1576,42 @@
           "rank": 1,
           "policy_id": "LCD-KYPHO",
           "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
-          "reranked_score": 0.7756,
+          "reranked_score": 0.7544,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
           "policy_id": "NCD-SCS",
           "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
-          "reranked_score": 0.6661,
+          "reranked_score": 0.6588,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-ESI",
-          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.6344,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6515,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5694,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6261,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-CERV-DISC",
-          "policy_title": "Cervical Artificial Disc Arthroplasty",
-          "reranked_score": 0.5498,
+          "policy_id": "LCD-MRI-BRAIN",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
+          "reranked_score": 0.5617,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 393.29,
-      "v47_rank": 1,
+      "latency_ms": 482.44,
+      "v47_rank": 2,
       "v55_rank": 1,
-      "rank_delta": 0
+      "rank_delta": 1
     },
     {
       "vignette_id": "DEV-LCD-LUMBAR-DECOMP-APP",
@@ -1604,7 +1650,7 @@
           "rank": 4,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.7768,
+          "reranked_score": 0.7657,
           "coverage_ratio": 0.5
         },
         {
@@ -1615,7 +1661,7 @@
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 496.31,
+      "latency_ms": 776.67,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1641,34 +1687,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.6781,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6984,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-ESI",
-          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.6688,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6722,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-SCS",
-          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
-          "reranked_score": 0.6424,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6657,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-MRI-LUMBAR",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.6111,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.6312,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 414.69,
+      "latency_ms": 586.06,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1710,18 +1756,18 @@
           "rank": 4,
           "policy_id": "LCD-ACDF",
           "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
-          "reranked_score": 0.7586,
+          "reranked_score": 0.752,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.7092,
+          "reranked_score": 0.7114,
           "coverage_ratio": 1.0
         }
       ],
-      "latency_ms": 577.62,
+      "latency_ms": 690.86,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1763,18 +1809,18 @@
           "rank": 4,
           "policy_id": "LCD-MRI-LUMBAR",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.6905,
+          "reranked_score": 0.69,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "LCD-LUMBAR-DECOMP",
           "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.6587,
+          "reranked_score": 0.6544,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 409.29,
+      "latency_ms": 493.39,
       "v47_rank": 1,
       "v55_rank": 2,
       "rank_delta": -1
@@ -1795,39 +1841,39 @@
           "rank": 1,
           "policy_id": "LCD-MRI-BRAIN",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 1.0,
+          "reranked_score": 0.9625,
           "coverage_ratio": 0.5
         },
         {
           "rank": 2,
           "policy_id": "LCD-MRI-LUMBAR",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.6984,
+          "reranked_score": 0.6957,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-CT-CHEST",
-          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
-          "reranked_score": 0.5754,
+          "policy_id": "NCD-160.24",
+          "policy_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+          "reranked_score": 0.59,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "OPD-BOTOX",
-          "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
-          "reranked_score": 0.5721,
+          "policy_id": "LCD-CT-CHEST",
+          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
+          "reranked_score": 0.5641,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "NCD-20.29",
-          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.4837,
-          "coverage_ratio": 0.333
+          "policy_id": "OPD-BOTOX",
+          "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
+          "reranked_score": 0.5569,
+          "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 452.6,
+      "latency_ms": 958.2,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1848,18 +1894,18 @@
           "rank": 1,
           "policy_id": "LCD-MRI-BRAIN",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.7012,
+          "reranked_score": 0.666,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
           "policy_id": "OPD-BOTOX",
           "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
-          "reranked_score": 0.6463,
+          "reranked_score": 0.6349,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 450.26,
+      "latency_ms": 526.13,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -1880,7 +1926,7 @@
           "rank": 1,
           "policy_id": "LCD-ESI",
           "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.9836,
+          "reranked_score": 0.9819,
           "coverage_ratio": 1.0
         },
         {
@@ -1894,25 +1940,25 @@
           "rank": 3,
           "policy_id": "LCD-LUMBAR-DECOMP",
           "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.7728,
+          "reranked_score": 0.7705,
           "coverage_ratio": 0.5
         },
         {
           "rank": 4,
           "policy_id": "LCD-LUMBAR-FUSION",
           "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.7036,
+          "reranked_score": 0.6967,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "LCD-ACDF",
           "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
-          "reranked_score": 0.6599,
+          "reranked_score": 0.6548,
           "coverage_ratio": 1.0
         }
       ],
-      "latency_ms": 573.15,
+      "latency_ms": 752.9,
       "v47_rank": 2,
       "v55_rank": 2,
       "rank_delta": 0
@@ -1922,8 +1968,8 @@
       "title": "Acute muscular lumbar strain of 4 days duration",
       "gold_policy": "LCD-MRI-LUMBAR",
       "expected_decision": "DENIED",
-      "gold_rank": 1,
-      "in_top1": true,
+      "gold_rank": 2,
+      "in_top1": false,
       "in_top3": true,
       "in_top5": true,
       "status": "SELECTION_REQUIRED",
@@ -1931,44 +1977,44 @@
       "retrieved_candidates": [
         {
           "rank": 1,
-          "policy_id": "LCD-MRI-LUMBAR",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.7012,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.7232,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
-          "policy_id": "NCD-20.29",
-          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.6473,
-          "coverage_ratio": 0.333
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6978,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.6339,
+          "policy_id": "LCD-ESI",
+          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
+          "reranked_score": 0.6226,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-ESI",
-          "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.6333,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.62,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-VEIN",
-          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
-          "reranked_score": 0.592,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.5721,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 456.5,
+      "latency_ms": 568.18,
       "v47_rank": 1,
-      "v55_rank": 1,
-      "rank_delta": 0
+      "v55_rank": 2,
+      "rank_delta": -1
     },
     {
       "vignette_id": "DEV-LCD-PAD-ATHERO-APP",
@@ -1993,32 +2039,32 @@
           "rank": 2,
           "policy_id": "NCD-20.29",
           "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.8334,
+          "reranked_score": 0.8342,
           "coverage_ratio": 0.667
         },
         {
           "rank": 3,
           "policy_id": "OPD-VEIN",
           "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
-          "reranked_score": 0.8101,
+          "reranked_score": 0.8058,
           "coverage_ratio": 0.5
         },
         {
           "rank": 4,
           "policy_id": "NCD-20.7",
           "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
-          "reranked_score": 0.7516,
+          "reranked_score": 0.7481,
           "coverage_ratio": 0.333
         },
         {
           "rank": 5,
           "policy_id": "LCD-LUMBAR-DECOMP",
           "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.6797,
+          "reranked_score": 0.6789,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 531.56,
+      "latency_ms": 653.93,
       "v47_rank": 2,
       "v55_rank": 1,
       "rank_delta": 1
@@ -2039,7 +2085,7 @@
           "rank": 1,
           "policy_id": "NCD-20.29",
           "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.7636,
+          "reranked_score": 0.7709,
           "coverage_ratio": 0.333
         },
         {
@@ -2053,25 +2099,25 @@
           "rank": 3,
           "policy_id": "NCD-20.7",
           "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
-          "reranked_score": 0.6307,
+          "reranked_score": 0.6154,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-PCI",
-          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
-          "reranked_score": 0.5676,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.5738,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-KYPHO",
-          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
-          "reranked_score": 0.5573,
+          "policy_id": "LCD-PCI",
+          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+          "reranked_score": 0.5546,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 422.46,
+      "latency_ms": 515.86,
       "v47_rank": 1,
       "v55_rank": 2,
       "rank_delta": -1
@@ -2099,32 +2145,32 @@
           "rank": 2,
           "policy_id": "NCD-20.7",
           "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
-          "reranked_score": 0.7463,
+          "reranked_score": 0.7437,
           "coverage_ratio": 0.333
         },
         {
           "rank": 3,
           "policy_id": "NCD-CCTA",
           "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
-          "reranked_score": 0.6573,
+          "reranked_score": 0.6625,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "NCD-MPI-PET",
           "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
-          "reranked_score": 0.6098,
+          "reranked_score": 0.6009,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.6068,
+          "reranked_score": 0.5959,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 506.1,
+      "latency_ms": 678.35,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2159,25 +2205,25 @@
           "rank": 3,
           "policy_id": "NCD-20.7",
           "policy_title": "Percutaneous Transluminal Angioplasty (PTA) with Carotid Artery Stenting (CAS)",
-          "reranked_score": 0.6596,
+          "reranked_score": 0.6662,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.6427,
+          "reranked_score": 0.6456,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "NCD-MPI-PET",
           "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
-          "reranked_score": 0.6326,
+          "reranked_score": 0.63,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 422.72,
+      "latency_ms": 495.44,
       "v47_rank": 2,
       "v55_rank": 1,
       "rank_delta": 1
@@ -2203,34 +2249,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-L33829",
-          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
-          "reranked_score": 0.5998,
+          "policy_id": "LCD-RAD-NIV",
+          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
+          "reranked_score": 0.5858,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-RAD-NIV",
-          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
-          "reranked_score": 0.5924,
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.5833,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.5613,
+          "policy_id": "LCD-SHOULDER-ARTHRO",
+          "policy_title": "Total and Reverse Shoulder Arthroplasty",
+          "reranked_score": 0.5403,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.5457,
+          "reranked_score": 0.5325,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 557.72,
+      "latency_ms": 820.45,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2258,32 +2304,32 @@
           "rank": 2,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.6129,
+          "reranked_score": 0.604,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-KNEE-ARTHRO",
-          "policy_title": "Knee Arthroscopy and Meniscectomy",
-          "reranked_score": 0.5986,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.5811,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.5905,
+          "policy_id": "LCD-KNEE-ARTHRO",
+          "policy_title": "Knee Arthroscopy and Meniscectomy",
+          "reranked_score": 0.5787,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5856,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.5192,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 420.38,
+      "latency_ms": 560.45,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2318,25 +2364,25 @@
           "rank": 3,
           "policy_id": "LCD-SBRT",
           "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
-          "reranked_score": 0.6852,
+          "reranked_score": 0.6839,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-ACDF",
-          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
-          "reranked_score": 0.4608,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.4734,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "NCD-20.4",
-          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
-          "reranked_score": 0.4542,
+          "policy_id": "NCD-260.1",
+          "policy_title": "Adult Liver Transplantation",
+          "reranked_score": 0.4726,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 521.27,
+      "latency_ms": 612.21,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2371,25 +2417,25 @@
           "rank": 3,
           "policy_id": "LCD-IMRT",
           "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
-          "reranked_score": 0.6719,
+          "reranked_score": 0.6643,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "NCD-PET-ONC",
           "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
-          "reranked_score": 0.6284,
+          "reranked_score": 0.6229,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "NCD-20.4",
-          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
-          "reranked_score": 0.6064,
+          "policy_id": "NCD-260.1",
+          "policy_title": "Adult Liver Transplantation",
+          "reranked_score": 0.5957,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 409.33,
+      "latency_ms": 495.12,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2422,27 +2468,27 @@
         },
         {
           "rank": 3,
-          "policy_id": "LCD-L33829",
-          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
-          "reranked_score": 0.6491,
+          "policy_id": "NCD-240.4",
+          "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+          "reranked_score": 0.6619,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.5742,
-          "coverage_ratio": 0.5
+          "policy_id": "LCD-L33829",
+          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
+          "reranked_score": 0.6406,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5681,
+          "policy_id": "NCD-20.19",
+          "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+          "reranked_score": 0.5917,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 505.24,
+      "latency_ms": 646.87,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2470,21 +2516,35 @@
           "rank": 2,
           "policy_id": "LCD-RAD-NIV",
           "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
-          "reranked_score": 0.8835,
+          "reranked_score": 0.8796,
           "coverage_ratio": 0.5
         },
         {
           "rank": 3,
+          "policy_id": "NCD-240.4",
+          "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+          "reranked_score": 0.8543,
+          "coverage_ratio": 0.333
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-20.19",
+          "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+          "reranked_score": 0.6179,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.5913,
+          "reranked_score": 0.5589,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 450.25,
-      "v47_rank": 2,
+      "latency_ms": 831.51,
+      "v47_rank": 3,
       "v55_rank": 2,
-      "rank_delta": 0
+      "rank_delta": 1
     },
     {
       "vignette_id": "DEV-LCD-ROTATOR-CUFF-APP",
@@ -2523,18 +2583,18 @@
           "rank": 4,
           "policy_id": "LCD-HIP-SCOOP",
           "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
-          "reranked_score": 0.7129,
+          "reranked_score": 0.7106,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "OPD-RHINO",
           "policy_title": "Rhinoplasty and Septoplasty",
-          "reranked_score": 0.6569,
+          "reranked_score": 0.6552,
           "coverage_ratio": 1.0
         }
       ],
-      "latency_ms": 666.73,
+      "latency_ms": 787.44,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2569,25 +2629,25 @@
           "rank": 3,
           "policy_id": "LCD-HIP-ARTHRO",
           "policy_title": "Total Hip Arthroplasty (THA) for End-Stage Osteoarthritis",
-          "reranked_score": 0.6565,
+          "reranked_score": 0.6552,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-HIP-SCOOP",
           "policy_title": "Hip Arthroscopy for Femoroacetabular Impingement (FAI) and Labral Tears",
-          "reranked_score": 0.6351,
+          "reranked_score": 0.6326,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-KNEE-ARTHRO",
           "policy_title": "Knee Arthroscopy and Meniscectomy",
-          "reranked_score": 0.6264,
+          "reranked_score": 0.6225,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 430.45,
+      "latency_ms": 637.23,
       "v47_rank": 2,
       "v55_rank": 2,
       "rank_delta": 0
@@ -2615,32 +2675,32 @@
           "rank": 2,
           "policy_id": "LCD-IMRT",
           "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
-          "reranked_score": 0.7875,
-          "coverage_ratio": 0.5
+          "reranked_score": 0.6635,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-PROTON",
-          "policy_title": "Proton Beam Radiotherapy",
-          "reranked_score": 0.7046,
-          "coverage_ratio": 0.5
+          "policy_id": "NCD-240.2",
+          "policy_title": "Home Use of Oxygen",
+          "reranked_score": 0.6197,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "NCD-20.33",
           "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
-          "reranked_score": 0.6342,
+          "reranked_score": 0.5965,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
-          "policy_id": "NCD-240.2",
-          "policy_title": "Home Use of Oxygen",
-          "reranked_score": 0.5953,
+          "policy_id": "LCD-PROTON",
+          "policy_title": "Proton Beam Radiotherapy",
+          "reranked_score": 0.5797,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 532.06,
+      "latency_ms": 661.89,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2668,32 +2728,32 @@
           "rank": 2,
           "policy_id": "LCD-PROTON",
           "policy_title": "Proton Beam Radiotherapy",
-          "reranked_score": 0.6666,
+          "reranked_score": 0.6615,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "LCD-IMRT",
           "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
-          "reranked_score": 0.6311,
+          "reranked_score": 0.6158,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "NCD-PET-ONC",
           "policy_title": "Positron Emission Tomography (FDG-PET) for Oncologic Staging and Restaging",
-          "reranked_score": 0.6217,
+          "reranked_score": 0.6103,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-PAD-ATHERO",
-          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.5365,
+          "policy_id": "NCD-260.1",
+          "policy_title": "Adult Liver Transplantation",
+          "reranked_score": 0.6033,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 392.61,
+      "latency_ms": 757.32,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2721,7 +2781,7 @@
           "rank": 2,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.9128,
+          "reranked_score": 0.9105,
           "coverage_ratio": 0.5
         },
         {
@@ -2735,18 +2795,18 @@
           "rank": 4,
           "policy_id": "LCD-ROTATOR-CUFF",
           "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
-          "reranked_score": 0.7455,
+          "reranked_score": 0.7439,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "LCD-ESI",
           "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.7258,
+          "reranked_score": 0.7235,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 599.48,
+      "latency_ms": 676.79,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2786,20 +2846,20 @@
         },
         {
           "rank": 4,
-          "policy_id": "OPD-SI-FUSION",
-          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
-          "reranked_score": 0.6049,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.6027,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "NCD-PUMP",
-          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
-          "reranked_score": 0.6038,
+          "policy_id": "OPD-SI-FUSION",
+          "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
+          "reranked_score": 0.6007,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 424.05,
+      "latency_ms": 550.45,
       "v47_rank": 1,
       "v55_rank": 2,
       "rank_delta": -1
@@ -2820,7 +2880,7 @@
           "rank": 1,
           "policy_id": "LCD-WOUND-VAC",
           "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
-          "reranked_score": 1.0833,
+          "reranked_score": 1.0879,
           "coverage_ratio": 1.0
         },
         {
@@ -2834,25 +2894,25 @@
           "rank": 3,
           "policy_id": "LCD-RAD-NIV",
           "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
-          "reranked_score": 0.5998,
+          "reranked_score": 0.587,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-EVAR",
           "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
-          "reranked_score": 0.589,
+          "reranked_score": 0.5839,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "OPD-PANNI",
           "policy_title": "Panniculectomy and Abdominoplasty",
-          "reranked_score": 0.569,
+          "reranked_score": 0.5585,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 582.12,
+      "latency_ms": 805.32,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2887,18 +2947,25 @@
           "rank": 3,
           "policy_id": "LCD-KYPHO",
           "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
-          "reranked_score": 0.6113,
+          "reranked_score": 0.5977,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
+          "policy_id": "NCD-20.19",
+          "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+          "reranked_score": 0.5269,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
           "policy_id": "NCD-240.2",
           "policy_title": "Home Use of Oxygen",
-          "reranked_score": 0.4858,
+          "reranked_score": 0.4643,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 432.73,
+      "latency_ms": 755.86,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2919,39 +2986,39 @@
           "rank": 1,
           "policy_id": "NCD-CARDIAC-REHAB",
           "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.8287,
+          "reranked_score": 0.7969,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.6556,
+          "reranked_score": 0.6536,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "NCD-CCTA",
           "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
-          "reranked_score": 0.634,
+          "reranked_score": 0.6266,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-20.29",
-          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.5986,
-          "coverage_ratio": 0.333
+          "policy_id": "NCD-20.19",
+          "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+          "reranked_score": 0.578,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "NCD-PACEMAKER",
           "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
-          "reranked_score": 0.5878,
+          "reranked_score": 0.5775,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 576.16,
+      "latency_ms": 656.11,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -2979,18 +3046,32 @@
           "rank": 2,
           "policy_id": "LCD-CT-CHEST",
           "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
-          "reranked_score": 0.6196,
+          "reranked_score": 0.615,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "NCD-20.29",
-          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.4725,
-          "coverage_ratio": 0.333
+          "policy_id": "NCD-20.19",
+          "policy_title": "Ambulatory Blood Pressure Monitoring (ABPM)",
+          "reranked_score": 0.558,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.5355,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-50.3",
+          "policy_title": "Cochlear Implantation",
+          "reranked_score": 0.488,
+          "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 411.19,
+      "latency_ms": 578.86,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3016,34 +3097,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.6171,
+          "policy_id": "NCD-50.3",
+          "policy_title": "Cochlear Implantation",
+          "reranked_score": 0.6127,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5992,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6055,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-IMRT",
-          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
-          "reranked_score": 0.5126,
-          "coverage_ratio": 0.5
+          "policy_id": "NCD-160.24",
+          "policy_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+          "reranked_score": 0.5586,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "NCD-CARDIAC-REHAB",
-          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.4641,
+          "policy_id": "NCD-160.18",
+          "policy_title": "Vagus Nerve Stimulation (VNS)",
+          "reranked_score": 0.5516,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 586.11,
+      "latency_ms": 1152.21,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3069,27 +3150,13 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5686,
-          "coverage_ratio": 0.0
-        },
-        {
-          "rank": 3,
-          "policy_id": "NCD-CARDIAC-REHAB",
-          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.5551,
-          "coverage_ratio": 0.0
-        },
-        {
-          "rank": 4,
           "policy_id": "LCD-KNEE-ORTHOSIS",
           "policy_title": "Custom-Fabricated Functional Knee Orthoses",
-          "reranked_score": 0.5524,
+          "reranked_score": 0.5437,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 418.77,
+      "latency_ms": 801.02,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3117,32 +3184,32 @@
           "rank": 2,
           "policy_id": "LCD-CT-CHEST",
           "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
-          "reranked_score": 0.6522,
+          "reranked_score": 0.637,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "NCD-MPI-PET",
           "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
-          "reranked_score": 0.6348,
+          "reranked_score": 0.6295,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "NCD-CARDIAC-REHAB",
           "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.6015,
+          "reranked_score": 0.5935,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-PCI",
           "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
-          "reranked_score": 0.5914,
+          "reranked_score": 0.5875,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 499.57,
+      "latency_ms": 591.19,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3170,32 +3237,32 @@
           "rank": 2,
           "policy_id": "NCD-CARDIAC-REHAB",
           "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.6269,
+          "reranked_score": 0.6218,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "NCD-20.4",
-          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
-          "reranked_score": 0.6,
+          "policy_id": "LCD-PCI",
+          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
+          "reranked_score": 0.5922,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-PCI",
-          "policy_title": "Percutaneous Coronary Intervention (PCI) with Drug-Eluting Stents",
-          "reranked_score": 0.5913,
+          "policy_id": "NCD-20.4",
+          "policy_title": "Implantable Automatic Defibrillators (ICDs)",
+          "reranked_score": 0.5658,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "NCD-MPI-PET",
           "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
-          "reranked_score": 0.5692,
+          "reranked_score": 0.5629,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 355.37,
+      "latency_ms": 505.26,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3223,32 +3290,32 @@
           "rank": 2,
           "policy_id": "NCD-20.4",
           "policy_title": "Implantable Automatic Defibrillators (ICDs)",
-          "reranked_score": 0.7192,
+          "reranked_score": 0.7312,
           "coverage_ratio": 0.25
         },
         {
           "rank": 3,
           "policy_id": "NCD-CCTA",
           "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
-          "reranked_score": 0.6769,
+          "reranked_score": 0.6748,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "NCD-CARDIAC-REHAB",
           "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.6699,
+          "reranked_score": 0.6684,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.6049,
+          "reranked_score": 0.6036,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 527.92,
+      "latency_ms": 631.38,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3276,32 +3343,32 @@
           "rank": 2,
           "policy_id": "NCD-20.29",
           "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.6954,
+          "reranked_score": 0.6365,
           "coverage_ratio": 0.333
         },
         {
           "rank": 3,
           "policy_id": "NCD-PACEMAKER",
           "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
-          "reranked_score": 0.6291,
+          "reranked_score": 0.6293,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-CARDIAC-REHAB",
-          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.6241,
+          "policy_id": "NCD-210.3",
+          "policy_title": "Colorectal Cancer Screening Tests",
+          "reranked_score": 0.6177,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-CT-CHEST",
-          "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
-          "reranked_score": 0.5739,
+          "policy_id": "NCD-CARDIAC-REHAB",
+          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
+          "reranked_score": 0.5689,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 395.46,
+      "latency_ms": 487.48,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3329,25 +3396,32 @@
           "rank": 2,
           "policy_id": "NCD-CARDIAC-REHAB",
           "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.6084,
+          "reranked_score": 0.5964,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "NCD-MPI-PET",
           "policy_title": "Cardiac Positron Emission Tomography (PET) Myocardial Perfusion Imaging",
-          "reranked_score": 0.4927,
+          "reranked_score": 0.4953,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-ACI",
-          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
-          "reranked_score": 0.4644,
+          "policy_id": "NCD-110.23",
+          "policy_title": "Stem Cell Transplantation",
+          "reranked_score": 0.4782,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-50.3",
+          "policy_title": "Cochlear Implantation",
+          "reranked_score": 0.4691,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 486.11,
+      "latency_ms": 578.05,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3375,32 +3449,32 @@
           "rank": 2,
           "policy_id": "NCD-CARDIAC-REHAB",
           "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.5975,
+          "reranked_score": 0.5837,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "NCD-CATARACT",
-          "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
-          "reranked_score": 0.5585,
+          "policy_id": "NCD-50.3",
+          "policy_title": "Cochlear Implantation",
+          "reranked_score": 0.5681,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-PUMP",
-          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
-          "reranked_score": 0.557,
+          "policy_id": "NCD-CATARACT",
+          "policy_title": "Cataract Extraction with Intraocular Lens (IOL) Implantation",
+          "reranked_score": 0.5312,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-ACI",
           "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
-          "reranked_score": 0.486,
+          "reranked_score": 0.484,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 408.62,
+      "latency_ms": 922.98,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3435,25 +3509,25 @@
           "rank": 3,
           "policy_id": "LCD-CT-CHEST",
           "policy_title": "Computed Tomography (CT) of the Chest with Contrast",
-          "reranked_score": 0.6927,
+          "reranked_score": 0.6907,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-SBRT",
           "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
-          "reranked_score": 0.6356,
+          "reranked_score": 0.633,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "NCD-CCTA",
           "policy_title": "Coronary Computed Tomography Angiography (CCTA)",
-          "reranked_score": 0.6144,
+          "reranked_score": 0.6089,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 411.91,
+      "latency_ms": 566.98,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3472,27 +3546,41 @@
       "retrieved_candidates": [
         {
           "rank": 1,
-          "policy_id": "LCD-SBRT",
-          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
-          "reranked_score": 0.6482,
+          "policy_id": "NCD-210.3",
+          "policy_title": "Colorectal Cancer Screening Tests",
+          "reranked_score": 0.6664,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
-          "policy_id": "NCD-SCS",
-          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
-          "reranked_score": 0.5423,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6398,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-WOUND-VAC",
-          "policy_title": "Negative Pressure Wound Therapy (NPWT / Wound VAC)",
-          "reranked_score": 0.4713,
+          "policy_id": "LCD-SBRT",
+          "policy_title": "Stereotactic Body Radiation Therapy (SBRT / SABR)",
+          "reranked_score": 0.6307,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.5471,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 5,
+          "policy_id": "NCD-160.24",
+          "policy_title": "Deep Brain Stimulation for Essential Tremor and Parkinson\u2019s Disease",
+          "reranked_score": 0.465,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 458.53,
+      "latency_ms": 844.32,
       "v47_rank": ">5",
       "v55_rank": ">5",
       "rank_delta": 0
@@ -3525,27 +3613,27 @@
         },
         {
           "rank": 3,
-          "policy_id": "LCD-KYPHO",
-          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
-          "reranked_score": 0.5937,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.5931,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-LUMBAR-DECOMP",
-          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.5522,
+          "policy_id": "LCD-KYPHO",
+          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
+          "reranked_score": 0.5882,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-L33829",
-          "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
-          "reranked_score": 0.5471,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.5431,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 525.71,
+      "latency_ms": 633.25,
       "v47_rank": 1,
       "v55_rank": 2,
       "rank_delta": -1
@@ -3555,7 +3643,7 @@
       "title": "Untreated bacteremia and local paraspinal abscess at surgical site",
       "gold_policy": "NCD-PUMP",
       "expected_decision": "DENIED",
-      "gold_rank": 2,
+      "gold_rank": 3,
       "in_top1": false,
       "in_top3": true,
       "in_top5": true,
@@ -3566,42 +3654,42 @@
           "rank": 1,
           "policy_id": "LCD-ESI",
           "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.6893,
+          "reranked_score": 0.6847,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
-          "policy_id": "NCD-PUMP",
-          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
-          "reranked_score": 0.6872,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6845,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-MRI-LUMBAR",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.627,
+          "policy_id": "NCD-PUMP",
+          "policy_title": "Implantable Infusion Pumps for Intrathecal Therapy",
+          "reranked_score": 0.6839,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.6253,
+          "reranked_score": 0.6208,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.5949,
+          "policy_id": "LCD-MRI-LUMBAR",
+          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
+          "reranked_score": 0.6196,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 377.41,
+      "latency_ms": 464.34,
       "v47_rank": 1,
-      "v55_rank": 2,
-      "rank_delta": -1
+      "v55_rank": 3,
+      "rank_delta": -2
     },
     {
       "vignette_id": "DEV-NCD-SCS-APP",
@@ -3619,14 +3707,14 @@
           "rank": 1,
           "policy_id": "LCD-LUMBAR-DECOMP",
           "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.794,
+          "reranked_score": 0.7782,
           "coverage_ratio": 0.5
         },
         {
           "rank": 2,
           "policy_id": "LCD-ESI",
           "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.7924,
+          "reranked_score": 0.7743,
           "coverage_ratio": 0.5
         },
         {
@@ -3638,20 +3726,20 @@
         },
         {
           "rank": 4,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.7357,
-          "coverage_ratio": 0.5
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.7177,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-VEIN",
-          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
-          "reranked_score": 0.6895,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.7137,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 517.93,
+      "latency_ms": 671.13,
       "v47_rank": 2,
       "v55_rank": 3,
       "rank_delta": -1
@@ -3677,34 +3765,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-ACI",
-          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
-          "reranked_score": 0.5708,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6005,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-RAD-NIV",
-          "policy_title": "Non-Invasive Positive Pressure Ventilation (Respiratory Assist Devices / BiPAP with Backup)",
-          "reranked_score": 0.4849,
+          "policy_id": "NCD-160.18",
+          "policy_title": "Vagus Nerve Stimulation (VNS)",
+          "reranked_score": 0.5689,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-PACEMAKER",
-          "policy_title": "Permanent Cardiac Pacemakers for Bradyarrhythmias",
-          "reranked_score": 0.484,
+          "policy_id": "LCD-ACI",
+          "policy_title": "Autologous Chondrocyte Implantation (ACI / MACI) for Knee Cartilage Defects",
+          "reranked_score": 0.5589,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-KYPHO",
-          "policy_title": "Percutaneous Vertebral Augmentation (Kyphoplasty and Vertebroplasty)",
-          "reranked_score": 0.465,
+          "policy_id": "NCD-240.4",
+          "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+          "reranked_score": 0.491,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 422.04,
+      "latency_ms": 597.9,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3732,25 +3820,18 @@
           "rank": 2,
           "policy_id": "LCD-POWER-WC",
           "policy_title": "Complex Rehabilitative Power Wheelchairs (Group 3)",
-          "reranked_score": 0.7392,
+          "reranked_score": 0.7384,
           "coverage_ratio": 0.5
         },
         {
           "rank": 3,
-          "policy_id": "NCD-CARDIAC-REHAB",
-          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.4854,
-          "coverage_ratio": 0.0
-        },
-        {
-          "rank": 4,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.4736,
+          "reranked_score": 0.4664,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 555.75,
+      "latency_ms": 721.06,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3771,18 +3852,11 @@
           "rank": 1,
           "policy_id": "NCD-SGD",
           "policy_title": "Speech Generating Devices (SGD)",
-          "reranked_score": 0.666,
-          "coverage_ratio": 0.0
-        },
-        {
-          "rank": 2,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5909,
+          "reranked_score": 0.6694,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 470.29,
+      "latency_ms": 897.3,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3810,18 +3884,25 @@
           "rank": 2,
           "policy_id": "LCD-ROTATOR-CUFF",
           "policy_title": "Rotator Cuff Repair (Open or Arthroscopic)",
-          "reranked_score": 0.6012,
+          "reranked_score": 0.589,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "LCD-KNEE-ORTHOSIS",
           "policy_title": "Custom-Fabricated Functional Knee Orthoses",
-          "reranked_score": 0.5752,
+          "reranked_score": 0.5653,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.4485,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 545.88,
+      "latency_ms": 677.62,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3849,11 +3930,18 @@
           "rank": 2,
           "policy_id": "LCD-KNEE-ORTHOSIS",
           "policy_title": "Custom-Fabricated Functional Knee Orthoses",
-          "reranked_score": 0.5982,
+          "reranked_score": 0.5874,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 3,
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.5621,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 485.21,
+      "latency_ms": 566.95,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3881,18 +3969,25 @@
           "rank": 2,
           "policy_id": "LCD-MRI-BRAIN",
           "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.6833,
+          "reranked_score": 0.6494,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "NCD-CARDIAC-REHAB",
-          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.4808,
+          "policy_id": "NCD-240.4",
+          "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+          "reranked_score": 0.5799,
+          "coverage_ratio": 0.0
+        },
+        {
+          "rank": 4,
+          "policy_id": "NCD-160.18",
+          "policy_title": "Vagus Nerve Stimulation (VNS)",
+          "reranked_score": 0.5284,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 529.72,
+      "latency_ms": 734.8,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3915,16 +4010,9 @@
           "policy_title": "Botulinum Toxin Injections for Chronic Migraine and Cervical Dystonia",
           "reranked_score": 0.9375,
           "coverage_ratio": 0.5
-        },
-        {
-          "rank": 2,
-          "policy_id": "NCD-CARDIAC-REHAB",
-          "policy_title": "Comprehensive Outpatient Cardiac Rehabilitation",
-          "reranked_score": 0.468,
-          "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 384.92,
+      "latency_ms": 549.14,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -3959,25 +4047,25 @@
           "rank": 3,
           "policy_id": "LCD-ESI",
           "policy_title": "Lumbar Epidural Steroid Injections (ESI) for Radiculopathy",
-          "reranked_score": 0.9016,
+          "reranked_score": 0.8963,
           "coverage_ratio": 1.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-LUMBAR-DECOMP",
-          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.7695,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.7668,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.7683,
+          "policy_id": "LCD-LUMBAR-DECOMP",
+          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
+          "reranked_score": 0.7664,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 525.81,
+      "latency_ms": 665.02,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4019,18 +4107,18 @@
           "rank": 4,
           "policy_id": "LCD-FACET",
           "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
-          "reranked_score": 0.6338,
+          "reranked_score": 0.6369,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.6243,
+          "reranked_score": 0.623,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 440.62,
+      "latency_ms": 552.13,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4051,39 +4139,39 @@
           "rank": 1,
           "policy_id": "OPD-PANNI",
           "policy_title": "Panniculectomy and Abdominoplasty",
-          "reranked_score": 1.0206,
+          "reranked_score": 1.016,
           "coverage_ratio": 1.0
         },
         {
           "rank": 2,
-          "policy_id": "NCD-20.29",
-          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.6976,
-          "coverage_ratio": 0.667
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.7369,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 3,
           "policy_id": "OPD-RHINO",
           "policy_title": "Rhinoplasty and Septoplasty",
-          "reranked_score": 0.6859,
+          "reranked_score": 0.6761,
           "coverage_ratio": 1.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-EVAR",
-          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
-          "reranked_score": 0.6287,
-          "coverage_ratio": 0.0
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6144,
+          "coverage_ratio": 0.5
         },
         {
           "rank": 5,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.6281,
-          "coverage_ratio": 0.5
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.61,
+          "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 593.43,
+      "latency_ms": 1277.31,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4109,34 +4197,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-KNEE-ORTHOSIS",
-          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
-          "reranked_score": 0.6212,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6232,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-EVAR",
-          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
-          "reranked_score": 0.5807,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.6108,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-20.29",
-          "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.5775,
+          "policy_id": "NCD-100.1",
+          "policy_title": "Bariatric Surgery for Treatment of Co-Morbid Conditions Related to Morbid Obesity",
+          "reranked_score": 0.5777,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-VEIN",
-          "policy_title": "Endovenous Ablation Therapy for Varicose Veins of Lower Extremity",
-          "reranked_score": 0.5197,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.5741,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 426.23,
+      "latency_ms": 879.85,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4164,32 +4252,32 @@
           "rank": 2,
           "policy_id": "LCD-L33829",
           "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
-          "reranked_score": 0.7118,
+          "reranked_score": 0.6975,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "NCD-20.33",
-          "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
-          "reranked_score": 0.6168,
+          "policy_id": "NCD-240.4",
+          "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+          "reranked_score": 0.6788,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-ACDF",
-          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
-          "reranked_score": 0.5977,
-          "coverage_ratio": 0.5
+          "policy_id": "NCD-20.33",
+          "policy_title": "Transcatheter Aortic Valve Replacement (TAVR)",
+          "reranked_score": 0.6075,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "OPD-PANNI",
-          "policy_title": "Panniculectomy and Abdominoplasty",
-          "reranked_score": 0.552,
+          "policy_id": "LCD-ACDF",
+          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
+          "reranked_score": 0.5941,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 566.23,
+      "latency_ms": 654.13,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4210,39 +4298,39 @@
           "rank": 1,
           "policy_id": "LCD-L33829",
           "policy_title": "Positive Airway Pressure (PAP) Devices for Obstructive Sleep Apnea",
-          "reranked_score": 0.6757,
+          "reranked_score": 0.6488,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
           "policy_id": "OPD-RHINO",
           "policy_title": "Rhinoplasty and Septoplasty",
-          "reranked_score": 0.6533,
+          "reranked_score": 0.6475,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-KNEE-ORTHOSIS",
-          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
-          "reranked_score": 0.6045,
+          "policy_id": "NCD-240.4",
+          "policy_title": "Continuous Positive Airway Pressure (CPAP) Therapy For Obstructive Sleep Apnea (OSA)",
+          "reranked_score": 0.6434,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-IMRT",
-          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
-          "reranked_score": 0.588,
+          "policy_id": "LCD-KNEE-ORTHOSIS",
+          "policy_title": "Custom-Fabricated Functional Knee Orthoses",
+          "reranked_score": 0.5843,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-ACDF",
-          "policy_title": "Anterior Cervical Discectomy and Fusion (ACDF)",
-          "reranked_score": 0.5596,
+          "policy_id": "LCD-IMRT",
+          "policy_title": "Intensity-Modulated Radiation Therapy (IMRT)",
+          "reranked_score": 0.57,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 432.74,
+      "latency_ms": 857.23,
       "v47_rank": 1,
       "v55_rank": 2,
       "rank_delta": -1
@@ -4268,34 +4356,34 @@
         },
         {
           "rank": 2,
-          "policy_id": "LCD-FACET",
-          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
-          "reranked_score": 0.7124,
-          "coverage_ratio": 0.5
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.7133,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.6807,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.7009,
           "coverage_ratio": 0.5
         },
         {
           "rank": 4,
-          "policy_id": "LCD-TOTAL-KNEE-01",
-          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.6599,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6703,
           "coverage_ratio": 0.5
         },
         {
           "rank": 5,
-          "policy_id": "LCD-LUMBAR-DECOMP",
-          "policy_title": "Lumbar Laminectomy and Decompression for Spinal Stenosis",
-          "reranked_score": 0.6385,
+          "policy_id": "LCD-TOTAL-KNEE-01",
+          "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
+          "reranked_score": 0.6516,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 631.09,
+      "latency_ms": 734.97,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4316,39 +4404,39 @@
           "rank": 1,
           "policy_id": "OPD-SI-FUSION",
           "policy_title": "Minimally Invasive Sacroiliac (SI) Joint Fusion",
-          "reranked_score": 0.7331,
+          "reranked_score": 0.7297,
           "coverage_ratio": 0.0
         },
         {
           "rank": 2,
-          "policy_id": "LCD-LUMBAR-FUSION",
-          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
-          "reranked_score": 0.6346,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.7213,
           "coverage_ratio": 0.0
         },
         {
           "rank": 3,
-          "policy_id": "LCD-FACET",
-          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
-          "reranked_score": 0.6264,
+          "policy_id": "LCD-LUMBAR-FUSION",
+          "policy_title": "Lumbar Spinal Fusion for Degenerative Spondylolisthesis and Instability",
+          "reranked_score": 0.6259,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "NCD-SCS",
-          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
-          "reranked_score": 0.6133,
+          "policy_id": "LCD-FACET",
+          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
+          "reranked_score": 0.6221,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-MRI-LUMBAR",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Lumbar Spine",
-          "reranked_score": 0.5931,
+          "policy_id": "NCD-SCS",
+          "policy_title": "Spinal Cord Stimulation (SCS) for Chronic Intractable Pain",
+          "reranked_score": 0.5998,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 416.2,
+      "latency_ms": 535.93,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4376,32 +4464,32 @@
           "rank": 2,
           "policy_id": "NCD-20.29",
           "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.783,
+          "reranked_score": 0.7814,
           "coverage_ratio": 0.667
         },
         {
           "rank": 3,
-          "policy_id": "LCD-PAD-ATHERO",
-          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.5965,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.5908,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-FACET",
-          "policy_title": "Facet Joint Interventions: Medial Branch Blocks and Radiofrequency Neurotomy",
-          "reranked_score": 0.5857,
-          "coverage_ratio": 0.5
+          "policy_id": "LCD-PAD-ATHERO",
+          "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
+          "reranked_score": 0.5907,
+          "coverage_ratio": 0.0
         },
         {
           "rank": 5,
           "policy_id": "LCD-TOTAL-KNEE-01",
           "policy_title": "Total Knee Arthroplasty (TKA) for Severe Osteoarthritis",
-          "reranked_score": 0.5728,
+          "reranked_score": 0.5704,
           "coverage_ratio": 0.5
         }
       ],
-      "latency_ms": 653.85,
+      "latency_ms": 716.22,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0
@@ -4429,32 +4517,32 @@
           "rank": 2,
           "policy_id": "NCD-20.29",
           "policy_title": "Hyperbaric Oxygen Therapy for Diabetic Wounds of Lower Extremities",
-          "reranked_score": 0.7004,
+          "reranked_score": 0.694,
           "coverage_ratio": 0.333
         },
         {
           "rank": 3,
           "policy_id": "LCD-PAD-ATHERO",
           "policy_title": "Peripheral Atherectomy and Angioplasty for Lower Extremity Arterial Disease",
-          "reranked_score": 0.6802,
+          "reranked_score": 0.6763,
           "coverage_ratio": 0.0
         },
         {
           "rank": 4,
-          "policy_id": "LCD-EVAR",
-          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
-          "reranked_score": 0.6099,
+          "policy_id": "NCD-30.3.3",
+          "policy_title": "Acupuncture for Chronic Lower Back Pain (cLBP)",
+          "reranked_score": 0.6553,
           "coverage_ratio": 0.0
         },
         {
           "rank": 5,
-          "policy_id": "LCD-MRI-BRAIN",
-          "policy_title": "Magnetic Resonance Imaging (MRI) of the Brain with and without Contrast",
-          "reranked_score": 0.5412,
+          "policy_id": "LCD-EVAR",
+          "policy_title": "Endovascular Repair of Abdominal Aortic Aneurysm (EVAR)",
+          "reranked_score": 0.5945,
           "coverage_ratio": 0.0
         }
       ],
-      "latency_ms": 458.57,
+      "latency_ms": 678.15,
       "v47_rank": 1,
       "v55_rank": 1,
       "rank_delta": 0

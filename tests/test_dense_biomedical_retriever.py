@@ -74,10 +74,10 @@ def test_vector_store_persists_and_reloads_identically():
     chunk_ids = data["chunk_ids"]
     policy_ids = data["policy_ids"]
 
-    assert embeddings.shape == (204, 768), f"Expected (204, 768), got {embeddings.shape}"
+    assert embeddings.shape == (242, 768), f"Expected (242, 768), got {embeddings.shape}"
     assert embeddings.dtype == np.float32, f"Expected float32, got {embeddings.dtype}"
-    assert len(chunk_ids) == 204
-    assert len(policy_ids) == 204
+    assert len(chunk_ids) == 242
+    assert len(policy_ids) == 242
 
     # Reload again and test identical reproduction
     data2 = np.load(NPZ_PATH)

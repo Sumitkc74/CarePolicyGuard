@@ -450,10 +450,11 @@ class DeclarativePolicyEngine:
 
             found = False
             for term in search_terms:
-                # Find occurrences in text
-                idx = ehr_text.lower().find(term.lower())
-                if idx != -1:
-                    e_idx = idx + len(term)
+                # Find occurrences in text with word boundary matching
+                m = re.search(r'\b' + re.escape(term) + r'\b', ehr_text, re.IGNORECASE)
+                if m:
+                    idx = m.start()
+                    e_idx = m.end()
 
                     # Check concept prohibited near-misses on the matched span
                     c_def = cmap.lookup_concept(term) or cmap.lookup_concept(criterion.name)
