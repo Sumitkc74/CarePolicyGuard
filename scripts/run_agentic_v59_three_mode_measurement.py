@@ -213,13 +213,23 @@ def run_deterministic_mode(vignettes: list[dict[str, Any]], db_session: Any) -> 
 
 
 def run_declarative_mode(
-    vignettes: list[dict[str, Any]], db_session: Any, span_repair_enabled: bool = True
+    vignettes: list[dict[str, Any]],
+    db_session: Any,
+    span_repair_enabled: bool = True,
+    concept_map: Any = None,
+    arm_label: str = "Declarative Mode (Committed Map 12 concepts)",
 ) -> dict[str, Any]:
-    """Runs Arm 2: Declarative Mode (committed 12 concepts, LLM Proposer enabled, local qwen2.5:3b)."""
+    """Runs Declarative Mode (LLM Proposer enabled, local qwen2.5:3b)."""
+    if concept_map is not None:
+        cm_mod._GLOBAL_CONCEPT_MAP = concept_map
+        map_label = f"Merged Map ({concept_map.total_concepts} concepts)"
+    else:
+        cm_mod._GLOBAL_CONCEPT_MAP = ConceptMap()
+        map_label = "Committed Map (12 concepts)"
+
     logger.info(
-        f"Starting Run: Declarative Mode (Committed Map 12 concepts, LLM Proposer enabled, carepolicyguard.db, span_repair={span_repair_enabled})..."
+        f"Starting Run: {arm_label} (LLM Proposer enabled, carepolicyguard.db, span_repair={span_repair_enabled})..."
     )
-    cm_mod._GLOBAL_CONCEPT_MAP = ConceptMap()
     LLMProposalAgent.span_repair_enabled = span_repair_enabled
 
     pipeline = MultiAgentVerificationPipeline(db=db_session)
@@ -302,9 +312,9 @@ def run_declarative_mode(
     cm_mod._GLOBAL_CONCEPT_MAP = None
 
     return {
-        "mode_name": "Declarative Mode (Committed Map 12 Concepts)",
+        "mode_name": arm_label,
         "execution_mode": "declarative",
-        "concept_map": "Committed Map (12 concepts)",
+        "concept_map": map_label,
         "total_cases": len(vignettes),
         "calls": telem.get("total_calls", 0),
         "gate_a_failures": telem.get("gate_a_rejections", 0),
@@ -369,6 +379,13 @@ def run_agentic_mode(
     advocacy_rejections_gate_b_or_c = 0
     advocacy_rejections_empty_quote = 0
     rescued_criteria_list = []
+
+    # Guard cost tracking (Task 6) & Judge in the loop (Task 2)
+    guard_cost_status_met_cases = []
+    guard_cost_concession_cases = []
+    judge_advocate_span_verifications = 0
+    judge_span_rejections = 0
+    pre_deferral_reviews_count = 0
 
     # Defense calls counters
     total_defense_calls_attempted = 0
@@ -582,11 +599,33 @@ def run_agentic_mode(
                         per_criterion_advocate_records[key]["advocate_outcome"] = "RESCUED"
                         per_criterion_advocate_records[key]["blocking_step"] = "N/A (Promoted to MET)"
 
-            if agent.startswith("Agent 3") and mtype == "CHALLENGE" and meta.get("advocacy_rejected"):
+            if mtype == "CHALLENGE" and meta.get("guard_blocked"):
+                guard_arm = meta.get("guard_arm", "unknown")
+                if guard_arm == "status-MET":
+                    guard_cost_status_met_cases.append({"vignette_id": vid, "criterion_code": ccode})
+                elif guard_arm == "concession":
+                    guard_cost_concession_cases.append({"vignette_id": vid, "criterion_code": ccode})
+                if ccode:
+                    key = f"{vid}::{ccode}"
+                    per_criterion_advocate_records[key] = {
+                        "vignette_id": vid,
+                        "policy_id": pid,
+                        "criterion_code": ccode,
+                        "advocate_attempted": False,
+                        "advocate_outcome": "BLOCKED_BY_GUARD",
+                        "blocking_step": f"Blocked by guard ({guard_arm} arm)",
+                        "advocate_quote": "",
+                        "advocate_rationale": f"Guard invariant enforced: {guard_arm} arm prevented advocacy",
+                    }
+
+            if mtype == "CHALLENGE" and meta.get("advocacy_rejected"):
                 case_advocacy_rejections += 1
                 total_advocacy_rejections += 1
                 fg = meta.get("failing_gate") or meta.get("gate")
-                if meta.get("empty_quote") or not adv_q or adv_q.strip() == "":
+                if fg == "JudgeEquivalence":
+                    judge_span_rejections += 1
+                    block_reason = f"Judge semantic verification rejected candidate span: {content}"
+                elif meta.get("empty_quote") or not adv_q or adv_q.strip() == "":
                     advocacy_rejections_empty_quote += 1
                     case_advocacy_empty += 1
                     block_reason = "Empty quote (no supporting evidence)"
@@ -605,16 +644,21 @@ def run_agentic_mode(
                         per_criterion_advocate_records[key]["advocate_outcome"] = "REJECTED"
                         per_criterion_advocate_records[key]["blocking_step"] = block_reason
 
-            # 5. Fallback VERDICT
+            # 5. VERDICT messages (Judge span-verification, pre-deferral review, or candidate span fallback)
             if mtype == "VERDICT":
                 case_judge_calls += 1
                 total_judge_calls += 1
-                case_entered_fallback = True
-                case_fallback_calls += 1
-                fallback_calls_burned += 1
-                lat = meta.get("latency_ms")
+                lat = meta.get("latency_ms") or meta.get("elapsed_ms")
                 if lat:
                     judge_latencies_ms.append(lat)
+                if meta.get("advocate_span_verification"):
+                    judge_advocate_span_verifications += 1
+                elif meta.get("pre_deferral_review"):
+                    pre_deferral_reviews_count += 1
+                else:
+                    case_entered_fallback = True
+                    case_fallback_calls += 1
+                    fallback_calls_burned += 1
 
             if agent.startswith("Agent 2") and mtype == "DEFENSE" and not meta.get("advocacy_promoted") and not meta.get("defense_quote"):
                 case_fallback_promotions += 1
@@ -968,6 +1012,18 @@ def run_agentic_mode(
             "judge_calls_mean": round(total_judge_calls / len(vignettes), 2),
             "judge_calls_max": max(c["judge_calls"] for c in cases) if cases else 0,
         },
+        "guard_cost_audit": {
+            "status_met_arm_count": len(guard_cost_status_met_cases),
+            "status_met_arm_cases": guard_cost_status_met_cases,
+            "concession_arm_count": len(guard_cost_concession_cases),
+            "concession_arm_cases": guard_cost_concession_cases,
+            "total_promotions_blocked_by_guard": len(guard_cost_status_met_cases) + len(guard_cost_concession_cases),
+        },
+        "judge_in_the_loop": {
+            "advocate_span_verifications": judge_advocate_span_verifications,
+            "advocate_span_rejections": judge_span_rejections,
+            "pre_deferral_reviews": pre_deferral_reviews_count,
+        },
         "synonymy_cases_status": synonymy_cases_status,
         "sbrt_and_si_fusion_regression": sbrt_si_fusion_status,
         "cases": cases,
@@ -1152,11 +1208,11 @@ def compute_attribution_of_agentic_gain(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v59)")
+    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v70)")
     parser.add_argument(
         "--output",
         type=str,
-        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v67_three_mode_run.json"),
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v70_three_mode_run.json"),
         help="Path to output raw JSON",
     )
     parser.add_argument(
@@ -1203,11 +1259,20 @@ def main() -> None:
         # 1. Deterministic Mode Run
         det_results = run_deterministic_mode(vignettes, db_session)
 
-        # 2. Declarative Mode Run
+        # 2a. Declarative Mode Run (Committed 12 concepts)
         dec_results = run_declarative_mode(vignettes, db_session, span_repair_enabled=True)
 
-        # 3. Agentic Mode Run
+        # 2b. Declarative Mode Run (Merged 131 concepts - Task 5 Same-Map Ablation)
         merged_map, comm_cnt, draft_cnt = build_merged_in_memory_map()
+        dec_131_results = run_declarative_mode(
+            vignettes,
+            db_session,
+            span_repair_enabled=True,
+            concept_map=merged_map,
+            arm_label="Declarative Mode (Merged Map 131 concepts)"
+        )
+
+        # 3. Agentic Mode Run
         age_results = run_agentic_mode(vignettes, merged_map, db_session, span_repair_enabled=True)
 
         # 4. Retrieval Sanity & Re-rank Evidence Run (Tasks 2 & 9)
@@ -1230,6 +1295,44 @@ def main() -> None:
         # 5. Attribution of Gain (Task 7)
         gain_attribution = compute_attribution_of_agentic_gain(det_results, dec_results, age_results)
 
+        # Task 5: Same-map ablation analysis
+        same_map_diffs = []
+        dec131_by_id = {c["vignette_id"]: c for c in dec_131_results["cases"]}
+        for c_age in age_results["cases"]:
+            vid = c_age["vignette_id"]
+            c_dec = dec131_by_id.get(vid, {})
+            if c_age["actual_decision"] != c_dec.get("actual_decision"):
+                same_map_diffs.append({
+                    "vignette_id": vid,
+                    "expected_decision": c_age["expected_decision"],
+                    "declarative_131_decision": c_dec.get("actual_decision"),
+                    "agentic_131_decision": c_age["actual_decision"],
+                    "declarative_131_concordant": c_dec.get("is_concordant"),
+                    "agentic_131_concordant": c_age["is_concordant"],
+                })
+
+        same_map_ablation = {
+            "declarative_131": {
+                "accuracy": f"{dec_131_results['concordant_decisions']}/{dec_131_results['total_cases']} ({dec_131_results['accuracy_pct']}%)",
+                "false_approvals": dec_131_results["false_approvals"],
+                "false_denials": dec_131_results["false_denials"],
+                "safe_deferrals": dec_131_results["deferrals"],
+                "synonymy_resolved": f"{dec_131_results['synonymy_resolved_count']}/19",
+                "synonymy_resolved_cases": dec_131_results["synonymy_resolved_cases"],
+            },
+            "agentic_131": {
+                "accuracy": f"{age_results['concordant_decisions']}/{age_results['total_cases']} ({age_results['accuracy_pct']}%)",
+                "false_approvals": age_results["false_approvals"],
+                "false_denials": age_results["false_denials"],
+                "safe_deferrals": age_results["deferrals"],
+                "synonymy_resolved": f"{age_results['synonymy_resolved_count']}/19",
+                "synonymy_resolved_cases": age_results["synonymy_resolved_cases"],
+            },
+            "agent_attributable_gain": age_results["concordant_decisions"] - dec_131_results["concordant_decisions"],
+            "per_case_diffs_count": len(same_map_diffs),
+            "per_case_diffs": same_map_diffs,
+        }
+
         # 6. Reproduction Check
         det_reproduced = (det_results["concordant_decisions"] == 37)
         dec_reproduced = (dec_results["concordant_decisions"] == 39)
@@ -1241,6 +1344,7 @@ def main() -> None:
             "passed": bool(det_reproduced and dec_reproduced),
         }
 
+        is_v70 = "v70" in str(args.output)
         is_v67 = "v67" in str(args.output)
         is_v63 = "v63" in str(args.output)
         is_v62 = "v62" in str(args.output)
@@ -1249,12 +1353,13 @@ def main() -> None:
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
                 "benchmark_run": (
-                    "v67 three-mode full measurement" if is_v67
+                    "v70 three-mode full measurement with routing, judge-in-the-loop, efficiency fast path and same-map ablation" if is_v70
+                    else ("v67 three-mode full measurement" if is_v67
                     else ("v63 three-mode full measurement" if is_v63
                     else ("v62 three-mode full measurement" if is_v62
-                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement")))
+                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement"))))
                 ),
-                "parent_git_head": "938fce1" if is_v67 else ("c305e65" if is_v63 else ("f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a"))),
+                "parent_git_head": "fbbb4e4" if is_v70 else ("938fce1" if is_v67 else ("c305e65" if is_v63 else ("f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a")))),
                 "catalog_size": "60 policies (all from official CMS coverage API verified)",
                 "database_used": "carepolicyguard.db",
                 "database_path": db_path,
@@ -1264,6 +1369,7 @@ def main() -> None:
                 "maps": {
                     "deterministic": f"Committed Map ({comm_cnt} concepts)",
                     "declarative": f"Committed Map ({comm_cnt} concepts)",
+                    "declarative_131": f"Merged Map ({comm_cnt} committed + {draft_cnt} drafts = {merged_map.total_concepts} concepts)",
                     "agentic": f"Merged Map ({comm_cnt} committed + {draft_cnt} drafts = {merged_map.total_concepts} concepts)",
                 },
             },
@@ -1290,11 +1396,13 @@ def main() -> None:
                     "synonymy_resolved": f"{age_results['synonymy_resolved_count']}/19",
                 },
             },
+            "same_map_ablation": same_map_ablation,
             "reproduction_check": reproduction_check,
             "gain_attribution": gain_attribution,
             "retrieval_sanity": retrieval_sanity,
             "deterministic_run": det_results,
             "declarative_run": dec_results,
+            "declarative_131_run": dec_131_results,
             "agentic_run": age_results,
         }
 

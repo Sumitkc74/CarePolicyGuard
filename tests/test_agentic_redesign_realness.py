@@ -410,7 +410,7 @@ def test_advocacy_with_grounded_quote_promotes_criterion(sample_vignette):
     (Agent 2 posts DEFENSE containing the advocacy quote and criterion is promoted to MET).
     """
     from app.core.agentic_guardrails import AgenticGuardrails
-    from app.core.llm_judge import AdvocacyResult
+    from app.core.llm_judge import AdvocacyResult, JudgeEvaluation, EquivalenceVerdict
 
     pipeline = MultiAgentVerificationPipeline(db=None)
 
@@ -430,8 +430,15 @@ def test_advocacy_with_grounded_quote_promotes_criterion(sample_vignette):
         status_code="COMPLETED"
     )
 
+    mock_judge_equiv = JudgeEvaluation(
+        verdict=EquivalenceVerdict.EQUIVALENT,
+        rationale="Rectal sparing documentation satisfies IMRT organ sparing criterion.",
+        status_code="COMPLETED"
+    )
+
     with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_not_met), \
          patch.object(ClinicalEquivalenceJudge, "generate_advocacy_sync", return_value=mock_advocacy), \
+         patch.object(ClinicalEquivalenceJudge, "judge_equivalence_sync", return_value=mock_judge_equiv), \
          patch.object(AgenticGuardrails, "evaluate_gate_chain", return_value={"passed": True, "failing_gate": None, "reason": "Verified equivalence"}):
         res = pipeline.adjudicate_sync(
             patient_id="PT-TEST-ADVOCACY-GROUNDED",

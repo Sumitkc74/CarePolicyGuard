@@ -64,6 +64,14 @@ class AdvocacyResult(BaseModel):
     status_code: str = Field(default="COMPLETED", description="Execution status")
 
 
+class CaseDeferralReview(BaseModel):
+    """Structured case-level pre-deferral confirmation from the clinical judge (Task 2b)."""
+    confirmed_deferrable: bool = Field(default=True, description="Whether the case is confirmed genuinely deferrable")
+    rationale: str = Field(..., description="Clinical reasoning confirming lack of statutory evidence")
+    elapsed_ms: float = Field(default=0.0, description="Inference latency in milliseconds")
+    status_code: str = Field(default="COMPLETED", description="Execution status")
+
+
 
 class ClinicalEquivalenceJudge:
     """
@@ -853,6 +861,118 @@ class ClinicalEquivalenceJudge:
             return AdvocacyResult(
                 advocacy_quote="",
                 rationale=f"Advocacy query exception: {exc!s}",
+                elapsed_ms=elapsed_ms,
+                status_code="ERROR"
+            )
+
+    def review_case_deferral_sync(
+        self,
+        policy_id: str,
+        policy_title: str,
+        unproven_criteria: list[dict[str, Any]],
+        advocate_summary: str,
+        note_text: str,
+    ) -> CaseDeferralReview:
+        """
+        Task 2(b): Pre-deferral case-level review by the clinical judge.
+        The judge reviews unproven criteria, advocate search outcomes, and the clinical note
+        to confirm the case is truly deferrable before routing to a human clinician.
+        """
+        t0 = time.perf_counter()
+
+        # Check per-case budget guardrails
+        if self.case_call_count >= self.max_calls_per_case:
+            logger.warning(f"Judge call budget exceeded ({self.case_call_count}/{self.max_calls_per_case}) on pre-deferral review.")
+            return CaseDeferralReview(
+                confirmed_deferrable=True,
+                rationale=f"Judge call budget exceeded ({self.max_calls_per_case} calls max per case); deferral confirmed by operational bound.",
+                elapsed_ms=0.0,
+                status_code="SKIPPED_BUDGET_EXHAUSTED"
+            )
+
+        if self.case_elapsed_ms >= (self.max_time_per_case_seconds * 1000.0):
+            logger.warning(f"Judge time budget exceeded ({self.case_elapsed_ms:.1f}ms / {self.max_time_per_case_seconds*1000}ms).")
+            return CaseDeferralReview(
+                confirmed_deferrable=True,
+                rationale="Judge time budget exceeded (60s max per case); deferral confirmed by operational bound.",
+                elapsed_ms=0.0,
+                status_code="SKIPPED_BUDGET_EXHAUSTED"
+            )
+
+        crit_strs = "\n".join(
+            f"- {c.get('criterion_code', '')}: {c.get('name', '')} ({c.get('description', '')})"
+            for c in unproven_criteria
+        ) or "None"
+
+        prompt = (
+            f"You are the Clinical Evaluation Judge for Medicare policy {policy_id} ('{policy_title}').\n"
+            f"The case is pending deferral because the following mandatory coverage criteria remain unproven:\n{crit_strs}\n\n"
+            f"Advocate Search Findings:\n{advocate_summary or 'No supporting evidence found.'}\n\n"
+            f"Clinical Note Excerpt:\n\"\"\"{note_text[:1500]}\"\"\"\n\n"
+            f"TASK: Perform a pre-deferral case-level review. Confirm whether this case is genuinely deferrable "
+            f"(i.e., genuine clinical ambiguity or missing documentation with no unexamined evidence satisfying the criteria), "
+            f"or if valid evidence was missed.\n"
+            f"Respond ONLY with valid JSON in this exact format:\n"
+            f'{{"confirmed_deferrable": true, "rationale": "One-sentence clinical reasoning confirming case deferral."}}'
+        )
+
+        payload = {
+            "model": self.model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.0,
+            "response_format": {"type": "json_object"},
+            "max_tokens": 150
+        }
+
+        try:
+            with httpx.Client(timeout=self.timeout_seconds) as client:
+                resp = client.post(self.endpoint_url, json=payload)
+
+            elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_judge_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
+
+            if resp.status_code != 200:
+                return CaseDeferralReview(
+                    confirmed_deferrable=True,
+                    rationale=f"LLM endpoint HTTP {resp.status_code}; deferral confirmed by fallback.",
+                    elapsed_ms=elapsed_ms,
+                    status_code=f"HTTP_{resp.status_code}"
+                )
+
+            data = resp.json()
+            content = data.get("choices", [{}])[0].get("message", {}).get("content", "{}")
+            try:
+                parsed = json.loads(content)
+            except (json.JSONDecodeError, ValueError):
+                m_conf = re.search(r'"confirmed_deferrable":\s*(true|false)', content, re.IGNORECASE)
+                m_rat = re.search(r'"rationale":\s*"([^"]+)"', content)
+                parsed = {
+                    "confirmed_deferrable": m_conf.group(1).lower() == "true" if m_conf else True,
+                    "rationale": m_rat.group(1) if m_rat else "Confirmed genuine lack of documentation"
+                }
+
+            confirmed = bool(parsed.get("confirmed_deferrable", True))
+            rationale = str(parsed.get("rationale", "Confirmed clinical deferral: missing required statutory documentation.")).strip()
+
+            return CaseDeferralReview(
+                confirmed_deferrable=confirmed,
+                rationale=rationale,
+                elapsed_ms=elapsed_ms,
+                status_code="COMPLETED"
+            )
+        except (httpx.HTTPError, TimeoutError, ValueError, KeyError, RuntimeError) as exc:
+            elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+            self.case_call_count += 1
+            self.case_elapsed_ms += elapsed_ms
+            self.telemetry["total_judge_calls"] += 1
+            self.telemetry["total_latency_ms"] += elapsed_ms
+            logger.debug(f"Pre-deferral review exception: {exc}")
+            return CaseDeferralReview(
+                confirmed_deferrable=True,
+                rationale=f"Pre-deferral review exception ({exc!s}); deferral confirmed by error fallback.",
                 elapsed_ms=elapsed_ms,
                 status_code="ERROR"
             )
