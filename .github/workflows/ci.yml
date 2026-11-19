@@ -29,6 +29,10 @@ jobs:
         run: |
           ruff check app/core app/schemas --ignore E501
 
+      - name: Validate Frontend JavaScript Syntax Gate
+        run: |
+          node --check app/static/js/app.js
+
   test-and-coverage:
     name: Unit, Integration & Fuzz Test Suite
     runs-on: ubuntu-latest
