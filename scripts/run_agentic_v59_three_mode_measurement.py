@@ -17,6 +17,7 @@ Outputs are saved to app/data/benchmarks/agentic_v59_three_mode_run.json
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import logging
 import sys
@@ -24,6 +25,14 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+# Eagerly load transformers / scipy into fresh memory to avoid Windows DLL loading paging errors
+try:
+    import scipy
+    import scipy.sparse.csgraph
+    from transformers import AutoModel, AutoTokenizer
+except Exception as _eager_err:
+    pass
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
@@ -1256,11 +1265,18 @@ def main() -> None:
                 json.dump(summary, f, indent=2)
             logger.info(f"Retrieval sanity check re-run complete. Output updated at: {out_file}")
             return
+        # 0. Retrieval Sanity & Re-rank Evidence Run (Tasks 2 & 9)
+        # Run first while memory is completely fresh to ensure SapBERT/transformers load cleanly
+        retrieval_sanity = run_retrieval_sanity_check(vignettes, db_session)
+        gc.collect()
+
         # 1. Deterministic Mode Run
         det_results = run_deterministic_mode(vignettes, db_session)
+        gc.collect()
 
         # 2a. Declarative Mode Run (Committed 12 concepts)
         dec_results = run_declarative_mode(vignettes, db_session, span_repair_enabled=True)
+        gc.collect()
 
         # 2b. Declarative Mode Run (Merged 131 concepts - Task 5 Same-Map Ablation)
         merged_map, comm_cnt, draft_cnt = build_merged_in_memory_map()
@@ -1271,12 +1287,11 @@ def main() -> None:
             concept_map=merged_map,
             arm_label="Declarative Mode (Merged Map 131 concepts)"
         )
+        gc.collect()
 
         # 3. Agentic Mode Run
         age_results = run_agentic_mode(vignettes, merged_map, db_session, span_repair_enabled=True)
-
-        # 4. Retrieval Sanity & Re-rank Evidence Run (Tasks 2 & 9)
-        retrieval_sanity = run_retrieval_sanity_check(vignettes, db_session)
+        gc.collect()
 
         # Backfill retrieval margins into agentic cases so margins are non-null (v62 acceptance requirement)
         selections_by_vid = {s["vignette_id"]: s for s in retrieval_sanity.get("pipeline_selections", [])}
