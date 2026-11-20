@@ -42,8 +42,11 @@ def imrt_vignette():
 def test_deferred_case_has_recorded_advocate_attempt_for_unproven_criteria(imrt_vignette):
     """
     Task 1 Routing: A deferred case must not contain an unattempted mandatory non-MET criterion.
-    Every unproven mandatory criterion must be offered to the advocate before deferral.
+    Every unproven mandatory criterion must be offered to the advocate before deferral,
+    with a recorded outcome: either an attempt with its result, or a guard-block with the arm named.
     """
+    from app.schemas.contracts import DeterminationStatus
+
     pipeline = MultiAgentVerificationPipeline(db=None)
 
     # Initial judge returns NOT_MET for unproven criteria
@@ -74,12 +77,48 @@ def test_deferred_case_has_recorded_advocate_attempt_for_unproven_criteria(imrt_
             save_record=False,
         )
 
-    # If the case deferred, verify every non-MET mandatory criterion had an advocate attempt recorded
-    if res.adjudication_decision == AdjudicationDecision.DEFERRED_TO_HUMAN:
-        board_msgs = res.message_board or []
-        adv_msgs = [m for m in board_msgs if m.get("message_type") in ("ADVOCACY", BoardMessageType.ADVOCACY)]
-        assert len(adv_msgs) >= 1, "Deferred case must contain at least one recorded advocate attempt"
-        assert mock_adv.called, "Advocate must be called for unproven mandatory criteria before deferral"
+    # Assert unconditionally that this case deferred
+    assert res.adjudication_decision == AdjudicationDecision.DEFERRED_TO_HUMAN
+
+    # Find unproven mandatory criteria (non-MET and not an exclusion criterion)
+    unproven_mandatory = [
+        ca for ca in res.criterion_assessments
+        if ca.status != DeterminationStatus.MET
+        and not ("EXCL" in ca.criterion_code or getattr(ca, "is_exclusion", False))
+    ]
+    assert len(unproven_mandatory) >= 1, "Expected at least one unproven mandatory criterion"
+
+    board_msgs = res.message_board or []
+
+    # Assert per-criterion: each unproven mandatory criterion has a recorded advocate outcome
+    for ca in unproven_mandatory:
+        ccode = ca.criterion_code
+        # Look for either an ADVOCACY message or a guard-blocked CHALLENGE message for this criterion
+        adv_attempt = [
+            m for m in board_msgs
+            if m.get("criterion_code") == ccode and m.get("message_type") in ("ADVOCACY", BoardMessageType.ADVOCACY)
+        ]
+        guard_block = [
+            m for m in board_msgs
+            if m.get("criterion_code") == ccode
+            and m.get("metadata", {}).get("guard_blocked") is True
+            and m.get("metadata", {}).get("guard_arm") in ("status-MET", "concession")
+        ]
+
+        has_recorded_outcome = (len(adv_attempt) > 0) or (len(guard_block) > 0)
+        assert has_recorded_outcome, (
+            f"Criterion {ccode} is unproven in deferred case but has no recorded advocate outcome "
+            f"(neither advocate attempt nor named guard-block found on board)"
+        )
+        if adv_attempt:
+            # Verify attempt recorded its result (status code or quote)
+            msg = adv_attempt[0]
+            assert "advocacy_quote" in msg.get("metadata", {}) or "status_code" in msg.get("metadata", {})
+        elif guard_block:
+            # Verify named guard arm
+            assert guard_block[0].get("metadata", {}).get("guard_arm") in ("status-MET", "concession")
+
+    assert mock_adv.called, "Advocate must be called for unproven mandatory criteria before deferral"
 
 
 def test_advocate_span_requires_judge_verification_before_promotion(imrt_vignette):
@@ -237,10 +276,10 @@ def test_fully_verified_case_makes_zero_llm_calls():
             save_record=False,
         )
 
-    # If the case was verified deterministically, verify fast-path activated and 0 LLM calls
-    if res.agentic_audit_trail.get("fast_path_activated"):
-        assert res.adjudication_decision == AdjudicationDecision.APPROVED
-        assert mock_judge.call_count == 0, f"Fast-path case must make 0 judge calls, made {mock_judge.call_count}"
-        assert mock_adv.call_count == 0, f"Fast-path case must make 0 advocate calls, made {mock_adv.call_count}"
-        assert mock_rev.call_count == 0, f"Fast-path case must make 0 pre-deferral calls, made {mock_rev.call_count}"
-        assert res.agentic_audit_trail.get("judge_routing", {}).get("judge_calls_total_case", 0) == 0
+    # Assert fast-path activated unconditionally (no conditional guard)
+    assert res.agentic_audit_trail.get("fast_path_activated") is True, "Fast path must activate for completely verified note"
+    assert res.adjudication_decision == AdjudicationDecision.APPROVED
+    assert mock_judge.call_count == 0, f"Fast-path case must make 0 judge calls, made {mock_judge.call_count}"
+    assert mock_adv.call_count == 0, f"Fast-path case must make 0 advocate calls, made {mock_adv.call_count}"
+    assert mock_rev.call_count == 0, f"Fast-path case must make 0 pre-deferral calls, made {mock_rev.call_count}"
+    assert res.agentic_audit_trail.get("judge_routing", {}).get("judge_calls_total_case", 0) == 0

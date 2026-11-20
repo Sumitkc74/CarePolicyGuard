@@ -398,7 +398,7 @@ class MultiAgentVerificationPipeline:
             from app.schemas.contracts import ClinicalEvidenceSpan
             from app.schemas.message_board import CaseMessageBoard, BoardMessageType
             from app.core.candidate_span_extractor import CandidateSpanExtractor
-            from app.core.llm_judge import ClinicalEquivalenceJudge, EquivalenceVerdict, CaseDeferralReview
+            from app.core.llm_judge import ClinicalEquivalenceJudge, EquivalenceVerdict
             from app.core.agentic_guardrails import AgenticGuardrails, GuardrailViolationError, BudgetExhaustionHalt
             from app.services.declarative_engine import DeclarativePolicyEngine
             from app.agents.toolbelt import AgentToolbelt

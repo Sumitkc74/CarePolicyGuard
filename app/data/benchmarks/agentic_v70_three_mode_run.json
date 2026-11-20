@@ -2,7 +2,8 @@
   "metadata": {
     "execution_timestamp": "2026-11-20T01:57:56.915941+00:00",
     "benchmark_run": "v70 three-mode full measurement with routing, judge-in-the-loop, efficiency fast path and same-map ablation",
-    "parent_git_head": "fbbb4e4",
+    "parent_git_head": "c919d85b6325a551648efb97475bf4614846aab2",
+    "parent_chain": "fbbb4e4 -> c919d85b6325a551648efb97475bf4614846aab2 -> 050eae03ab0c6b32b5e7e941d9309283ad49c4a0 -> 41d7b481292bd36bf7e9c42fa0eb22b5c44439aa -> 546b71340fe00b0dc2495e017e2aa039db702c58",
     "catalog_size": "60 policies (all from official CMS coverage API verified)",
     "database_used": "carepolicyguard.db",
     "database_path": "E:\\Class\\GitHub\\CarePolicyGuard\\carepolicyguard.db",
