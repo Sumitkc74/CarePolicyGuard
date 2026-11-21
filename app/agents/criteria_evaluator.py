@@ -975,12 +975,19 @@ class CriteriaEvaluationAgent:
                                 llm_proposer.telemetry["proposals_accepted"] += 1
                         if gate_res.passed and gate_res.verified_span:
                             assessment.verified_spans.append(gate_res.verified_span)
+                            is_prov = getattr(gate_res, "is_provisional", False)
                             if not target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
                                 assessment.status = DeterminationStatus.MET
-                                assessment.clinical_rationale += f" [Grounded LLM Proposal Accepted: '{prop.claimed_text}']"
+                                if is_prov:
+                                    assessment.clinical_rationale += f" [Judge-verified Provisional Equivalence Accepted: '{prop.claimed_text}']"
+                                else:
+                                    assessment.clinical_rationale += f" [Grounded LLM Proposal Accepted: '{prop.claimed_text}']"
                             elif target_criterion.get("is_exclusion", False) and prop.proposed_status in ("MET", DeterminationStatus.MET):
                                 assessment.status = DeterminationStatus.MET
-                                assessment.clinical_rationale += f" [Grounded LLM Proposal Disqualifying: '{prop.claimed_text}']"
+                                if is_prov:
+                                    assessment.clinical_rationale += f" [Judge-verified Provisional Equivalence Disqualifying: '{prop.claimed_text}']"
+                                else:
+                                    assessment.clinical_rationale += f" [Grounded LLM Proposal Disqualifying: '{prop.claimed_text}']"
                             break
             else:
                 methods_tried.append("phenotype_detector")

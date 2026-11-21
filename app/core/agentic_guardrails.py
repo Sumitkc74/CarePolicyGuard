@@ -103,6 +103,8 @@ class AgenticGuardrails:
         verifier_agent: Any | None = None,
         policy_domain: str | None = None,
         policy_id: str | None = None,
+        judge_verified_met: bool = False,
+        conceded: bool = False,
     ) -> dict[str, Any]:
         """
         Passes a candidate span through the mandatory sequential gate chain:
@@ -180,12 +182,30 @@ class AgenticGuardrails:
             elif "PROHIBITED_NEAR_MISS" in equiv_reason or "disjoint concepts" in equiv_reason:
                 concept_match_reason = equiv_reason
 
+        is_provisional = False
+        gate_c_rejected = False
+        gate_c_rejection_reason = None
+
         if not concept_match_found:
-            return {
-                "passed": False,
-                "failing_gate": "GATE_C_MAP_CHECK",
-                "reason": f"ConceptMap equivalence rejected: {concept_match_reason}."
-            }
+            # Task 1 (v72): Gate C provisional-equivalence path
+            # When Gate A passes (verbatim slice verified in Step 1),
+            # AND judge returned MET (judge_verified_met is True),
+            # BUT Gate C rejects (no matching concept definition),
+            # AND the criterion was NOT conceded and is not an explicit near-miss contradiction:
+            # do NOT kill the criterion. Record judge-verified provisional equivalence.
+            is_explicit_contradiction = bool(
+                "PROHIBITED_NEAR_MISS" in concept_match_reason or "disjoint concepts" in concept_match_reason
+            )
+            if judge_verified_met and not conceded and not is_explicit_contradiction:
+                is_provisional = True
+                gate_c_rejected = True
+                gate_c_rejection_reason = f"ConceptMap equivalence rejected: {concept_match_reason}."
+            else:
+                return {
+                    "passed": False,
+                    "failing_gate": "GATE_C_MAP_CHECK",
+                    "reason": f"ConceptMap equivalence rejected: {concept_match_reason}."
+                }
 
         # Step 4: Agent 3 Cross-Examination
         if verifier_agent is not None and hasattr(verifier_agent, "audit_assessment"):
@@ -208,10 +228,29 @@ class AgenticGuardrails:
                     "reason": f"Agent 3 cross-examination veto: {audit.audit_notes}."
                 }
 
+        if is_provisional:
+            return {
+                "passed": True,
+                "failing_gate": None,
+                "reason": f"Judge-verified provisional equivalence: unmapped concept queued for human attestation ({concept_match_reason}).",
+                "is_provisional": True,
+                "needs_human_attestation": True,
+                "concept_term": cname or (candidate_crit_terms[0] if candidate_crit_terms else ccode),
+                "quote": candidate_span.source_text,
+                "gate_c_rejected": gate_c_rejected,
+                "gate_c_rejection_reason": gate_c_rejection_reason,
+            }
+
         return {
             "passed": True,
             "failing_gate": None,
-            "reason": concept_match_reason
+            "reason": concept_match_reason,
+            "is_provisional": False,
+            "needs_human_attestation": False,
+            "concept_term": cname or (candidate_crit_terms[0] if candidate_crit_terms else ccode),
+            "quote": candidate_span.source_text,
+            "gate_c_rejected": gate_c_rejected,
+            "gate_c_rejection_reason": None,
         }
 
     # 3. Grounded Negative Reconciliation Guardrail (Task 2 Reconciliation Rule)

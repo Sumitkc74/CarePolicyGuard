@@ -413,6 +413,7 @@ class MultiAgentVerificationPipeline:
             toolbelt = AgentToolbelt(db=self.db, concept_map=None)
             fallback_activated = False
             fallback_reason = None
+            provisional_equivalences: list[dict[str, Any]] = []
 
             # Task 1 & 2: Agent 1 posts POLICY_SELECTED with score and margin to runner-up
             top_score = 1.0
@@ -826,6 +827,8 @@ class MultiAgentVerificationPipeline:
                             verifier_agent=self.verifier_agent,
                             policy_domain=getattr(policy_obj, "category", None),
                             policy_id=policy_id,
+                            judge_verified_met=(crit_judgment.status == "MET"),
+                            conceded=(debated_criteria_outcomes.get(ccode) == "CONCEDED"),
                         )
 
                         if not gate_res["passed"]:
@@ -854,6 +857,52 @@ class MultiAgentVerificationPipeline:
                                 evidence_span=sanitized_ehr[s:e]
                             )
                         else:
+                            if gate_res.get("is_provisional"):
+                                # Task 1 (v72): Gate C provisional equivalence path
+                                # When Gate A passes, judge verified MET, but concept is unmapped:
+                                # Record judge-verified provisional equivalence, queue for human attestation, proceed on provisional verdict.
+                                prov_entry = {
+                                    "criterion_code": ccode,
+                                    "concept_term": gate_res.get("concept_term"),
+                                    "quote": sanitized_ehr[s:e],
+                                    "judge_verdict": crit_judgment.status,
+                                    "gate_c_rejected": gate_res.get("gate_c_rejected", True),
+                                    "gate_c_rejection_reason": gate_res.get("gate_c_rejection_reason"),
+                                    "status": "MET_PROVISIONAL",
+                                    "needs_human_attestation": True,
+                                }
+                                provisional_equivalences.append(prov_entry)
+                                board.post(
+                                    agent="Agent 2: Clinical Evaluator",
+                                    message_type=BoardMessageType.VERDICT,
+                                    content=(
+                                        f"Judge-verified provisional equivalence on {ccode}: "
+                                        f"Judge verdict MET on verbatim quote '{sanitized_ehr[s:e]}'. "
+                                        f"Gate C rejected ({gate_res.get('gate_c_rejection_reason')}); "
+                                        f"concept '{gate_res.get('concept_term')}' queued for human attestation. "
+                                        f"Case proceeds on provisional verdict."
+                                    ),
+                                    criterion_code=ccode,
+                                    evidence=ev_span,
+                                    metadata={
+                                        "judge_verdict": crit_judgment.status,
+                                        "verbatim_quote": sanitized_ehr[s:e],
+                                        "gate_c_rejected": True,
+                                        "gate_c_rejection_reason": gate_res.get("gate_c_rejection_reason"),
+                                        "provisional_status": True,
+                                        "needs_human_attestation": True,
+                                    }
+                                )
+                                from app.core.concept_map import ConceptReviewQueue
+                                ConceptReviewQueue.submit_unmapped_proposal(
+                                    case_id=case_id,
+                                    criterion_code=ccode,
+                                    criterion_term=gate_res.get("concept_term") or ccode,
+                                    proposed_span=sanitized_ehr[s:e],
+                                    claimed_equivalence=crit_judgment.rationale or f"Judge-verified MET for {ccode}",
+                                    ehr_snippet=sanitized_ehr[max(0, s - 50):min(len(sanitized_ehr), e + 50)]
+                                )
+
                             # Task 3: Agent 3 Adversarial Counter-Reading Challenge via LLM
                             adv_challenge = judge.generate_adversarial_counter_reading_sync(
                                 criterion=crit,
@@ -1004,7 +1053,13 @@ class MultiAgentVerificationPipeline:
                                 assessment.status = DeterminationStatus.MET
                                 assessment.verified_spans = [ev_span]
                                 assessment.raw_confidence = 0.95
-                                assessment.clinical_rationale = f"Semantic equivalence verified via LLM judgment: '{sanitized_ehr[s:e]}'."
+                                if gate_res.get("is_provisional"):
+                                    assessment.clinical_rationale = (
+                                        f"Judge-verified provisional equivalence (queued for human attestation): "
+                                        f"'{sanitized_ehr[s:e]}' ({gate_res.get('gate_c_rejection_reason', 'unmapped')})."
+                                    )
+                                else:
+                                    assessment.clinical_rationale = f"Semantic equivalence verified via LLM judgment: '{sanitized_ehr[s:e]}'."
                                 promoted = True
 
                 if is_excl:
@@ -1019,7 +1074,7 @@ class MultiAgentVerificationPipeline:
                         criteria_assessments.append(assessment)
                         continue
 
-                # Task 1 & Task 2 (v70): Agent 3 Advocacy, Guard Cost Tracking & Judge Span-Verification
+                # Task 1 & Task 2 (v70 & v72): Agent 3 Advocacy, Guard Cost Tracking & Judge Span-Verification
                 # If criterion-level judgment was NOT MET or INSUFFICIENT_EVIDENCE, offer to advocate before deferral
                 if not is_excl and not promoted and not budget_halt and ccode in needs_judge_codes:
                     if debated_criteria_outcomes.get(ccode) == "CONCEDED":
@@ -1030,13 +1085,20 @@ class MultiAgentVerificationPipeline:
                             criterion_code=ccode,
                             metadata={"guard_blocked": True, "guard_arm": "concession", "advocacy_rejected": True}
                         )
-                    elif crit_judgment.status == "MET":
+                    elif crit_judgment.status == "MET" and (
+                        not crit_judgment.quoted_evidence
+                        or LLMProposalAgent.locate_claimed_span(sanitized_ehr, crit_judgment.quoted_evidence, allow_repair=True)[0] == -1
+                    ):
                         board.post(
                             agent="Agent 3: Adversarial Verifier",
                             message_type=BoardMessageType.CHALLENGE,
-                            content=f"Advocacy on {ccode} blocked by guard (status-MET arm): Initial judgment status was MET; ungrounded quote cannot be advocated.",
+                            content=(
+                                f"Advocacy on {ccode} blocked by guard (status-MET arm): "
+                                f"Initial judgment quote '{crit_judgment.quoted_evidence}' is ungrounded in note (Gate A failure); "
+                                "ungrounded quote cannot be advocated."
+                            ),
                             criterion_code=ccode,
-                            metadata={"guard_blocked": True, "guard_arm": "status-MET", "advocacy_rejected": True}
+                            metadata={"guard_blocked": True, "guard_arm": "status-MET", "advocacy_rejected": True, "genuinely_ungrounded": True}
                         )
                     else:
                         advocacy_attempted = False
@@ -1124,6 +1186,8 @@ class MultiAgentVerificationPipeline:
                                             verifier_agent=self.verifier_agent,
                                             policy_domain=getattr(policy_obj, "category", None),
                                             policy_id=policy_id,
+                                            judge_verified_met=True,
+                                            conceded=(debated_criteria_outcomes.get(ccode) == "CONCEDED"),
                                         )
 
                                         if adv_gate_res["passed"]:
@@ -1154,23 +1218,57 @@ class MultiAgentVerificationPipeline:
                                                 assessment.status = DeterminationStatus.MET
                                                 assessment.verified_spans = [adv_span]
                                                 assessment.raw_confidence = 0.92
-                                                assessment.clinical_rationale = (
-                                                    f"Criterion satisfied via Agent 3 advocacy grounded quote: "
-                                                    f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res['reason']}) verified by LLM Judge."
-                                                )
+                                                is_prov = adv_gate_res.get("is_provisional", False)
+                                                if is_prov:
+                                                    assessment.clinical_rationale = (
+                                                        f"Criterion satisfied via Agent 3 advocacy grounded quote with judge-verified provisional equivalence (queued for human attestation): "
+                                                        f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res.get('gate_c_rejection_reason', 'unmapped')})."
+                                                    )
+                                                    prov_entry = {
+                                                        "criterion_code": ccode,
+                                                        "concept_term": adv_gate_res.get("concept_term"),
+                                                        "quote": sanitized_ehr[adv_s:adv_e],
+                                                        "judge_verdict": "EQUIVALENT",
+                                                        "gate_c_rejected": True,
+                                                        "gate_c_rejection_reason": adv_gate_res.get("gate_c_rejection_reason"),
+                                                        "status": "MET_PROVISIONAL",
+                                                        "needs_human_attestation": True,
+                                                    }
+                                                    provisional_equivalences.append(prov_entry)
+                                                    from app.core.concept_map import ConceptReviewQueue
+                                                    ConceptReviewQueue.submit_unmapped_proposal(
+                                                        case_id=case_id,
+                                                        criterion_code=ccode,
+                                                        criterion_term=adv_gate_res.get("concept_term") or ccode,
+                                                        proposed_span=sanitized_ehr[adv_s:adv_e],
+                                                        claimed_equivalence=f"Advocate-span judge-verified equivalence for {ccode}",
+                                                        ehr_snippet=sanitized_ehr[max(0, adv_s - 50):min(len(sanitized_ehr), adv_e + 50)]
+                                                    )
+                                                else:
+                                                    assessment.clinical_rationale = (
+                                                        f"Criterion satisfied via Agent 3 advocacy grounded quote: "
+                                                        f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res['reason']}) verified by LLM Judge."
+                                                    )
                                                 toolbelt.tool_attribution[ccode] = "advocate_for"
                                                 toolbelt.record_mind_change(
                                                     agent="Agent 3",
                                                     criterion=ccode,
                                                     from_status="NOT_MET",
                                                     to_status="MET",
-                                                    reason=f"Advocacy grounded quote passed Gate A, Gate B, Gate C and verified by Judge: '{sanitized_ehr[adv_s:adv_e]}'",
+                                                    reason=(
+                                                        f"Advocacy grounded quote with judge-verified provisional equivalence: '{sanitized_ehr[adv_s:adv_e]}'"
+                                                        if is_prov else
+                                                        f"Advocacy grounded quote passed Gate A, Gate B, Gate C and verified by Judge: '{sanitized_ehr[adv_s:adv_e]}'"
+                                                    ),
                                                     evidence_span=sanitized_ehr[adv_s:adv_e]
                                                 )
                                                 board.post(
                                                     agent="Agent 2: Clinical Evaluator",
                                                     message_type=BoardMessageType.DEFENSE,
                                                     content=(
+                                                        f"Defense of {ccode}: Grounded advocacy quote '{sanitized_ehr[adv_s:adv_e]}' "
+                                                        f"passed Gate A, Gate B, Gate C (provisional) and verified by Judge. Promoting {ccode} to MET (provisional)."
+                                                        if is_prov else
                                                         f"Defense of {ccode}: Grounded advocacy quote '{sanitized_ehr[adv_s:adv_e]}' "
                                                         f"passed Gate A, Gate B, Gate C and verified by Judge. Promoting {ccode} to MET."
                                                     ),
@@ -1181,7 +1279,9 @@ class MultiAgentVerificationPipeline:
                                                         "gate_chain_passed": True,
                                                         "verbatim_grounded": True,
                                                         "judge_verified": True,
-                                                        "quote": sanitized_ehr[adv_s:adv_e]
+                                                        "quote": sanitized_ehr[adv_s:adv_e],
+                                                        "is_provisional": is_prov,
+                                                        "needs_human_attestation": is_prov,
                                                     }
                                                 )
                                                 promoted = True
@@ -1717,8 +1817,10 @@ class MultiAgentVerificationPipeline:
                 pre_deferral_review_record.model_dump() if pre_deferral_review_record else None
             )
             agentic_audit_trail["fast_path_activated"] = fast_path_activated
+            agentic_audit_trail["provisional_equivalences"] = provisional_equivalences if 'provisional_equivalences' in locals() else []
 
             llm_proposal_metadata["fast_path_activated"] = fast_path_activated
+            llm_proposal_metadata["provisional_equivalences"] = provisional_equivalences if 'provisional_equivalences' in locals() else []
             llm_proposal_metadata["judge_calls_otherwise_deferring"] = judge_calls_otherwise_deferring if 'judge_calls_otherwise_deferring' in locals() else 0
             llm_proposal_metadata["judge_calls_already_settled"] = judge_calls_already_settled if 'judge_calls_already_settled' in locals() else 0
             llm_proposal_metadata["judge_calls_total_case"] = judge.case_call_count if 'judge' in locals() else 0

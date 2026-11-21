@@ -61,6 +61,10 @@ class GateEvaluationResult(BaseModel):
     failing_gate: Optional[str] = None  # "GATE_A_EXACT_SLICE", "GATE_B_SEMANTIC", "GATE_C_ADVERSARIAL_VETO"
     rejection_reason: Optional[str] = None
     verified_span: Optional[ClinicalEvidenceSpan] = None
+    is_provisional: bool = False
+    needs_human_attestation: bool = False
+    gate_c_rejected: bool = False
+    gate_c_rejection_reason: Optional[str] = None
 
     @property
     def reason(self) -> Optional[str]:
@@ -461,7 +465,9 @@ class LLMProposalAgent:
         criterion: Optional[Dict[str, Any]] = None,
         verifier_agent: Optional[Any] = None,
         raw_narrative: Optional[str] = None,
-        criterion_def: Optional[Dict[str, Any]] = None
+        criterion_def: Optional[Dict[str, Any]] = None,
+        judge_verified_met: bool = False,
+        conceded: bool = False,
     ) -> GateEvaluationResult:
         """
         Passes a proposed span through the 3 mandatory gates in strict sequential order:
@@ -621,6 +627,25 @@ class LLMProposalAgent:
                 claimed_equivalence=proposal.claimed_equivalence or proposal.rationale,
                 ehr_snippet=text[max(0, s - 50):min(len(text), e + 50)]
             )
+            is_near_miss = "PROHIBITED_NEAR_MISS" in map_reason
+            if judge_verified_met and not conceded and not is_near_miss:
+                cand_span = ClinicalEvidenceSpan(
+                    source_text=claimed,
+                    start_char=s,
+                    end_char=e,
+                    confidence=0.88
+                )
+                return GateEvaluationResult(
+                    proposal=proposal,
+                    passed=True,
+                    failing_gate=None,
+                    rejection_reason=None,
+                    verified_span=cand_span,
+                    is_provisional=True,
+                    needs_human_attestation=True,
+                    gate_c_rejected=True,
+                    gate_c_rejection_reason=f"Concept Map check failed: {map_reason}."
+                )
             return GateEvaluationResult(
                 proposal=proposal,
                 passed=False,
@@ -842,9 +867,16 @@ class LLMProposalAgent:
                 "criterion_code": ccode,
                 "span": prop.claimed_text,
                 "offsets": [prop.char_start, prop.char_end],
-                "concept_confirmed": True
+                "concept_confirmed": True,
+                "is_provisional": gate_res.is_provisional,
+                "needs_human_attestation": gate_res.needs_human_attestation,
             },
-            question_or_decision=f"Span '{prop.claimed_text}' verified at [{prop.char_start}:{prop.char_end}]; confirmed patient experiencer and confirmed concept map entry.",
+            question_or_decision=(
+                f"Span '{prop.claimed_text}' verified at [{prop.char_start}:{prop.char_end}]; "
+                f"provisional equivalence queued for human attestation."
+                if gate_res.is_provisional else
+                f"Span '{prop.claimed_text}' verified at [{prop.char_start}:{prop.char_end}]; confirmed patient experiencer and confirmed concept map entry."
+            ),
             round_number=3
         )
         AgentConversationAuditBus.record_message(msg_defense)

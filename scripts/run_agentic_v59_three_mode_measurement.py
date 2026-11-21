@@ -48,6 +48,38 @@ from app.services.policy_shortlist_service import PolicyShortlistService
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("run_agentic_v59_measurement")
 
+import subprocess
+
+
+def get_git_provenance() -> dict[str, Any]:
+    """Dynamically compute git HEAD, parent, and recent chain at runtime (Task 4 fix)."""
+    try:
+        head_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL
+        ).strip()
+        parent_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD~1"], text=True, stderr=subprocess.DEVNULL
+        ).strip()
+        chain = subprocess.check_output(
+            ["git", "log", "-n", "10", "--format=%h %s"], text=True, stderr=subprocess.DEVNULL
+        ).strip().splitlines()
+        return {
+            "head": head_commit,
+            "head_short": head_commit[:7],
+            "parent_git_head": parent_commit,
+            "parent_git_head_short": parent_commit[:7],
+            "parent_chain": chain,
+        }
+    except Exception as exc:
+        return {
+            "head": "unknown",
+            "head_short": "unknown",
+            "parent_git_head": "75193cb",
+            "parent_git_head_short": "75193cb",
+            "parent_chain": [],
+            "error": str(exc),
+        }
+
 SYNONYMY_VIGNETTE_IDS = [
     "DEV-LCD-IMRT-APP",
     "DEV-LCD-KNEE-ORTHOSIS-APP",
@@ -1217,11 +1249,11 @@ def compute_attribution_of_agentic_gain(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v70)")
+    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v72)")
     parser.add_argument(
         "--output",
         type=str,
-        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v70_three_mode_run.json"),
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v72_three_mode_run.json"),
         help="Path to output raw JSON",
     )
     parser.add_argument(
@@ -1359,6 +1391,8 @@ def main() -> None:
             "passed": bool(det_reproduced and dec_reproduced),
         }
 
+        git_prov = get_git_provenance()
+        is_v72 = "v72" in str(args.output)
         is_v70 = "v70" in str(args.output)
         is_v67 = "v67" in str(args.output)
         is_v63 = "v63" in str(args.output)
@@ -1368,13 +1402,18 @@ def main() -> None:
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
                 "benchmark_run": (
-                    "v70 three-mode full measurement with routing, judge-in-the-loop, efficiency fast path and same-map ablation" if is_v70
+                    "v72 three-mode full measurement with Gate C provisional-equivalence path, guard grounding check, and dynamic provenance" if is_v72
+                    else ("v70 three-mode full measurement with routing, judge-in-the-loop, efficiency fast path and same-map ablation" if is_v70
                     else ("v67 three-mode full measurement" if is_v67
                     else ("v63 three-mode full measurement" if is_v63
                     else ("v62 three-mode full measurement" if is_v62
-                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement"))))
+                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement")))))
                 ),
-                "parent_git_head": "fbbb4e4" if is_v70 else ("938fce1" if is_v67 else ("c305e65" if is_v63 else ("f2868ee" if is_v62 else ("82c40b3" if is_v61 else "c04665a")))),
+                "parent_git_head": git_prov["parent_git_head_short"],
+                "parent_git_head_full": git_prov["parent_git_head"],
+                "git_head": git_prov["head_short"],
+                "git_head_full": git_prov["head"],
+                "parent_chain": git_prov["parent_chain"],
                 "catalog_size": "60 policies (all from official CMS coverage API verified)",
                 "database_used": "carepolicyguard.db",
                 "database_path": db_path,
