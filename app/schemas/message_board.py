@@ -29,6 +29,7 @@ class BoardMessageType(str, Enum):
     ADVOCACY = "ADVOCACY"
     CONCEDE = "CONCEDE"
     VERDICT = "VERDICT"
+    INFORM = "INFORM"
     HALT = "HALT"
     DECISION = "DECISION"
 

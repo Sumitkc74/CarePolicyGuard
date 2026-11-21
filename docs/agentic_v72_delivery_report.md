@@ -30,9 +30,10 @@ Prompt v72 resolves this architectural gap while maintaining the governing rule:
 ### Key Findings of the v72 Delivery:
 1. **Gate C Provisional-Equivalence Path (Task 1):** Zero of the 8 Gate C criteria were killed by Gate C in v72. When Gate A passes (exact verbatim quote in EHR note) and the Clinical Judge returns `MET` (or verifies advocate equivalence), but the concept is unmapped, Gate C passes provisionally. The concept is queued for human attestation (`needs_human_attestation: True`), posted to the message board, recorded in the audit trail, and the case proceeds. The committed map remains strictly frozen at 12 concepts.
 2. **Guard Grounding Check (Task 2):** In `app/agents/pipeline.py`, the status-MET guard arm now blocks only when a quote is **genuinely ungrounded** (locating to `-1` in the text, Gate A failure). The 8 grounded quotes rejected by Gate C in v70 were unblocked. The concession arm remains 100% strictly enforced (`CRIT-SBRT-01` and `CRIT-SI-01` pattern).
-3. **Agentic Accuracy Gain (+2 Cases, 48/84 = 57.1%):** Agentic mode increased from 46/84 (54.8%) in v70 to **48/84 (57.1%)** in v72.
+3. **Agentic Accuracy Gain (+2 Cases, 48/84 = 57.1%):** Agentic mode increased from 46/84 (54.8%) in v70 to **48/84 (57.1%)** in v72 (+2 cases concordant; synonymy resolved improved by +1 from 8/19 to 9/19 with `DEV-LCD-POWER-WC-APP`).
    - `DEV-LCD-POWER-WC-APP` was approved (+1) after `CRIT-PWC-02` passed Gate C provisionally and successfully defended against counter-reading.
    - `DEV-LCD-PCI-APP` was approved (+1) via live advocate span verification: Agent 3 advocate found the LAD stenosis quote, and the Clinical Judge verified it as equivalent, promoting `CRIT-PCI-01`.
+   - **Gain Attribution Accounting:** 8 map-driven approvals + 2 agent-driven approvals (`POWER-WC`, `PCI`) − 1 draft-concept regression (`DEV-NCD-CATARACT-APP`, where declarative approves but declarative-131 defers due to a draft-concept contradiction, pre-existing since v70) = **9 net resolved synonymy cases**.
 4. **Advocate Span Verification Proven in Production:** The live judge advocate-span verification mechanism (Task 2a from v70, previously 0 calls) recorded **2 live calls**:
    - `DEV-LCD-PCI-APP` (`CRIT-PCI-01`): Verified and promoted (rescued case to APPROVED).
    - `DEV-NCD-SCS-APP` (`CRIT-SCS-01`): Correctly rejected candidate quote due to semantic mismatch (80% pain relief vs >= 50% trial criterion mismatch).
@@ -48,7 +49,7 @@ Across all 84 author-written development vignettes evaluated against `carepolicy
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Deterministic Mode** | 12 concepts | 37/84 (44.0%) | 0 | 2 | 45 | 0/19 |
 | **Declarative Mode** | 12 concepts | 39/84 (46.4%) | 0 | 0 | 45 | 0/19 |
-| **Agentic Mode (v70 Baseline)** | 131 concepts | 46/84 (54.8%) | 0 | 0 | 38 | 7/19 |
+| **Agentic Mode (v70 Baseline)** | 131 concepts | 46/84 (54.8%) | 0 | 0 | 38 | 8/19 |
 | **Agentic Mode (v72 Delivery)** | 131 concepts (provisional path) | **48/84 (57.1%)** | **0** | **0** | **36** | **9/19** |
 
 *Reproduction Check: Deterministic 37/84 and Declarative 39/84 reproduced exactly (passed).*
@@ -90,7 +91,7 @@ Detailed tracking of the 8 criteria blocked by Gate C in v70:
 | **`CRIT-PWC-02`** | `DEV-LCD-POWER-WC-APP` | Rejected (Veto) | **Passed (Provisional)** | Challenged on `ANATOMIC_MISMATCH`. Agent 2 defended with grounded quote. Case APPROVED. | **`MET`** (Defended) |
 | **`CRIT-CAT-01`** | `DEV-NCD-CATARACT-APP` | Rejected (Veto) | **Passed (Provisional)** | Challenged on `NEGATION` (visual acuity 20/60). Defense conceded. | `INSUFFICIENT_EVIDENCE` |
 | **`CRIT-CAT-02`** | `DEV-NCD-CATARACT-APP` | Rejected (Veto) | **Passed (Provisional)** | No fatal counter-reading. Defended and promoted. | **`MET`** (Provisional) |
-| **`CRIT-SCS-02`** | `DEV-NCD-SCS-APP` | Rejected (Veto) | **Passed (Provisional)** | Challenged on `TEMPORAL`. Operational time budget exceeded (76s > 60s) during defense attempt. | `INSUFFICIENT_EVIDENCE` |
+| **`CRIT-SCS-02`** | `DEV-NCD-SCS-APP` | Rejected (Veto) | **Passed (Provisional)** | Challenged on `TEMPORAL`. Operational time budget exceeded (76s > 60s) during defense attempt; recorded as `UNRESOLVED_DISAGREEMENT` (defense cut off by 60s budget, not a clinical concession). | `INSUFFICIENT_EVIDENCE` |
 | **`CRIT-SGD-02`** | `DEV-NCD-SGD-APP` | Rejected (Veto) | **Passed (Provisional)** | Challenged on `NEGATION`. Defense conceded. | `INSUFFICIENT_EVIDENCE` |
 
 ### Complementary Target Criteria:
@@ -112,9 +113,11 @@ Detailed tracking of the 8 criteria blocked by Gate C in v70:
 
 ### Execution Bounds & Latency Telemetry:
 - **Total Runtime:** 2,391.87 seconds (~39.8 min) across 84 cases in all 3 modes.
-- **Mean Case Wall Time:** 28.47s (min 0.05s via Fast Path, max 76.28s).
-- **Cases Exceeding 60s:** 29 (down from 32 in v70).
+- **Mean Case Wall Time:** 28.47s (min 0.05s via Fast Path, max 76.28s) — a **wall-time regression vs v70** (v70 was mean 26.59s, max 71.09s, 26 over 60s).
+- **Cases Exceeding 60s:** 29 cases (a regression vs v70's 26 cases, driven by multi-round debate defenses and span verifications on rescued cases).
 - **Judge Calls:** 114 total across 84 cases (mean 1.36 calls/case, max 5).
+- **Pre-Deferral Case Reviews:** Out of 36 deferred cases, **24 COMPLETED** and **12 SKIPPED_BUDGET_EXHAUSTED** (the 12 cases had already exhausted their per-case budget before reaching the pre-deferral step).
+- **Advocate Span Verifications Live (Task 2a):** **2 calls live** (1 promoted: `PCI-01`, 1 rejected: `SCS-01`).
 - **Fast Path:** Activated on all deterministically verified cases (0 LLM calls, <0.1s latency).
 
 ---
@@ -156,8 +159,13 @@ Detailed tracking of the 8 criteria blocked by Gate C in v70:
 
 ### Ruff Linting & Frontend Checks:
 - **Standard Scope (`app/core app/schemas --ignore E501`):** 0 errors (Clean).
-- **`app/core/llm_judge.py`:** 0 errors (Clean).
-- **`tests/test_v72_provisional_equivalence.py`:** 0 errors (Clean).
+- **Per-File Ruff Audits on Changed Files:**
+  - `app/core/agentic_guardrails.py`: 0 errors (Clean).
+  - `app/core/llm_judge.py`: 0 errors (Clean).
+  - `tests/test_v72_provisional_equivalence.py`: 0 errors (Clean).
+  - `app/agents/pipeline.py`: 44 errors (40 pre-existing formatting/typing; 0 syntax errors; I001 import sort fixed in v73 Part A).
+  - `app/agents/llm_proposer.py`: 48 errors (48 pre-existing formatting/typing; UP045 Optional[str] fixed in v73 Part A).
+  - `scripts/run_agentic_v59_three_mode_measurement.py`: 6 errors (pre-existing script warnings).
 - **Frontend Syntax Gate (`node --check app/static/js/app.js`):** Clean.
 
 ---

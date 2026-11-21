@@ -64,7 +64,7 @@ class GateEvaluationResult(BaseModel):
     is_provisional: bool = False
     needs_human_attestation: bool = False
     gate_c_rejected: bool = False
-    gate_c_rejection_reason: Optional[str] = None
+    gate_c_rejection_reason: str | None = None
 
     @property
     def reason(self) -> Optional[str]:

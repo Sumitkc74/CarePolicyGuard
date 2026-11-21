@@ -1,31 +1,33 @@
+import json
 import time
 import uuid
-import json
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional
+
 from sqlalchemy.orm import Session
 
+from app.agents.abstention_gate import CalibratedAbstentionGate
+from app.agents.adversarial_verifier import AdversarialVerificationAgent
+from app.agents.criteria_evaluator import CriteriaEvaluationAgent
+from app.agents.critic_agent import CriticAgent
+from app.agents.llm_proposer import LLMProposalAgent
+from app.agents.missing_evidence_agent import MissingEvidenceAgent
+from app.agents.policy_retriever import PolicyRetrievalAgent
+from app.agents.state_machine import ClinicalAdjudicationStateMachine
 from app.core.config import settings
 from app.core.security import compute_audit_hash, sanitize_phi
+from app.db.models import AdjudicationLog, MedicarePolicy
 from app.schemas.contracts import (
-    FinalAdjudication,
     AdjudicationDecision,
     DeterminationStatus,
+    FinalAdjudication,
+    MultiPolicyScanResponse,
     PolicyMatchSummary,
-    MultiPolicyScanResponse
 )
-from app.agents.policy_retriever import PolicyRetrievalAgent
-from app.agents.criteria_evaluator import CriteriaEvaluationAgent
-from app.agents.adversarial_verifier import AdversarialVerificationAgent
-from app.agents.abstention_gate import CalibratedAbstentionGate
-from app.agents.critic_agent import CriticAgent
-from app.agents.missing_evidence_agent import MissingEvidenceAgent
-from app.agents.llm_proposer import LLMProposalAgent
-from app.services.hybrid_retriever import HybridPolicyRetriever
-from app.agents.state_machine import ClinicalAdjudicationStateMachine
-from app.db.models import AdjudicationLog, MedicarePolicy
 from app.services.billing_validator import BillingValidatorService
+from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.services.timeline_analyzer import TimelineAnalyzerService
+
 
 class MultiAgentVerificationPipeline:
     """
@@ -162,7 +164,7 @@ class MultiAgentVerificationPipeline:
         masked_patient_id = f"PT-***{patient_id[-4:]}" if len(patient_id) > 4 else f"PT-***"
 
         # Initialize Case Message Board for the full adjudication lifecycle (Task 1 & Task 5)
-        from app.schemas.message_board import CaseMessageBoard, BoardMessageType
+        from app.schemas.message_board import BoardMessageType, CaseMessageBoard
         board = CaseMessageBoard(case_id=case_id)
 
         # 1b. Policy Shortlist & Governing Directive Selection (Task 1, Task 2, Task 3, Task 4)
@@ -395,13 +397,17 @@ class MultiAgentVerificationPipeline:
             ) = gate.evaluate(criteria_assessments, verification_audits)
         elif execution_mode == "agentic":
             # Communicating Multi-Agent Adjudication Architecture (Tasks 1, 2, 3)
-            from app.schemas.contracts import ClinicalEvidenceSpan
-            from app.schemas.message_board import CaseMessageBoard, BoardMessageType
+            from app.agents.toolbelt import AgentToolbelt
+            from app.core.agentic_guardrails import (
+                AgenticGuardrails,
+                BudgetExhaustionHalt,
+                GuardrailViolationError,
+            )
             from app.core.candidate_span_extractor import CandidateSpanExtractor
             from app.core.llm_judge import ClinicalEquivalenceJudge, EquivalenceVerdict
-            from app.core.agentic_guardrails import AgenticGuardrails, GuardrailViolationError, BudgetExhaustionHalt
+            from app.schemas.contracts import ClinicalEvidenceSpan
+            from app.schemas.message_board import BoardMessageType, CaseMessageBoard
             from app.services.declarative_engine import DeclarativePolicyEngine
-            from app.agents.toolbelt import AgentToolbelt
 
             # board is already initialized at start of case and has recorded POLICY_SHORTLIST and POLICY_CHOSEN
             judge = ClinicalEquivalenceJudge(
@@ -1235,7 +1241,9 @@ class MultiAgentVerificationPipeline:
                                                         "needs_human_attestation": True,
                                                     }
                                                     provisional_equivalences.append(prov_entry)
-                                                    from app.core.concept_map import ConceptReviewQueue
+                                                    from app.core.concept_map import (
+                                                        ConceptReviewQueue,
+                                                    )
                                                     ConceptReviewQueue.submit_unmapped_proposal(
                                                         case_id=case_id,
                                                         criterion_code=ccode,
@@ -1714,43 +1722,68 @@ class MultiAgentVerificationPipeline:
         insufficient_criteria = [c.criterion_code for c in criteria_assessments if c.status == DeterminationStatus.INSUFFICIENT_EVIDENCE and not c.is_exclusion]
         deferral_reason = abstention_reason if decision == AdjudicationDecision.DEFERRED_TO_HUMAN else None
 
-        # Task 2(b): Pre-deferral case-level review by clinical judge
+        # Task 2 (v70 & v73): Pre-deferral case-level review by clinical judge
+        # Narrowing rule (v73 Task 2): Run ONLY when the case has at least one mandatory (non-exclusion) criterion
+        # with final status MET. Skip when criteria_met_count == 0 (straightforward deferral with no approval evidence to weigh against).
         pre_deferral_review_record = None
+        pre_deferral_review_skipped_by_narrowing = False
         if execution_mode == "agentic" and not fast_path_activated and (decision == AdjudicationDecision.DEFERRED_TO_HUMAN or abstention_status):
-            unproven_criteria = [
-                {
-                    "criterion_code": ca.criterion_code,
-                    "name": getattr(ca, "name", ca.criterion_code),
-                    "description": ca.clinical_rationale or ""
-                }
-                for ca in criteria_assessments
-                if not getattr(ca, "is_exclusion", False) and ca.status != DeterminationStatus.MET
-            ]
-            advocate_summary = "Advocate attempted span search for unproven criteria."
-            pre_deferral_review_record = judge.review_case_deferral_sync(
-                policy_id=policy_id,
-                policy_title=policy_title,
-                unproven_criteria=unproven_criteria,
-                advocate_summary=advocate_summary,
-                note_text=sanitized_ehr
-            )
-            if 'board' in locals() and board:
-                board.post(
-                    agent="Agent 2: Clinical Evaluator",
-                    message_type=BoardMessageType.VERDICT,
-                    content=(
-                        f"Pre-deferral Case Review by Clinical Judge: "
-                        f"confirmed_deferrable={pre_deferral_review_record.confirmed_deferrable}. "
-                        f"Rationale: {pre_deferral_review_record.rationale}"
-                    ),
-                    metadata={
-                        "pre_deferral_review": True,
-                        "confirmed_deferrable": pre_deferral_review_record.confirmed_deferrable,
-                        "rationale": pre_deferral_review_record.rationale,
-                        "elapsed_ms": pre_deferral_review_record.elapsed_ms,
-                        "status_code": pre_deferral_review_record.status_code,
+            has_mandatory_met = bool(criteria_met_count > 0)
+            if has_mandatory_met:
+                unproven_criteria = [
+                    {
+                        "criterion_code": ca.criterion_code,
+                        "name": getattr(ca, "name", ca.criterion_code),
+                        "description": ca.clinical_rationale or ""
                     }
+                    for ca in criteria_assessments
+                    if not getattr(ca, "is_exclusion", False) and ca.status != DeterminationStatus.MET
+                ]
+                advocate_summary = "Advocate attempted span search for unproven criteria."
+                pre_deferral_review_record = judge.review_case_deferral_sync(
+                    policy_id=policy_id,
+                    policy_title=policy_title,
+                    unproven_criteria=unproven_criteria,
+                    advocate_summary=advocate_summary,
+                    note_text=sanitized_ehr
                 )
+                if 'board' in locals() and board:
+                    board.post(
+                        agent="Agent 2: Clinical Evaluator",
+                        message_type=BoardMessageType.VERDICT,
+                        content=(
+                            f"Pre-deferral Case Review by Clinical Judge: "
+                            f"confirmed_deferrable={pre_deferral_review_record.confirmed_deferrable}. "
+                            f"Rationale: {pre_deferral_review_record.rationale}"
+                        ),
+                        metadata={
+                            "pre_deferral_review": True,
+                            "confirmed_deferrable": pre_deferral_review_record.confirmed_deferrable,
+                            "rationale": pre_deferral_review_record.rationale,
+                            "elapsed_ms": pre_deferral_review_record.elapsed_ms,
+                            "status_code": pre_deferral_review_record.status_code,
+                        }
+                    )
+            else:
+                pre_deferral_review_skipped_by_narrowing = True
+                if 'board' in locals() and board:
+                    board.post(
+                        agent="Agent 2: Clinical Evaluator",
+                        message_type=BoardMessageType.INFORM,
+                        content=(
+                            "Pre-deferral Case Review skipped by narrowing rule (v73 Task 2): "
+                            "No mandatory (non-exclusion) criterion reached final status MET (criteria_met_count=0); "
+                            "straightforward deferral with no approval evidence requiring case-level confirmation."
+                        ),
+                        metadata={
+                            "pre_deferral_review": True,
+                            "pre_deferral_review_skipped": True,
+                            "narrowing_rule_applied": True,
+                            "skip_reason": "no_mandatory_met_criterion",
+                            "reason": "No mandatory criteria met; pre-deferral review narrowed to cases with >= 1 criterion MET",
+                            "criteria_met_count": 0,
+                        }
+                    )
 
         # 5h. Agent 4 Exploratory Calibration Sweep & Agentic Audit Trail (Task 1 & Task 2)
         candidate_tau_analysis = self.abstention_gate.run_exploratory_tau_sweep()
@@ -1806,7 +1839,9 @@ class MultiAgentVerificationPipeline:
                 "judge_calls_otherwise_deferring": judge_calls_otherwise_deferring if 'judge_calls_otherwise_deferring' in locals() else 0,
                 "judge_calls_already_settled": judge_calls_already_settled if 'judge_calls_already_settled' in locals() else 0,
                 "judge_calls_total_case": judge.case_call_count if 'judge' in locals() else 0,
-                "debated_criteria_outcomes": debated_criteria_outcomes if 'debated_criteria_outcomes' in locals() else {}
+                "debated_criteria_outcomes": debated_criteria_outcomes if 'debated_criteria_outcomes' in locals() else {},
+                "pre_deferral_review_completed": bool(pre_deferral_review_record is not None) if 'pre_deferral_review_record' in locals() else False,
+                "pre_deferral_review_skipped_by_narrowing": bool(pre_deferral_review_skipped_by_narrowing) if 'pre_deferral_review_skipped_by_narrowing' in locals() else False,
             }
             agentic_audit_trail["tool_attribution"] = toolbelt.tool_attribution if 'toolbelt' in locals() else {}
             agentic_audit_trail["mind_changes"] = [mc.model_dump() for mc in toolbelt.mind_changes] if 'toolbelt' in locals() else []
@@ -1816,10 +1851,12 @@ class MultiAgentVerificationPipeline:
             agentic_audit_trail["pre_deferral_review"] = (
                 pre_deferral_review_record.model_dump() if pre_deferral_review_record else None
             )
+            agentic_audit_trail["pre_deferral_review_skipped_by_narrowing"] = pre_deferral_review_skipped_by_narrowing
             agentic_audit_trail["fast_path_activated"] = fast_path_activated
             agentic_audit_trail["provisional_equivalences"] = provisional_equivalences if 'provisional_equivalences' in locals() else []
 
             llm_proposal_metadata["fast_path_activated"] = fast_path_activated
+            llm_proposal_metadata["pre_deferral_review_skipped_by_narrowing"] = pre_deferral_review_skipped_by_narrowing
             llm_proposal_metadata["provisional_equivalences"] = provisional_equivalences if 'provisional_equivalences' in locals() else []
             llm_proposal_metadata["judge_calls_otherwise_deferring"] = judge_calls_otherwise_deferring if 'judge_calls_otherwise_deferring' in locals() else 0
             llm_proposal_metadata["judge_calls_already_settled"] = judge_calls_already_settled if 'judge_calls_already_settled' in locals() else 0

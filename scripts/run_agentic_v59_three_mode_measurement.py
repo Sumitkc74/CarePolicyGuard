@@ -80,6 +80,70 @@ def get_git_provenance() -> dict[str, Any]:
             "error": str(exc),
         }
 
+
+def verify_baseline_reuse_validity(reuse_json_path: Path) -> bool:
+    """
+    Verifies whether deterministic/declarative code and concept map are unchanged
+    since the previous baseline run (Task 3a).
+    Checks git diff of critical files between previous commit and current HEAD.
+    """
+    if not reuse_json_path.exists():
+        raise FileNotFoundError(f"Cannot reuse baselines: previous run JSON not found at {reuse_json_path}")
+
+    with open(reuse_json_path, "r", encoding="utf-8") as f:
+        prev_data = json.load(f)
+
+    prev_head = (
+        prev_data.get("metadata", {}).get("git_head_full")
+        or prev_data.get("metadata", {}).get("git_head")
+        or prev_data.get("metadata", {}).get("parent_git_head_full")
+    )
+    if not prev_head:
+        raise ValueError("Cannot reuse baselines: previous run JSON has no recorded git head")
+
+    critical_files = [
+        "app/core/concept_map.py",
+        "app/services/declarative_engine.py",
+        "app/data/concept_map.json",
+        "app/data/policies_extended/",
+        "carepolicyguard.db",
+    ]
+
+    try:
+        diff_out = subprocess.check_output(
+            ["git", "diff", "--name-only", prev_head, "HEAD", "--"] + critical_files,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        if diff_out:
+            changed_files = diff_out.splitlines()
+            raise RuntimeError(
+                f"Cannot reuse baselines: deterministic/declarative code or concept map has changed since {prev_head[:7]}: {changed_files}"
+            )
+        logger.info(f"Baseline reuse validity verified: 0 critical files changed since {prev_head[:7]}.")
+        return True
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(f"Git check failed during baseline reuse verification: {exc}")
+
+
+def warmup_ollama(model: str = "qwen2.5:3b", keep_alive: str = "60m") -> bool:
+    """Issue a warm-up call to Ollama to pre-load the model and pin keep_alive (Task 3b)."""
+    import urllib.error
+    import urllib.request
+    try:
+        payload = json.dumps({"model": model, "prompt": "warmup", "keep_alive": keep_alive}).encode("utf-8")
+        req = urllib.request.Request(
+            "http://127.0.0.1:11434/api/generate",
+            data=payload,
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            logger.info(f"Ollama model {model} warmed up successfully (keep_alive={keep_alive}, status={resp.status}).")
+            return resp.status == 200
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError) as exc:
+        logger.warning(f"Ollama warm-up call failed or unavailable: {exc}")
+        return False
+
 SYNONYMY_VIGNETTE_IDS = [
     "DEV-LCD-IMRT-APP",
     "DEV-LCD-KNEE-ORTHOSIS-APP",
@@ -427,6 +491,9 @@ def run_agentic_mode(
     judge_advocate_span_verifications = 0
     judge_span_rejections = 0
     pre_deferral_reviews_count = 0
+    pre_deferral_reviews_completed = 0
+    pre_deferral_reviews_skipped_by_narrowing = 0
+    pre_deferral_reviews_skipped_budget_exhausted = 0
 
     # Defense calls counters
     total_defense_calls_attempted = 0
@@ -685,6 +752,12 @@ def run_agentic_mode(
                         per_criterion_advocate_records[key]["advocate_outcome"] = "REJECTED"
                         per_criterion_advocate_records[key]["blocking_step"] = block_reason
 
+            if mtype == "INFORM" and meta.get("pre_deferral_review_skipped"):
+                pre_deferral_reviews_skipped_by_narrowing += 1
+
+            if mtype == "CHALLENGE" and meta.get("pre_deferral_review_budget_exhausted"):
+                pre_deferral_reviews_skipped_budget_exhausted += 1
+
             # 5. VERDICT messages (Judge span-verification, pre-deferral review, or candidate span fallback)
             if mtype == "VERDICT":
                 case_judge_calls += 1
@@ -696,6 +769,7 @@ def run_agentic_mode(
                     judge_advocate_span_verifications += 1
                 elif meta.get("pre_deferral_review"):
                     pre_deferral_reviews_count += 1
+                    pre_deferral_reviews_completed += 1
                 else:
                     case_entered_fallback = True
                     case_fallback_calls += 1
@@ -1064,6 +1138,9 @@ def run_agentic_mode(
             "advocate_span_verifications": judge_advocate_span_verifications,
             "advocate_span_rejections": judge_span_rejections,
             "pre_deferral_reviews": pre_deferral_reviews_count,
+            "pre_deferral_reviews_completed": pre_deferral_reviews_completed,
+            "pre_deferral_reviews_skipped_by_narrowing": pre_deferral_reviews_skipped_by_narrowing,
+            "pre_deferral_reviews_skipped_budget_exhausted": pre_deferral_reviews_skipped_budget_exhausted,
         },
         "synonymy_cases_status": synonymy_cases_status,
         "sbrt_and_si_fusion_regression": sbrt_si_fusion_status,
@@ -1249,12 +1326,28 @@ def compute_attribution_of_agentic_gain(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v72)")
+    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v73)")
     parser.add_argument(
         "--output",
         type=str,
-        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v72_three_mode_run.json"),
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v73_three_mode_run.json"),
         help="Path to output raw JSON",
+    )
+    parser.add_argument(
+        "--reuse-baselines",
+        action="store_true",
+        help="Reuse verified deterministic, declarative, and retrieval baselines from a prior benchmark run JSON",
+    )
+    parser.add_argument(
+        "--reuse-from",
+        type=str,
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v72_three_mode_run.json"),
+        help="Path to prior benchmark run JSON for baseline reuse",
+    )
+    parser.add_argument(
+        "--bench-only",
+        action="store_true",
+        help="Run only the 10 BENCH vignettes for fast testing/feedback",
     )
     parser.add_argument(
         "--retrieval-sanity-only",
@@ -1267,7 +1360,23 @@ def main() -> None:
     with open(vignettes_file, "r", encoding="utf-8") as f:
         vignettes = json.load(f)
 
-    logger.info(f"Loaded {len(vignettes)} development vignettes.")
+    if args.bench_only:
+        from app.agents.benchmark_engine import BENCHMARK_VIGNETTES
+        vignettes = [
+            {
+                "vignette_id": b["id"],
+                "policy_id": b["policy_id"],
+                "ehr_narrative": b["ehr"],
+                "expected_decision": b["gold_decision"],
+                "title": b["name"],
+                "vignette_type": "BENCHMARK",
+            }
+            for b in BENCHMARK_VIGNETTES
+        ]
+        logger.info(f"Running in --bench-only mode on {len(vignettes)} benchmark vignettes.")
+    else:
+        logger.info(f"Loaded {len(vignettes)} development vignettes.")
+
     db_session = SessionLocal()
     db_path = str(ROOT_DIR / "carepolicyguard.db")
     logger.info(f"Database session initialized against: {db_path}")
@@ -1297,29 +1406,50 @@ def main() -> None:
                 json.dump(summary, f, indent=2)
             logger.info(f"Retrieval sanity check re-run complete. Output updated at: {out_file}")
             return
-        # 0. Retrieval Sanity & Re-rank Evidence Run (Tasks 2 & 9)
-        # Run first while memory is completely fresh to ensure SapBERT/transformers load cleanly
-        retrieval_sanity = run_retrieval_sanity_check(vignettes, db_session)
-        gc.collect()
 
-        # 1. Deterministic Mode Run
-        det_results = run_deterministic_mode(vignettes, db_session)
-        gc.collect()
-
-        # 2a. Declarative Mode Run (Committed 12 concepts)
-        dec_results = run_declarative_mode(vignettes, db_session, span_repair_enabled=True)
-        gc.collect()
-
-        # 2b. Declarative Mode Run (Merged 131 concepts - Task 5 Same-Map Ablation)
         merged_map, comm_cnt, draft_cnt = build_merged_in_memory_map()
-        dec_131_results = run_declarative_mode(
-            vignettes,
-            db_session,
-            span_repair_enabled=True,
-            concept_map=merged_map,
-            arm_label="Declarative Mode (Merged Map 131 concepts)"
-        )
-        gc.collect()
+
+        if args.reuse_baselines:
+            reuse_path = Path(args.reuse_from)
+            verify_baseline_reuse_validity(reuse_path)
+            with open(reuse_path, "r", encoding="utf-8") as f:
+                prev_summary = json.load(f)
+            det_results = prev_summary["deterministic_run"]
+            dec_results = prev_summary["declarative_run"]
+            dec_131_results = prev_summary["declarative_131_run"]
+            retrieval_sanity = prev_summary["retrieval_sanity"]
+            logger.info(
+                f"Reused baselines from {reuse_path.name}: "
+                f"Det={det_results['concordant_decisions']}/{det_results['total_cases']}, "
+                f"Dec={dec_results['concordant_decisions']}/{dec_results['total_cases']}, "
+                f"Dec131={dec_131_results['concordant_decisions']}/{dec_131_results['total_cases']}."
+            )
+        else:
+            # 0. Retrieval Sanity & Re-rank Evidence Run (Tasks 2 & 9)
+            # Run first while memory is completely fresh to ensure SapBERT/transformers load cleanly
+            retrieval_sanity = run_retrieval_sanity_check(vignettes, db_session)
+            gc.collect()
+
+            # 1. Deterministic Mode Run
+            det_results = run_deterministic_mode(vignettes, db_session)
+            gc.collect()
+
+            # 2a. Declarative Mode Run (Committed 12 concepts)
+            dec_results = run_declarative_mode(vignettes, db_session, span_repair_enabled=True)
+            gc.collect()
+
+            # 2b. Declarative Mode Run (Merged 131 concepts - Task 5 Same-Map Ablation)
+            dec_131_results = run_declarative_mode(
+                vignettes,
+                db_session,
+                span_repair_enabled=True,
+                concept_map=merged_map,
+                arm_label="Declarative Mode (Merged Map 131 concepts)"
+            )
+            gc.collect()
+
+        # Warm up Ollama before agentic mode
+        warmup_ollama(model="qwen2.5:3b", keep_alive="60m")
 
         # 3. Agentic Mode Run
         age_results = run_agentic_mode(vignettes, merged_map, db_session, span_repair_enabled=True)
@@ -1392,6 +1522,7 @@ def main() -> None:
         }
 
         git_prov = get_git_provenance()
+        is_v73 = "v73" in str(args.output)
         is_v72 = "v72" in str(args.output)
         is_v70 = "v70" in str(args.output)
         is_v67 = "v67" in str(args.output)
@@ -1402,18 +1533,22 @@ def main() -> None:
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
                 "benchmark_run": (
-                    "v72 three-mode full measurement with Gate C provisional-equivalence path, guard grounding check, and dynamic provenance" if is_v72
+                    "v73 three-mode full measurement with narrowed pre-deferral review, baseline reuse, and warmup keep-alive" if is_v73
+                    else ("v72 three-mode full measurement with Gate C provisional-equivalence path, guard grounding check, and dynamic provenance" if is_v72
                     else ("v70 three-mode full measurement with routing, judge-in-the-loop, efficiency fast path and same-map ablation" if is_v70
                     else ("v67 three-mode full measurement" if is_v67
                     else ("v63 three-mode full measurement" if is_v63
                     else ("v62 three-mode full measurement" if is_v62
-                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement")))))
+                    else ("v61 three-mode full measurement" if is_v61 else "v59 three-mode full measurement"))))))
                 ),
                 "parent_git_head": git_prov["parent_git_head_short"],
                 "parent_git_head_full": git_prov["parent_git_head"],
                 "git_head": git_prov["head_short"],
                 "git_head_full": git_prov["head"],
                 "parent_chain": git_prov["parent_chain"],
+                "baselines_reused": bool(args.reuse_baselines),
+                "bench_only": bool(args.bench_only),
+                "ollama_keep_alive": "60m",
                 "catalog_size": "60 policies (all from official CMS coverage API verified)",
                 "database_used": "carepolicyguard.db",
                 "database_path": db_path,
