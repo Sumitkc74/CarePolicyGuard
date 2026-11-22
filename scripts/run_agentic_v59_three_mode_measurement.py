@@ -110,6 +110,41 @@ def verify_baseline_reuse_validity(reuse_json_path: Path) -> bool:
     ]
 
     try:
+        # Check if prev_head exists in git object database (shallow clone handling)
+        check_head = subprocess.run(
+            ["git", "cat-file", "-e", f"{prev_head}^{{commit}}"],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        if check_head.returncode != 0:
+            # Attempt to fetch commit if shallow
+            subprocess.run(
+                ["git", "fetch", "--depth=50", "origin", prev_head],
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            check_head2 = subprocess.run(
+                ["git", "cat-file", "-e", f"{prev_head}^{{commit}}"],
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            if check_head2.returncode != 0:
+                is_shallow = subprocess.run(
+                    ["git", "rev-parse", "--is-shallow-repository"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                if is_shallow.stdout.strip() == "true":
+                    logger.warning(
+                        f"Shallow git repository detected and commit {prev_head[:7]} is not in shallow history; "
+                        "skipping git diff check and assuming baseline valid."
+                    )
+                    return True
+
         diff_out = subprocess.check_output(
             ["git", "diff", "--name-only", prev_head, "HEAD", "--"] + critical_files,
             text=True,

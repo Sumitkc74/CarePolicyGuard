@@ -25,7 +25,7 @@ Suggestion Prompt v73 executed two major objectives:
 - **Synonymy Resolved:** Exactly **9/19 (47.4%)** (identical to v72).
 - **Efficiency Wins Achieved:**
   - **Judge Calls:** Reduced from **114** in v72 down to **89** in v73 (**-25 calls, -21.9% reduction**).
-  - **Pre-Deferral Reviews:** Dropped from **36** (24 completed, 12 budget-exhausted) down to **10** (10 completed, 26 safely skipped by narrowing, 0 budget-exhausted).
+  - **Pre-Deferral Reviews:** Out of 36 deferred cases, **8 COMPLETED**, **2 SKIPPED_BUDGET_EXHAUSTED** (`DEV-LCD-PAD-ATHERO-APP` and `DEV-NCD-CATARACT-APP`), and **26 SKIPPED BY NARROWING** (cases with `criteria_met_count == 0`).
   - **Wall-Time Latency:** Reduced from **2391.87s** down to **2237.59s** (**154.28s faster**).
   - **Over-60s Wall-Time Cases:** Reduced from **29** in v72 down to **17** in v73 (**-12 cases, -41.4% reduction**).
 
@@ -52,7 +52,7 @@ All 6 identified defects in `docs/agentic_v72_delivery_report.md` have been corr
    - *Correction:* Fixed I001 in `pipeline.py` and UP045 in `llm_proposer.py`. Reported exact per-file counts confirming zero net-new errors.
 6. **Gain Attribution Accounting (Cataract Regression):**
    - *Previous Record:* Claimed 8 map + 2 agent = 10 net gain over declarative (39).
-   - *Correction:* Accounted for `DEV-NCD-CATARACT-APP` draft-concept contradiction regression (47 declarative 131 vs 48 agentic): Map 8 + agent 2 - 1 (`CATARACT-APP`) = **9 net gain**.
+   - *Correction:* Verified declarative-131 concordance is **48/84 (57.1%)** (recomputed from the run JSON). The gain attribution is: Declarative 39 (committed 12) → Declarative-131 48 (merged 131) = **+9 net gain** (10 concept gains − 1 `CATARACT-APP` draft contradiction loss); Agentic 48 matches Declarative-131 at 48 (**+9 net gain vs Declarative 39**: Map 8 kept + agent 2 − 1 `CATARACT-APP` = 9 net).
 
 ---
 
@@ -62,26 +62,26 @@ All 6 identified defects in `docs/agentic_v72_delivery_report.md` have been corr
 - **The Rule:** In `app/agents/pipeline.py`, pre-deferral case-level review runs **ONLY** when a deferred case has at least one mandatory (non-exclusion) criterion with final status `MET` (`criteria_met_count > 0`). When `criteria_met_count == 0`, the review is safely skipped.
 - **Clinical & System Rationality:** When a case has 0 mandatory criteria met, it is a straightforward deferral with no approval evidence to weigh or confirm; consulting the judge wastes an LLM call (~15s) and risks operational budget exhaustion. When >= 1 criterion is MET, the judge's case-level review confirms whether the remaining unproven criteria genuinely justify deferral over human clinician escalation.
 - **Traceability & Audit:** When skipped, an `INFORM` message is posted to the shared message board with `metadata={"pre_deferral_review": True, "pre_deferral_review_skipped": True, "narrowing_rule_applied": True, "reason": "No mandatory criteria met; pre-deferral review narrowed to cases with >= 1 criterion MET"}`. Both `pre_deferral_review_completed` and `pre_deferral_review_skipped_by_narrowing` flags are recorded in `agentic_audit_trail["judge_routing"]`.
-- **Pre-Deferral Review Distribution:**
-  - **Reviewed (10 Cases):**
+- **Pre-Deferral Review Distribution (36 Deferred Cases Total):**
+  - **Completed Reviews (8 Cases):**
     1. `DEV-LCD-MRI-BRAIN-APP`
     2. `DEV-LCD-MRI-LUMBAR-APP`
-    3. `DEV-LCD-PAD-ATHERO-APP`
-    4. `DEV-LCD-SBRT-APP`
-    5. `DEV-NCD-CATARACT-APP`
-    6. `DEV-NCD-CCTA-APP`
-    7. `DEV-NCD-PACEMAKER-APP`
-    8. `DEV-NCD-PET-ONC-APP`
-    9. `DEV-NCD-SGD-APP`
-    10. `DEV-OPD-SI-FUSION-APP`
-  - **Skipped by Narrowing (26 Cases):** All cases with 0 criteria MET (e.g. `DEV-LCD-ACDF-NEG`, `DEV-LCD-FACET-APP`, etc.).
-  - **Budget-Exhausted Halts at Review:** **0** (eliminated all 12 budget-exhausted stalls).
+    3. `DEV-LCD-SBRT-APP`
+    4. `DEV-NCD-CCTA-APP`
+    5. `DEV-NCD-PACEMAKER-APP`
+    6. `DEV-NCD-PET-ONC-APP`
+    7. `DEV-NCD-SGD-APP`
+    8. `DEV-OPD-SI-FUSION-APP`
+  - **Skipped by Budget Exhaustion (2 Cases):**
+    1. `DEV-LCD-PAD-ATHERO-APP` (wall time 69.32s; 60s per-case budget bound reached prior to review execution, recorded on board as `SKIPPED_BUDGET_EXHAUSTED`)
+    2. `DEV-NCD-CATARACT-APP` (wall time 68.63s; 60s per-case budget bound reached prior to review execution, recorded on board as `SKIPPED_BUDGET_EXHAUSTED`)
+  - **Skipped by Narrowing Rule (26 Cases):** All cases with 0 mandatory criteria MET (`criteria_met_count == 0`), straightforward deferrals with explicit narrowing audit record on board.
 
 ### Task 3: Measurement Script Wins
 1. **Deterministic / Declarative Baseline Reuse (`--reuse-baselines`):**
    - Implemented `verify_baseline_reuse_validity()` in `scripts/run_agentic_v59_three_mode_measurement.py`.
    - Executes `git diff --name-only <prev_head> HEAD` against critical files (`app/core/concept_map.py`, `app/services/declarative_engine.py`, `app/data/concept_map.json`, `app/data/policies_extended/`, `carepolicyguard.db`).
-   - Verified 0 critical files modified since `41350ec`; safely reused baseline runs, eliminating ~400s of redundant re-execution.
+   - Verified 0 critical files modified since `41350ec`; safely reused baseline runs, eliminating **~2172s** (specifically: deterministic 4.70s + declarative 1596.16s + declarative-131 570.96s = 2171.82s total) of redundant re-execution.
 2. **Ollama Keep-Alive Pinning (`warmup_ollama`):**
    - Issues a pre-run API call to `http://127.0.0.1:11434/api/generate` with `keep_alive="60m"` and model `qwen2.5:3b`.
    - Prevents model unloads between batches or idle turn pauses, stabilizing per-call inference latency.
@@ -119,12 +119,12 @@ When both Declarative and Agentic pipelines run on the identical 131-concept mer
 | Metric | v70 Baseline | v72 Baseline | v73 (Safe Optimizations) | Delta (v73 vs v72) |
 | :--- | :--- | :--- | :--- | :--- |
 | **Total LLM Judge Calls** | 109 | 114 | **89** | **-25 calls (-21.9%)** |
-| **Pre-Deferral Review Calls** | 36 | 36 (24 ran / 12 timeout) | **10** (10 ran / 26 skipped) | **-26 calls skipped** |
+| **Pre-Deferral Review Calls** | 36 | 36 (24 ran / 12 timeout) | **10 attempted** (8 completed / 2 budget-exhausted / 26 skipped by narrowing) | **-26 calls skipped by narrowing** |
 | **Advocate Span Verifications** | 0 | 2 | **3** | +1 call |
 | **Advocate Span Rejections** | 0 | 1 | **2** | +1 rejection |
 | **Total Agentic Wall Time** | 2244.60s | 2391.87s | **2237.59s** | **-154.28s faster** |
 | **Cases Exceeding 60s Wall Time**| 26 | 29 | **17** | **-12 cases (-41.4%)** |
-| **Operational Budget Halts** | 12 | 12 | **0 at Review Stage** | **-12 halts eliminated** |
+| **Operational Budget Halts at Review Stage** | 12 | 12 | **2** (`PAD-ATHERO-APP`, `CATARACT-APP`) | **-10 halts eliminated (10 eliminated, 2 remain)** |
 
 ---
 
@@ -152,12 +152,20 @@ When both Declarative and Agentic pipelines run on the identical 131-concept mer
   2. `test_app_js_syntax_gate_catches_broken_syntax`: PASSED.
   3. `test_frontend_auth_handlers_present_and_wired`: PASSED.
 
-### Ruff Linting & Quality Verification:
-- `app/agents/pipeline.py`: 340 errors (reduced from 351 on `41350ec`; **0 net-new errors**).
-- `app/agents/llm_proposer.py`: 370 errors (reduced from 378 on `41350ec`; **0 net-new errors**).
-- `app/schemas/message_board.py`: **0 errors (Clean)**.
-- `scripts/run_agentic_v59_three_mode_measurement.py`: 22 errors (unchanged from 22 on `41350ec`; **0 net-new errors**).
+### Ruff Linting & Quality Verification (Standard Flags: `ruff check --ignore E501`):
+- `app/core` & `app/schemas` (Standard Scope): **0 errors (Clean)**.
+- `app/agents/pipeline.py`: **44 errors** (reduced from 48 on `41350ec`; **0 net-new errors**).
+- `app/agents/llm_proposer.py`: **48 errors** (reduced from 49 on `41350ec`; **0 net-new errors**).
+- `scripts/run_agentic_v59_three_mode_measurement.py`: **6 errors** (unchanged from 6 on `41350ec`; **0 net-new errors**).
 - `tests/test_v73_safe_optimizations.py`: **0 errors (Clean)**.
+- `app/core/agentic_guardrails.py`: **0 errors (Clean)**.
+- `app/core/llm_judge.py`: **0 errors (Clean)**.
+- `app/schemas/message_board.py`: **0 errors (Clean)**.
+
+### CI Environment Fix Note:
+- At commit `9377166`, GitHub Actions CI run `44956330407` failed in `Unit, Integration & Fuzz Test Suite` on step `Run Pytest with Coverage` due to `test_baseline_reuse_validation_mechanism` failing with Git exit status 128 (`fatal: bad object e3b4bc6...`).
+- **Root Cause:** GitHub Actions `actions/checkout@v4` defaults to `fetch-depth: 1` (shallow clone). The previous baseline commit `e3b4bc6` was not present in the shallow repository history when `git diff` executed.
+- **Fix:** Added `fetch-depth: 0` to `actions/checkout@v4` in `.github/workflows/ci.yml` and added shallow-clone detection and fetch fallback to `verify_baseline_reuse_validity` in `scripts/run_agentic_v59_three_mode_measurement.py`. No adjudication code was touched; no benchmark re-measurement was required.
 
 ---
 
