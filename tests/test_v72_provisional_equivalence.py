@@ -215,6 +215,9 @@ def test_conceded_criterion_still_blocked_by_guard():
     mock_fatal_obj = {
         "has_objection": True,
         "objection_type": "ANATOMIC_MISMATCH",
+        "counter_quote": "severe baseline COPD",
+        "named_sub_requirement": "lesion diameter <= 5 cm without mediastinal nodal involvement",
+        "specific_contradiction": True,
         "rationale": "Lesion size exceeds max threshold of 5 cm",
         "status_code": "COMPLETED",
     }

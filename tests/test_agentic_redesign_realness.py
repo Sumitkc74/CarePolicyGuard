@@ -227,7 +227,9 @@ def test_fatal_anatomic_mismatch_without_defense_leaves_criterion_deferred(sampl
              "adversarial_counter_reading": True,
              "has_objection": True,
              "objection_type": "ANATOMIC_MISMATCH",
-             "counter_quote": "prostate adenocarcinoma",
+             "counter_quote": "3D-CRT plan exceeds rectal wall tolerance constraints",
+             "named_sub_requirement": "lesion adjacent to spinal cord or critical normal tissue",
+             "specific_contradiction": True,
              "rationale": "Radiation field targets pelvis instead of spine."
          }), \
          patch.object(ClinicalEquivalenceJudge, "generate_defense_sync", return_value=DefenseResult(
@@ -286,7 +288,9 @@ def test_grounded_defense_quote_produces_defend_and_promotes_criterion(sample_vi
              "adversarial_counter_reading": True,
              "has_objection": True,
              "objection_type": "TEMPORAL",
-             "counter_quote": "prostate adenocarcinoma",
+             "counter_quote": "68-year-old male with confirmed prostate adenocarcinoma",
+             "named_sub_requirement": "documentation of active staging within current episode",
+             "specific_contradiction": True,
              "rationale": "Biopsy timing ambiguous in clinical record."
          }), \
          patch.object(ClinicalEquivalenceJudge, "generate_defense_sync", return_value=DefenseResult(
@@ -343,7 +347,9 @@ def test_fabricated_defense_quote_rejected_by_gate_a_and_leaves_criterion_deferr
              "adversarial_counter_reading": True,
              "has_objection": True,
              "objection_type": "HYPOTHETICAL",
-             "counter_quote": "prostate adenocarcinoma",
+             "counter_quote": "3D-CRT plan exceeds rectal wall tolerance constraints",
+             "named_sub_requirement": "definitive diagnosis without speculative wording",
+             "specific_contradiction": True,
              "rationale": "Condition might be hypothetical rule-out."
          }), \
          patch.object(ClinicalEquivalenceJudge, "generate_defense_sync", return_value=DefenseResult(
@@ -410,7 +416,7 @@ def test_advocacy_with_grounded_quote_promotes_criterion(sample_vignette):
     (Agent 2 posts DEFENSE containing the advocacy quote and criterion is promoted to MET).
     """
     from app.core.agentic_guardrails import AgenticGuardrails
-    from app.core.llm_judge import AdvocacyResult, JudgeEvaluation, EquivalenceVerdict
+    from app.core.llm_judge import AdvocacyResult, EquivalenceVerdict, JudgeEvaluation
 
     pipeline = MultiAgentVerificationPipeline(db=None)
 

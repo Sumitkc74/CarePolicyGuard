@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import uuid
 from datetime import datetime, timezone
@@ -27,6 +28,29 @@ from app.schemas.contracts import (
 from app.services.billing_validator import BillingValidatorService
 from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.services.timeline_analyzer import TimelineAnalyzerService
+
+
+def _is_valid_clinical_sub_requirement(val: str, ccode: str = "") -> bool:
+    """
+    Task 1 (v77): A named_sub_requirement counts as specific ONLY if it names
+    a clinical sub-requirement of the criterion (a phrase from the criterion's
+    own text, e.g. named finding, test, duration, or threshold) and NEVER if it
+    is a criterion code, requirement reference, or empty string.
+    """
+    if not val:
+        return False
+    v = val.strip()
+    if len(v) < 3 or v.lower() in ("none", "n/a", "empty"):
+        return False
+    if ccode and v.lower() == ccode.strip().lower():
+        return False
+    # Explicitly disallow criterion codes (CRIT-...), requirement references (REQUIREMENT ...),
+    # or numbered references like 2.1.1.1.1
+    if re.match(r"^CRIT-[A-Z0-9_-]+$", v, re.IGNORECASE):
+        return False
+    if re.match(r"^REQUIREMENT(?:\s+[\d\.]+)?$", v, re.IGNORECASE):
+        return False
+    return not bool(re.match(r"^[\d]+(?:\.[\d]+)+$", v))
 
 
 class MultiAgentVerificationPipeline:
@@ -568,11 +592,18 @@ class MultiAgentVerificationPipeline:
                         # Task 1: Every unproven mandatory criterion must be routed to judging agents before deferral
                         needs_judge_codes.append(ccode)
 
+            # Task 4 (v77): Allocate frozen per-case budget (60s / 8 calls) per criterion needing evaluation
+            num_judge_targets = max(1, len(needs_judge_codes))
+            crit_time_budget_sec = round(AgenticGuardrails.MAX_LLM_TIME_PER_CASE_SECONDS / num_judge_targets, 1)
+            crit_call_budget = max(1, AgenticGuardrails.MAX_LLM_CALLS_PER_CASE // num_judge_targets)
+
             # Post Task 2 PLAN message to board (Agent 1 Case Coordinator ownership)
             plan_meta = {
                 "settled_deterministic": settled_codes,
                 "needs_judge": needs_judge_codes,
                 "missing_evidence": missing_evidence_codes,
+                "per_criterion_time_budget_seconds": crit_time_budget_sec,
+                "per_criterion_call_budget": crit_call_budget,
                 "routing": {
                     c.get("criterion_code", ""): (
                         "SETTLED_DETERMINISTIC" if c.get("criterion_code") in settled_codes
@@ -797,6 +828,19 @@ class MultiAgentVerificationPipeline:
                     # Gate A: Verbatim grounding check
                     s, e = LLMProposalAgent.locate_claimed_span(sanitized_ehr, crit_judgment.quoted_evidence, allow_repair=True)
                     if s == -1 or e == -1:
+                        # Task 3(a) (v77): Span normalization before Gate A failure
+                        # Propose the nearest verbatim span from the note for the same finding via semantic span search
+                        norm_span = ClinicalEquivalenceJudge.select_most_relevant_span(
+                            criterion=crit,
+                            note_text=sanitized_ehr,
+                            candidate_quote=crit_judgment.quoted_evidence,
+                        )
+                        if norm_span:
+                            norm_s, norm_e = LLMProposalAgent.locate_claimed_span(sanitized_ehr, norm_span, allow_repair=True)
+                            if norm_s != -1 and norm_e != -1:
+                                s, e = norm_s, norm_e
+                                crit_judgment.quoted_evidence = sanitized_ehr[s:e]
+                    if s == -1 or e == -1:
                         board.post(
                             agent="Agent 3: Adversarial Verifier",
                             message_type=BoardMessageType.CHALLENGE,
@@ -950,11 +994,7 @@ class MultiAgentVerificationPipeline:
                                     if not (cq_s >= s and cq_e <= e) and not (s >= cq_s and e <= cq_e):
                                         cq_undercuts = True
 
-                            has_named_sub_req = bool(
-                                named_sub_req
-                                and len(named_sub_req) >= 3
-                                and named_sub_req.lower() not in ("none", "n/a", "empty")
-                            )
+                            has_named_sub_req = _is_valid_clinical_sub_requirement(named_sub_req, ccode)
 
                             has_specific_contradiction = bool(
                                 has_obj and (
@@ -1108,8 +1148,8 @@ class MultiAgentVerificationPipeline:
                                     agent="Agent 2: Clinical Evaluator",
                                     message_type=BoardMessageType.DEFENSE,
                                     content=(
-                                        f"Defense of {ccode}: Judge HOLDS MET verdict against challenge; verifier cited no specific contradiction "
-                                        f"(grounded contradictory span or named sub-requirement). Verbatim grounding at [{s}:{e}] reaffirmed."
+                                        f"Defense of {ccode}: Judge HOLDS MET verdict against {obj_type} challenge; verifier cited no specific contradiction "
+                                        f"(grounded contradictory span or named sub-requirement). Verbatim grounding '{sanitized_ehr[s:e]}' at [{s}:{e}] reaffirmed."
                                     ),
                                     criterion_code=ccode,
                                     evidence=ev_span,
@@ -1117,6 +1157,7 @@ class MultiAgentVerificationPipeline:
                                         "specific_contradiction_cited": False,
                                         "judge_action": "HOLD",
                                         "objection_type": obj_type,
+                                        "defense_quote": sanitized_ehr[s:e],
                                         "gate_chain_passed": True,
                                         "verbatim_grounded": True,
                                         "debated_criteria_outcome": "DEFENDED",

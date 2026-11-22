@@ -154,13 +154,15 @@ class ClinicalEquivalenceJudge:
             f"{self.EQUIVALENCE_QUESTION}\n\n"
             f"GOVERNING RULES:\n"
             f"1. Semantic equivalence is understanding: If the span uses a medical synonym, subtype, or paraphrase for the SAME clinical concept (e.g. 'prostate adenocarcinoma' is prostate cancer; 'esophageal adenocarcinoma' is biopsy-proven malignancy; 'absence of reversible causes' or 'not taking AV nodal blocking agents' confirms bradyarrhythmia is not caused by reversible causes), return EQUIVALENT.\n"
-            f"2. Genuine ambiguity is a deferral: If the span discusses a different organ, a clinical trade-off, or requires a coverage judgment (e.g. whether rectal sparing substitutes for spinal cord proximity), return AMBIGUOUS.\n"
-            f"3. Do NOT evaluate whether the patient qualifies for insurance coverage. Only evaluate if the span expresses the same clinical fact.\n"
-            f"4. Do NOT output character offsets or spans. Output ONLY valid JSON.\n\n"
+            f"2. Check the criterion requirement AS WRITTEN: When a criterion specifies disjunctive alternatives (e.g. 'X (or Y)'), satisfying EITHER alternative satisfies the criterion. For example, if a criterion requires 'Pathology report documenting biopsy-proven malignancy (or solitary pulmonary nodule)', ANY biopsy-proven malignancy (such as esophageal adenocarcinoma, colorectal adenocarcinoma) satisfies the first branch; do NOT reject it because it is not a pulmonary nodule or not in the lung.\n"
+            f"3. Genuine ambiguity is a deferral: If the span discusses a different condition altogether, an unfulfilled coverage trade-off, or requires a coverage judgment (e.g. whether rectal sparing substitutes for spinal cord proximity), return AMBIGUOUS.\n"
+            f"4. Do NOT evaluate whether the patient qualifies for insurance coverage. Only evaluate if the span expresses the same clinical fact as written.\n"
+            f"5. If returning NOT_EQUIVALENT or AMBIGUOUS, the rationale MUST explicitly quote the specific phrase from 'Clinical Fact Required' that the evidence fails to satisfy.\n"
+            f"6. Do NOT output character offsets or spans. Output ONLY valid JSON.\n\n"
             f"Return JSON matching this exact structure:\n"
             f"{{\n"
             f'  "verdict": "EQUIVALENT" or "NOT_EQUIVALENT" or "AMBIGUOUS",\n'
-            f'  "rationale": "<concise one-line clinical explanation>"\n'
+            f'  "rationale": "<concise clinical explanation quoting the unmet criterion phrase if NOT_EQUIVALENT/AMBIGUOUS>"\n'
             f"}}"
         )
 
@@ -475,15 +477,15 @@ class ClinicalEquivalenceJudge:
             f"3. Temporal/duration mismatch (did conservative therapy last < required weeks, or is it outdated)?\n"
             f"4. Hypothetical / speculative (is the finding merely a differential, rule-out, or future consideration)?\n"
             f"5. Anatomic / organ mismatch (is it a different anatomic site or unrelated condition)?\n\n"
-            f"If there is a valid clinical objection, ambiguity, or contradiction, set has_objection to true, specify the objection_type, quote any contradictory text from the note, state any named sub-requirement that is unmet, and provide a one-sentence challenge rationale.\n"
-            f"If the challenge cites a specific contradicting verbatim span from the note or a named statutory sub-requirement that the evidence fails, set specific_contradiction to true. If the challenge is general skepticism, ambiguity, or unsupported doubt, set specific_contradiction to false.\n"
+            f"If there is a valid clinical objection, ambiguity, or contradiction, set has_objection to true, specify the objection_type, quote any contradictory text from the note, state any unmet clinical sub-requirement phrase from the criterion text (e.g. named test, duration, threshold, or clinical finding; NEVER a criterion code like CRIT-... or requirement number), and provide a one-sentence challenge rationale.\n"
+            f"If the challenge cites a specific contradicting verbatim span from the note or a named clinical sub-requirement from the criterion text that the evidence fails, set specific_contradiction to true. If the challenge is general skepticism, ambiguity, or unsupported doubt, set specific_contradiction to false.\n"
             f"If the evidence is solid, unambiguous, and unassailable in the note with NO contradictions or doubts, set has_objection to false.\n\n"
             f"Output ONLY JSON in this format:\n"
             f"{{\n"
             f'  "has_objection": true or false,\n'
             f'  "objection_type": "NEGATION" or "EXPERIENCER" or "TEMPORAL" or "HYPOTHETICAL" or "ANATOMIC_MISMATCH" or "NONE",\n'
             f'  "counter_quote": "<verbatim excerpt from note or empty string>",\n'
-            f'  "named_sub_requirement": "<named statutory sub-requirement or empty string>",\n'
+            f'  "named_sub_requirement": "<clinical sub-requirement phrase from criterion text that is unmet, NEVER a criterion code like CRIT-... or requirement reference, or empty string>",\n'
             f'  "specific_contradiction": true or false,\n'
             f'  "rationale": "<one-sentence explanation of the challenge>"\n'
             f"}}"
