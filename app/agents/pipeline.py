@@ -928,12 +928,46 @@ class MultiAgentVerificationPipeline:
                                 }
                             )
 
-                            # Task 1 & Task 2 (v51-fix): Widen fatal rule & 2-round debate with evidence-backed defense
+                            # Task 1 (v75): Tighten the concession rule
+                            # The judge concedes a MET verdict ONLY when the verifier cites a specific contradiction:
+                            # (1) A verbatim span from the note that undercuts the MET verdict, OR
+                            # (2) A named statutory sub-requirement of the criterion that the quoted evidence does not satisfy.
+                            # If the verifier's challenge is general, the judge HOLDS its MET verdict.
                             has_obj = adv_challenge.get("has_objection", False)
                             obj_type = adv_challenge.get("objection_type", "NONE")
-                            is_fatal_challenge = bool(has_obj and obj_type in (
-                                "NEGATION", "EXPERIENCER", "TEMPORAL", "HYPOTHETICAL", "ANATOMIC_MISMATCH"
-                            ))
+                            counter_quote = str(adv_challenge.get("counter_quote", "")).strip()
+                            named_sub_req = str(adv_challenge.get("named_sub_requirement", "")).strip()
+                            flagged_specific = bool(adv_challenge.get("specific_contradiction", False))
+
+                            cq_grounded = False
+                            cq_undercuts = False
+                            cq_s, cq_e = -1, -1
+                            if counter_quote and len(counter_quote) >= 5:
+                                cq_s, cq_e = LLMProposalAgent.locate_claimed_span(sanitized_ehr, counter_quote, allow_repair=True)
+                                if cq_s != -1 and cq_e != -1:
+                                    cq_grounded = True
+                                    # An undercutting span must be distinct from the proposed supporting evidence span [s:e]
+                                    if not (cq_s >= s and cq_e <= e) and not (s >= cq_s and e <= cq_e):
+                                        cq_undercuts = True
+
+                            has_named_sub_req = bool(
+                                named_sub_req
+                                and len(named_sub_req) >= 3
+                                and named_sub_req.lower() not in ("none", "n/a", "empty")
+                            )
+
+                            has_specific_contradiction = bool(
+                                has_obj and (
+                                    (cq_grounded and cq_undercuts)
+                                    or has_named_sub_req
+                                    or (flagged_specific and cq_grounded and cq_undercuts)
+                                )
+                            )
+
+                            is_fatal_challenge = bool(
+                                has_specific_contradiction
+                                and obj_type in ("NEGATION", "EXPERIENCER", "TEMPORAL", "HYPOTHETICAL", "ANATOMIC_MISMATCH")
+                            )
 
                             total_agent_turns += 1
                             if is_fatal_challenge:
@@ -965,7 +999,12 @@ class MultiAgentVerificationPipeline:
                                         agent="Agent 2: Clinical Evaluator",
                                         message_type=BoardMessageType.CONCEDE,
                                         content=f"Conceding challenge on {ccode} due to operational budget exhaustion during {obj_type} defense.",
-                                        criterion_code=ccode
+                                        criterion_code=ccode,
+                                        metadata={
+                                            "specific_contradiction_cited": True,
+                                            "judge_action": "CONCEDE",
+                                            "debated_criteria_outcome": "UNRESOLVED_DISAGREEMENT",
+                                        }
                                     )
                                     toolbelt.record_mind_change(
                                         agent="Agent 2",
@@ -1015,11 +1054,14 @@ class MultiAgentVerificationPipeline:
                                             criterion_code=ccode,
                                             evidence=def_ev_span,
                                             metadata={
+                                                "specific_contradiction_cited": True,
+                                                "judge_action": "DEFEND",
                                                 "objection_type": obj_type,
                                                 "defense_quote": sanitized_ehr[def_s:def_e],
                                                 "defense_rationale": defense_res.rationale,
                                                 "gate_chain_passed": True,
-                                                "verbatim_grounded": True
+                                                "verbatim_grounded": True,
+                                                "debated_criteria_outcome": "DEFENDED",
                                             }
                                         )
                                         assessment.status = DeterminationStatus.MET
@@ -1032,9 +1074,15 @@ class MultiAgentVerificationPipeline:
                                         board.post(
                                             agent="Agent 2: Clinical Evaluator",
                                             message_type=BoardMessageType.CONCEDE,
-                                            content=f"Conceding challenge on {ccode}: Agent 2 defense failed to provide a valid grounded quote resolving {obj_type} objection.",
+                                            content=f"Conceding challenge on {ccode}: Verifier cited specific contradiction; Agent 2 defense failed to provide a valid grounded quote resolving {obj_type} objection.",
                                             criterion_code=ccode,
-                                            metadata={"objection_type": obj_type, "defense_quote": def_quote}
+                                            metadata={
+                                                "specific_contradiction_cited": True,
+                                                "judge_action": "CONCEDE",
+                                                "objection_type": obj_type,
+                                                "defense_quote": def_quote,
+                                                "debated_criteria_outcome": "CONCEDED",
+                                            }
                                         )
                                         toolbelt.record_mind_change(
                                             agent="Agent 2",
@@ -1044,17 +1092,35 @@ class MultiAgentVerificationPipeline:
                                             reason=f"Agent 2 defense failed to provide a valid grounded quote resolving {obj_type} objection",
                                             evidence_span=def_quote or sanitized_ehr[s:e]
                                         )
+                                        assessment.status = DeterminationStatus.INSUFFICIENT_EVIDENCE
+                                        assessment.verified_spans = []
+                                        assessment.raw_confidence = 0.50
+                                        assessment.clinical_rationale = (
+                                            f"Conceded challenge on {ccode}: Verifier cited specific contradiction "
+                                            f"({obj_type}); Agent 2 defense failed to provide resolving evidence."
+                                        )
                             else:
-                                # No fatal objection or objection_type is NONE / empty
+                                # Non-fatal or general challenge (no specific contradicting span or named sub-requirement)
+                                # Task 1 (v75): Judge HOLDS its MET verdict by default
                                 debated_criteria_outcomes[ccode] = "DEFENDED"
                                 toolbelt.tool_attribution[ccode] = "judge_criterion"
                                 board.post(
                                     agent="Agent 2: Clinical Evaluator",
                                     message_type=BoardMessageType.DEFENSE,
-                                    content=f"Defense of {ccode}: Verbatim grounding at [{s}:{e}] reaffirmed against counter-reading; no disabling {obj_type} contradiction found in narrative.",
+                                    content=(
+                                        f"Defense of {ccode}: Judge HOLDS MET verdict against challenge; verifier cited no specific contradiction "
+                                        f"(grounded contradictory span or named sub-requirement). Verbatim grounding at [{s}:{e}] reaffirmed."
+                                    ),
                                     criterion_code=ccode,
                                     evidence=ev_span,
-                                    metadata={"objection_type": obj_type, "gate_chain_passed": True, "verbatim_grounded": True}
+                                    metadata={
+                                        "specific_contradiction_cited": False,
+                                        "judge_action": "HOLD",
+                                        "objection_type": obj_type,
+                                        "gate_chain_passed": True,
+                                        "verbatim_grounded": True,
+                                        "debated_criteria_outcome": "DEFENDED",
+                                    }
                                 )
                                 assessment.status = DeterminationStatus.MET
                                 assessment.verified_spans = [ev_span]
