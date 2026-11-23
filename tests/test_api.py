@@ -227,6 +227,12 @@ def test_upload_note_and_submit_to_insurance():
     db.close()
     clinician_hdr = {"Authorization": f"Bearer {clinician_token}"}
 
+    # Assign clinician to case for sign-off authorization
+    db = SessionLocal()
+    from app.services.deferral_queue import DeferralWorkQueue
+    DeferralWorkQueue.assign_case(case_id, clinician_user.id, db=db)
+    db.close()
+
     sign_res = client.post(
         f"/api/v1/determination/{case_id}/sign-off",
         headers=clinician_hdr,
@@ -423,9 +429,14 @@ def test_fhir_bundle_export_and_ehr_push_endpoints():
         )
         db.add(user)
         db.commit()
-        token = create_access_token({"sub": clinician_username})
+        db.refresh(user)
+        user_id = user.id
+        token = create_access_token({"sub": clinician_username, "role": "Clinician", "uid": user_id})
     finally:
         db.close()
+
+    from app.services.deferral_queue import DeferralWorkQueue
+    DeferralWorkQueue.assign_case(case_id, user_id)
 
     sign_off_res = client.post(
         f"/api/v1/determination/{case_id}/sign-off",

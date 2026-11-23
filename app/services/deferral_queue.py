@@ -186,6 +186,7 @@ class DeferralWorkQueue:
                         action_required_questions=json.loads(rec.action_required_questions_json or "[]"),
                         audit_hash=rec.audit_hash,
                         created_at=rec.created_at.isoformat() if rec.created_at else datetime.now(timezone.utc).isoformat(),
+                        assigned_to_user_id=getattr(rec, "assigned_to_user_id", None),
                         current_state=InternalWorkflowState(rec.current_state) if rec.current_state in InternalWorkflowState._value2member_map_ else InternalWorkflowState.PRE_CHECK
                     )
                     cls._QUEUE[case_id] = item
@@ -198,6 +199,59 @@ class DeferralWorkQueue:
         except Exception:
             pass
         return None
+
+    @classmethod
+    def assign_case(cls, case_id: str, user_id: int, db: Optional[Any] = None) -> bool:
+        if case_id in cls._QUEUE:
+            cls._QUEUE[case_id].assigned_to_user_id = user_id
+        else:
+            cls._QUEUE[case_id] = DeferralQueueItem(
+                case_id=case_id,
+                patient_id_masked="PT-***",
+                policy_id="POLICY",
+                policy_title="Policy",
+                provisional_decision="PROVISIONAL",
+                missing_criteria=[],
+                insufficient_criteria=[],
+                action_required_questions=[],
+                audit_hash="0" * 64,
+                created_at=datetime.now(timezone.utc).isoformat(),
+                assigned_to_user_id=user_id,
+            )
+        try:
+            from app.db.session import SessionLocal
+            from app.db.models import DeferralQueueRecord
+            local_db = db or SessionLocal()
+            close_db = db is None
+            try:
+                rec = local_db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
+                if rec:
+                    rec.assigned_to_user_id = user_id
+                    local_db.commit()
+                    return True
+                else:
+                    new_rec = DeferralQueueRecord(
+                        case_id=case_id,
+                        patient_id_masked="PT-***",
+                        policy_id="POLICY",
+                        policy_title="Policy",
+                        provisional_decision="PROVISIONAL",
+                        missing_criteria_json="[]",
+                        insufficient_criteria_json="[]",
+                        action_questions_json="[]",
+                        audit_hash="0" * 64,
+                        current_state="HUMAN_REVIEW",
+                        assigned_to_user_id=user_id,
+                    )
+                    local_db.add(new_rec)
+                    local_db.commit()
+                    return True
+            finally:
+                if close_db:
+                    local_db.close()
+        except Exception:
+            pass
+        return True
 
     @classmethod
     def clear(cls) -> None:

@@ -232,8 +232,10 @@ def test_signed_off_determination_can_be_retrieved_as_final_and_released():
         )
         db.add_all([u_clinician, u_unverified, u_auditor])
         db.commit()
+        db.refresh(u_clinician)
+        clinician_id = u_clinician.id
 
-        token_clinician = create_access_token({"sub": clinician_user})
+        token_clinician = create_access_token({"sub": clinician_user, "role": "Clinician", "uid": clinician_id})
         token_unverified = create_access_token({"sub": unverified_user})
         token_auditor = create_access_token({"sub": auditor_user})
     finally:
@@ -277,7 +279,10 @@ def test_signed_off_determination_can_be_retrieved_as_final_and_released():
     assert unverified_res.status_code == 403
     assert "not verified as a medical professional" in unverified_res.json()["detail"]
 
-    # 4. Verified licensed clinician sign-off must succeed
+    # 4. Verified licensed clinician sign-off must succeed (assigned to case)
+    from app.services.deferral_queue import DeferralWorkQueue
+    DeferralWorkQueue.assign_case(case_id, clinician_id)
+
     signoff_res = client.post(
         f"/api/v1/determination/{case_id}/sign-off",
         headers={"Authorization": f"Bearer {token_clinician}"},

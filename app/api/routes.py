@@ -19,6 +19,7 @@ import re
 
 logger = logging.getLogger(__name__)
 import uuid
+import json
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form, Response, Request
@@ -636,9 +637,13 @@ async def adjudicate_record(
             run_number = existing_runs_count + 1
             run_id = f"RUN-{result.case_id[:8]}-{run_number:02d}"
 
+            from app.services.declarative_engine import DeclarativePolicyEngine
+            pol_def = DeclarativePolicyEngine.load_policy(result.policy_id)
+            policy_version = getattr(pol_def, "policy_version", None) or getattr(result, "policy_version", None) or "2024.1"
+
             result.run_id = run_id
-            result.policy_version = getattr(result, "policy_version", "2024.1") or "2024.1"
-            result.engine_version = "v80.0.0"
+            result.policy_version = policy_version
+            result.engine_version = "qwen2.5:3b (carepolicyguard-multiagent-v80)"
             result.note_version = note_hash
             result.evaluation_label = "Coverage Criteria Evaluation"
 
@@ -671,6 +676,8 @@ async def adjudicate_record(
 
             log_item = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == result.case_id).first()
             if log_item:
+                if current_user and not log_item.user_id:
+                    log_item.user_id = current_user.id
                 log_item.full_packet_json = packet.model_dump_json()
                 if not log_item.full_adjudication_json:
                     log_item.full_adjudication_json = result.model_dump_json()
@@ -1342,13 +1349,18 @@ def sign_off_clinical_determination(
     Only after sign-off can the determination be released, exported as final,
     or transmitted to external payers / EHR systems.
     """
-    now = datetime.now(timezone.utc)
+    from datetime import UTC
+    now = datetime.now(UTC)
     cred = current_user.credential_title or request.clinician_credentials
     signed_name = f"{current_user.username}, {cred}" if cred else current_user.username
     signer_npi = current_user.npi_number or request.clinician_npi
     signer_credentials = cred
 
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if not log and case_id not in _EPHEMERAL_PACKETS:
+        raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
+    verify_case_record_access(case_id, log or _EPHEMERAL_PACKETS.get(case_id), current_user, for_modification=True, db=db)
+
     adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
     if not adj and log and log.full_adjudication_json:
         try:
@@ -1399,6 +1411,18 @@ def sign_off_clinical_determination(
         packet.signed_at = now.isoformat()
         if request.attestation_notes:
             packet.clinician_action_notes = ((packet.clinician_action_notes or "") + f"\n[Sign-Off Attestation]: {request.attestation_notes}").strip()
+        if log:
+            log.full_packet_json = packet.model_dump_json()
+        try:
+            latest_run = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id).order_by(EvaluationRun.run_number.desc()).first()
+            if latest_run:
+                latest_run.determination_stage = "FINAL"
+                latest_run.is_releasable = True
+                latest_run.human_sign_off_status = "SIGNED_OFF"
+                latest_run.full_packet_json = packet.model_dump_json()
+                db.commit()
+        except Exception:
+            pass
     elif log and log.full_packet_json:
         try:
             packet = CMSCoveragePacket.model_validate_json(log.full_packet_json)
@@ -1427,6 +1451,29 @@ def sign_off_clinical_determination(
             log.required_clinician_action_notes = ((log.required_clinician_action_notes or "") + f"\n[Sign-Off Attestation]: {request.attestation_notes}").strip()
         if adj:
             log.full_adjudication_json = adj.model_dump_json()
+        if case_id in _EPHEMERAL_PACKETS:
+            log.full_packet_json = _EPHEMERAL_PACKETS[case_id].model_dump_json()
+        db.commit()
+    elif case_id in _EPHEMERAL_PACKETS:
+        # Create persistent AdjudicationLog record if missing to ensure DB persistence
+        pkt = _EPHEMERAL_PACKETS[case_id]
+        log = AdjudicationLog(
+            case_id=case_id,
+            patient_id_masked=pkt.patient_id_masked or pkt.patient_id or "PT-UNKNOWN",
+            policy_id=pkt.policy_id,
+            decision=pkt.adjudication_decision,
+            full_packet_json=pkt.model_dump_json(),
+            determination_stage="FINAL",
+            is_releasable=True,
+            human_sign_off_status="SIGNED_OFF",
+            signed_by=signed_name,
+            signed_at=now,
+            submission_status="SIGNED_OFF",
+            signer_npi=signer_npi,
+            signer_credentials=signer_credentials,
+            user_id=current_user.id
+        )
+        db.add(log)
         db.commit()
 
     if not adj and case_id not in _EPHEMERAL_PACKETS and not log:
@@ -1464,6 +1511,10 @@ def override_clinical_determination(
         )
 
     log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    if not log and case_id not in _EPHEMERAL_PACKETS:
+        raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
+    verify_case_record_access(case_id, log or _EPHEMERAL_PACKETS.get(case_id), current_user, for_modification=True, db=db)
+
     adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
     if not adj and log and log.full_adjudication_json:
         try:
@@ -1494,7 +1545,8 @@ def override_clinical_determination(
             timestamp=log.created_at or datetime.now(timezone.utc)
         )
 
-    now = datetime.now(timezone.utc)
+    from datetime import UTC
+    now = datetime.now(UTC)
     cred = current_user.credential_title or "MD"
     signed_name = f"{current_user.username}, {cred}"
 
@@ -1696,81 +1748,95 @@ def get_final_determination(
 @api_router.post("/packet/submit", response_model=SubmissionReceipt, summary="Sign & Submit Reviewed Policy Packet to Insurance")
 def submit_coverage_to_insurance(
     request: SubmitPacketRequest,
+    http_request: Request,
+    http_response: Response,
     current_user: User = Depends(get_verified_clinician_user),
     db: Session = Depends(get_db)
 ):
     """
-    Clinician Sign-Off & Electronic Submission to Medicare Payer (v76):
+    Clinician Sign-Off & Electronic Submission to Medicare Payer (v76/v79/v81):
     Strictly requires verified clinician credentials (HTTP 403 otherwise).
     Enforces that determination is ALREADY FINAL and releasable via shared gate (HTTP 412 otherwise).
-    Does NOT finalize provisional determinations — finalization occurs exclusively via sign-off or override endpoints.
+    Supports caller-scoped IETF Idempotency-Key (submit:{caller_id}:{key}) with 24h TTL:
+    A repeated submission with the same key for the same case returns the original receipt.
+    Different callers reusing the same key never receive each other's receipts.
+    Reads packet from persisted DB state via get_coverage_packet as single source of truth.
     Does NOT fabricate payer transmission or acceptance — records honest status SUBMITTED_TO_PAYER.
     """
-    now = datetime.now(timezone.utc)
-    local_ref = f"LOCAL-SUBMISSION-REF-CMS-EDI-837-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+    idempotency_key = http_request.headers.get("Idempotency-Key") or http_request.headers.get("X-Idempotency-Key")
 
-    # Verify signer identity: signed_by must match authenticated clinician if supplied
-    cred = current_user.credential_title or "MD"
-    auth_signer = f"{current_user.username}, {cred}" if cred else current_user.username
-    if request.signed_by and request.signed_by.strip():
-        req_signer_clean = request.signed_by.strip().lower()
-        allowed_names = {current_user.username.lower(), auth_signer.lower()}
-        if req_signer_clean not in allowed_names and current_user.username.lower() not in req_signer_clean:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Signer name mismatch: 'signed_by' ('{request.signed_by}') does not match authenticated verified clinician ('{current_user.username}')."
-            )
-        signer_name = request.signed_by.strip()
-    else:
-        signer_name = auth_signer
+    def _execute_submission() -> tuple[dict[str, Any], int, Optional[dict[str, str]]]:
+        from datetime import UTC
+        now = datetime.now(UTC)
+        local_ref = f"LOCAL-SUBMISSION-REF-CMS-EDI-837-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
 
-    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == request.case_id).first()
-    verify_case_record_access(request.case_id, log, current_user)
+        # Verify signer identity: signed_by must match authenticated clinician if supplied
+        cred = current_user.credential_title or "MD"
+        auth_signer = f"{current_user.username}, {cred}" if cred else current_user.username
+        if request.signed_by and request.signed_by.strip():
+            req_signer_clean = request.signed_by.strip().lower()
+            allowed_names = {current_user.username.lower(), auth_signer.lower()}
+            if req_signer_clean not in allowed_names and current_user.username.lower() not in req_signer_clean:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Signer name mismatch: 'signed_by' ('{request.signed_by}') does not match authenticated verified clinician ('{current_user.username}')."
+                )
+            signer_name = request.signed_by.strip()
+        else:
+            signer_name = auth_signer
 
-    packet = _EPHEMERAL_PACKETS.get(request.case_id)
-    if packet is None and log and log.full_packet_json:
-        try:
-            packet = CMSCoveragePacket.model_validate_json(log.full_packet_json)
-        except Exception:
-            pass
+        log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == request.case_id).first()
+        # Single source of truth: reconcile through persisted packet & stage
+        packet = get_coverage_packet(request.case_id, current_user=current_user, db=db)
 
-    if packet is None and log is None:
-        raise HTTPException(status_code=404, detail=f"Case adjudication record '{request.case_id}' not found.")
+        # Shared Release Gate: strictly enforces determination is ALREADY FINAL and releasable
+        require_releasable_determination(packet or log, log=log)
 
-    # Shared Release Gate: strictly enforces determination is ALREADY FINAL and releasable
-    require_releasable_determination(packet or log, log=log)
+        audit_hash = "AUDIT_HASH_RECORDED"
+        if log:
+            log.submission_status = "SUBMITTED_TO_PAYER"
+            log.signed_by = signer_name
+            log.signed_at = now
+            log.payer_transaction_id = local_ref
+            if not log.user_id:
+                log.user_id = current_user.id
+            if request.clinician_notes:
+                log.required_clinician_action_notes = ((log.required_clinician_action_notes or "") + f"\n[Clinician Attestation Note]: {request.clinician_notes}").strip()
+            db.commit()
+            audit_hash = log.audit_hash or audit_hash
 
-    audit_hash = "AUDIT_HASH_RECORDED"
-    if log:
-        log.submission_status = "SUBMITTED_TO_PAYER"
-        log.signed_by = signer_name
-        log.signed_at = now
-        log.payer_transaction_id = local_ref
-        if not log.user_id:
-            log.user_id = current_user.id
-        if request.clinician_notes:
-            log.required_clinician_action_notes = ((log.required_clinician_action_notes or "") + f"\n[Clinician Attestation Note]: {request.clinician_notes}").strip()
-        db.commit()
-        audit_hash = log.audit_hash or audit_hash
+        if packet:
+            packet.submission_status = "SUBMITTED_TO_PAYER"
+            packet.payer_transaction_id = local_ref
+            _EPHEMERAL_PACKETS[request.case_id] = packet
+            audit_hash = packet.audit_hash or audit_hash
 
-    if packet:
-        packet.submission_status = "SUBMITTED_TO_PAYER"
-        packet.payer_transaction_id = local_ref
-        _EPHEMERAL_PACKETS[request.case_id] = packet
-        audit_hash = packet.audit_hash or audit_hash
+        receipt = SubmissionReceipt(
+            case_id=request.case_id,
+            packet_id=f"CMS-PAC-{request.case_id}",
+            payer_transaction_id=local_ref,
+            local_submission_reference=local_ref,
+            submission_status="SUBMITTED_TO_PAYER",
+            signed_by=signer_name,
+            signed_at=now.isoformat(),
+            payer_name=request.payer_name or "Medicare Part B / CMS Regional MAC",
+            audit_hash=audit_hash,
+            message="Packet recorded as submitted for transmission; no payer response has been received (payer electronic gateway integration is not implemented)."
+        )
+        return receipt.model_dump(), 200, None
 
-    return SubmissionReceipt(
-        case_id=request.case_id,
-        packet_id=f"CMS-PAC-{request.case_id}",
-        payer_transaction_id=local_ref,
-        local_submission_reference=local_ref,
-        submission_status="SUBMITTED_TO_PAYER",
-        signed_by=signer_name,
-        signed_at=now.isoformat(),
-        payer_name=request.payer_name or "Medicare Part B / CMS Regional MAC",
-        audit_hash=audit_hash,
-        message="Packet recorded as submitted for transmission; no payer response has been received (payer electronic gateway integration is not implemented)."
-    )
+    if idempotency_key:
+        scoped_key = f"submit:{current_user.id}:{idempotency_key}"
+        payload, status_code, _, is_replay = idempotency_engine.execute_idempotent(
+            idempotency_key=scoped_key,
+            action=_execute_submission
+        )
+        if is_replay:
+            http_response.headers["Idempotency-Replay"] = "true"
+        return SubmissionReceipt(**payload)
+
+    payload, _, _ = _execute_submission()
+    return SubmissionReceipt(**payload)
 
 @api_router.post("/packet/{case_id}/appeal-letter", response_model=PeerToPeerAppealLetter, summary="Generate Peer-to-Peer Medical Reconsideration Letter")
 def generate_appeal_letter(
@@ -1837,7 +1903,8 @@ async def append_clinical_addendum(
     updates the audit ledger, and returns the updated adjudication decision.
     Strictly requires authentication and case access validation.
     """
-    now = datetime.now(timezone.utc)
+    from datetime import UTC
+    now = datetime.now(UTC)
     addendum_id = f"ADDENDUM-{uuid.uuid4().hex[:8].upper()}"
 
     # 1. Retrieve original clinical narrative & metadata
@@ -1912,9 +1979,13 @@ async def append_clinical_addendum(
             run_number = existing_runs_count + 1
             run_id = f"RUN-{target_case_id[:8]}-{run_number:02d}"
 
+            from app.services.declarative_engine import DeclarativePolicyEngine
+            pol_def = DeclarativePolicyEngine.load_policy(updated_adj.policy_id)
+            policy_version = getattr(pol_def, "policy_version", None) or getattr(updated_adj, "policy_version", None) or "2024.1"
+
             updated_adj.run_id = run_id
-            updated_adj.policy_version = getattr(updated_adj, "policy_version", "2024.1") or "2024.1"
-            updated_adj.engine_version = "v80.0.0"
+            updated_adj.policy_version = policy_version
+            updated_adj.engine_version = "qwen2.5:3b (carepolicyguard-multiagent-v80)"
             updated_adj.note_version = note_hash
             updated_adj.evaluation_label = "Coverage Criteria Evaluation"
 
@@ -2382,11 +2453,10 @@ def get_case_agent_trace(
     if run_id:
         run_rec = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id, EvaluationRun.run_id == run_id).first()
         if run_rec and run_rec.full_adjudication_json:
-            import json
             try:
                 adj_dict = json.loads(run_rec.full_adjudication_json)
                 ehr_text = run_rec.sanitized_ehr_preview or ""
-            except Exception:
+            except (ValueError, KeyError, TypeError, json.JSONDecodeError):
                 pass
 
     if adj_dict is None:
@@ -2395,11 +2465,10 @@ def get_case_agent_trace(
             adj_dict = adj.model_dump()
             ehr_text = adj.sanitized_ehr_text or ""
         elif log and log.full_adjudication_json:
-            import json
             try:
                 adj_dict = json.loads(log.full_adjudication_json)
                 ehr_text = log.full_ehr_text or log.sanitized_ehr_preview or ""
-            except Exception:
+            except (ValueError, KeyError, TypeError, json.JSONDecodeError):
                 pass
 
     if not adj_dict:
@@ -2413,7 +2482,7 @@ def get_case_agent_trace(
     }
 
 
-@api_router.get("/adjudication/{case_id}/runs", response_model=List[EvaluationRunOut], summary="List All Evaluation Runs For Case")
+@api_router.get("/adjudication/{case_id}/runs", response_model=list[EvaluationRunOut], summary="List All Evaluation Runs For Case")
 def list_case_evaluation_runs(
     case_id: str,
     current_user: User = Depends(get_current_user),
@@ -2429,14 +2498,18 @@ def list_case_evaluation_runs(
     if not runs and log:
         # Fallback synthesized run for legacy records
         import hashlib
+
+        from app.services.declarative_engine import DeclarativePolicyEngine
+        pol_def = DeclarativePolicyEngine.load_policy(log.policy_id)
+        policy_version = getattr(pol_def, "policy_version", None) or "2024.1"
         n_hash = hashlib.sha256((log.full_ehr_text or log.sanitized_ehr_preview or "").encode("utf-8")).hexdigest()
         return [EvaluationRunOut(
             run_id=f"RUN-{case_id[:8]}-01",
             case_id=case_id,
             run_number=1,
             policy_id=log.policy_id,
-            policy_version="2024.1",
-            engine_version="v80.0.0",
+            policy_version=policy_version,
+            engine_version="qwen2.5:3b (carepolicyguard-multiagent-v80)",
             note_version=n_hash,
             decision=log.decision,
             determination_stage=log.determination_stage or "PROVISIONAL",
@@ -2500,12 +2573,11 @@ def get_case_evaluation_run(
     if not run_rec:
         raise HTTPException(status_code=404, detail=f"Evaluation run '{run_id}' not found for case '{case_id}'.")
 
-    import json
     packet_obj = None
     if run_rec.full_packet_json:
         try:
             packet_obj = json.loads(run_rec.full_packet_json)
-        except Exception:
+        except (ValueError, KeyError, TypeError, json.JSONDecodeError):
             pass
 
     return {
@@ -2547,7 +2619,6 @@ def create_human_assessment(
     if not run_rec:
         raise HTTPException(status_code=404, detail=f"Evaluation run '{run_id}' not found for case '{case_id}'.")
 
-    import json
     crit_val = request.criterion_assessments
     crit_json = json.dumps(crit_val if isinstance(crit_val, (dict, list)) else [c.model_dump() for c in crit_val])
     cred = current_user.credential_title or "MD"
@@ -2559,7 +2630,8 @@ def create_human_assessment(
         HumanAssessmentRecord.reviewer_id == current_user.id
     ).first()
 
-    now = datetime.now(timezone.utc)
+    from datetime import UTC
+    now = datetime.now(UTC)
     if assessment:
         assessment.overall_agreement = request.overall_agreement
         assessment.criterion_assessments_json = crit_json
@@ -2602,7 +2674,7 @@ def create_human_assessment(
             db.commit()
         if case_id in _EPHEMERAL_PACKETS:
             _EPHEMERAL_PACKETS[case_id].human_assessment = ha_dict
-    except Exception:
+    except (ValueError, KeyError, TypeError, json.JSONDecodeError):
         pass
 
     crit_parsed = json.loads(assessment.criterion_assessments_json or "{}")
@@ -2623,7 +2695,7 @@ def create_human_assessment(
     )
 
 
-@api_router.get("/adjudication/{case_id}/runs/{run_id}/assessment", response_model=Optional[HumanAssessmentOut], summary="Retrieve Human Assessment on Run")
+@api_router.get("/adjudication/{case_id}/runs/{run_id}/assessment", response_model=HumanAssessmentOut | None, summary="Retrieve Human Assessment on Run")
 def get_human_assessment(
     case_id: str,
     run_id: str,
@@ -2644,8 +2716,22 @@ def get_human_assessment(
     if not assessment:
         return None
 
-    import json
     crit_parsed = json.loads(assessment.criterion_assessments_json or "{}")
+    if isinstance(crit_parsed, list):
+        crit_parsed = {c.get("criterion_code", f"CRIT-{i}"): c for i, c in enumerate(crit_parsed)}
+
+    return HumanAssessmentOut(
+        assessment_id=assessment.assessment_id,
+        case_id=assessment.case_id,
+        run_id=assessment.run_id,
+        reviewer_username=assessment.reviewer_username,
+        reviewer_name=assessment.reviewer_name,
+        reviewer_role=assessment.reviewer_role,
+        overall_agreement=assessment.overall_agreement,
+        criterion_assessments=crit_parsed,
+        clinical_rationale=assessment.clinical_rationale,
+        created_at=assessment.created_at.isoformat() if hasattr(assessment.created_at, "isoformat") else str(assessment.created_at)
+    )
     if isinstance(crit_parsed, list):
         crit_parsed = {c.get("criterion_code", f"CRIT-{i}"): c for i, c in enumerate(crit_parsed)}
 

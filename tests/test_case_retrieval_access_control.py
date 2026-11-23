@@ -116,6 +116,7 @@ def setup_access_control_users_and_cases():
     data = {
         "case_id": case_id,
         "owner_id": user_owner.id,
+        "signer_id": user_signer.id,
         "signer_username": user_signer.username,
         "token_owner": token_owner,
         "token_signer": token_signer,
@@ -226,7 +227,10 @@ def test_signing_clinician_gains_retrieval_rights(setup_access_control_users_and
     token_signer = setup_access_control_users_and_cases["token_signer"]
     headers_signer = {"Authorization": f"Bearer {token_signer}"}
 
-    # 1. Sign off the case
+    # 1. Sign off the case (assign signer to case first)
+    from app.services.deferral_queue import DeferralWorkQueue
+    DeferralWorkQueue.assign_case(case_id, setup_access_control_users_and_cases["signer_id"])
+
     signoff_res = client.post(
         f"/api/v1/determination/{case_id}/sign-off",
         headers=headers_signer,

@@ -6,7 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.db.models import MedicarePolicy, AdjudicationLog
+from app.db.models import MedicarePolicy, AdjudicationLog, User
+from app.api.deps import get_current_user
 from app.agents.criteria_evaluator import evaluate_patient_against_policy
 from app.core.idempotency import idempotency_engine
 
@@ -182,6 +183,7 @@ def submit_pas_claim(
     claim: PASClaimRequest,
     request: Request,
     response: Response,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -189,7 +191,9 @@ def submit_pas_claim(
     Ingests a FHIR R4 Claim resource with preauthorization intent,
     evaluates supporting clinical narratives and draft orders against CMS policies,
     and returns an official FHIR R4 ClaimResponse.
-    Supports IETF Idempotency-Key headers to prevent race conditions and duplicate claim evaluations.
+    Strictly requires authenticated caller (get_current_user) to prevent unauthenticated injection.
+    Supports caller-scoped IETF Idempotency-Key headers (pas:{caller_id}:{key}) to prevent
+    race conditions and cross-tenant replay collisions.
     """
     patient_ref = claim.patient.get("reference", "Patient/PT-UNKNOWN")
     patient_id = patient_ref.replace("Patient/", "")
@@ -209,7 +213,7 @@ def submit_pas_claim(
     idempotency_key = request.headers.get("Idempotency-Key") or request.headers.get("X-Idempotency-Key")
 
     if idempotency_key:
-        scoped_key = f"pas:{idempotency_key}"
+        scoped_key = f"pas:{current_user.id}:{idempotency_key}"
 
         def compute_action():
             claim_resp = _evaluate_pas_claim(claim, patient_id, provider_ref, combined_narrative, db)

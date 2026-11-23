@@ -191,15 +191,21 @@ def get_verified_clinician_user(
 def verify_case_record_access(
     case_id: str,
     log: Optional[Any],
-    current_user: User
+    current_user: User,
+    *,
+    for_modification: bool = False,
+    db: Optional[Any] = None
 ) -> Any:
     """
     Enforces HIPAA Minimum Necessary and Anti-Enumeration Defense on case records:
     1. Auditors and Admins retain organization-wide compliance and system inspection rights.
-    2. Clinicians and users can only inspect cases they submitted/own or personally signed off.
-    3. Anti-Enumeration Oracle Defense: If the case does not exist OR exists but the caller
-       is not authorized to view it, returns an IDENTICAL HTTP 404 response to prevent attackers
-       from discovering valid case IDs.
+    2. Clinicians and users can inspect cases they submitted/own, are assigned to, or personally signed off.
+    3. For write operations (for_modification=True: sign-off & override):
+       Strictly requires that the verified clinician is the case owner (log.user_id == current_user.id),
+       assigned in the deferral queue (assigned_to_user_id == current_user.id), or an Admin.
+       Unassigned / unowned cases cannot be modified by arbitrary clinicians and return HTTP 403.
+    4. Anti-Enumeration Oracle Defense on read operations: If the case does not exist OR exists
+       but the caller is not authorized to view it, returns an IDENTICAL HTTP 404 response.
     """
     not_found_detail = f"Case adjudication record '{case_id}' not found."
     if log is None:
@@ -212,15 +218,42 @@ def verify_case_record_access(
     if current_user.role in (UserRole.AUDITOR.value, UserRole.ADMIN.value, "Auditor", "Admin"):
         return log
 
-    # If case has no assigned owner (e.g. unassigned demo evaluation created without user_id)
-    if getattr(log, "user_id", None) is None:
-        return log
-
     # Case owner check (the user who submitted or created the case)
     if getattr(log, "user_id", None) is not None and log.user_id == current_user.id:
         return log
 
-    # Signer check (the verified clinician who signed off the case)
+    # Deferral queue assignment check on log itself
+    assigned_user_id = getattr(log, "assigned_to_user_id", None)
+    if assigned_user_id is not None and assigned_user_id == current_user.id:
+        return log
+
+    # Deferral queue assignment check via DB
+    if db is not None:
+        try:
+            from app.db.models import DeferralQueueRecord
+            q_rec = db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
+            if q_rec and q_rec.assigned_to_user_id == current_user.id:
+                return log
+        except Exception:
+            pass
+
+    # Deferral queue assignment check via in-memory queue
+    try:
+        from app.services.deferral_queue import DeferralWorkQueue
+        q_item = DeferralWorkQueue._QUEUE.get(case_id)
+        if q_item and q_item.assigned_to_user_id == current_user.id:
+            return log
+    except Exception:
+        pass
+
+    if for_modification:
+        # Rejection for write actions (sign-off, override): explicit 403 Forbidden
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Access denied: Clinician is neither the owner nor assigned to case '{case_id}'. Cases must be assigned before sign-off or override."
+        )
+
+    # Signer check (the verified clinician who signed off the case - valid for read inspection)
     signed_by = getattr(log, "signed_by", None)
     if signed_by:
         signed_by_lower = signed_by.lower()
@@ -233,7 +266,11 @@ def verify_case_record_access(
         if signer_npi == current_user.npi_number:
             return log
 
-    # Anti-enumeration oracle defense: do NOT return 403; return 404 with identical message
+    # If case has no assigned owner (e.g. unassigned demo evaluation created without user_id)
+    if getattr(log, "user_id", None) is None:
+        return log
+
+    # Anti-enumeration oracle defense for read operations: do NOT return 403; return 404 with identical message
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=not_found_detail,

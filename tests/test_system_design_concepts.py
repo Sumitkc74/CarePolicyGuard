@@ -146,6 +146,9 @@ def test_da_vinci_pas_submit_idempotency():
     }
 
     idemp_header = {"Idempotency-Key": "pas-claim-key-778"}
+    from tests.test_v80_reviewer_workflow import _create_test_user
+    auth_headers, _ = _create_test_user()
+    idemp_header.update(auth_headers)
 
     # Submit 1
     resp1 = client.post("/api/v1/pas/submit", json=claim_payload, headers=idemp_header)

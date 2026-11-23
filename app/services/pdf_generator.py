@@ -34,7 +34,7 @@ class PDFPacketGeneratorService:
             f"Report Type:           {packet.evaluation_label or 'Coverage Criteria Evaluation'}",
             f"Evaluation Run ID:     {packet.run_id or 'RUN-INITIAL'}",
             f"Policy Version:        {packet.policy_version or '2024.1'}",
-            f"Engine Version:        {packet.engine_version or 'v80.0.0'}",
+            f"Engine Version:        {packet.engine_version if packet.engine_version and packet.engine_version != 'v80.0.0' else 'qwen2.5:3b (carepolicyguard-multiagent-v80)'}",
             f"Note Version (SHA256): {packet.note_version or 'N/A'}",
             f"Packet Identifier:     {packet.packet_id}",
             f"Case Identifier:       {packet.case_id}",

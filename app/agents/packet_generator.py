@@ -171,8 +171,22 @@ class CoveragePacketGenerator:
             clinician_action_notes=adjudication.required_clinician_action_notes,
             authorization_validity_period=validity_period,
             shared_decision_making_attestation=sdm_attestation,
-            policy_version=getattr(adjudication, "policy_version", "2024.1"),
-            engine_version=getattr(adjudication, "engine_version", "v80.0.0"),
+            policy_version=(
+                (
+                    getattr(
+                        __import__("app.services.declarative_engine", fromlist=["DeclarativePolicyEngine"]).DeclarativePolicyEngine.load_policy(adjudication.policy_id),
+                        "policy_version",
+                        None
+                    ) if adjudication.policy_id else None
+                )
+                or getattr(adjudication, "policy_version", None)
+                or "2024.1"
+            ),
+            engine_version=(
+                getattr(adjudication, "engine_version", None)
+                if getattr(adjudication, "engine_version", None) and "v80.0.0" not in getattr(adjudication, "engine_version", "")
+                else "qwen2.5:3b (carepolicyguard-multiagent-v80)"
+            ),
             note_version=getattr(adjudication, "note_version", None),
             run_id=getattr(adjudication, "run_id", None),
             evaluation_label=getattr(adjudication, "evaluation_label", "Coverage Criteria Evaluation"),

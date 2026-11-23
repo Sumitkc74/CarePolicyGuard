@@ -67,7 +67,8 @@ for item in demo_cases:
         json={
             "patient_id": f"PT-{vid}",
             "policy_id": policy_id,
-            "ehr_narrative": narrative
+            "ehr_narrative": narrative,
+            "execution_mode": "agentic"
         }
     )
     assert res.status_code == 200, res.text

@@ -1,11 +1,17 @@
-from app.services.pdf_generator import PDFPacketGeneratorService
-from app.services.appeal_generator import PeerToPeerAppealService
-from fastapi import Response, HTTPException, status, Depends
+import logging
+
+from fastapi import Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
-from app.db.session import get_db
+
 from app.api.deps import get_current_user
 from app.api.release import require_releasable_determination
 from app.db.models import User
+from app.db.session import get_db
+from app.services.appeal_generator import PeerToPeerAppealService
+from app.services.pdf_generator import PDFPacketGeneratorService
+
+logger = logging.getLogger(__name__)
+
 
 def register_pdf_routes(api_router, get_coverage_packet_fn):
     @api_router.get("/packet/{case_id}/pdf", response_class=Response, summary="Download Signed CMS Coverage Packet as PDF")
@@ -30,12 +36,12 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
                 if run_rec and run_rec.full_packet_json:
                     try:
                         packet = CMSCoveragePacket.model_validate_json(run_rec.full_packet_json)
-                    except Exception:
+                    except (ValueError, KeyError, TypeError):
                         pass
             if packet is None:
                 packet = get_coverage_packet_fn(case_id, current_user, db)
 
-            # Task 4 & 5: If packet does not have human_assessment, look up HumanAssessmentRecord
+            # If packet does not have human_assessment, look up HumanAssessmentRecord
             if not getattr(packet, "human_assessment", None):
                 from app.db.models import HumanAssessmentRecord
                 query = db.query(HumanAssessmentRecord).filter(HumanAssessmentRecord.case_id == case_id)
@@ -54,7 +60,7 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
             if require_final:
                 require_releasable_determination(packet)
             pdf_bytes = PDFPacketGeneratorService.generate_coverage_packet_pdf(packet)
-            
+
             headers = {
                 "Content-Disposition": f'attachment; filename="CMS_Coverage_Packet_{case_id}.pdf"'
             }
@@ -62,10 +68,11 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
         except HTTPException:
             raise
         except Exception as e:
+            logger.error(f"Failed to generate coverage packet PDF: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to generate coverage packet PDF: {str(e)}"
-            )
+                detail=f"Failed to generate coverage packet PDF: {e!s}"
+            ) from e
 
     @api_router.get("/packet/{case_id}/appeal-letter/pdf", response_class=Response, summary="Download Peer-to-Peer Appeal Letter as PDF")
     def download_appeal_letter_pdf(
@@ -84,7 +91,7 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
                 require_releasable_determination(packet)
             appeal = PeerToPeerAppealService.generate_appeal(packet)
             pdf_bytes = PDFPacketGeneratorService.generate_appeal_letter_pdf(appeal)
-            
+
             headers = {
                 "Content-Disposition": f'attachment; filename="Appeal_Letter_{case_id}.pdf"'
             }
@@ -92,7 +99,8 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
         except HTTPException:
             raise
         except Exception as e:
+            logger.error(f"Failed to generate appeal letter PDF: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to generate appeal letter PDF: {str(e)}"
-            )
+                detail=f"Failed to generate appeal letter PDF: {e!s}"
+            ) from e

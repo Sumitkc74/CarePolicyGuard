@@ -65,7 +65,8 @@ def test_da_vinci_pas_submit_approved():
             }
         ]
     }
-    res = client.post("/api/v1/pas/submit", json=claim_payload)
+    headers = _get_admin_headers()
+    res = client.post("/api/v1/pas/submit", json=claim_payload, headers=headers)
     assert res.status_code == 200
     data = res.json()
     assert data["resourceType"] == "ClaimResponse"
@@ -97,7 +98,8 @@ def test_da_vinci_pas_submit_pended_deficiency():
             }
         ]
     }
-    res = client.post("/api/v1/pas/submit", json=claim_payload)
+    headers = _get_admin_headers()
+    res = client.post("/api/v1/pas/submit", json=claim_payload, headers=headers)
     assert res.status_code == 200
     data = res.json()
     assert data["resourceType"] == "ClaimResponse"

@@ -57,8 +57,8 @@ def _create_test_user(
     return {"Authorization": f"Bearer {token}"}, user
 
 
-def _adjudicate_case(auth_headers: dict[str, str], ehr_text: str, policy_id: str = "NCD-20.4") -> str:
-    """Helper to adjudicate a test case and return its case_id."""
+def _adjudicate_case(auth_headers: dict[str, str], ehr_text: str, policy_id: str = "NCD-20.4", assigned_user_id: int | None = None) -> str:
+    """Helper to adjudicate a test case, assign clinician, and return its case_id."""
     res = client.post(
         "/api/v1/adjudicate",
         headers=auth_headers,
@@ -69,7 +69,21 @@ def _adjudicate_case(auth_headers: dict[str, str], ehr_text: str, policy_id: str
         },
     )
     assert res.status_code == 200, f"Adjudication failed: {res.text}"
-    return res.json()["case_id"]
+    case_id = res.json()["case_id"]
+    if assigned_user_id:
+        from app.services.deferral_queue import DeferralWorkQueue
+        from app.db.session import SessionLocal
+        from app.db.models import AdjudicationLog
+        DeferralWorkQueue.assign_case(case_id, assigned_user_id)
+        db = SessionLocal()
+        try:
+            log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+            if log:
+                log.user_id = assigned_user_id
+                db.commit()
+        finally:
+            db.close()
+    return case_id
 
 
 def test_v76_provisional_determination_cannot_be_submitted():
@@ -81,6 +95,7 @@ def test_v76_provisional_determination_cannot_be_submitted():
     case_id = _adjudicate_case(
         clin_headers,
         "Patient has severe ischemic cardiomyopathy with LVEF 25%, NYHA Class III heart failure.",
+        assigned_user_id=clin_user.id,
     )
 
     # Submit before sign-off must be blocked by the shared release gate
@@ -148,6 +163,7 @@ def test_v76_verified_clinician_can_submit_final_determination_with_honest_recei
     case_id = _adjudicate_case(
         clin_headers,
         "Patient has severe ischemic cardiomyopathy with LVEF 25%, NYHA Class III heart failure.",
+        assigned_user_id=clin_user.id,
     )
 
     # 1. Sign off
@@ -197,6 +213,7 @@ def test_v76_override_to_approved_rebuilds_packet_and_pdf_export_reflects_approv
         clin_headers,
         "Patient has severe ischemic cardiomyopathy with LVEF 45%.",
         policy_id="NCD-20.4",
+        assigned_user_id=clin_user.id,
     )
 
     # Verify initial decision was not APPROVED (was DEFERRED or DENIED)
@@ -243,6 +260,7 @@ def test_v76_override_to_denied_rebuilds_packet_and_fhir_export_reflects_denied(
         clin_headers,
         "Diagnostic PSG shows AHI of 32 events/hr. Face-to-face physician evaluation completed. Prescribing CPAP.",
         policy_id="LCD-L33829",
+        assigned_user_id=clin_user.id,
     )
 
     # Verify initial packet decision was APPROVED
@@ -293,6 +311,7 @@ def test_v76_sign_off_and_override_lifecycle_preserves_audit_trail():
         clin_headers,
         "Patient has severe ischemic cardiomyopathy with LVEF 45%.",
         policy_id="NCD-20.4",
+        assigned_user_id=clin_user.id,
     )
 
     db = SessionLocal()
@@ -328,10 +347,11 @@ def test_v76_ehr_push_enforces_shared_gate_rejects_provisional():
     """
     Task 4g: The EHR push strictly enforces the shared gate (412 for provisional determination).
     """
-    clin_headers, _ = _create_test_user(role="Clinician", is_verified=True)
+    clin_headers, clin_user = _create_test_user(role="Clinician", is_verified=True)
     case_id = _adjudicate_case(
         clin_headers,
         "Patient has severe ischemic cardiomyopathy with LVEF 25%, NYHA Class III heart failure.",
+        assigned_user_id=clin_user.id,
     )
 
     # EHR push on provisional case -> 412 Precondition Failed
@@ -356,6 +376,7 @@ def test_v76_submit_rejects_signer_identity_mismatch():
     case_id = _adjudicate_case(
         clin_headers,
         "Patient has severe ischemic cardiomyopathy with LVEF 25%, NYHA Class III heart failure.",
+        assigned_user_id=clin_user.id,
     )
 
     # Sign off first so it is FINAL
