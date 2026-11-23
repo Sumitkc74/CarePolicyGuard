@@ -20,7 +20,7 @@ import app.core.config as config_mod
 from app.agents.llm_proposer import LLMProposalAgent
 from app.agents.pipeline import MultiAgentVerificationPipeline
 from app.core.config import settings
-from app.core.llm_judge import ClinicalEquivalenceJudge, CriterionJudgment
+from app.core.llm_judge import AdvocacyResult, ClinicalEquivalenceJudge, CriterionJudgment
 from app.schemas.message_board import BoardMessageType
 
 
@@ -570,7 +570,14 @@ def test_fallback_skipped_on_clean_not_met_and_capped_on_judge_error(sample_vign
         from app.core.llm_judge import EquivalenceVerdict, JudgeEvaluation
         return JudgeEvaluation(verdict=EquivalenceVerdict.NOT_EQUIVALENT, rationale="No match")
 
+    mock_no_advocacy = AdvocacyResult(
+        advocacy_quote="",
+        rationale="No supporting evidence found.",
+        status_code="COMPLETED",
+    )
+
     with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_clean_not_met), \
+         patch.object(ClinicalEquivalenceJudge, "generate_advocacy_sync", return_value=mock_no_advocacy), \
          patch.object(ClinicalEquivalenceJudge, "judge_equivalence_sync", side_effect=mock_judge_equiv):
         pipeline.adjudicate_sync(
             patient_id="PT-TEST-FALLBACK-SKIPPED",
@@ -599,6 +606,7 @@ def test_fallback_skipped_on_clean_not_met_and_capped_on_judge_error(sample_vign
         return JudgeEvaluation(verdict=EquivalenceVerdict.NOT_EQUIVALENT, rationale="No match")
 
     with patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", return_value=mock_error_judgment), \
+         patch.object(ClinicalEquivalenceJudge, "generate_advocacy_sync", return_value=mock_no_advocacy), \
          patch.object(ClinicalEquivalenceJudge, "judge_equivalence_sync", side_effect=mock_judge_equiv_error):
         pipeline.adjudicate_sync(
             patient_id="PT-TEST-FALLBACK-CAPPED",

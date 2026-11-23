@@ -30,7 +30,12 @@ from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.services.timeline_analyzer import TimelineAnalyzerService
 
 
-def _is_valid_clinical_sub_requirement(val: str, ccode: str = "") -> bool:
+def _is_valid_clinical_sub_requirement(
+    val: str,
+    ccode: str = "",
+    crit_desc: str = "",
+    crit_name: str = "",
+) -> bool:
     """
     Task 1 (v77): A named_sub_requirement counts as specific ONLY if it names
     a clinical sub-requirement of the criterion (a phrase from the criterion's
@@ -43,6 +48,10 @@ def _is_valid_clinical_sub_requirement(val: str, ccode: str = "") -> bool:
     if len(v) < 3 or v.lower() in ("none", "n/a", "empty"):
         return False
     if ccode and v.lower() == ccode.strip().lower():
+        return False
+    if crit_desc and v.lower() == crit_desc.strip().lower():
+        return False
+    if crit_name and v.lower() == crit_name.strip().lower():
         return False
     # Explicitly disallow criterion codes (CRIT-...), requirement references (REQUIREMENT ...),
     # or numbered references like 2.1.1.1.1
@@ -994,7 +1003,15 @@ class MultiAgentVerificationPipeline:
                                     if not (cq_s >= s and cq_e <= e) and not (s >= cq_s and e <= cq_e):
                                         cq_undercuts = True
 
-                            has_named_sub_req = _is_valid_clinical_sub_requirement(named_sub_req, ccode)
+                            has_named_sub_req = bool(
+                                flagged_specific
+                                and _is_valid_clinical_sub_requirement(
+                                    named_sub_req,
+                                    ccode,
+                                    crit_desc=crit.get("description", ""),
+                                    crit_name=crit.get("name", ""),
+                                )
+                            )
 
                             has_specific_contradiction = bool(
                                 has_obj and (

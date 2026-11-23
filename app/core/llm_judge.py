@@ -716,6 +716,17 @@ class ClinicalEquivalenceJudge:
         neg_pats = [r"\bno\s+history\s+of\b", r"\bdenies\b", r"\bnegative\s+for\b", r"\bno\s+evidence\s+of\b", r"\bruled\s+out\b", r"\babsent\b"]
 
         best_span = ""
+
+        # If candidate_quote is provided and priority_stems are absent or already satisfied by candidate,
+        # query specifically for candidate_quote to find the nearest verbatim paraphrase span.
+        # Otherwise, if candidate lacks priority stems (e.g. weak fragment), query for the criterion requirement.
+        is_paraphrase_query = bool(
+            candidate_quote
+            and (not priority_stems or any(stem in cand_norm for stem in priority_stems))
+        )
+        query_text = candidate_quote if is_paraphrase_query else req_text
+        min_sim_threshold = 0.70 if is_paraphrase_query else 0.35
+
         # Try SapBERT semantic embedding similarity
         try:
             import torch
@@ -723,15 +734,15 @@ class ClinicalEquivalenceJudge:
             from app.services.hybrid_retriever import _get_sapbert_model
             tokenizer, model, device = _get_sapbert_model()
 
-            inputs = tokenizer([req_text] + sentences, padding=True, truncation=True, max_length=256, return_tensors="pt").to(device)
+            inputs = tokenizer([query_text] + sentences, padding=True, truncation=True, max_length=256, return_tensors="pt").to(device)
             with torch.no_grad():
                 out = model(**inputs)
                 reps = out.last_hidden_state[:, 0, :]
                 norms = reps.norm(dim=1, keepdim=True)
                 normed = reps / torch.clamp(norms, min=1e-9)
-                crit_emb = normed[0:1]
+                query_emb = normed[0:1]
                 sent_embs = normed[1:]
-                sims = (crit_emb @ sent_embs.T)[0].tolist()
+                sims = (query_emb @ sent_embs.T)[0].tolist()
 
             candidates: list[tuple[float, str]] = []
             for sent, sim in zip(sentences, sims):
@@ -748,19 +759,23 @@ class ClinicalEquivalenceJudge:
                         has_synonym_match = True
                         break
 
-                if has_term_overlap or has_synonym_match:
-                    candidates.append((sim, sent))
+                # If matching a specific candidate quote paraphrase, high semantic similarity is sufficient
+                if is_paraphrase_query or has_term_overlap or has_synonym_match:
+                    score = sim
+                    if not is_paraphrase_query and priority_stems and any(stem in sent_lower for stem in priority_stems):
+                        score += 0.5
+                    candidates.append((score, sent))
 
             if candidates:
                 candidates.sort(key=lambda x: x[0], reverse=True)
                 top_sim, top_sent = candidates[0]
-                if top_sim >= 0.35:
+                if top_sim >= min_sim_threshold:
                     best_span = top_sent
         except (ImportError, RuntimeError, ValueError, KeyError, TypeError, OSError) as exc:
             logger.debug(f"SapBERT span search fallback: {exc}")
 
-        # Lexical fallback if SapBERT did not resolve
-        if not best_span:
+        # Lexical fallback if SapBERT did not resolve and no candidate_quote was specified
+        if not best_span and not candidate_quote:
             best_score = 0.0
             for sent in sentences:
                 sent_lower = sent.lower()
