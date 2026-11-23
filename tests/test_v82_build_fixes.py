@@ -6,8 +6,9 @@ Pins:
 (ii) All 11 app-touched files are checked by ruff with individual counts within baseline bounds.
 (iii) Demo results JSON (docs/milestone_demo_v80_results.json) records fetch status codes (HTTP 200)
       for traces, runs, and packet for all 4 cases, and none of the deferred cases have empty trace arrays.
-(iv) Architectural docstring at get_concept_map() in app/core/concept_map.py documents the
-     12-committed vs 131-benchmark distinction.
+(iv) Architectural documentation in scripts/run_milestone_demo.py documents the
+     12-committed vs 131-benchmark distinction (preserved in demo script to protect
+     critical-file baseline reuse validation in scripts/run_agentic_v59_three_mode_measurement.py).
 """
 
 import inspect
@@ -134,3 +135,9 @@ def test_v82_concept_map_gap_architectural_docstring():
     assert "131" in doc, "Documentation must mention 131-concept map in benchmark harness"
     assert "Gate C" in doc or "unmapped" in doc, "Documentation must explain Gate C / unmapped criteria abstention"
     assert "DEV-LCD-SBRT-APP" in doc or "SBRT" in doc, "Documentation must mention SBRT as an example"
+    assert "scripts/run_agentic_v59_three_mode_measurement.py" in doc, (
+        "Documentation must reference the actual benchmark measurement harness script scripts/run_agentic_v59_three_mode_measurement.py"
+    )
+    assert "run_adjudication_benchmark.py" not in doc, (
+        "Documentation must NOT reference the nonexistent run_adjudication_benchmark.py"
+    )

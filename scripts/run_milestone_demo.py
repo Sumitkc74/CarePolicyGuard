@@ -12,7 +12,7 @@ The production API deliberately loads only the 12 committed, clinically attested
 built-in concepts via `_load_built_in_concepts()` in `app/core/concept_map.py`. It does
 NOT load uncommitted draft concepts into production runtime.
 
-In contrast, the offline research benchmark harness (`run_adjudication_benchmark.py`)
+In contrast, the offline research benchmark harness (`scripts/run_agentic_v59_three_mode_measurement.py`)
 constructs an extended 131-concept map (12 committed concepts + 119 experimental draft
 concepts, such as `DRAFT-CONCEPT-ATTESTED-SBRT-02` for `CRIT-SBRT-02`).
 
