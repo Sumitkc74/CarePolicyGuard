@@ -1207,8 +1207,8 @@ def get_coverage_packet(
                 if not adj and log.full_adjudication_json:
                     try:
                         adj = FinalAdjudication.model_validate_json(log.full_adjudication_json)
-                    except Exception:
-                        pass
+                    except (ValueError, KeyError) as err:
+                        logger.debug(f"Could not parse full_adjudication_json for {case_id}: {err}")
                 if adj is not None:
                     packet = rebuild_coverage_packet(adj, existing_packet=packet)
                     _EPHEMERAL_PACKETS[case_id] = packet
@@ -1414,15 +1414,15 @@ def override_clinical_determination(
     if not adj and log and log.full_adjudication_json:
         try:
             adj = FinalAdjudication.model_validate_json(log.full_adjudication_json)
-        except Exception:
-            pass
+        except (ValueError, KeyError) as err:
+            logger.debug(f"Could not parse full_adjudication_json for override: {err}")
 
     if not adj and not log:
         raise HTTPException(status_code=404, detail=f"Case adjudication record '{case_id}' not found.")
 
     if not adj and log:
         # Reconstruct minimal FinalAdjudication if JSON was corrupted
-        from app.schemas.contracts import AdjudicationDecision, DeterminationStage
+        from app.schemas.contracts import AdjudicationDecision
         adj = FinalAdjudication(
             case_id=log.case_id,
             patient_id_masked=log.patient_id_masked,

@@ -240,6 +240,16 @@ def verify_case_record_access(
     )
 
 
-from app.api.release import require_releasable_determination  # noqa: E402
+from app.api.release import require_releasable_determination
+
+__all__ = [
+    "get_current_user",
+    "get_optional_current_user",
+    "get_verified_clinician_user",
+    "oauth2_scheme",
+    "require_releasable_determination",
+    "require_role",
+    "verify_case_record_access",
+]
 
 

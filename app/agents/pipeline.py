@@ -37,7 +37,7 @@ def _is_valid_clinical_sub_requirement(
     crit_name: str = "",
 ) -> bool:
     """
-    Task 1 (v77): A named_sub_requirement counts as specific ONLY if it names
+    Task 1 (v77 & v78): A named_sub_requirement counts as specific ONLY if it names
     a clinical sub-requirement of the criterion (a phrase from the criterion's
     own text, e.g. named finding, test, duration, or threshold) and NEVER if it
     is a criterion code, requirement reference, or empty string.
@@ -1321,111 +1321,119 @@ class MultiAgentVerificationPipeline:
                                         )
 
                                         if adv_gate_res["passed"]:
-                                            # Task 2(a): Judge in the loop — Advocate-span verification
-                                            judge_span_res = judge.judge_equivalence_sync(
-                                                criterion=crit,
-                                                candidate_span_text=sanitized_ehr[adv_s:adv_e]
+                                            # Task 3 (v78): Eliminate redundant judge verifications
+                                            # Do not re-verify if criterion is already settled/MET via defense
+                                            is_settled_met = (
+                                                assessment.status == DeterminationStatus.MET
+                                                or promoted
+                                                or debated_criteria_outcomes.get(ccode) == "DEFENDED"
                                             )
-                                            board.post(
-                                                agent="Agent 2: Clinical Evaluator",
-                                                message_type=BoardMessageType.VERDICT,
-                                                content=(
-                                                    f"LLM Judge verified advocate span '{sanitized_ehr[adv_s:adv_e]}' for {ccode}: "
-                                                    f"verdict={judge_span_res.verdict.value} (Rationale: {judge_span_res.rationale})."
-                                                ),
-                                                criterion_code=ccode,
-                                                evidence={"source_text": sanitized_ehr[adv_s:adv_e], "start_char": adv_s, "end_char": adv_e},
-                                                metadata={
-                                                    "advocate_span_verification": True,
-                                                    "verdict": judge_span_res.verdict.value,
-                                                    "rationale": judge_span_res.rationale,
-                                                    "latency_ms": judge_span_res.elapsed_ms,
-                                                    "status_code": judge_span_res.status_code
-                                                }
-                                            )
-
-                                            if judge_span_res.verdict == EquivalenceVerdict.EQUIVALENT:
-                                                assessment.status = DeterminationStatus.MET
-                                                assessment.verified_spans = [adv_span]
-                                                assessment.raw_confidence = 0.92
-                                                is_prov = adv_gate_res.get("is_provisional", False)
-                                                if is_prov:
-                                                    assessment.clinical_rationale = (
-                                                        f"Criterion satisfied via Agent 3 advocacy grounded quote with judge-verified provisional equivalence (queued for human attestation): "
-                                                        f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res.get('gate_c_rejection_reason', 'unmapped')})."
-                                                    )
-                                                    prov_entry = {
-                                                        "criterion_code": ccode,
-                                                        "concept_term": adv_gate_res.get("concept_term"),
-                                                        "quote": sanitized_ehr[adv_s:adv_e],
-                                                        "judge_verdict": "EQUIVALENT",
-                                                        "gate_c_rejected": True,
-                                                        "gate_c_rejection_reason": adv_gate_res.get("gate_c_rejection_reason"),
-                                                        "status": "MET_PROVISIONAL",
-                                                        "needs_human_attestation": True,
-                                                    }
-                                                    provisional_equivalences.append(prov_entry)
-                                                    from app.core.concept_map import (
-                                                        ConceptReviewQueue,
-                                                    )
-                                                    ConceptReviewQueue.submit_unmapped_proposal(
-                                                        case_id=case_id,
-                                                        criterion_code=ccode,
-                                                        criterion_term=adv_gate_res.get("concept_term") or ccode,
-                                                        proposed_span=sanitized_ehr[adv_s:adv_e],
-                                                        claimed_equivalence=f"Advocate-span judge-verified equivalence for {ccode}",
-                                                        ehr_snippet=sanitized_ehr[max(0, adv_s - 50):min(len(sanitized_ehr), adv_e + 50)]
-                                                    )
-                                                else:
-                                                    assessment.clinical_rationale = (
-                                                        f"Criterion satisfied via Agent 3 advocacy grounded quote: "
-                                                        f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res['reason']}) verified by LLM Judge."
-                                                    )
-                                                toolbelt.tool_attribution[ccode] = "advocate_for"
-                                                toolbelt.record_mind_change(
-                                                    agent="Agent 3",
-                                                    criterion=ccode,
-                                                    from_status="NOT_MET",
-                                                    to_status="MET",
-                                                    reason=(
-                                                        f"Advocacy grounded quote with judge-verified provisional equivalence: '{sanitized_ehr[adv_s:adv_e]}'"
-                                                        if is_prov else
-                                                        f"Advocacy grounded quote passed Gate A, Gate B, Gate C and verified by Judge: '{sanitized_ehr[adv_s:adv_e]}'"
-                                                    ),
-                                                    evidence_span=sanitized_ehr[adv_s:adv_e]
+                                            if not is_settled_met:
+                                                # Task 2(a): Judge in the loop — Advocate-span verification (with case-level span caching)
+                                                judge_span_res = judge.judge_equivalence_sync(
+                                                    criterion=crit,
+                                                    candidate_span_text=sanitized_ehr[adv_s:adv_e]
                                                 )
                                                 board.post(
                                                     agent="Agent 2: Clinical Evaluator",
-                                                    message_type=BoardMessageType.DEFENSE,
+                                                    message_type=BoardMessageType.VERDICT,
                                                     content=(
-                                                        f"Defense of {ccode}: Grounded advocacy quote '{sanitized_ehr[adv_s:adv_e]}' "
-                                                        f"passed Gate A, Gate B, Gate C (provisional) and verified by Judge. Promoting {ccode} to MET (provisional)."
-                                                        if is_prov else
-                                                        f"Defense of {ccode}: Grounded advocacy quote '{sanitized_ehr[adv_s:adv_e]}' "
-                                                        f"passed Gate A, Gate B, Gate C and verified by Judge. Promoting {ccode} to MET."
+                                                        f"LLM Judge verified advocate span '{sanitized_ehr[adv_s:adv_e]}' for {ccode}: "
+                                                        f"verdict={judge_span_res.verdict.value} (Rationale: {judge_span_res.rationale})."
                                                     ),
                                                     criterion_code=ccode,
-                                                    evidence=adv_span,
+                                                    evidence={"source_text": sanitized_ehr[adv_s:adv_e], "start_char": adv_s, "end_char": adv_e},
                                                     metadata={
-                                                        "advocacy_promoted": True,
-                                                        "gate_chain_passed": True,
-                                                        "verbatim_grounded": True,
-                                                        "judge_verified": True,
-                                                        "quote": sanitized_ehr[adv_s:adv_e],
-                                                        "is_provisional": is_prov,
-                                                        "needs_human_attestation": is_prov,
+                                                        "advocate_span_verification": True,
+                                                        "verdict": judge_span_res.verdict.value,
+                                                        "rationale": judge_span_res.rationale,
+                                                        "latency_ms": judge_span_res.elapsed_ms,
+                                                        "status_code": judge_span_res.status_code
                                                     }
                                                 )
-                                                promoted = True
-                                            else:
-                                                board.post(
-                                                    agent="Agent 2: Clinical Evaluator",
-                                                    message_type=BoardMessageType.CHALLENGE,
-                                                    content=f"Advocacy on {ccode} rejected by Judge semantic verification: {judge_span_res.rationale}.",
-                                                    criterion_code=ccode,
-                                                    evidence=adv_span,
-                                                    metadata={"failing_gate": "JudgeEquivalence", "advocacy_rejected": True}
-                                                )
+
+                                                if judge_span_res.verdict == EquivalenceVerdict.EQUIVALENT:
+                                                    assessment.status = DeterminationStatus.MET
+                                                    assessment.verified_spans = [adv_span]
+                                                    assessment.raw_confidence = 0.92
+                                                    is_prov = adv_gate_res.get("is_provisional", False)
+                                                    if is_prov:
+                                                        assessment.clinical_rationale = (
+                                                            f"Criterion satisfied via Agent 3 advocacy grounded quote with judge-verified provisional equivalence (queued for human attestation): "
+                                                            f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res.get('gate_c_rejection_reason', 'unmapped')})."
+                                                        )
+                                                        prov_entry = {
+                                                            "criterion_code": ccode,
+                                                            "concept_term": adv_gate_res.get("concept_term"),
+                                                            "quote": sanitized_ehr[adv_s:adv_e],
+                                                            "judge_verdict": "EQUIVALENT",
+                                                            "gate_c_rejected": True,
+                                                            "gate_c_rejection_reason": adv_gate_res.get("gate_c_rejection_reason"),
+                                                            "status": "MET_PROVISIONAL",
+                                                            "needs_human_attestation": True,
+                                                        }
+                                                        provisional_equivalences.append(prov_entry)
+                                                        from app.core.concept_map import (
+                                                            ConceptReviewQueue,
+                                                        )
+                                                        ConceptReviewQueue.submit_unmapped_proposal(
+                                                            case_id=case_id,
+                                                            criterion_code=ccode,
+                                                            criterion_term=adv_gate_res.get("concept_term") or ccode,
+                                                            proposed_span=sanitized_ehr[adv_s:adv_e],
+                                                            claimed_equivalence=f"Advocate-span judge-verified equivalence for {ccode}",
+                                                            ehr_snippet=sanitized_ehr[max(0, adv_s - 50):min(len(sanitized_ehr), adv_e + 50)]
+                                                        )
+                                                    else:
+                                                        assessment.clinical_rationale = (
+                                                            f"Criterion satisfied via Agent 3 advocacy grounded quote: "
+                                                            f"'{sanitized_ehr[adv_s:adv_e]}' ({adv_gate_res['reason']}) verified by LLM Judge."
+                                                        )
+                                                    toolbelt.tool_attribution[ccode] = "advocate_for"
+                                                    toolbelt.record_mind_change(
+                                                        agent="Agent 3",
+                                                        criterion=ccode,
+                                                        from_status="NOT_MET",
+                                                        to_status="MET",
+                                                        reason=(
+                                                            f"Advocacy grounded quote with judge-verified provisional equivalence: '{sanitized_ehr[adv_s:adv_e]}'"
+                                                            if is_prov else
+                                                            f"Advocacy grounded quote passed Gate A, Gate B, Gate C and verified by Judge: '{sanitized_ehr[adv_s:adv_e]}'"
+                                                        ),
+                                                        evidence_span=sanitized_ehr[adv_s:adv_e]
+                                                    )
+                                                    board.post(
+                                                        agent="Agent 2: Clinical Evaluator",
+                                                        message_type=BoardMessageType.DEFENSE,
+                                                        content=(
+                                                            f"Defense of {ccode}: Grounded advocacy quote '{sanitized_ehr[adv_s:adv_e]}' "
+                                                            f"passed Gate A, Gate B, Gate C (provisional) and verified by Judge. Promoting {ccode} to MET (provisional)."
+                                                            if is_prov else
+                                                            f"Defense of {ccode}: Grounded advocacy quote '{sanitized_ehr[adv_s:adv_e]}' "
+                                                            f"passed Gate A, Gate B, Gate C and verified by Judge. Promoting {ccode} to MET."
+                                                        ),
+                                                        criterion_code=ccode,
+                                                        evidence=adv_span,
+                                                        metadata={
+                                                            "advocacy_promoted": True,
+                                                            "gate_chain_passed": True,
+                                                            "verbatim_grounded": True,
+                                                            "judge_verified": True,
+                                                            "quote": sanitized_ehr[adv_s:adv_e],
+                                                            "is_provisional": is_prov,
+                                                            "needs_human_attestation": is_prov,
+                                                        }
+                                                    )
+                                                    promoted = True
+                                                else:
+                                                    board.post(
+                                                        agent="Agent 2: Clinical Evaluator",
+                                                        message_type=BoardMessageType.CHALLENGE,
+                                                        content=f"Advocacy on {ccode} rejected by Judge semantic verification: {judge_span_res.rationale}.",
+                                                        criterion_code=ccode,
+                                                        evidence=adv_span,
+                                                        metadata={"failing_gate": "JudgeEquivalence", "advocacy_rejected": True}
+                                                    )
                                         else:
                                             failing_gate = adv_gate_res["failing_gate"]
                                             reason = adv_gate_res["reason"]

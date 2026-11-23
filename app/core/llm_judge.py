@@ -117,6 +117,7 @@ class ClinicalEquivalenceJudge:
 
         self.case_call_count = 0
         self.case_elapsed_ms = 0.0
+        self.evaluated_spans_cache: dict[tuple[str, str], JudgeEvaluation] = {}
 
         self.telemetry = {
             "total_judge_calls": 0,
@@ -127,42 +128,46 @@ class ClinicalEquivalenceJudge:
         }
 
     def reset_case_budget(self) -> None:
-        """Resets per-case call count and elapsed time budget at case boundary."""
+        """Resets per-case call count, elapsed time budget, and span cache at case boundary."""
         self.case_call_count = 0
         self.case_elapsed_ms = 0.0
+        self.evaluated_spans_cache.clear()
 
     def build_prompt(
         self,
         criterion_code: str,
         criterion_name: str,
         criterion_desc: str,
-        candidate_span_text: str
+        candidate_span_text: str,
+        clinical_intent: str = ""
     ) -> str:
         """
-        Builds the strict semantic equivalence prompt.
+        Builds the strict semantic equivalence prompt (Task 1).
+        Verifies the candidate evidence span against the criterion requirement AS WRITTEN.
         Explicitly forbids coverage judgments and restricts LLM to semantic evaluation.
         """
+        intent_block = f"\n- Clinical Intent: {clinical_intent}" if clinical_intent else ""
         return (
             f"You are a clinical semantic equivalence judge for Medicare policy criteria.\n\n"
             f"CRITERION:\n"
             f"- Code: {criterion_code}\n"
             f"- Name: {criterion_name}\n"
-            f"- Clinical Fact Required: {criterion_desc}\n\n"
+            f"- Requirement as Written: {criterion_desc}{intent_block}\n\n"
             f"CANDIDATE EVIDENCE SPAN (extracted verbatim from clinical note):\n"
             f"\"{candidate_span_text}\"\n\n"
-            f"EVALUATION QUESTION:\n"
-            f"{self.EQUIVALENCE_QUESTION}\n\n"
+            f"TASK:\n"
+            f"Determine whether the candidate evidence span satisfies the criterion requirement AS WRITTEN (either fully or through a qualifying clinical branch/alternative stated in the requirement).\n"
+            f"State clearly which requirement or branch the span satisfies or fails, explicitly quoting the criterion text applied.\n\n"
             f"GOVERNING RULES:\n"
-            f"1. Semantic equivalence is understanding: If the span uses a medical synonym, subtype, or paraphrase for the SAME clinical concept (e.g. 'prostate adenocarcinoma' is prostate cancer; 'esophageal adenocarcinoma' is biopsy-proven malignancy; 'absence of reversible causes' or 'not taking AV nodal blocking agents' confirms bradyarrhythmia is not caused by reversible causes), return EQUIVALENT.\n"
-            f"2. Check the criterion requirement AS WRITTEN: When a criterion specifies disjunctive alternatives (e.g. 'X (or Y)'), satisfying EITHER alternative satisfies the criterion. For example, if a criterion requires 'Pathology report documenting biopsy-proven malignancy (or solitary pulmonary nodule)', ANY biopsy-proven malignancy (such as esophageal adenocarcinoma, colorectal adenocarcinoma) satisfies the first branch; do NOT reject it because it is not a pulmonary nodule or not in the lung.\n"
-            f"3. Genuine ambiguity is a deferral: If the span discusses a different condition altogether, an unfulfilled coverage trade-off, or requires a coverage judgment (e.g. whether rectal sparing substitutes for spinal cord proximity), return AMBIGUOUS.\n"
+            f"1. Semantic Equivalence is Understanding: If the span uses a medical synonym, clinical subtype, or paraphrase for the required clinical condition (e.g. 'prostate adenocarcinoma' is prostate cancer; 'esophageal adenocarcinoma' or 'colorectal adenocarcinoma' is biopsy-proven malignancy; 'absence of reversible causes' confirms bradyarrhythmia is not caused by reversible causes), return EQUIVALENT.\n"
+            f"2. Check the criterion requirement AS WRITTEN: When a criterion specifies alternatives (e.g. separated by 'or', parentheses '(or ...)', or multiple qualifying clinical pathways), satisfying EITHER alternative satisfies the criterion (satisfying ANY one of the stated qualifying branches). You must NOT require the span to satisfy all alternatives or require features from an alternative branch (e.g. if the requirement is 'Pathology report documenting biopsy-proven malignancy (or solitary pulmonary nodule)', biopsy proof of ANY malignancy satisfies the first branch; do NOT reject it because it is not a pulmonary nodule or not in the lung).\n"
+            f"3. Ambiguity vs Genuine Dissimilarity: If the span describes a completely unrelated condition, fails to meet the core clinical requirement, or requires a coverage/medical necessity trade-off, return NOT_EQUIVALENT or AMBIGUOUS.\n"
             f"4. Do NOT evaluate whether the patient qualifies for insurance coverage. Only evaluate if the span expresses the same clinical fact as written.\n"
-            f"5. If returning NOT_EQUIVALENT or AMBIGUOUS, the rationale MUST explicitly quote the specific phrase from 'Clinical Fact Required' that the evidence fails to satisfy.\n"
-            f"6. Do NOT output character offsets or spans. Output ONLY valid JSON.\n\n"
-            f"Return JSON matching this exact structure:\n"
+            f"5. Rationale Requirement: The rationale MUST explicitly quote the exact phrase from 'Requirement as Written' that the evidence satisfies (if EQUIVALENT) or fails to satisfy (if NOT_EQUIVALENT / AMBIGUOUS).\n"
+            f"6. Output Format: Output ONLY valid JSON matching this exact structure:\n"
             f"{{\n"
             f'  "verdict": "EQUIVALENT" or "NOT_EQUIVALENT" or "AMBIGUOUS",\n'
-            f'  "rationale": "<concise clinical explanation quoting the unmet criterion phrase if NOT_EQUIVALENT/AMBIGUOUS>"\n'
+            f'  "rationale": "<clinical explanation stating which requirement the span satisfies or fails, explicitly quoting the criterion text applied>"\n'
             f"}}"
         )
 
@@ -198,8 +203,13 @@ class ClinicalEquivalenceJudge:
         ccode = criterion.get("criterion_code", "CRIT-UNKNOWN")
         cname = criterion.get("name", "")
         cdesc = criterion.get("description", cname)
+        cintent = criterion.get("clinical_intent", "")
 
-        prompt = self.build_prompt(ccode, cname, cdesc, candidate_span_text)
+        cache_key = (ccode, candidate_span_text.strip())
+        if hasattr(self, "evaluated_spans_cache") and cache_key in self.evaluated_spans_cache:
+            return self.evaluated_spans_cache[cache_key]
+
+        prompt = self.build_prompt(ccode, cname, cdesc, candidate_span_text, clinical_intent=cintent)
 
         payload = {
             "model": self.model_name,
@@ -253,12 +263,15 @@ class ClinicalEquivalenceJudge:
 
             rat = str(parsed.get("rationale", "No explanation provided.")).strip()
 
-            return JudgeEvaluation(
+            eval_res = JudgeEvaluation(
                 verdict=verdict,
                 rationale=rat,
                 elapsed_ms=elapsed_ms,
                 status_code="COMPLETED"
             )
+            if hasattr(self, "evaluated_spans_cache"):
+                self.evaluated_spans_cache[cache_key] = eval_res
+            return eval_res
 
         except (httpx.HTTPError, TimeoutError, ValueError, KeyError, RuntimeError) as exc:
             elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
@@ -713,7 +726,11 @@ class ClinicalEquivalenceJudge:
             return candidate_quote
 
         is_absence_criterion = any(k in req_text for k in ["absence of", "not caused by", "without", "negative for", "ruled out"])
-        neg_pats = [r"\bno\s+history\s+of\b", r"\bdenies\b", r"\bnegative\s+for\b", r"\bno\s+evidence\s+of\b", r"\bruled\s+out\b", r"\babsent\b"]
+        neg_pats = [
+            r"\bno\s+history\s+of\b", r"\bdenies\b", r"\bnegative\s+for\b", r"\bno\s+evidence\s+of\b",
+            r"\bruled\s+out\b", r"\babsent\b", r"\bnot\s+indicated\b", r"\bcontraindicated\b",
+            r"\bineffective\b", r"\bnot\s+recommended\b"
+        ]
 
         best_span = ""
 
@@ -725,7 +742,7 @@ class ClinicalEquivalenceJudge:
             and (not priority_stems or any(stem in cand_norm for stem in priority_stems))
         )
         query_text = candidate_quote if is_paraphrase_query else req_text
-        min_sim_threshold = 0.70 if is_paraphrase_query else 0.35
+        min_sim_threshold = 0.65 if is_paraphrase_query else 0.35
 
         # Try SapBERT semantic embedding similarity
         try:
