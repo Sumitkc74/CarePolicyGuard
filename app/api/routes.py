@@ -7,7 +7,7 @@ from app.api.dtr_routes import register_dtr_routes
 from app.api.oauth_routes import register_oauth_routes
 from app.api.cds_hooks_routes import register_cds_hooks_routes
 from app.api.metrics_routes import register_metrics_routes
-from app.core.rate_limiter import rate_limit, limiter
+from app.core.rate_limiter import rate_limit
 from app.api.mfa_routes import register_mfa_routes
 from app.api.session_routes import register_session_management_routes
 from app.api.smart_fhir_routes import register_smart_fhir_routes
@@ -34,12 +34,11 @@ from app.core.security import (
     create_access_token,
     verify_clinical_document_authenticity,
     verify_medical_professional_credentials,
-    validate_npi_luhn,
     is_institutional_clinical_email,
     UserRole
 )
 from app.db.session import get_db
-from app.db.models import User, MedicarePolicy, PolicyCriterion, AdjudicationLog, EvaluationRun, HumanAssessmentRecord
+from app.db.models import User, MedicarePolicy, AdjudicationLog, EvaluationRun, HumanAssessmentRecord
 from app.services.trace_service import build_criterion_agent_trace
 from app.schemas.contracts import HumanAssessmentCreate, HumanAssessmentOut, EvaluationRunOut
 from app.schemas.contracts import (
@@ -56,7 +55,6 @@ from app.schemas.contracts import (
     MultiPolicyScanResponse,
     PolicyShortlistRequest,
     PolicyShortlistResponse,
-    PolicyMatchSummary,
     AuditLogOut,
     BenchmarkResponse,
     CMSCoveragePacket,
@@ -72,9 +70,6 @@ from app.schemas.contracts import (
     ClinicalAddendumResponse,
     AuditTrailEvent,
     AuditTrailResponse,
-    BatchAdjudicationRequest,
-    BatchAdjudicationResponse,
-    BatchAdjudicationItemResult,
     BootstrapSetupRequest,
     OverrideRequest,
     OverrideResponse,
@@ -82,7 +77,6 @@ from app.schemas.contracts import (
 )
 from app.api.deps import (
     get_current_user,
-    require_role,
     get_optional_current_user,
     get_verified_clinician_user,
     verify_case_record_access
@@ -90,17 +84,13 @@ from app.api.deps import (
 from app.api.release import require_releasable_determination, rebuild_coverage_packet
 from app.services.deferral_queue import DeferralWorkQueue, DeferralQueueItem
 from app.agents.pipeline import MultiAgentVerificationPipeline
-from app.services.hybrid_retriever import HybridPolicyRetriever
 from app.agents.benchmark_engine import BenchmarkRunner, BENCHMARK_VIGNETTES
 from app.agents.packet_generator import CoveragePacketGenerator
-from app.agents.policy_retriever import PolicyRetrievalAgent
 from app.services import (
     sync_cms_policies,
     get_sync_status,
     PeerToPeerAppealService,
-    FHIRExportService,
-    BillingValidatorService,
-    TimelineAnalyzerService
+    FHIRExportService
 )
 
 api_router = APIRouter()
@@ -583,9 +573,8 @@ async def adjudicate_record(
 
     # Zero-Retention Mode: Do not save unsubmitted / exploratory evaluations to database
     save_record = True
-    if request.options:
-        if request.options.get("zero_retention") or request.options.get("save_record") is False:
-            save_record = False
+    if request.options and (request.options.get("zero_retention") or request.options.get("save_record") is False):
+        save_record = False
 
     idempotency_key = (
         http_request.headers.get("Idempotency-Key") or
@@ -635,7 +624,7 @@ async def adjudicate_record(
             note_hash = hashlib.sha256(result.sanitized_ehr_text.encode("utf-8")).hexdigest()
             existing_runs_count = db.query(EvaluationRun).filter(EvaluationRun.case_id == result.case_id).count()
             run_number = existing_runs_count + 1
-            run_id = f"RUN-{result.case_id[:8]}-{run_number:02d}"
+            run_id = f"RUN-{result.case_id}-{run_number:02d}"
 
             from app.services.declarative_engine import DeclarativePolicyEngine
             pol_def = DeclarativePolicyEngine.load_policy(result.policy_id)
@@ -684,7 +673,7 @@ async def adjudicate_record(
                 if not log_item.full_ehr_text or log_item.full_ehr_text != result.sanitized_ehr_text:
                     log_item.full_ehr_text = result.sanitized_ehr_text
             db.commit()
-        except Exception as db_e:
+        except Exception:
             db.rollback()
 
     return result
@@ -1827,7 +1816,7 @@ def submit_coverage_to_insurance(
 
     if idempotency_key:
         scoped_key = f"submit:{current_user.id}:{idempotency_key}"
-        payload, status_code, _, is_replay = idempotency_engine.execute_idempotent(
+        payload, _status_code, _, is_replay = idempotency_engine.execute_idempotent(
             idempotency_key=scoped_key,
             action=_execute_submission
         )
@@ -1977,7 +1966,7 @@ async def append_clinical_addendum(
             target_case_id = case_id
             existing_runs_count = db.query(EvaluationRun).filter(EvaluationRun.case_id == target_case_id).count()
             run_number = existing_runs_count + 1
-            run_id = f"RUN-{target_case_id[:8]}-{run_number:02d}"
+            run_id = f"RUN-{target_case_id}-{run_number:02d}"
 
             from app.services.declarative_engine import DeclarativePolicyEngine
             pol_def = DeclarativePolicyEngine.load_policy(updated_adj.policy_id)

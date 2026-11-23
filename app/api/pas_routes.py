@@ -2,11 +2,11 @@ from typing import Dict, Any, List, Optional
 import uuid
 from datetime import UTC, datetime, timezone
 from pydantic import BaseModel, Field
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.db.models import MedicarePolicy, AdjudicationLog, User
+from app.db.models import MedicarePolicy, User
 from app.api.deps import get_current_user
 from app.agents.criteria_evaluator import evaluate_patient_against_policy
 from app.core.idempotency import idempotency_engine

@@ -190,11 +190,11 @@ def get_verified_clinician_user(
 
 def verify_case_record_access(
     case_id: str,
-    log: Optional[Any],
+    log: Any | None,
     current_user: User,
     *,
     for_modification: bool = False,
-    db: Optional[Any] = None
+    db: Any | None = None
 ) -> Any:
     """
     Enforces HIPAA Minimum Necessary and Anti-Enumeration Defense on case records:
@@ -229,22 +229,16 @@ def verify_case_record_access(
 
     # Deferral queue assignment check via DB
     if db is not None:
-        try:
-            from app.db.models import DeferralQueueRecord
-            q_rec = db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
-            if q_rec and q_rec.assigned_to_user_id == current_user.id:
-                return log
-        except Exception:
-            pass
+        from app.db.models import DeferralQueueRecord
+        q_rec = db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
+        if q_rec is not None and q_rec.assigned_to_user_id == current_user.id:
+            return log
 
     # Deferral queue assignment check via in-memory queue
-    try:
-        from app.services.deferral_queue import DeferralWorkQueue
-        q_item = DeferralWorkQueue._QUEUE.get(case_id)
-        if q_item and q_item.assigned_to_user_id == current_user.id:
-            return log
-    except Exception:
-        pass
+    from app.services.deferral_queue import DeferralWorkQueue
+    q_item = DeferralWorkQueue._QUEUE.get(case_id)
+    if q_item is not None and q_item.assigned_to_user_id == current_user.id:
+        return log
 
     if for_modification:
         # Rejection for write actions (sign-off, override): explicit 403 Forbidden
@@ -262,9 +256,8 @@ def verify_case_record_access(
             return log
 
     signer_npi = getattr(log, "signer_npi", None)
-    if signer_npi and getattr(current_user, "npi_number", None):
-        if signer_npi == current_user.npi_number:
-            return log
+    if signer_npi and getattr(current_user, "npi_number", None) and signer_npi == current_user.npi_number:
+        return log
 
     # If case has no assigned owner (e.g. unassigned demo evaluation created without user_id)
     if getattr(log, "user_id", None) is None:

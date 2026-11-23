@@ -6,6 +6,21 @@ Executes the four core demo vignettes covering all four determination states:
 3. Insufficient documentation (missing clinical requirement): DEV-LCD-KYPHO-APP
 4. Ambiguous deferral (active gate deferral requiring human review): DEV-LCD-HIP-ARTHRO-NEG
 
+Architectural Note on Concept Map Scope (API vs. Benchmark Harness):
+-------------------------------------------------------------------
+The production API deliberately loads only the 12 committed, clinically attested
+built-in concepts via `_load_built_in_concepts()` in `app/core/concept_map.py`. It does
+NOT load uncommitted draft concepts into production runtime.
+
+In contrast, the offline research benchmark harness (`run_adjudication_benchmark.py`)
+constructs an extended 131-concept map (12 committed concepts + 119 experimental draft
+concepts, such as `DRAFT-CONCEPT-ATTESTED-SBRT-02` for `CRIT-SBRT-02`).
+
+Cases evaluated by the API requiring uncommitted draft concepts (such as DEV-LCD-SBRT-APP)
+will correctly and safely defer to human review at Gate C (concept scope / unmapped
+criteria abstention). Draft concepts must undergo clinical attestation and explicit
+promotion to committed status before graduating to production runtime.
+
 Extracts:
 - case_id, run_id, run_number, policy_id, policy_version, engine_version, note_version (hash)
 - Decision and determination stage
@@ -103,7 +118,10 @@ for item in demo_cases:
         "criteria_evaluated": len(data.get("criterion_assessments") or []),
         "agent_traces_count": len(trace_data.get("traces", [])),
         "persisted_runs_count": len(runs_list),
-        "packet_label": pkt_data.get("evaluation_label")
+        "packet_label": pkt_data.get("evaluation_label"),
+        "trace_fetch_status": trace_res.status_code,
+        "runs_fetch_status": runs_res.status_code,
+        "packet_fetch_status": pkt_res.status_code,
     }
     results.append(result_summary)
 
@@ -117,6 +135,7 @@ for item in demo_cases:
     print(f"  Stage:              {data.get('determination_stage')}")
     print(f"  Report Label:       {data.get('evaluation_label')}")
     print(f"  Criteria Count:     {len(data.get('criterion_assessments') or [])}")
+    print(f"  Fetch Status Codes: trace={trace_res.status_code}, runs={runs_res.status_code}, packet={pkt_res.status_code}")
     print(f"  Agent Traces:       {len(trace_data.get('traces', []))} structured traces extracted")
 
 with open("docs/milestone_demo_v80_results.json", "w") as f:

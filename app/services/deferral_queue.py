@@ -1,8 +1,8 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from enum import Enum
 from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from app.schemas.contracts import FinalAdjudication, AdjudicationDecision, DeterminationStatus
 from app.core.security import compute_audit_hash
@@ -201,7 +201,7 @@ class DeferralWorkQueue:
         return None
 
     @classmethod
-    def assign_case(cls, case_id: str, user_id: int, db: Optional[Any] = None) -> bool:
+    def assign_case(cls, case_id: str, user_id: int, db: Any | None = None) -> bool:
         if case_id in cls._QUEUE:
             cls._QUEUE[case_id].assigned_to_user_id = user_id
         else:
@@ -215,42 +215,43 @@ class DeferralWorkQueue:
                 insufficient_criteria=[],
                 action_required_questions=[],
                 audit_hash="0" * 64,
-                created_at=datetime.now(timezone.utc).isoformat(),
+                created_at=datetime.now(UTC).isoformat(),
                 assigned_to_user_id=user_id,
             )
+        from app.db.models import DeferralQueueRecord
+        from app.db.session import SessionLocal
+
+        local_db = db or SessionLocal()
+        close_db = db is None
         try:
-            from app.db.session import SessionLocal
-            from app.db.models import DeferralQueueRecord
-            local_db = db or SessionLocal()
-            close_db = db is None
-            try:
-                rec = local_db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
-                if rec:
-                    rec.assigned_to_user_id = user_id
-                    local_db.commit()
-                    return True
-                else:
-                    new_rec = DeferralQueueRecord(
-                        case_id=case_id,
-                        patient_id_masked="PT-***",
-                        policy_id="POLICY",
-                        policy_title="Policy",
-                        provisional_decision="PROVISIONAL",
-                        missing_criteria_json="[]",
-                        insufficient_criteria_json="[]",
-                        action_questions_json="[]",
-                        audit_hash="0" * 64,
-                        current_state="HUMAN_REVIEW",
-                        assigned_to_user_id=user_id,
-                    )
-                    local_db.add(new_rec)
-                    local_db.commit()
-                    return True
-            finally:
-                if close_db:
-                    local_db.close()
+            rec = local_db.query(DeferralQueueRecord).filter(DeferralQueueRecord.case_id == case_id).first()
+            if rec:
+                rec.assigned_to_user_id = user_id
+                local_db.commit()
+                return True
+            else:
+                new_rec = DeferralQueueRecord(
+                    case_id=case_id,
+                    patient_id_masked="PT-***",
+                    policy_id="POLICY",
+                    policy_title="Policy",
+                    provisional_decision="PROVISIONAL",
+                    missing_criteria_json="[]",
+                    insufficient_criteria_json="[]",
+                    action_required_questions_json="[]",
+                    audit_hash="0" * 64,
+                    current_state="HUMAN_REVIEW",
+                    assigned_to_user_id=user_id,
+                )
+                local_db.add(new_rec)
+                local_db.commit()
+                return True
         except Exception:
-            pass
+            local_db.rollback()
+            return False
+        finally:
+            if close_db:
+                local_db.close()
         return True
 
     @classmethod

@@ -2,8 +2,8 @@
   {
     "category": "Supported (Documented Approval)",
     "vignette_id": "DEV-LCD-PCI-APP",
-    "case_id": "CASE-C1C248F94712",
-    "run_id": "RUN-CASE-C1C-01",
+    "case_id": "CASE-A0BA3483369B",
+    "run_id": "RUN-CASE-A0BA3483369B-01",
     "policy_id": "LCD-PCI",
     "policy_version": "2024.1",
     "engine_version": "qwen2.5:3b (carepolicyguard-multiagent-v80)",
@@ -14,13 +14,16 @@
     "criteria_evaluated": 3,
     "agent_traces_count": 3,
     "persisted_runs_count": 1,
-    "packet_label": "Coverage Criteria Evaluation"
+    "packet_label": "Coverage Criteria Evaluation",
+    "trace_fetch_status": 200,
+    "runs_fetch_status": 200,
+    "packet_fetch_status": 200
   },
   {
     "category": "Contradiction (Factual Objection)",
     "vignette_id": "DEV-LCD-SBRT-APP",
-    "case_id": "CASE-86DF14B68893",
-    "run_id": "RUN-CASE-86D-01",
+    "case_id": "CASE-22405A2743EB",
+    "run_id": "RUN-CASE-22405A2743EB-01",
     "policy_id": "LCD-SBRT",
     "policy_version": "2024.1",
     "engine_version": "qwen2.5:3b (carepolicyguard-multiagent-v80)",
@@ -29,15 +32,18 @@
     "determination_stage": "PROVISIONAL",
     "evaluation_label": "Coverage Criteria Evaluation",
     "criteria_evaluated": 3,
-    "agent_traces_count": 0,
-    "persisted_runs_count": 0,
-    "packet_label": null
+    "agent_traces_count": 3,
+    "persisted_runs_count": 1,
+    "packet_label": "Coverage Criteria Evaluation",
+    "trace_fetch_status": 200,
+    "runs_fetch_status": 200,
+    "packet_fetch_status": 200
   },
   {
     "category": "Insufficient Documentation (Missing Requirement)",
     "vignette_id": "DEV-LCD-KYPHO-APP",
-    "case_id": "CASE-644401F11122",
-    "run_id": "RUN-CASE-644-01",
+    "case_id": "CASE-26660C70C2E9",
+    "run_id": "RUN-CASE-26660C70C2E9-01",
     "policy_id": "LCD-KYPHO",
     "policy_version": "2024.1",
     "engine_version": "qwen2.5:3b (carepolicyguard-multiagent-v80)",
@@ -46,15 +52,18 @@
     "determination_stage": "PROVISIONAL",
     "evaluation_label": "Coverage Criteria Evaluation",
     "criteria_evaluated": 3,
-    "agent_traces_count": 0,
-    "persisted_runs_count": 0,
-    "packet_label": null
+    "agent_traces_count": 3,
+    "persisted_runs_count": 1,
+    "packet_label": "Coverage Criteria Evaluation",
+    "trace_fetch_status": 200,
+    "runs_fetch_status": 200,
+    "packet_fetch_status": 200
   },
   {
     "category": "Ambiguous Deferral (Gate Deferral / Human Adjudication)",
     "vignette_id": "DEV-LCD-HIP-ARTHRO-NEG",
-    "case_id": "CASE-5C19854B28C8",
-    "run_id": "RUN-CASE-5C1-01",
+    "case_id": "CASE-68356298CF9F",
+    "run_id": "RUN-CASE-68356298CF9F-01",
     "policy_id": "LCD-HIP-ARTHRO",
     "policy_version": "2024.1",
     "engine_version": "qwen2.5:3b (carepolicyguard-multiagent-v80)",
@@ -63,8 +72,11 @@
     "determination_stage": "PROVISIONAL",
     "evaluation_label": "Coverage Criteria Evaluation",
     "criteria_evaluated": 3,
-    "agent_traces_count": 0,
-    "persisted_runs_count": 0,
-    "packet_label": null
+    "agent_traces_count": 3,
+    "persisted_runs_count": 1,
+    "packet_label": "Coverage Criteria Evaluation",
+    "trace_fetch_status": 200,
+    "runs_fetch_status": 200,
+    "packet_fetch_status": 200
   }
 ]

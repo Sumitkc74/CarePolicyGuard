@@ -10,9 +10,12 @@ Pins:
 
 import json
 import re
+import shutil
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
+
+import pytest
 
 from app.agents.packet_generator import CoveragePacketGenerator
 from app.db.models import EvaluationRun
@@ -155,22 +158,46 @@ def test_v81_engine_version_contains_model_tag():
 
 def test_v81_ruff_error_counts_within_baseline_bounds():
     """Pin (iv): Ruff error counts for touched files stay at or below baseline."""
+    if not shutil.which("ruff"):
+        pytest.fail(
+            "ruff binary not found on PATH. Install ruff via 'pip install ruff' and ensure it is available on PATH."
+        )
+
     targets = {
-        "app/api/routes.py": 175,
-        "app/api/pdf_routes.py": 11,
+        "app/api/deps.py": 17,
+        "app/api/pas_routes.py": 35,
+        "app/services/deferral_queue.py": 56,
+        "app/api/routes.py": 147,
+        "app/api/pdf_routes.py": 9,
         "app/api/release.py": 0,
+        "app/db/models.py": 4,
         "app/schemas/contracts.py": 0,
         "app/services/trace_service.py": 0,
+        "app/services/pdf_generator.py": 15,
+        "app/agents/packet_generator.py": 9,
     }
 
+    total_errors = 0
+    total_bound = 292
+
     for path_str, max_allowed in targets.items():
-        res = subprocess.run(
-            ["ruff", "check", path_str, "--ignore", "E501"],
-            capture_output=True,
-            text=True,
-        )
+        try:
+            res = subprocess.run(
+                ["ruff", "check", path_str, "--ignore", "E501"],
+                capture_output=True,
+                text=True,
+            )
+        except FileNotFoundError:
+            pytest.fail(
+                "ruff binary not found on PATH. Install ruff via 'pip install ruff' and ensure it is available on PATH."
+            )
         match = re.search(r"Found (\d+) error", res.stdout + res.stderr)
         count = int(match.group(1)) if match else 0
+        total_errors += count
         assert count <= max_allowed, (
             f"Ruff error count for {path_str} is {count}, exceeding baseline bound {max_allowed}!"
         )
+
+    assert total_errors <= total_bound, (
+        f"Total ruff errors across 11 files is {total_errors}, exceeding maximum allowed bound {total_bound}!"
+    )
