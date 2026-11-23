@@ -54,6 +54,8 @@ class DefenseResult(BaseModel):
     rationale: str = Field(..., description="Clinical reasoning explaining how the quote resolves the objection")
     elapsed_ms: float = Field(default=0.0, description="Inference latency in milliseconds")
     status_code: str = Field(default="COMPLETED", description="Execution status")
+    objection_valid: bool = Field(default=True, description="Whether the verifier's objection cites a requirement actually present in the criterion text with correct logic/arithmetic")
+    objection_invalid_reason: str = Field(default="", description="If objection_valid is False, the clinical/textual explanation quoting the criterion text explaining why the objection is invalid")
 
 
 class AdvocacyResult(BaseModel):
@@ -589,14 +591,19 @@ class ClinicalEquivalenceJudge:
             f"Challenging Quote: \"{counter_quote}\"\n\n"
             f"FULL CLINICAL NOTE:\n\"\"\"\n{note_text}\n\"\"\"\n\n"
             f"TASK:\n"
-            f"Examine the clinical note to determine if there is specific evidence that directly resolves, refutes, or satisfies this {obj_type} objection.\n"
-            f"Requirements:\n"
-            f"1. If resolving evidence exists elsewhere in the note, provide a verbatim quote (defense_quote) that is DIFFERENT from the original proposed evidence, and explain how it resolves the objection.\n"
-            f"2. If the objection is valid and cannot be refuted by the clinical note, return defense_quote as an empty string (\"\") and explain why the objection stands.\n\n"
+            f"STEP 1 — OBJECTION-VALIDITY CHECK (Perform this FIRST):\n"
+            f"Examine the exact REQUIREMENT text above and evaluate whether the adversarial objection is valid or invalid:\n"
+            f"  (i) Does the objection cite or demand a requirement, duration, threshold, test, or finding that is NOT actually present in the criterion REQUIREMENT text? If the objection asserts a requirement absent from the criterion text, the objection is INVALID (objection_valid=false).\n"
+            f"  (ii) Does the objection assert a backwards or mathematically/clinically incorrect comparison? For example, with Snellen visual acuity, a larger denominator represents worse vision (20/60 is worse vision than 20/50, satisfying '20/50 or worse'); asserting that 20/60 fails '20/50 or worse' is backwards and INVALID (objection_valid=false).\n"
+            f"  (iii) If the objection is INVALID, set objection_valid to false, quote the exact criterion text in objection_invalid_reason explaining why the objection fails, set defense_quote to \"\", and explain why the original evidence stands in rationale.\n\n"
+            f"STEP 2 — EVIDENCE RESOLUTION (Only if objection is VALID):\n"
+            f"  - If the objection is VALID (objection_valid=true): Examine the clinical note to determine if there is specific evidence that directly resolves, refutes, or satisfies this objection. If resolving evidence exists elsewhere in the note, provide a verbatim quote (defense_quote) DIFFERENT from the original proposed evidence, and explain how it resolves the objection in rationale. If the objection is valid and cannot be refuted by the clinical note, return defense_quote as \"\" and explain why the objection stands.\n\n"
             f"Output ONLY JSON in this format:\n"
             f"{{\n"
-            f'  "defense_quote": "<verbatim excerpt from note resolving objection, or empty string>",\n'
-            f'  "rationale": "<clinical explanation answering the objection>"\n'
+            f'  "objection_valid": true or false,\n'
+            f'  "objection_invalid_reason": "<explanation quoting criterion text if invalid, or empty string if valid>",\n'
+            f'  "defense_quote": "<verbatim excerpt from note resolving objection if objection is valid and unrefuted, or empty string>",\n'
+            f'  "rationale": "<clinical explanation answering the objection or explaining why the objection stands/fails>"\n'
             f"}}"
         )
 
@@ -605,7 +612,7 @@ class ClinicalEquivalenceJudge:
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.0,
             "response_format": {"type": "json_object"},
-            "max_tokens": 200
+            "max_tokens": 300
         }
 
         try:
@@ -631,17 +638,30 @@ class ClinicalEquivalenceJudge:
             try:
                 parsed = json.loads(content)
             except (json.JSONDecodeError, ValueError):
+                m_valid = re.search(r'"objection_valid":\s*(true|false)', content, re.IGNORECASE)
+                m_inv_reason = re.search(r'"objection_invalid_reason":\s*"([^"]*)"', content)
                 m_quote = re.search(r'"defense_quote":\s*"([^"]*)"', content)
                 m_rat = re.search(r'"rationale":\s*"([^"]+)"', content)
                 parsed = {
+                    "objection_valid": (m_valid.group(1).lower() == "true") if m_valid else True,
+                    "objection_invalid_reason": m_inv_reason.group(1) if m_inv_reason else "",
                     "defense_quote": m_quote.group(1) if m_quote else "",
                     "rationale": m_rat.group(1) if m_rat else "Extracted from partial response"
                 }
 
+            obj_valid_val = parsed.get("objection_valid")
+            if obj_valid_val is None:
+                obj_valid = True
+            else:
+                obj_valid = bool(obj_valid_val)
+
+            invalid_reason = str(parsed.get("objection_invalid_reason", "")).strip()
             quote = str(parsed.get("defense_quote", "")).strip()
             rationale = str(parsed.get("rationale", "No rationale provided.")).strip()
 
             return DefenseResult(
+                objection_valid=obj_valid,
+                objection_invalid_reason=invalid_reason,
                 defense_quote=quote,
                 rationale=rationale,
                 elapsed_ms=elapsed_ms,
@@ -742,7 +762,7 @@ class ClinicalEquivalenceJudge:
             and (not priority_stems or any(stem in cand_norm for stem in priority_stems))
         )
         query_text = candidate_quote if is_paraphrase_query else req_text
-        min_sim_threshold = 0.65 if is_paraphrase_query else 0.35
+        min_sim_threshold = 0.60 if is_paraphrase_query else 0.35
 
         # Try SapBERT semantic embedding similarity
         try:
@@ -791,8 +811,8 @@ class ClinicalEquivalenceJudge:
         except (ImportError, RuntimeError, ValueError, KeyError, TypeError, OSError) as exc:
             logger.debug(f"SapBERT span search fallback: {exc}")
 
-        # Lexical fallback if SapBERT did not resolve and no candidate_quote was specified
-        if not best_span and not candidate_quote:
+        # Lexical fallback if SapBERT did not resolve
+        if not best_span:
             best_score = 0.0
             for sent in sentences:
                 sent_lower = sent.lower()

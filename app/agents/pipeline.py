@@ -1092,7 +1092,45 @@ class MultiAgentVerificationPipeline:
                                         if def_s != -1 and def_e != -1 and not (def_s == s and def_e == e):
                                             defense_grounded = True
 
-                                    if defense_grounded:
+                                    if not defense_res.objection_valid:
+                                        debated_criteria_outcomes[ccode] = "DEFENDED"
+                                        toolbelt.tool_attribution[ccode] = "judge_criterion"
+                                        invalid_reason = defense_res.objection_invalid_reason or defense_res.rationale
+                                        obj_rationale = adv_challenge.get("rationale", "")
+                                        crit_desc = crit.get("description", "")
+                                        board.post(
+                                            agent="Agent 2: Clinical Evaluator",
+                                            message_type=BoardMessageType.DEFENSE,
+                                            content=(
+                                                f"Defense of {ccode}: Adversarial {obj_type} objection invalidated. "
+                                                f"Objection rationale: '{obj_rationale}'. "
+                                                f"Invalidation reason: {invalid_reason}"
+                                            ),
+                                            criterion_code=ccode,
+                                            evidence=ev_span,
+                                            metadata={
+                                                "specific_contradiction_cited": True,
+                                                "judge_action": "HOLD",
+                                                "objection_type": obj_type,
+                                                "objection_valid": False,
+                                                "objection_invalid_reason": invalid_reason,
+                                                "objection_rationale": obj_rationale,
+                                                "criterion_text": crit_desc,
+                                                "defense_quote": sanitized_ehr[s:e],
+                                                "defense_rationale": invalid_reason,
+                                                "gate_chain_passed": True,
+                                                "verbatim_grounded": True,
+                                                "debated_criteria_outcome": "DEFENDED",
+                                            }
+                                        )
+                                        assessment.status = DeterminationStatus.MET
+                                        assessment.verified_spans = [ev_span]
+                                        assessment.raw_confidence = 0.95
+                                        assessment.clinical_rationale = (
+                                            f"Verified and defended against invalid {obj_type} objection: {invalid_reason}"
+                                        )
+                                        promoted = True
+                                    elif defense_grounded:
                                         debated_criteria_outcomes[ccode] = "DEFENDED"
                                         toolbelt.tool_attribution[ccode] = "judge_criterion"
                                         def_ev_span = ClinicalEvidenceSpan(

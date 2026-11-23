@@ -764,6 +764,7 @@ def run_agentic_mode(
             if mtype == "CHALLENGE" and meta.get("advocacy_rejected"):
                 case_advocacy_rejections += 1
                 total_advocacy_rejections += 1
+                adv_q = meta.get("advocacy_quote", meta.get("quote", ""))
                 fg = meta.get("failing_gate") or meta.get("gate")
                 if fg == "JudgeEquivalence":
                     judge_span_rejections += 1
@@ -1361,11 +1362,11 @@ def compute_attribution_of_agentic_gain(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v73)")
+    parser = argparse.ArgumentParser(description="Run 84 dev vignettes in Deterministic, Declarative, and Agentic modes (v84)")
     parser.add_argument(
         "--output",
         type=str,
-        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v73_three_mode_run.json"),
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v84_three_mode_run.json"),
         help="Path to output raw JSON",
     )
     parser.add_argument(
@@ -1376,7 +1377,7 @@ def main() -> None:
     parser.add_argument(
         "--reuse-from",
         type=str,
-        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v72_three_mode_run.json"),
+        default=str(ROOT_DIR / "app" / "data" / "benchmarks" / "agentic_v78_three_mode_run.json"),
         help="Path to prior benchmark run JSON for baseline reuse",
     )
     parser.add_argument(
