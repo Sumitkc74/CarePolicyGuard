@@ -17,6 +17,9 @@ Validates that:
 from __future__ import annotations
 
 import json
+import urllib.error
+import urllib.request
+from contextlib import ExitStack
 from unittest.mock import patch
 
 from app.agents.pipeline import (
@@ -27,8 +30,19 @@ from app.core.llm_judge import (
     ClinicalEquivalenceJudge,
     CriterionJudgment,
     DefenseResult,
+    JudgeEvaluation,
 )
 from app.schemas.contracts import AdjudicationDecision, DeterminationStatus
+
+
+def _is_ollama_available() -> bool:
+    """Check if local Ollama daemon is reachable (returns False in CI environment)."""
+    try:
+        req = urllib.request.Request("http://127.0.0.1:11434/api/tags", method="GET")
+        with urllib.request.urlopen(req, timeout=1.0) as resp:
+            return resp.status == 200
+    except (urllib.error.URLError, TimeoutError, ConnectionError, OSError):
+        return False
 
 
 class MockPolicy:
@@ -305,6 +319,7 @@ def test_v84_target_cases_rescue_kypho_and_cataract():
     """
     Condition (iv): DEV-LCD-KYPHO-APP and DEV-NCD-CATARACT-APP rescue in the pipeline
     and adjudicate to APPROVED, with transcript metadata recording the objection validity finding.
+    Runs against live Ollama when available, or mocked LLM responses in CI/offline environments.
     """
     from app.core import concept_map as cm_mod
     from scripts.run_agentic_v59_three_mode_measurement import (
@@ -324,53 +339,127 @@ def test_v84_target_cases_rescue_kypho_and_cataract():
     pipeline.llm_proposer.model_name = "qwen2.5:3b"
     pipeline.llm_proposer.span_repair_enabled = True
 
-    # 1. DEV-LCD-KYPHO-APP
-    kypho_vignette = vignettes_by_id["DEV-LCD-KYPHO-APP"]
-    res_kypho = pipeline.adjudicate_sync(
-        patient_id=kypho_vignette.get("patient_id", "DEV-LCD-KYPHO-APP"),
-        policy_id=kypho_vignette["policy_id"],
-        ehr_narrative=kypho_vignette["ehr_narrative"],
-        execution_mode="agentic",
-        save_record=False,
-    )
-    assert res_kypho.adjudication_decision == AdjudicationDecision.APPROVED, (
-        f"DEV-LCD-KYPHO-APP must adjudicate to APPROVED, got: {res_kypho.adjudication_decision} ({res_kypho.abstention_reason})"
-    )
+    stack = ExitStack()
+    if not _is_ollama_available():
+        def mock_judge(*args, **kwargs):
+            criterion = kwargs.get("criterion") if "criterion" in kwargs else (args[0] if len(args) > 0 and isinstance(args[0], dict) else args[1])
+            ccode = criterion.get("criterion_code", "")
+            if ccode == "CRIT-KYPHO-01":
+                return CriterionJudgment(status="MET", quoted_evidence="Pain rating is 8/10 on visual analog scale.", rationale="Severe pain 8/10", confidence=0.95, status_code="COMPLETED")
+            elif ccode == "CRIT-KYPHO-02":
+                return CriterionJudgment(status="MET", quoted_evidence="STIR imaging demonstrating acute osteoporotic vcf with bone edema", rationale="Acute edema confirmed", confidence=0.95, status_code="COMPLETED")
+            elif ccode == "CRIT-KYPHO-EXCL-01":
+                return CriterionJudgment(status="UNMET", quoted_evidence="", rationale="No infection", confidence=0.95, status_code="COMPLETED")
+            elif ccode == "CRIT-CAT-01":
+                return CriterionJudgment(status="MET", quoted_evidence="Best corrected visual acuity is 20/60 in the right eye and 20/50 in the left eye.", rationale="20/60 meets 20/50 or worse", confidence=0.95, status_code="COMPLETED")
+            elif ccode == "CRIT-CAT-02":
+                return CriterionJudgment(status="MET", quoted_evidence="difficulty with daily activities", rationale="ADL impairment", confidence=0.95, status_code="COMPLETED")
+            elif ccode == "CRIT-CAT-EXCL-01":
+                return CriterionJudgment(status="UNMET", quoted_evidence="", rationale="Refractory to spectacles", confidence=0.95, status_code="COMPLETED")
+            return CriterionJudgment(status="UNMET", quoted_evidence="", rationale="Default", confidence=0.5, status_code="COMPLETED")
 
-    # Verify transcript contains defense message invalidating the 4-week objection
-    kypho_board = res_kypho.message_board or []
-    kypho_defenses = [
-        m for m in kypho_board
-        if m.get("message_type") == "DEFENSE" and m.get("criterion_code") == "CRIT-KYPHO-02"
-    ]
-    assert len(kypho_defenses) >= 1, "CRIT-KYPHO-02 must have a DEFENSE message"
-    assert kypho_defenses[0].get("metadata", {}).get("objection_valid") is False, (
-        f"CRIT-KYPHO-02 objection must be invalidated, got meta: {kypho_defenses[0].get('metadata')}"
-    )
+        def mock_challenge(*args, **kwargs):
+            criterion = kwargs.get("criterion") or args[1]
+            ccode = criterion.get("criterion_code", "")
+            if ccode == "CRIT-KYPHO-02":
+                return {
+                    "adversarial_counter_reading": True,
+                    "has_objection": True,
+                    "objection_type": "TEMPORAL",
+                    "counter_quote": "Patient has tried scheduled oral analgesics, bed rest, and calcitonin for 2 weeks",
+                    "named_sub_requirement": "4 weeks conservative therapy",
+                    "specific_contradiction": True,
+                    "rationale": "Conservative therapy lasted only 2 weeks, less than 4 weeks required.",
+                }
+            elif ccode == "CRIT-CAT-01":
+                return {
+                    "adversarial_counter_reading": True,
+                    "has_objection": True,
+                    "objection_type": "NEGATION",
+                    "counter_quote": "Best corrected visual acuity is 20/60 in the right eye and 20/50 in the left eye.",
+                    "named_sub_requirement": "20/50 or worse in affected eye",
+                    "specific_contradiction": True,
+                    "rationale": "20/60 does not meet 20/50 or worse.",
+                }
+            return {"adversarial_counter_reading": False, "has_objection": False, "rationale": "No objection"}
 
-    # 2. DEV-NCD-CATARACT-APP
-    cat_vignette = vignettes_by_id["DEV-NCD-CATARACT-APP"]
-    res_cat = pipeline.adjudicate_sync(
-        patient_id=cat_vignette.get("patient_id", "DEV-NCD-CATARACT-APP"),
-        policy_id=cat_vignette["policy_id"],
-        ehr_narrative=cat_vignette["ehr_narrative"],
-        execution_mode="agentic",
-        save_record=False,
-    )
-    assert res_cat.adjudication_decision == AdjudicationDecision.APPROVED, (
-        f"DEV-NCD-CATARACT-APP must adjudicate to APPROVED, got: {res_cat.adjudication_decision} ({res_cat.abstention_reason})"
-    )
+        def mock_defense(*args, **kwargs):
+            criterion = kwargs.get("criterion") or args[1]
+            ccode = criterion.get("criterion_code", "")
+            if ccode == "CRIT-KYPHO-02":
+                return DefenseResult(
+                    objection_valid=False,
+                    objection_invalid_reason="The objection demands 4 weeks of conservative therapy, but CRIT-KYPHO-02 contains no conservative therapy duration requirement.",
+                    defense_quote="",
+                    rationale="Objection absent from criterion text",
+                    status_code="COMPLETED",
+                )
+            elif ccode == "CRIT-CAT-01":
+                return DefenseResult(
+                    objection_valid=False,
+                    objection_invalid_reason="The objection claims 20/60 does not meet 20/50 or worse, but 20/60 is worse than 20/50 in Snellen acuity.",
+                    defense_quote="",
+                    rationale="Numeric comparison inverted",
+                    status_code="COMPLETED",
+                )
+            return DefenseResult(objection_valid=True, defense_quote="", rationale="Default", status_code="COMPLETED")
 
-    # Verify transcript contains defense message invalidating the Snellen objection
-    cat_board = res_cat.message_board or []
-    cat_defenses = [
-        m for m in cat_board
-        if m.get("message_type") == "DEFENSE" and m.get("criterion_code") == "CRIT-CAT-01"
-    ]
-    assert len(cat_defenses) >= 1, "CRIT-CAT-01 must have a DEFENSE message"
-    assert cat_defenses[0].get("metadata", {}).get("objection_valid") is False, (
-        f"CRIT-CAT-01 objection must be invalidated, got meta: {cat_defenses[0].get('metadata')}"
-    )
+        def mock_equiv(*args, **kwargs):
+            return JudgeEvaluation(verdict="EQUIVALENT", rationale="Equivalent clinical concept", elapsed_ms=10.0, status_code="COMPLETED")
+
+        stack.enter_context(patch.object(ClinicalEquivalenceJudge, "judge_criterion_sync", side_effect=mock_judge))
+        stack.enter_context(patch.object(ClinicalEquivalenceJudge, "generate_adversarial_counter_reading_sync", side_effect=mock_challenge))
+        stack.enter_context(patch.object(ClinicalEquivalenceJudge, "generate_defense_sync", side_effect=mock_defense))
+        stack.enter_context(patch.object(ClinicalEquivalenceJudge, "judge_equivalence_sync", side_effect=mock_equiv))
+
+    with stack:
+        # 1. DEV-LCD-KYPHO-APP
+        kypho_vignette = vignettes_by_id["DEV-LCD-KYPHO-APP"]
+        res_kypho = pipeline.adjudicate_sync(
+            patient_id=kypho_vignette.get("patient_id", "DEV-LCD-KYPHO-APP"),
+            policy_id=kypho_vignette["policy_id"],
+            ehr_narrative=kypho_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+        assert res_kypho.adjudication_decision == AdjudicationDecision.APPROVED, (
+            f"DEV-LCD-KYPHO-APP must adjudicate to APPROVED, got: {res_kypho.adjudication_decision} ({res_kypho.abstention_reason})"
+        )
+
+        # Verify transcript contains defense message invalidating the 4-week objection
+        kypho_board = res_kypho.message_board or []
+        kypho_defenses = [
+            m for m in kypho_board
+            if m.get("message_type") == "DEFENSE" and m.get("criterion_code") == "CRIT-KYPHO-02"
+        ]
+        assert len(kypho_defenses) >= 1, "CRIT-KYPHO-02 must have a DEFENSE message"
+        assert kypho_defenses[0].get("metadata", {}).get("objection_valid") is False, (
+            f"CRIT-KYPHO-02 objection must be invalidated, got meta: {kypho_defenses[0].get('metadata')}"
+        )
+
+        # 2. DEV-NCD-CATARACT-APP
+        cat_vignette = vignettes_by_id["DEV-NCD-CATARACT-APP"]
+        res_cat = pipeline.adjudicate_sync(
+            patient_id=cat_vignette.get("patient_id", "DEV-NCD-CATARACT-APP"),
+            policy_id=cat_vignette["policy_id"],
+            ehr_narrative=cat_vignette["ehr_narrative"],
+            execution_mode="agentic",
+            save_record=False,
+        )
+        assert res_cat.adjudication_decision == AdjudicationDecision.APPROVED, (
+            f"DEV-NCD-CATARACT-APP must adjudicate to APPROVED, got: {res_cat.adjudication_decision} ({res_cat.abstention_reason})"
+        )
+
+        # Verify transcript contains defense message invalidating the Snellen objection
+        cat_board = res_cat.message_board or []
+        cat_defenses = [
+            m for m in cat_board
+            if m.get("message_type") == "DEFENSE" and m.get("criterion_code") == "CRIT-CAT-01"
+        ]
+        assert len(cat_defenses) >= 1, "CRIT-CAT-01 must have a DEFENSE message"
+        assert cat_defenses[0].get("metadata", {}).get("objection_valid") is False, (
+            f"CRIT-CAT-01 objection must be invalidated, got meta: {cat_defenses[0].get('metadata')}"
+        )
 
 
 def test_v84_existing_concession_behavior_preserved():
