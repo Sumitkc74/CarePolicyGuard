@@ -3380,6 +3380,18 @@ function renderAdjudicationResults(data) {
     const hashDisp = document.getElementById("audit-hash-display");
     if (hashDisp) hashDisp.textContent = data.audit_hash;
 
+    // v80: Populate version pins
+    const polVerElem = document.getElementById("res-policy-ver");
+    if (polVerElem) polVerElem.textContent = data.policy_version || "2024.1";
+    const engVerElem = document.getElementById("res-engine-ver");
+    if (engVerElem) engVerElem.textContent = data.engine_version || "v80.0.0";
+    const runIdElem = document.getElementById("res-run-id");
+    if (runIdElem) runIdElem.textContent = data.run_id || "RUN-01";
+
+    // Load evaluation runs & human assessment for this case
+    loadCaseEvaluationRuns(data.case_id);
+    loadCaseHumanAssessment(data.case_id, data.run_id || "RUN-01");
+
     // 4b. CMS Billing & Medical Coding Verification Panel
     renderBillingCompliancePanel(data);
 
@@ -3619,6 +3631,45 @@ function renderCriteriaCards(data) {
             `;
         }
 
+        // v80 Agent Trace Accordion per criterion
+        let traceSectionHtml = "";
+        if (data.agent_trace && Array.isArray(data.agent_trace)) {
+            const tr = data.agent_trace.find(t => t.criterion_code === crit.criterion_code);
+            if (tr) {
+                const ep = tr.evaluator_proposal || {};
+                const vf = tr.verifier_finding || {};
+                const res = tr.resolution || {};
+                traceSectionHtml = `
+                    <div class="agent-trace-box" style="margin-top: 10px; padding: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 6px; font-size: 0.78rem;">
+                        <details style="cursor: pointer;">
+                            <summary style="font-weight: 600; color: #38bdf8; outline: none;">
+                                Agent Trace &bull; Evaluator &rarr; Verifier &rarr; Resolution
+                            </summary>
+                            <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px; line-height: 1.4;">
+                                <div>
+                                    <strong style="color: #6ee7b7;">1. Evaluator Proposal:</strong>
+                                    <span style="color: #cbd5e1;">Quote: &ldquo;${escapeHtml(ep.candidate_quote || 'None')}&rdquo;</span>
+                                    <span style="color: #94a3b8; font-size: 0.72rem;">(Chars ${ep.start_char}&ndash;${ep.end_char} &bull; Gate A: ${ep.gate_a_verbatim_status || 'NOT_CHECKED'})</span>
+                                </div>
+                                <div>
+                                    <strong style="color: #f59e0b;">2. Verifier Audit:</strong>
+                                    <span style="color: #cbd5e1;">Action: ${escapeHtml(vf.action || 'NONE')} &bull; Objection: ${escapeHtml(vf.objection_type || 'NONE')}</span>
+                                    ${vf.counter_quote ? `<div style="color: #cbd5e1;">Counter: &ldquo;${escapeHtml(vf.counter_quote)}&rdquo;</div>` : ''}
+                                    <span style="color: #94a3b8; font-size: 0.72rem;">(Gate C: ${vf.gate_c_concept_status || 'NOT_CHECKED'} &bull; Judge Verdict: ${vf.judge_verdict || 'NONE'})</span>
+                                </div>
+                                <div>
+                                    <strong style="color: #38bdf8;">3. Resolution:</strong>
+                                    <span style="color: #cbd5e1;">Final: ${escapeHtml(res.final_criterion_status || crit.status)}</span>
+                                    ${res.concession_made ? `<span style="color: #f43f5e; margin-left: 6px;">[Conceded: ${escapeHtml(res.concession_criterion_code || '')}]</span>` : ''}
+                                    ${res.defense_quote ? `<div style="color: #cbd5e1;">Defense: &ldquo;${escapeHtml(res.defense_quote)}&rdquo;</div>` : ''}
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+                `;
+            }
+        }
+
         card.innerHTML = `
             <div class="criterion-header-compact">
                 <div class="criterion-title-wrap">
@@ -3633,6 +3684,7 @@ function renderCriteriaCards(data) {
                     </span>
                 </div>
             </div>
+            ${traceSectionHtml}
         `;
         container.appendChild(card);
     });
@@ -7856,3 +7908,130 @@ document.addEventListener('click', (e) => {
         else if (e.target.id === 'fhir-bundle-modal' && typeof closeFhirModal === 'function') closeFhirModal();
     }
 });
+
+
+// =============================================================================
+// V80 RUN VERSIONING & HUMAN ASSESSMENT FRONTEND HANDLERS
+// =============================================================================
+
+async function loadCaseEvaluationRuns(caseId) {
+    const listElem = document.getElementById("evaluation-runs-list");
+    if (!listElem) return;
+    try {
+        const token = currentToken || sessionStorage.getItem("carepolicyguard_token");
+        const res = await fetch(`/api/v1/adjudication/${caseId}/runs`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+            const runs = await res.json();
+            listElem.innerHTML = runs.map(r => `
+                <button type="button" class="btn-sm ${r.run_id === (lastAdjudicationResult?.run_id || runs[runs.length - 1]?.run_id) ? 'btn-primary' : 'btn-secondary'}" style="padding: 2px 8px; font-size: 0.72rem;" onclick="switchEvaluationRun('${caseId}', '${r.run_id}')">
+                    Run #${r.run_number} (${r.decision})
+                </button>
+            `).join("");
+        }
+    } catch (e) {
+        console.warn("Could not load evaluation runs:", e);
+    }
+}
+
+async function switchEvaluationRun(caseId, runId) {
+    try {
+        const token = currentToken || sessionStorage.getItem("carepolicyguard_token");
+        const res = await fetch(`/api/v1/adjudication/${caseId}/runs/${runId}`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+            const runData = await res.json();
+            if (runData.packet) {
+                currentCoveragePacket = runData.packet;
+                populatePacketDocument();
+            }
+            const runIdElem = document.getElementById("res-run-id");
+            if (runIdElem) runIdElem.textContent = runId;
+            loadCaseHumanAssessment(caseId, runId);
+            loadCaseEvaluationRuns(caseId);
+        }
+    } catch (e) {
+        console.warn("Could not switch run:", e);
+    }
+}
+
+async function loadCaseHumanAssessment(caseId, runId) {
+    const badge = document.getElementById("assessment-status-badge");
+    const agreeSelect = document.getElementById("ha-overall-agreement");
+    const notesText = document.getElementById("ha-clinical-rationale");
+    try {
+        const token = currentToken || sessionStorage.getItem("carepolicyguard_token");
+        const res = await fetch(`/api/v1/adjudication/${caseId}/runs/${runId}/assessment`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+            const ha = await res.json();
+            if (ha) {
+                if (badge) {
+                    badge.className = "badge-status met";
+                    badge.textContent = `Recorded: ${ha.overall_agreement}`;
+                }
+                if (agreeSelect) agreeSelect.value = ha.overall_agreement;
+                if (notesText) notesText.value = ha.clinical_rationale || "";
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn("Could not load human assessment:", e);
+    }
+    if (badge) {
+        badge.className = "badge-status insufficient";
+        badge.textContent = "Not Recorded";
+    }
+}
+
+async function saveHumanAssessment() {
+    if (!lastAdjudicationResult || !lastAdjudicationResult.case_id) {
+        alert("No active case to assess.");
+        return;
+    }
+    const caseId = lastAdjudicationResult.case_id;
+    const runId = lastAdjudicationResult.run_id || "RUN-INITIAL";
+    const agreement = document.getElementById("ha-overall-agreement")?.value || "AGREE";
+    const rationale = document.getElementById("ha-clinical-rationale")?.value || "Clinical agreement with criteria evaluation.";
+
+    const critAssessments = (lastAdjudicationResult.criterion_assessments || []).map(c => ({
+        criterion_code: c.criterion_code,
+        clinician_status: c.status,
+        agrees_with_system: true,
+        clinician_notes: ""
+    }));
+
+    try {
+        const token = currentToken || sessionStorage.getItem("carepolicyguard_token");
+        const res = await fetch(`/api/v1/adjudication/${caseId}/runs/${runId}/assessment`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            },
+            body: JSON.stringify({
+                overall_agreement: agreement,
+                clinical_rationale: rationale,
+                criterion_assessments: critAssessments
+            })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            const badge = document.getElementById("assessment-status-badge");
+            if (badge) {
+                badge.className = "badge-status met";
+                badge.textContent = `Recorded: ${data.overall_agreement}`;
+            }
+            alert(`Human Assessment recorded successfully for ${runId}.`);
+        } else {
+            const err = await res.json();
+            alert(`Could not record assessment: ${err.detail || res.statusText}`);
+        }
+    } catch (e) {
+        alert(`Error recording assessment: ${e.message}`);
+    }
+}

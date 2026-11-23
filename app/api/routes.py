@@ -38,7 +38,9 @@ from app.core.security import (
     UserRole
 )
 from app.db.session import get_db
-from app.db.models import User, MedicarePolicy, PolicyCriterion, AdjudicationLog
+from app.db.models import User, MedicarePolicy, PolicyCriterion, AdjudicationLog, EvaluationRun, HumanAssessmentRecord
+from app.services.trace_service import build_criterion_agent_trace
+from app.schemas.contracts import HumanAssessmentCreate, HumanAssessmentOut, EvaluationRunOut
 from app.schemas.contracts import (
     LoginRequest,
     TokenResponse,
@@ -624,9 +626,49 @@ async def adjudicate_record(
     _EPHEMERAL_EHR_TEXTS[result.case_id] = result.sanitized_ehr_text
     _EPHEMERAL_ADJUDICATIONS[result.case_id] = result
 
-    # Persist full packet and sanitized narrative to AdjudicationLog in DB
+    # Persist full packet and sanitized narrative to AdjudicationLog in DB & record EvaluationRun (Task 3)
     if save_record and db:
         try:
+            # Compute note hash & run metadata
+            import hashlib
+            note_hash = hashlib.sha256(result.sanitized_ehr_text.encode("utf-8")).hexdigest()
+            existing_runs_count = db.query(EvaluationRun).filter(EvaluationRun.case_id == result.case_id).count()
+            run_number = existing_runs_count + 1
+            run_id = f"RUN-{result.case_id[:8]}-{run_number:02d}"
+
+            result.run_id = run_id
+            result.policy_version = getattr(result, "policy_version", "2024.1") or "2024.1"
+            result.engine_version = "v80.0.0"
+            result.note_version = note_hash
+            result.evaluation_label = "Coverage Criteria Evaluation"
+
+            packet.run_id = run_id
+            packet.policy_version = result.policy_version
+            packet.engine_version = result.engine_version
+            packet.note_version = note_hash
+            packet.evaluation_label = "Coverage Criteria Evaluation"
+
+            eval_run = EvaluationRun(
+                run_id=run_id,
+                case_id=result.case_id,
+                run_number=run_number,
+                policy_id=result.policy_id,
+                policy_version=result.policy_version,
+                engine_version=result.engine_version,
+                note_version=note_hash,
+                decision=result.adjudication_decision.value,
+                determination_stage=result.determination_stage or "PROVISIONAL",
+                is_releasable=result.is_releasable,
+                human_sign_off_status=result.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF",
+                audit_hash=result.audit_hash or "",
+                criterion_evaluations_json=packet.model_dump_json(),
+                full_adjudication_json=result.model_dump_json(),
+                full_packet_json=packet.model_dump_json(),
+                sanitized_ehr_preview=result.sanitized_ehr_text[:500] if result.sanitized_ehr_text else "",
+                execution_time_ms=result.execution_time_ms or 0.0
+            )
+            db.add(eval_run)
+
             log_item = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == result.case_id).first()
             if log_item:
                 log_item.full_packet_json = packet.model_dump_json()
@@ -634,7 +676,7 @@ async def adjudicate_record(
                     log_item.full_adjudication_json = result.model_dump_json()
                 if not log_item.full_ehr_text or log_item.full_ehr_text != result.sanitized_ehr_text:
                     log_item.full_ehr_text = result.sanitized_ehr_text
-                db.commit()
+            db.commit()
         except Exception as db_e:
             db.rollback()
 
@@ -1336,6 +1378,18 @@ def sign_off_clinical_determination(
         _EPHEMERAL_PACKETS[case_id] = rebuilt_packet
         if log:
             log.full_packet_json = rebuilt_packet.model_dump_json()
+        try:
+            latest_run = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id).order_by(EvaluationRun.run_number.desc()).first()
+            if latest_run:
+                latest_run.determination_stage = "FINAL"
+                latest_run.is_releasable = True
+                latest_run.human_sign_off_status = "SIGNED_OFF"
+                latest_run.full_packet_json = rebuilt_packet.model_dump_json()
+                if adj:
+                    latest_run.full_adjudication_json = adj.model_dump_json()
+                db.commit()
+        except Exception:
+            pass
     elif case_id in _EPHEMERAL_PACKETS:
         packet = _EPHEMERAL_PACKETS[case_id]
         packet.determination_stage = "FINAL"
@@ -1483,6 +1537,17 @@ def override_clinical_determination(
         if not log.original_system_output_json:
             log.original_system_output_json = adj.model_dump_json()
         log.required_clinician_action_notes = ((log.required_clinician_action_notes or "") + f"\n[Human Override]: {request.override_reason}").strip()
+        try:
+            latest_run = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id).order_by(EvaluationRun.run_number.desc()).first()
+            if latest_run:
+                latest_run.decision = dec_upper
+                latest_run.determination_stage = "FINAL"
+                latest_run.is_releasable = True
+                latest_run.human_sign_off_status = "OVERRIDDEN_FINAL"
+                latest_run.full_packet_json = rebuilt_packet.model_dump_json()
+                latest_run.full_adjudication_json = overridden_adj.model_dump_json()
+        except Exception:
+            pass
         db.commit()
 
     # Notify originating clinician if override performed by another user
@@ -1836,7 +1901,56 @@ async def append_clinical_addendum(
     new_packet = CoveragePacketGenerator.generate_packet(updated_adj, physician_name=request.clinician_name)
     _EPHEMERAL_PACKETS[updated_adj.case_id] = new_packet
 
-    # 5. Update existing DB log if applicable
+    # 5. Record new EvaluationRun & update existing DB log if applicable (Task 3)
+    if db:
+        try:
+            import hashlib
+            note_hash = hashlib.sha256(updated_adj.sanitized_ehr_text.encode("utf-8")).hexdigest()
+            # Link to the persistent case_id
+            target_case_id = case_id
+            existing_runs_count = db.query(EvaluationRun).filter(EvaluationRun.case_id == target_case_id).count()
+            run_number = existing_runs_count + 1
+            run_id = f"RUN-{target_case_id[:8]}-{run_number:02d}"
+
+            updated_adj.run_id = run_id
+            updated_adj.policy_version = getattr(updated_adj, "policy_version", "2024.1") or "2024.1"
+            updated_adj.engine_version = "v80.0.0"
+            updated_adj.note_version = note_hash
+            updated_adj.evaluation_label = "Coverage Criteria Evaluation"
+
+            new_packet.run_id = run_id
+            new_packet.case_id = target_case_id
+            new_packet.policy_version = updated_adj.policy_version
+            new_packet.engine_version = updated_adj.engine_version
+            new_packet.note_version = note_hash
+            new_packet.evaluation_label = "Coverage Criteria Evaluation"
+
+            eval_run = EvaluationRun(
+                run_id=run_id,
+                case_id=target_case_id,
+                run_number=run_number,
+                policy_id=updated_adj.policy_id,
+                policy_version=updated_adj.policy_version,
+                engine_version=updated_adj.engine_version,
+                note_version=note_hash,
+                decision=updated_adj.adjudication_decision.value,
+                determination_stage=updated_adj.determination_stage or "PROVISIONAL",
+                is_releasable=updated_adj.is_releasable,
+                human_sign_off_status=updated_adj.human_sign_off_status or "PENDING_CLINICAL_SIGN_OFF",
+                audit_hash=updated_adj.audit_hash or "",
+                criterion_evaluations_json=new_packet.model_dump_json(),
+                full_adjudication_json=updated_adj.model_dump_json(),
+                full_packet_json=new_packet.model_dump_json(),
+                sanitized_ehr_preview=updated_adj.sanitized_ehr_text[:500] if updated_adj.sanitized_ehr_text else "",
+                execution_time_ms=updated_adj.execution_time_ms or 0.0
+            )
+            db.add(eval_run)
+            if log:
+                log.full_packet_json = new_packet.model_dump_json()
+                log.full_adjudication_json = updated_adj.model_dump_json()
+        except Exception:
+            pass
+
     if log:
         log.decision = updated_adj.adjudication_decision.value
         log.abstention_status = updated_adj.abstention_status
@@ -1851,7 +1965,7 @@ async def append_clinical_addendum(
         db.commit()
 
     return ClinicalAddendumResponse(
-        case_id=updated_adj.case_id,
+        case_id=case_id,
         status="ADDENDUM_APPLIED",
         addendum_id=addendum_id,
         criterion_addressed=request.criterion_code,
@@ -2240,3 +2354,310 @@ def api_v1_health():
         "tau_threshold": settings.ABSTENTION_THRESHOLD,
         "phi_masking": settings.ENABLE_PHI_MASKING
     }
+
+
+# =============================================================================
+# V80 REVIEWER-FACING AGENT TRACE, RUN VERSIONING & HUMAN ASSESSMENT ENDPOINTS
+# =============================================================================
+
+@api_router.get("/adjudication/{case_id}/trace", summary="Retrieve Reviewer-Facing Agent Trace Per Criterion")
+def get_case_agent_trace(
+    case_id: str,
+    run_id: str | None = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns the structured agent trace per criterion:
+    - Evaluator: Proposal (quote, character span, Gate A verbatim check)
+    - Verifier: Action (ACCEPT/REJECT/OBJECT), objection type, counter-quote, Gate C check, judge verdict
+    - Resolution: Defense quote, concession, advocacy promotion, final status
+    """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
+    adj_dict = None
+    ehr_text = ""
+
+    if run_id:
+        run_rec = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id, EvaluationRun.run_id == run_id).first()
+        if run_rec and run_rec.full_adjudication_json:
+            import json
+            try:
+                adj_dict = json.loads(run_rec.full_adjudication_json)
+                ehr_text = run_rec.sanitized_ehr_preview or ""
+            except Exception:
+                pass
+
+    if adj_dict is None:
+        adj = _EPHEMERAL_ADJUDICATIONS.get(case_id)
+        if adj:
+            adj_dict = adj.model_dump()
+            ehr_text = adj.sanitized_ehr_text or ""
+        elif log and log.full_adjudication_json:
+            import json
+            try:
+                adj_dict = json.loads(log.full_adjudication_json)
+                ehr_text = log.full_ehr_text or log.sanitized_ehr_preview or ""
+            except Exception:
+                pass
+
+    if not adj_dict:
+        raise HTTPException(status_code=404, detail=f"Adjudication details not found for case '{case_id}'.")
+
+    traces = build_criterion_agent_trace(adj_dict, ehr_text)
+    return {
+        "case_id": case_id,
+        "run_id": run_id or adj_dict.get("run_id") or "RUN-LATEST",
+        "traces": [t if isinstance(t, dict) else t.model_dump() for t in traces]
+    }
+
+
+@api_router.get("/adjudication/{case_id}/runs", response_model=List[EvaluationRunOut], summary="List All Evaluation Runs For Case")
+def list_case_evaluation_runs(
+    case_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Lists all immutable evaluation runs for a case in chronological order.
+    """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
+    runs = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id).order_by(EvaluationRun.run_number.asc()).all()
+    if not runs and log:
+        # Fallback synthesized run for legacy records
+        import hashlib
+        n_hash = hashlib.sha256((log.full_ehr_text or log.sanitized_ehr_preview or "").encode("utf-8")).hexdigest()
+        return [EvaluationRunOut(
+            run_id=f"RUN-{case_id[:8]}-01",
+            case_id=case_id,
+            run_number=1,
+            policy_id=log.policy_id,
+            policy_version="2024.1",
+            engine_version="v80.0.0",
+            note_version=n_hash,
+            decision=log.decision,
+            determination_stage=log.determination_stage or "PROVISIONAL",
+            is_releasable=bool(log.is_releasable),
+            audit_hash=log.audit_hash or "",
+            created_at=log.created_at.isoformat() if hasattr(log.created_at, "isoformat") else str(log.created_at),
+            human_assessments=[]
+        )]
+    result_runs = []
+    for r in runs:
+        has = db.query(HumanAssessmentRecord).filter(HumanAssessmentRecord.case_id == case_id, HumanAssessmentRecord.run_id == r.run_id).all()
+        ha_outs = []
+        for a in has:
+            cp = json.loads(a.criterion_assessments_json or "{}")
+            if isinstance(cp, list):
+                cp = {c.get("criterion_code", f"CRIT-{i}"): c for i, c in enumerate(cp)}
+            ha_outs.append(HumanAssessmentOut(
+                assessment_id=a.assessment_id,
+                case_id=a.case_id,
+                run_id=a.run_id,
+                reviewer_username=a.reviewer_username,
+                reviewer_name=a.reviewer_name,
+                reviewer_role=a.reviewer_role,
+                overall_agreement=a.overall_agreement,
+                criterion_assessments=cp,
+                clinical_rationale=a.clinical_rationale,
+                created_at=a.created_at.isoformat() if hasattr(a.created_at, "isoformat") else str(a.created_at)
+            ))
+        result_runs.append(EvaluationRunOut(
+            run_id=r.run_id,
+            case_id=r.case_id,
+            run_number=r.run_number,
+            policy_id=r.policy_id,
+            policy_version=r.policy_version,
+            engine_version=r.engine_version,
+            note_version=r.note_version,
+            decision=r.decision,
+            determination_stage=r.determination_stage,
+            is_releasable=r.is_releasable,
+            audit_hash=r.audit_hash,
+            created_at=r.created_at.isoformat() if hasattr(r.created_at, "isoformat") else str(r.created_at),
+            human_assessments=ha_outs
+        ))
+    return result_runs
+
+
+@api_router.get("/adjudication/{case_id}/runs/{run_id}", summary="Retrieve Specific Evaluation Run Record")
+def get_case_evaluation_run(
+    case_id: str,
+    run_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieves complete run record including full packet and adjudication JSON.
+    """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
+    run_rec = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id, EvaluationRun.run_id == run_id).first()
+    if not run_rec:
+        raise HTTPException(status_code=404, detail=f"Evaluation run '{run_id}' not found for case '{case_id}'.")
+
+    import json
+    packet_obj = None
+    if run_rec.full_packet_json:
+        try:
+            packet_obj = json.loads(run_rec.full_packet_json)
+        except Exception:
+            pass
+
+    return {
+        "run_id": run_rec.run_id,
+        "case_id": run_rec.case_id,
+        "run_number": run_rec.run_number,
+        "policy_id": run_rec.policy_id,
+        "policy_version": run_rec.policy_version,
+        "engine_version": run_rec.engine_version,
+        "note_version": run_rec.note_version,
+        "decision": run_rec.decision,
+        "determination_stage": run_rec.determination_stage,
+        "is_releasable": run_rec.is_releasable,
+        "human_sign_off_status": run_rec.human_sign_off_status,
+        "audit_hash": run_rec.audit_hash,
+        "packet": packet_obj,
+        "created_at": run_rec.created_at.isoformat() if run_rec.created_at else None
+    }
+
+
+@api_router.post("/adjudication/{case_id}/runs/{run_id}/assessment", response_model=HumanAssessmentOut, summary="Record Clinician Human Assessment on Run")
+def create_human_assessment(
+    case_id: str,
+    run_id: str,
+    request: HumanAssessmentCreate,
+    current_user: User = Depends(get_verified_clinician_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Records a distinct Human Assessment on an evaluation run (Task 4):
+    - Separate data model, not overwriting system output
+    - Permission gated: only assigned clinician / owner can record assessment
+    - Stores overall agreement, per-criterion assessments, and clinical rationale
+    """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
+    run_rec = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id, EvaluationRun.run_id == run_id).first()
+    if not run_rec:
+        raise HTTPException(status_code=404, detail=f"Evaluation run '{run_id}' not found for case '{case_id}'.")
+
+    import json
+    crit_val = request.criterion_assessments
+    crit_json = json.dumps(crit_val if isinstance(crit_val, (dict, list)) else [c.model_dump() for c in crit_val])
+    cred = current_user.credential_title or "MD"
+    rev_name = f"{current_user.username}, {cred}"
+
+    assessment = db.query(HumanAssessmentRecord).filter(
+        HumanAssessmentRecord.case_id == case_id,
+        HumanAssessmentRecord.run_id == run_id,
+        HumanAssessmentRecord.reviewer_id == current_user.id
+    ).first()
+
+    now = datetime.now(timezone.utc)
+    if assessment:
+        assessment.overall_agreement = request.overall_agreement
+        assessment.criterion_assessments_json = crit_json
+        assessment.clinical_rationale = request.clinical_rationale
+        assessment.updated_at = now
+    else:
+        assessment_id = f"HA-{uuid.uuid4().hex[:8].upper()}"
+        assessment = HumanAssessmentRecord(
+            assessment_id=assessment_id,
+            case_id=case_id,
+            run_id=run_id,
+            reviewer_id=current_user.id,
+            reviewer_username=current_user.username,
+            reviewer_name=rev_name,
+            reviewer_role=cred,
+            overall_agreement=request.overall_agreement,
+            criterion_assessments_json=crit_json,
+            clinical_rationale=request.clinical_rationale,
+            created_at=now,
+            updated_at=now
+        )
+        db.add(assessment)
+    db.commit()
+
+    # Also update packet in run_rec and _EPHEMERAL_PACKETS with human assessment summary
+    try:
+        from app.schemas.contracts import CMSCoveragePacket
+        ha_dict = {
+            "reviewer_name": rev_name,
+            "reviewer_username": current_user.username,
+            "reviewer_role": cred,
+            "overall_agreement": request.overall_agreement,
+            "clinical_rationale": request.clinical_rationale,
+            "created_at": now.isoformat()
+        }
+        if run_rec.full_packet_json:
+            p = CMSCoveragePacket.model_validate_json(run_rec.full_packet_json)
+            p.human_assessment = ha_dict
+            run_rec.full_packet_json = p.model_dump_json()
+            db.commit()
+        if case_id in _EPHEMERAL_PACKETS:
+            _EPHEMERAL_PACKETS[case_id].human_assessment = ha_dict
+    except Exception:
+        pass
+
+    crit_parsed = json.loads(assessment.criterion_assessments_json or "{}")
+    if isinstance(crit_parsed, list):
+        crit_parsed = {c.get("criterion_code", f"CRIT-{i}"): c for i, c in enumerate(crit_parsed)}
+
+    return HumanAssessmentOut(
+        assessment_id=assessment.assessment_id,
+        case_id=assessment.case_id,
+        run_id=assessment.run_id,
+        reviewer_username=assessment.reviewer_username,
+        reviewer_name=assessment.reviewer_name,
+        reviewer_role=assessment.reviewer_role,
+        overall_agreement=assessment.overall_agreement,
+        criterion_assessments=crit_parsed,
+        clinical_rationale=assessment.clinical_rationale,
+        created_at=assessment.created_at.isoformat() if hasattr(assessment.created_at, "isoformat") else str(assessment.created_at)
+    )
+
+
+@api_router.get("/adjudication/{case_id}/runs/{run_id}/assessment", response_model=Optional[HumanAssessmentOut], summary="Retrieve Human Assessment on Run")
+def get_human_assessment(
+    case_id: str,
+    run_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieves the recorded Human Assessment on a run.
+    """
+    log = db.query(AdjudicationLog).filter(AdjudicationLog.case_id == case_id).first()
+    verify_case_record_access(case_id, log, current_user)
+
+    assessment = db.query(HumanAssessmentRecord).filter(
+        HumanAssessmentRecord.case_id == case_id,
+        HumanAssessmentRecord.run_id == run_id
+    ).first()
+
+    if not assessment:
+        return None
+
+    import json
+    crit_parsed = json.loads(assessment.criterion_assessments_json or "{}")
+    if isinstance(crit_parsed, list):
+        crit_parsed = {c.get("criterion_code", f"CRIT-{i}"): c for i, c in enumerate(crit_parsed)}
+
+    return HumanAssessmentOut(
+        assessment_id=assessment.assessment_id,
+        case_id=assessment.case_id,
+        run_id=assessment.run_id,
+        reviewer_username=assessment.reviewer_username,
+        reviewer_name=assessment.reviewer_name,
+        reviewer_role=assessment.reviewer_role,
+        overall_agreement=assessment.overall_agreement,
+        criterion_assessments=crit_parsed,
+        clinical_rationale=assessment.clinical_rationale,
+        created_at=assessment.created_at.isoformat() if hasattr(assessment.created_at, "isoformat") else str(assessment.created_at)
+    )

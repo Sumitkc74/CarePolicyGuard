@@ -27,10 +27,15 @@ class PDFPacketGeneratorService:
         """
         lines = [
             "==================================================================",
-            "        OFFICIAL CMS PRIOR AUTHORIZATION COVERAGE PACKET          ",
+            "             MEDICARE COVERAGE CRITERIA EVALUATION                ",
             "  Cryptographic Proof of Adjudication (Pursuant to CMS-0057-F)    ",
             "==================================================================",
             "",
+            f"Report Type:           {packet.evaluation_label or 'Coverage Criteria Evaluation'}",
+            f"Evaluation Run ID:     {packet.run_id or 'RUN-INITIAL'}",
+            f"Policy Version:        {packet.policy_version or '2024.1'}",
+            f"Engine Version:        {packet.engine_version or 'v80.0.0'}",
+            f"Note Version (SHA256): {packet.note_version or 'N/A'}",
             f"Packet Identifier:     {packet.packet_id}",
             f"Case Identifier:       {packet.case_id}",
             f"Patient Legal Name:    {packet.patient_name or 'Not on file'}",
@@ -41,17 +46,31 @@ class PDFPacketGeneratorService:
             f"CPT/HCPCS Codes:       {', '.join(packet.cpt_hcpcs_codes) if packet.cpt_hcpcs_codes else '33249'}",
             f"ICD-10 Diagnosis:      {', '.join(packet.icd10_codes) if packet.icd10_codes else 'I25.2'}",
             f"Submission Status:     {packet.submission_status}",
+            f"Determination Stage:   {packet.determination_stage or 'PROVISIONAL'}",
             f"Final Determination:   {packet.adjudication_decision}",
             f"Sufficiency Score:     {round((packet.sufficiency_score or 0.0) * 100, 1)}%",
             f"Calibrated Confidence: {round(packet.calibrated_confidence * 100, 1) if packet.calibrated_confidence is not None else 'Uncalibrated (Empirical Model Pending)'}",
             f"Safety Gate (tau):     Passed (threshold >= 0.85)",
             f"SHA-256 Audit Seal:    {packet.audit_hash}",
             "",
+        ]
+
+        if packet.adjudication_decision == "DEFERRED" or packet.abstention_status:
+            lines.extend([
+                "------------------------------------------------------------------",
+                "                      DEFERRAL RATIONALE                          ",
+                "------------------------------------------------------------------",
+                "Deferral Status:       Active Gate Deferral",
+                "Clinical Context:      Requires clinician adjudication or additional clinical evidence.",
+                ""
+            ])
+
+        lines.extend([
             "------------------------------------------------------------------",
             "                  STATUTORY CRITERIA EVALUATION                   ",
             "------------------------------------------------------------------",
             ""
-        ]
+        ])
 
         for s in packet.criteria_sections:
             lines.append(f"[{s.criterion_code}] {s.name}")
@@ -63,6 +82,19 @@ class PDFPacketGeneratorService:
             if s.physician_attestation:
                 lines.append(f"  Attestation:     {s.physician_attestation}")
             lines.append("")
+
+        if packet.human_assessment and isinstance(packet.human_assessment, dict):
+            ha = packet.human_assessment
+            lines.extend([
+                "------------------------------------------------------------------",
+                "                  CLINICIAN HUMAN ASSESSMENT                      ",
+                "------------------------------------------------------------------",
+                f"Reviewer:              {ha.get('reviewer_name') or ha.get('reviewer_username')} ({ha.get('reviewer_role', 'Clinician')})",
+                f"Overall Agreement:     {ha.get('overall_agreement', 'N/A')}",
+                f"Clinical Rationale:    {ha.get('clinical_rationale', 'N/A')}",
+                f"Assessment Recorded:   {ha.get('created_at', 'N/A')}",
+                ""
+            ])
 
         lines.extend([
             "------------------------------------------------------------------",

@@ -89,6 +89,19 @@ def rebuild_coverage_packet(
     if adjudication.required_clinician_action_notes:
         packet.clinician_action_notes = adjudication.required_clinician_action_notes
 
+    if hasattr(adjudication, "policy_version") and adjudication.policy_version:
+        packet.policy_version = adjudication.policy_version
+    if hasattr(adjudication, "engine_version") and adjudication.engine_version:
+        packet.engine_version = adjudication.engine_version
+    if hasattr(adjudication, "note_version") and adjudication.note_version:
+        packet.note_version = adjudication.note_version
+    if hasattr(adjudication, "run_id") and adjudication.run_id:
+        packet.run_id = adjudication.run_id
+    if hasattr(adjudication, "evaluation_label") and adjudication.evaluation_label:
+        packet.evaluation_label = adjudication.evaluation_label
+    if hasattr(adjudication, "human_assessment") and adjudication.human_assessment:
+        packet.human_assessment = adjudication.human_assessment
+
     if existing_packet:
         if getattr(existing_packet, "submission_status", None):
             packet.submission_status = existing_packet.submission_status

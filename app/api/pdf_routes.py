@@ -12,6 +12,7 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
     def download_coverage_packet_pdf(
         case_id: str,
         require_final: bool = False,
+        run_id: str | None = None,
         current_user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
     ):
@@ -21,7 +22,35 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
         Strictly requires authentication and case record access authorization.
         """
         try:
-            packet = get_coverage_packet_fn(case_id, current_user, db)
+            from app.db.models import EvaluationRun
+            from app.schemas.contracts import CMSCoveragePacket
+            packet = None
+            if run_id:
+                run_rec = db.query(EvaluationRun).filter(EvaluationRun.case_id == case_id, EvaluationRun.run_id == run_id).first()
+                if run_rec and run_rec.full_packet_json:
+                    try:
+                        packet = CMSCoveragePacket.model_validate_json(run_rec.full_packet_json)
+                    except Exception:
+                        pass
+            if packet is None:
+                packet = get_coverage_packet_fn(case_id, current_user, db)
+
+            # Task 4 & 5: If packet does not have human_assessment, look up HumanAssessmentRecord
+            if not getattr(packet, "human_assessment", None):
+                from app.db.models import HumanAssessmentRecord
+                query = db.query(HumanAssessmentRecord).filter(HumanAssessmentRecord.case_id == case_id)
+                if run_id:
+                    query = query.filter(HumanAssessmentRecord.run_id == run_id)
+                ha_rec = query.order_by(HumanAssessmentRecord.created_at.desc()).first()
+                if ha_rec:
+                    packet.human_assessment = {
+                        "reviewer_name": ha_rec.reviewer_name or ha_rec.reviewer_username,
+                        "reviewer_username": ha_rec.reviewer_username,
+                        "reviewer_role": ha_rec.reviewer_role,
+                        "overall_agreement": ha_rec.overall_agreement,
+                        "clinical_rationale": ha_rec.clinical_rationale,
+                        "created_at": ha_rec.created_at.isoformat() if hasattr(ha_rec.created_at, "isoformat") else str(ha_rec.created_at)
+                    }
             if require_final:
                 require_releasable_determination(packet)
             pdf_bytes = PDFPacketGeneratorService.generate_coverage_packet_pdf(packet)

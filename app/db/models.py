@@ -243,3 +243,63 @@ class InAppNotification(Base):
     created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
 
 
+class EvaluationRun(Base):
+    """
+    Persisted evaluation run record (Task 3).
+    Each evaluation (or re-evaluation / addendum) creates an immutable run entry,
+    preserving historical evaluation outcomes, evidence citations, and versions.
+    """
+    __tablename__ = "evaluation_runs"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    run_id = Column(String(100), unique=True, index=True, nullable=False)
+    case_id = Column(String(100), index=True, nullable=False)
+    run_number = Column(Integer, default=1, nullable=False)
+    policy_id = Column(String(50), index=True, nullable=False)
+    policy_version = Column(String(50), nullable=True, default="2024.1")
+    engine_version = Column(String(100), nullable=False, default="qwen2.5:3b (carepolicyguard-multiagent-v80)")
+    note_version = Column(String(64), nullable=False)  # SHA-256 hash of sanitized EHR note text
+    decision = Column(String(50), index=True, nullable=False)
+    determination_stage = Column(String(50), default="PROVISIONAL", nullable=False)
+    is_releasable = Column(Boolean, default=False, nullable=False)
+    human_sign_off_status = Column(String(50), default="PENDING_CLINICAL_SIGN_OFF", nullable=False)
+    audit_hash = Column(String(64), index=True, nullable=False)
+    criterion_evaluations_json = Column(Text, nullable=False, default="[]")
+    evidence_spans_json = Column(Text, nullable=False, default="[]")
+    adversarial_audits_json = Column(Text, nullable=False, default="[]")
+    full_adjudication_json = Column(Text, nullable=True)
+    full_packet_json = Column(Text, nullable=True)
+    sanitized_ehr_preview = Column(Text, nullable=False)
+    execution_time_ms = Column(Float, default=0.0, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
+
+    human_assessments = relationship("HumanAssessmentRecord", back_populates="run", cascade="all, delete-orphan")
+
+
+class HumanAssessmentRecord(Base):
+    """
+    Separate clinician reviewer assessment record (Task 4).
+    Distinct from the autonomous system output, recording reviewer agreement/disagreement
+    per criterion or overall with clinical rationale, attached to an exact evaluation run.
+    """
+    __tablename__ = "human_assessment_records"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    assessment_id = Column(String(100), unique=True, index=True, nullable=False)
+    case_id = Column(String(100), index=True, nullable=False)
+    run_id = Column(String(100), ForeignKey("evaluation_runs.run_id", ondelete="CASCADE"), nullable=False, index=True)
+    reviewer_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    reviewer_username = Column(String(100), nullable=False)
+    reviewer_name = Column(String(100), nullable=False)
+    reviewer_role = Column(String(50), nullable=False)
+    overall_agreement = Column(String(50), nullable=False)  # AGREE, DISAGREE, PARTIALLY_AGREE, NEEDS_CLARIFICATION
+    criterion_assessments_json = Column(Text, nullable=False, default="{}")
+    clinical_rationale = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
+
+    run = relationship("EvaluationRun", back_populates="human_assessments")
+    reviewer = relationship("User")
+
+
+

@@ -490,11 +490,23 @@
                     <div class="results-compact-strip">
                         <span class="meta-item">Evaluated Policy: <strong id="res-policy-code">NCD 20.4 &ndash; Implantable Defibrillators</strong></span>
                         <span class="meta-sep">&bull;</span>
-                        <span class="meta-item">Status: <strong id="res-criteria-count">-- Met</strong></span>
+                        <span class="meta-item">Policy Ver: <strong id="res-policy-ver">2024.1</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span class="meta-item">Engine Ver: <strong id="res-engine-ver">v80.0.0</strong></span>
+                        <span class="meta-sep">&bull;</span>
+                        <span class="meta-item">Run ID: <strong id="res-run-id">RUN-01</strong></span>
                         <span class="meta-sep">&bull;</span>
                         <span class="meta-item">Evidence: <strong id="res-grounding-stat">100% Grounded</strong></span>
                         <span class="meta-sep">&bull;</span>
                         <span class="meta-item">Match: <strong id="res-conf-stat">--</strong></span>
+                    </div>
+
+                    <!-- RUN SWITCHER STRIP (Task 3) -->
+                    <div id="evaluation-runs-strip" style="display: flex; align-items: center; gap: 8px; margin: 8px 0; padding: 6px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 6px; font-size: 0.78rem;">
+                        <span style="color: #94a3b8; font-weight: 600;">Evaluation Runs:</span>
+                        <div id="evaluation-runs-list" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                            <!-- Runs populated dynamically -->
+                        </div>
                     </div>
 
                     <!-- HIDDEN BACKWARD-COMPATIBILITY HOOKS -->
@@ -533,6 +545,38 @@
                         </div>
                         <div class="criteria-cards-list" id="criteria-cards-list">
                             <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- CLINICIAN HUMAN ASSESSMENT FORM (Task 4) -->
+                    <div class="human-assessment-section" id="human-assessment-section" style="margin: 16px 0; padding: 14px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="med-icon icon-xs icon-emerald"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
+                                <strong style="color: #f8fafc; font-size: 0.9rem;">Clinician Human Assessment</strong>
+                                <span style="font-size: 0.75rem; color: #94a3b8;">(Separate from system determination &bull; Attributed to reviewer)</span>
+                            </div>
+                            <span id="assessment-status-badge" class="badge-status insufficient" style="font-size: 0.72rem;">Not Recorded</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <label style="font-size: 0.8rem; color: #cbd5e1; font-weight: 600;">Overall Agreement:</label>
+                                <select id="ha-overall-agreement" style="background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem;">
+                                    <option value="AGREE">AGREE &ndash; Concur with system findings</option>
+                                    <option value="DISAGREE">DISAGREE &ndash; Diverge on clinical interpretation</option>
+                                    <option value="PARTIAL_AGREE">PARTIAL_AGREE &ndash; Concur on some criteria</option>
+                                    <option value="NEEDS_CLARIFICATION">NEEDS_CLARIFICATION &ndash; Incomplete documentation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.8rem; color: #cbd5e1; font-weight: 600; margin-bottom: 4px;">Clinical Review Rationale / Notes:</label>
+                                <textarea id="ha-clinical-rationale" rows="2" style="width: 100%; background: #1e293b; color: #f8fafc; border: 1px solid #475569; border-radius: 4px; padding: 6px; font-size: 0.8rem; font-family: inherit;" placeholder="Enter independent clinical review findings..."></textarea>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                                <button type="button" class="btn-secondary btn-sm" onclick="saveHumanAssessment()" style="border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">
+                                    Record Human Assessment
+                                </button>
+                            </div>
                         </div>
                     </div>
 

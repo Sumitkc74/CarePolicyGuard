@@ -203,6 +203,14 @@ class FinalAdjudication(BaseModel):
     message_board: list[dict[str, Any]] | None = Field(default=None, description="Task 1: Shared chronological message board recording all agent communication")
     policy_shortlist: list[dict[str, Any]] | None = Field(default=None, description="Task 5: Shortlist of candidate Medicare policies evaluated with unified scores and criteria coverage")
     policy_choice_metadata: dict[str, Any] | None = Field(default=None, description="Task 5: Persistence of who chose the policy (clinician vs auto), margin, coverage, and timestamp")
+    policy_version: str | None = Field(default="2024.1", description="Governing Medicare policy version")
+    engine_version: str | None = Field(default="qwen2.5:3b (carepolicyguard-multiagent-v80)", description="Adjudication model and pipeline version")
+    note_version: str | None = Field(default=None, description="SHA-256 integrity hash of sanitized EHR note text")
+    run_id: str | None = Field(default=None, description="Unique execution run identifier")
+    run_number: int = Field(default=1, description="Sequential evaluation run index for this case")
+    evaluation_label: str = Field(default="Coverage Criteria Evaluation", description="Official report type label")
+    agent_trace: list[dict[str, Any]] | None = Field(default=None, description="Detailed per-criterion agent debate & verification trace")
+    human_assessment: dict[str, Any] | None = Field(default=None, description="Separate clinician assessment record attached to run")
 
 # Request / Response DTOs
 class PolicyShortlistCandidate(BaseModel):
@@ -578,6 +586,44 @@ class CMSCoveragePacket(BaseModel):
     clinician_action_notes: str | None = None
     authorization_validity_period: str | None = "180 calendar days from date of determination"
     shared_decision_making_attestation: str | None = None
+    policy_version: str | None = Field(default="2024.1", description="Governing Medicare policy version")
+    engine_version: str | None = Field(default="qwen2.5:3b (carepolicyguard-multiagent-v80)", description="Adjudication model and pipeline version")
+    note_version: str | None = Field(default=None, description="SHA-256 integrity hash of sanitized EHR note text")
+    run_id: str | None = Field(default=None, description="Unique execution run identifier")
+    evaluation_label: str = Field(default="Coverage Criteria Evaluation", description="Official report type label")
+    human_assessment: dict[str, Any] | None = Field(default=None, description="Separate clinician assessment record attached to run")
+
+class HumanAssessmentCreate(BaseModel):
+    overall_agreement: str = Field(..., description="Overall reviewer agreement: AGREE, DISAGREE, PARTIALLY_AGREE, or NEEDS_CLARIFICATION")
+    criterion_assessments: dict[str, Any] = Field(default_factory=dict, description="Per-criterion reviewer agreement and rationales")
+    clinical_rationale: str = Field(..., description="Clinician reviewer's detailed clinical reasoning and judgment")
+
+class HumanAssessmentOut(BaseModel):
+    assessment_id: str
+    case_id: str
+    run_id: str
+    reviewer_username: str
+    reviewer_name: str
+    reviewer_role: str
+    overall_agreement: str
+    criterion_assessments: dict[str, Any] = Field(default_factory=dict)
+    clinical_rationale: str
+    created_at: str
+
+class EvaluationRunOut(BaseModel):
+    run_id: str
+    case_id: str
+    run_number: int
+    policy_id: str
+    policy_version: str | None = None
+    engine_version: str
+    note_version: str
+    decision: str
+    determination_stage: str
+    is_releasable: bool
+    audit_hash: str
+    created_at: str
+    human_assessments: list[HumanAssessmentOut] = Field(default_factory=list)
 
 class SignOffRequest(BaseModel):
     signed_by: str | None = Field(default=None, description="Optional clinician name; verified user profile identity is authoritatively used")
