@@ -204,22 +204,58 @@ def test_upload_note_and_submit_to_insurance():
     assert len(packet["criteria_sections"]) >= 2
     assert "G47.33" in packet["icd10_codes"][0]
 
-    # 3. Clinician signs & transmits packet to insurance
-    submit_res = client.post(
-        "/api/v1/packet/submit",
-        headers=admin_hdr,
+    # 3. Verified Clinician signs off on the determination first (Mandatory Release Gate)
+    db = SessionLocal()
+    clinician_username = f"dr_jenkins_{secrets.token_hex(3)}"
+    clinician_user = User(
+        username=clinician_username,
+        email=f"{clinician_username}@hospital.med",
+        hashed_password=get_password_hash(secrets.token_hex(16)),
+        role="Clinician",
+        is_active=True,
+        is_verified_medical_pro=True,
+        credential_title="MD",
+        npi_number="1234567890",
+    )
+    db.add(clinician_user)
+    db.commit()
+    db.refresh(clinician_user)
+    clinician_token = create_access_token(
+        {"sub": clinician_username, "role": "Clinician", "uid": clinician_user.id},
+        expires_delta=timedelta(minutes=30)
+    )
+    db.close()
+    clinician_hdr = {"Authorization": f"Bearer {clinician_token}"}
+
+    sign_res = client.post(
+        f"/api/v1/determination/{case_id}/sign-off",
+        headers=clinician_hdr,
         json={
             "case_id": case_id,
-            "signed_by": "Dr. Sarah Jenkins, MD, FCCP",
+            "attestation_notes": "Patient thoroughly evaluated; meets all criteria under LCD L33829.",
+            "clinician_npi": "1234567890",
+            "clinician_credentials": "MD"
+        }
+    )
+    assert sign_res.status_code == 200
+
+    # 4. Verified Clinician transmits finalized packet to insurance
+    submit_res = client.post(
+        "/api/v1/packet/submit",
+        headers=clinician_hdr,
+        json={
+            "case_id": case_id,
+            "signed_by": f"{clinician_username}, MD",
             "clinician_notes": "Patient thoroughly evaluated; meets all criteria under LCD L33829.",
             "payer_name": "CMS Medicare Part B / Noridian MAC"
         }
     )
     assert submit_res.status_code == 200
     receipt = submit_res.json()
-    assert receipt["submission_status"] == "TRANSMITTED_ACCEPTED"
-    assert receipt["signed_by"] == "Dr. Sarah Jenkins, MD, FCCP"
-    assert receipt["payer_transaction_id"].startswith("CMS-EDI-837-")
+    assert receipt["submission_status"] == "SUBMITTED_TO_PAYER"
+    assert receipt["signed_by"] == f"{clinician_username}, MD"
+    assert "CMS-EDI-837-" in receipt["payer_transaction_id"]
+    assert "no payer response has been received" in receipt["message"]
 
 def test_upload_image_note_and_adjudicate():
     """Verify that clinical note images (.png, .jpg) are accepted and OCR-extracted."""

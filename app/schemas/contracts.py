@@ -604,6 +604,7 @@ class SubmissionReceipt(BaseModel):
     case_id: str
     packet_id: str
     payer_transaction_id: str
+    local_submission_reference: str | None = None
     submission_status: str
     signed_by: str
     signed_at: str

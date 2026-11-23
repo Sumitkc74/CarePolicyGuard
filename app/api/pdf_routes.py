@@ -4,6 +4,7 @@ from fastapi import Response, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.api.deps import get_current_user
+from app.api.release import require_releasable_determination
 from app.db.models import User
 
 def register_pdf_routes(api_router, get_coverage_packet_fn):
@@ -21,11 +22,8 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
         """
         try:
             packet = get_coverage_packet_fn(case_id, current_user, db)
-            if require_final and getattr(packet, "determination_stage", "PROVISIONAL") != "FINAL" and not getattr(packet, "is_releasable", False):
-                raise HTTPException(
-                    status_code=status.HTTP_412_PRECONDITION_FAILED,
-                    detail="Determination is PROVISIONAL and cannot be exported as final PDF without recorded human sign-off."
-                )
+            if require_final:
+                require_releasable_determination(packet)
             pdf_bytes = PDFPacketGeneratorService.generate_coverage_packet_pdf(packet)
             
             headers = {
@@ -43,6 +41,7 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
     @api_router.get("/packet/{case_id}/appeal-letter/pdf", response_class=Response, summary="Download Peer-to-Peer Appeal Letter as PDF")
     def download_appeal_letter_pdf(
         case_id: str,
+        require_final: bool = False,
         current_user: User = Depends(get_current_user),
         db: Session = Depends(get_db)
     ):
@@ -52,6 +51,8 @@ def register_pdf_routes(api_router, get_coverage_packet_fn):
         """
         try:
             packet = get_coverage_packet_fn(case_id, current_user, db)
+            if require_final:
+                require_releasable_determination(packet)
             appeal = PeerToPeerAppealService.generate_appeal(packet)
             pdf_bytes = PDFPacketGeneratorService.generate_appeal_letter_pdf(appeal)
             
