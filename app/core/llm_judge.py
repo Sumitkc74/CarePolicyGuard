@@ -126,7 +126,8 @@ class ClinicalEquivalenceJudge:
             "equivalent_count": 0,
             "not_equivalent_count": 0,
             "ambiguous_count": 0,
-            "total_latency_ms": 0.0
+            "total_latency_ms": 0.0,
+            "equivalence_resolved_by_umls": 0,
         }
 
     def reset_case_budget(self) -> None:
@@ -210,6 +211,67 @@ class ClinicalEquivalenceJudge:
         cache_key = (ccode, candidate_span_text.strip())
         if hasattr(self, "evaluated_spans_cache") and cache_key in self.evaluated_spans_cache:
             return self.evaluated_spans_cache[cache_key]
+
+        # Task 2(b) (v87): Consult UMLS CUI lookup before LLM judge call.
+        # Synonymy check order:
+        # 1. Exact verbatim match (handled upstream)
+        # 2. Committed concept map (12 human-attested concepts)
+        # 3. UMLS CUI lookup (authoritative terminology equivalence: same CUI = equivalent)
+        # 4. LLM judge (context check)
+        # 5. Unproven / Deferral queue
+        # If UMLS confirms the same CUI AND the context is unambiguous (no negation/contradiction),
+        # equivalence is confirmed authoritatively without an LLM call.
+        try:
+            from app.services.umls_client import get_umls_client
+            umls = get_umls_client()
+            if umls.is_configured:
+                cand_clean = candidate_span_text.strip()
+                crit_terms: list[str] = []
+                if cname and umls.validate_term_egress_boundary(cname):
+                    crit_terms.append(cname)
+                for kw in criterion.get("keywords", []):
+                    if kw and isinstance(kw, str) and umls.validate_term_egress_boundary(kw):
+                        crit_terms.append(kw)
+
+                # Context check: reject spans containing explicit negation or contraindication patterns
+                neg_pats = [
+                    r"\bno\s+history\s+of\b", r"\bdenies\b", r"\bnegative\s+for\b",
+                    r"\bno\s+evidence\s+of\b", r"\bruled\s+out\b", r"\babsent\b",
+                    r"\bnot\s+indicated\b", r"\bcontraindicated\b", r"\bineffective\b",
+                    r"\bnot\s+recommended\b"
+                ]
+                has_negation = any(re.search(p, cand_clean.lower()) for p in neg_pats)
+
+                if not has_negation and crit_terms:
+                    # Extract individual candidate terms from span (single term or sub-phrases)
+                    cand_terms: list[str] = []
+                    if umls.validate_term_egress_boundary(cand_clean):
+                        cand_terms.append(cand_clean)
+                    else:
+                        words = re.findall(r"[A-Za-z0-9\-]+", cand_clean)
+                        for n in (4, 3, 2, 1):
+                            for i in range(len(words) - n + 1):
+                                phrase = " ".join(words[i:i + n])
+                                if len(phrase) >= 3 and umls.validate_term_egress_boundary(phrase):
+                                    cand_terms.append(phrase)
+
+                    for ct in crit_terms:
+                        for cand_t in cand_terms:
+                            is_eq, matched_cui = umls.are_equivalent(ct, cand_t)
+                            if is_eq and matched_cui:
+                                elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
+                                self.telemetry["equivalence_resolved_by_umls"] = self.telemetry.get("equivalence_resolved_by_umls", 0) + 1
+                                self.telemetry["equivalent_count"] += 1
+                                eval_res = JudgeEvaluation(
+                                    verdict=EquivalenceVerdict.EQUIVALENT,
+                                    rationale=f"Authoritative semantic equivalence confirmed via UMLS CUI ({matched_cui}) for '{cand_t}' matching criterion term '{ct}' without LLM call.",
+                                    elapsed_ms=elapsed_ms,
+                                    status_code="EQUIVALENCE_CONFIRMED_VIA_UMLS"
+                                )
+                                self.evaluated_spans_cache[cache_key] = eval_res
+                                return eval_res
+        except (ImportError, RuntimeError, ValueError, KeyError, TypeError, OSError) as exc:
+            logger.debug(f"UMLS pre-judge equivalence check skipped: {exc}")
 
         prompt = self.build_prompt(ccode, cname, cdesc, candidate_span_text, clinical_intent=cintent)
 

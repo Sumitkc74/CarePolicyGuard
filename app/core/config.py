@@ -45,6 +45,8 @@ class Settings(BaseSettings):
     # HIPAA & Privacy Guardrail: Hard default-off for network egress of clinical text
     ENABLE_REMOTE_LLM_EGRESS: bool = os.getenv("ENABLE_REMOTE_LLM_EGRESS", "false").lower() in ("true", "1", "yes")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
+    UMLS_API_KEY: str = os.getenv("UMLS_API_KEY", "")
+    UMLS_VERSION: str = os.getenv("UMLS_VERSION", "2024AB")
     LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
     LLM_MODEL: str = os.getenv("LLM_MODEL", "gemini-1.5-flash")
     LLM_TEMPERATURE: float = float(os.getenv("LLM_TEMPERATURE", "0.7"))

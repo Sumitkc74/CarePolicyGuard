@@ -9,3 +9,5 @@ venv/
 .coverage
 htmlcov/
 *.coverage.*
+app/data/umls_cui_cache.json
+*umls_cui_cache.json

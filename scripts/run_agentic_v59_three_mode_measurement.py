@@ -1597,6 +1597,7 @@ def main() -> None:
                     "declarative_131": f"Merged Map ({comm_cnt} committed + {draft_cnt} drafts = {merged_map.total_concepts} concepts)",
                     "agentic": f"Merged Map ({comm_cnt} committed + {draft_cnt} drafts = {merged_map.total_concepts} concepts)",
                 },
+                "umls_version": "2024AB",
             },
             "four_number_safety_comparison": {
                 "deterministic": {

@@ -308,6 +308,23 @@ class ConceptMap:
         crit_norm = criterion_term.strip().lower()
         prop_norm = proposed_term.strip().lower()
 
+        def _check_umls_equivalence() -> tuple[bool, str] | None:
+            # Synonymy check order (Task 2 v87):
+            # 1. Exact verbatim match (handled upstream)
+            # 2. Committed concept map (12 human-attested concepts)
+            # 3. UMLS CUI lookup (authoritative terminology equivalence: same CUI = equivalent)
+            # 4. LLM judge (context check)
+            # 5. Unproven / Deferral queue
+            try:
+                from app.services.umls_client import get_umls_client
+                umls = get_umls_client()
+                is_equiv, cui = umls.are_equivalent(criterion_term, proposed_term)
+                if is_equiv and cui:
+                    return True, f"EQUIVALENCE_CONFIRMED_VIA_UMLS: Both terms share CUI {cui}."
+            except (ImportError, RuntimeError, ValueError, KeyError, TypeError, OSError) as exc:
+                logger.debug(f"UMLS equivalence check fallback skipped: {exc}")
+            return None
+
         # Find concepts for both terms within the policy domain
         crit_concept = self.lookup_concept(crit_norm, domain=domain, policy_id=policy_id)
         if not crit_concept:
@@ -317,6 +334,9 @@ class ConceptMap:
         prop_concept = self.lookup_concept(prop_norm, domain=domain, policy_id=policy_id)
 
         if not crit_concept:
+            umls_res = _check_umls_equivalence()
+            if umls_res is not None:
+                return umls_res
             return False, f"NO_CONCEPT_MAP_ENTRY: Criterion term '{criterion_term}' is not indexed in concept map."
 
         # Check prohibited near-misses on the criterion's concept
@@ -325,6 +345,9 @@ class ConceptMap:
                 return False, f"PROHIBITED_NEAR_MISS: Proposed term '{proposed_term}' matches prohibited near-miss '{near_miss}' for concept {crit_concept.canonical_name}."
 
         if not prop_concept:
+            umls_res = _check_umls_equivalence()
+            if umls_res is not None:
+                return umls_res
             return False, f"NO_CONCEPT_MAP_ENTRY: Proposed term '{proposed_term}' has no entry in concept map."
 
         if crit_concept.concept_id == prop_concept.concept_id:
@@ -343,6 +366,10 @@ class ConceptMap:
             for inst in crit_concept.authorized_instances:
                 if inst.lower() in prop_norm or prop_norm in inst.lower():
                     return True, f"EQUIVALENCE_CONFIRMED: '{proposed_term}' is an authorized instance of class '{crit_concept.canonical_name}'."
+
+        umls_res = _check_umls_equivalence()
+        if umls_res is not None:
+            return umls_res
 
         return False, f"NO_CONCEPT_MAP_ENTRY: Terms belong to disjoint concepts ('{crit_concept.canonical_name}' vs '{prop_concept.canonical_name}')."
 
