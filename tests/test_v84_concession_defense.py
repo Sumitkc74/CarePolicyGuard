@@ -327,7 +327,6 @@ def test_v84_target_cases_rescue_kypho_and_cataract():
     )
 
     merged_map, _, _ = build_merged_in_memory_map()
-    cm_mod._GLOBAL_CONCEPT_MAP = merged_map
 
     with open("app/data/policies_extended/dev_vignettes_extended.json", "r", encoding="utf-8") as f:
         vignettes = json.load(f)
@@ -340,6 +339,7 @@ def test_v84_target_cases_rescue_kypho_and_cataract():
     pipeline.llm_proposer.span_repair_enabled = True
 
     stack = ExitStack()
+    stack.enter_context(patch.object(cm_mod, "_GLOBAL_CONCEPT_MAP", merged_map))
     if not _is_ollama_available():
         def mock_judge(*args, **kwargs):
             criterion = kwargs.get("criterion") if "criterion" in kwargs else (args[0] if len(args) > 0 and isinstance(args[0], dict) else args[1])
