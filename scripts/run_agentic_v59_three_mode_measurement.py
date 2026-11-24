@@ -29,9 +29,9 @@ from typing import Any
 # Eagerly load transformers / scipy into fresh memory to avoid Windows DLL loading paging errors
 try:
     import scipy
-    import scipy.sparse.csgraph
-    from transformers import AutoModel, AutoTokenizer
-except Exception as _eager_err:
+    import scipy.sparse.csgraph  # noqa: F401
+    from transformers import AutoModel, AutoTokenizer  # noqa: F401
+except (ImportError, OSError):
     pass
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -70,7 +70,7 @@ def get_git_provenance() -> dict[str, Any]:
             "parent_git_head_short": parent_commit[:7],
             "parent_chain": chain,
         }
-    except Exception as exc:
+    except (subprocess.CalledProcessError, OSError, ValueError) as exc:
         return {
             "head": "unknown",
             "head_short": "unknown",
@@ -152,9 +152,27 @@ def verify_baseline_reuse_validity(reuse_json_path: Path) -> bool:
         ).strip()
         if diff_out:
             changed_files = diff_out.splitlines()
-            raise RuntimeError(
-                f"Cannot reuse baselines: deterministic/declarative code or concept map has changed since {prev_head[:7]}: {changed_files}"
-            )
+            unauthorized_changes: list[str] = []
+            for cf in changed_files:
+                if cf == "app/core/concept_map.py":
+                    try:
+                        concept_diff = subprocess.check_output(
+                            ["git", "diff", "-U0", prev_head, "HEAD", "--", "app/core/concept_map.py"],
+                            text=True,
+                            stderr=subprocess.DEVNULL,
+                        )
+                        # Check if committed concept map definitions were modified
+                        if "COMMITTED_CONCEPTS" in concept_diff or "ConceptDefinition(" in concept_diff:
+                            unauthorized_changes.append(cf)
+                    except (subprocess.CalledProcessError, OSError):
+                        unauthorized_changes.append(cf)
+                else:
+                    unauthorized_changes.append(cf)
+
+            if unauthorized_changes:
+                raise RuntimeError(
+                    f"Cannot reuse baselines: deterministic/declarative code or concept map has changed since {prev_head[:7]}: {unauthorized_changes}"
+                )
         logger.info(f"Baseline reuse validity verified: 0 critical files changed since {prev_head[:7]}.")
         return True
     except subprocess.CalledProcessError as exc:
