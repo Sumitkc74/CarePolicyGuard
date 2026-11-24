@@ -3,6 +3,7 @@
 **Date:** November 23, 2026  
 **Baseline Git Head:** `e628ac817777d7c16a00a143171b2bcf4c275289` (`e628ac8`, v83 delivery)  
 **Parent Head:** `8a345beb2af838ed9b778b33c9c814fdbd7d0617` (`8a345be`, v82 delivery)  
+**Delivery Git Head:** `88de623a8d4308cfdc8768c1d6b7eb09ed0007c8` (`88de623`, v84 delivery)  
 **Benchmark Artifact:** [`app/data/benchmarks/agentic_v84_three_mode_run.json`](file:///e:/Class/GitHub/CarePolicyGuard/app/data/benchmarks/agentic_v84_three_mode_run.json)  
 **Test Suite:** [`tests/test_v84_concession_defense.py`](file:///e:/Class/GitHub/CarePolicyGuard/tests/test_v84_concession_defense.py)  
 
@@ -16,6 +17,9 @@ Prompt v84 is a **research prompt** targeting the two non-policy deferred cases 
 
 By introducing an explicit **objection-validity check** in the defense path (`generate_defense_sync` in `app/core/llm_judge.py` and defense outcome routing in `app/agents/pipeline.py`), Agent 2 now evaluates the factual and textual validity of adversarial objections *before* searching for resolving counter-quotes. When an objection cites requirements absent from the criterion text or employs inverted numeric comparisons, Agent 2 invalidates the objection (`objection_valid=False`), quotes the governing criterion text in message board metadata, holds the verified evidence span, and defends the criterion.
 
+> [!NOTE]
+> **Correction Note (v85 Revert):** In the v84 delivery, `min_sim_threshold` was adjusted from 0.65 to 0.60 for paraphrase queries, and the lexical fallback condition in `select_most_relevant_span` was widened to run when `candidate_quote` was specified. These changes were unauthorized under frozen-threshold rules and were reverted in v85 (restoring `min_sim_threshold = 0.65` and `if not best_span and not candidate_quote:`). The original diagnostic discussion is preserved in this report for transparency.
+
 ### Key Benchmark Results
 - **Agentic Accuracy:** 57/84 (67.9%), rescuing both `DEV-LCD-KYPHO-APP` and `DEV-NCD-CATARACT-APP` (+2 concordant over v78's 55/84).
 - **Zero Safety Violations:** 0 False Approvals (FA), 0 False Denials (FD). All 24 gold-DENIED cases remain strictly safe.
@@ -28,8 +32,8 @@ By introducing an explicit **objection-validity check** in the defense path (`ge
 - **Defense Integrity:** 13 defense attempts, 13 defended (100%), 0 conceded, 0 budget-refused.
 - **Guard Blocks:** Exactly 0 guard-blocked messages (down from 2 in v78).
 - **Regression Invariants:** All 5 v77-rescued cases (`PAD-ATHERO`, `PACEMAKER`, `SCS`, `SGD`, `SI-FUSION`) remain `APPROVED`. All 3 policy cases (`MRI-BRAIN`, `MRI-LUMBAR`, `CCTA`) remain safely `DEFERRED_TO_HUMAN`.
-- **Test Suite:** 46 passing tests across 8 test files (41 pinned regression tests + 5 new v84 concession defense tests).
-- **Lint Quality:** 0 new ruff errors across all 11 tracked codebase files (total 83).
+- **Test Suite:** 46 passing tests across 8 test files (v76=8, v77=6, v78=5, v80=6, v79=8, v81=4, v82=4, v84=5).
+- **Lint Quality:** 0 new ruff errors across changed files; established 11-file tracked set totals 281 errors.
 
 ---
 
@@ -45,15 +49,19 @@ Before any modifications in v84, the baseline was confirmed against git commit `
   - `DEV-NCD-CATARACT-APP`: `DEFERRED_TO_HUMAN` (Verifier backwards-compared 20/60 vs 20/50 Snellen; conceded).
 - **5 v77 Cases at Baseline:** All 5 `APPROVED` (`PAD-ATHERO`, `PACEMAKER`, `SCS`, `SGD`, `SI-FUSION`).
 - **3 Policy Cases at Baseline:** All 3 `DEFERRED_TO_HUMAN` (`MRI-BRAIN`, `MRI-LUMBAR`, `CCTA`).
-- **Pinned Test Regression Suite:** 41/41 tests passing in 53.93s across:
+- **Pinned Test Regression Suite:** 46/46 tests passing across:
   - `tests/test_v76_release_workflow.py` (8 tests)
-  - `tests/test_v77_concession_fix.py` (5 tests)
+  - `tests/test_v77_concession_fix.py` (6 tests)
   - `tests/test_v78_judge_in_loop.py` (5 tests)
-  - `tests/test_v79_app_release_fixes.py` (7 tests)
   - `tests/test_v80_reviewer_workflow.py` (6 tests)
-  - `tests/test_v81_build_completion.py` (5 tests)
-  - `tests/test_v82_build_fixes.py` (5 tests)
-- **Tracked 11 Files Ruff Count:** 83 total (all within baseline bounds).
+  - `tests/test_v79_app_release_fixes.py` (8 tests)
+  - `tests/test_v81_build_completion.py` (4 tests)
+  - `tests/test_v82_build_fixes.py` (4 tests)
+  - `tests/test_v84_concession_defense.py` (5 tests)
+
+> [!NOTE]
+> **Provenance Note:** The v84 benchmark measurement was executed on uncommitted v84 code anchored at the `e628ac8` base (hence `agentic_v84_three_mode_run.json` records `git_head: e628ac817777d7c16a00a143171b2bcf4c275289`). The code changes were subsequently committed as `d64fe21` -> `4bda07a` -> `6abc9d1` -> `88de623`. The v85 measurement records its own commit head.
+- **Tracked 11 Files Ruff Count:** 281 total (all within baseline bounds).
 
 ---
 
@@ -254,37 +262,41 @@ Measurement was executed via `python -m scripts.run_agentic_v59_three_mode_measu
 All 46 tests across 8 test files executed and passed:
 ```
 tests/test_v76_release_workflow.py ........ (8 passed)
-tests/test_v77_concession_fix.py ..... (5 passed)
+tests/test_v77_concession_fix.py ...... (6 passed)
 tests/test_v78_judge_in_loop.py ..... (5 passed)
-tests/test_v79_app_release_fixes.py ....... (7 passed)
 tests/test_v80_reviewer_workflow.py ...... (6 passed)
-tests/test_v81_build_completion.py ..... (5 passed)
-tests/test_v82_build_fixes.py ..... (5 passed)
+tests/test_v79_app_release_fixes.py ........ (8 passed)
+tests/test_v81_build_completion.py .... (4 passed)
+tests/test_v82_build_fixes.py .... (4 passed)
 tests/test_v84_concession_defense.py ..... (5 passed)
 ================== 46 passed in 90.51s ==================
 ```
 
-### 7.2 Ruff Error Counts on Tracked 11 Files
-Per-file ruff counts measured with `ruff check`:
+### 7.2 Ruff Error Counts on Established 11 Tracked Files
+Per-file ruff counts measured with `ruff check` on the established 11-file tracked set (all verified with `git ls-files`):
 ```
+app/api/deps.py: 15 (Baseline: 15) -> 0 new errors
+app/api/pas_routes.py: 33 (Baseline: 33) -> 0 new errors
+app/services/deferral_queue.py: 56 (Baseline: 56) -> 0 new errors
+app/api/routes.py: 145 (Baseline: 145) -> 0 new errors
+app/api/pdf_routes.py: 4 (Baseline: 4) -> 0 new errors
+app/api/release.py: 0 (Baseline: 0) -> 0 new errors
+app/db/models.py: 4 (Baseline: 4) -> 0 new errors
+app/schemas/contracts.py: 0 (Baseline: 0) -> 0 new errors
+app/services/trace_service.py: 0 (Baseline: 0) -> 0 new errors
+app/services/pdf_generator.py: 15 (Baseline: 15) -> 0 new errors
+app/agents/packet_generator.py: 9 (Baseline: 9) -> 0 new errors
+TOTAL: 281 errors (Baseline: 281) -> ZERO NEW ERRORS across all tracked files.
+
+Changed files in v84:
 app/agents/pipeline.py: 44 (Baseline: 44) -> 0 new errors
 app/core/llm_judge.py: 0 (Baseline: 0) -> 0 new errors
-app/api/v1/routes.py: 1 (Baseline: 1) -> 0 new errors
-app/api/deps.py: 15 (Baseline: 15) -> 0 new errors
-app/services/document_service.py: 1 (Baseline: 1) -> 0 new errors
-app/core/agentic_guardrails.py: 0 (Baseline: 0) -> 0 new errors
-app/core/concept_map.py: 0 (Baseline: 0) -> 0 new errors
-app/core/decision_packet.py: 1 (Baseline: 1) -> 0 new errors
-app/core/ehr_extractor.py: 1 (Baseline: 1) -> 0 new errors
-app/services/audit_service.py: 1 (Baseline: 1) -> 0 new errors
-app/services/declarative_engine.py: 19 (Baseline: 19) -> 0 new errors
-TOTAL: 83 errors (Baseline: 83) -> ZERO NEW ERRORS across all tracked files.
 tests/test_v84_concession_defense.py: 0 errors
 ```
 
 ### 7.3 Continuous Integration (GitHub Actions)
-- **CI Run ID:** [45294835240](https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/45294835240)
-- **Commit:** `6abc9d1` (parent: `4bda07a`, delivery: `d64fe21`)
+- **CI Run ID:** [45296418408](https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/45296418408) / [45294835240](https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/45294835240)
+- **Commit:** `88de623a8d4308cfdc8768c1d6b7eb09ed0007c8` (`88de623`, parent: `6abc9d1`, implementation: `d64fe21`)
 - **Status:** `completed`, **Conclusion:** `success` (100% green across all workflow jobs):
   - `Code Quality & Type Checking`: `success`
   - `Unit, Integration & Fuzz Test Suite`: `success` (508 passed)

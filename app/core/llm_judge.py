@@ -594,7 +594,7 @@ class ClinicalEquivalenceJudge:
             f"STEP 1 — OBJECTION-VALIDITY CHECK (Perform this FIRST):\n"
             f"Examine the exact REQUIREMENT text above and evaluate whether the adversarial objection is valid or invalid:\n"
             f"  (i) Does the objection cite or demand a requirement, duration, threshold, test, or finding that is NOT actually present in the criterion REQUIREMENT text? If the objection asserts a requirement absent from the criterion text, the objection is INVALID (objection_valid=false).\n"
-            f"  (ii) Does the objection assert a backwards or mathematically/clinically incorrect comparison? For example, with Snellen visual acuity, a larger denominator represents worse vision (20/60 is worse vision than 20/50, satisfying '20/50 or worse'); asserting that 20/60 fails '20/50 or worse' is backwards and INVALID (objection_valid=false).\n"
+            f"  (ii) Does the objection assert a backwards or mathematically/clinically incorrect comparison? For example, with Snellen visual acuity, a larger denominator represents worse vision (an acuity with a greater denominator represents worse sight and satisfies a threshold requiring vision at or worse than that level); asserting that an acuity with a larger denominator fails a 'worse than' requirement is inverted and INVALID (objection_valid=false).\n"
             f"  (iii) If the objection is INVALID, set objection_valid to false, quote the exact criterion text in objection_invalid_reason explaining why the objection fails, set defense_quote to \"\", and explain why the original evidence stands in rationale.\n\n"
             f"STEP 2 — EVIDENCE RESOLUTION (Only if objection is VALID):\n"
             f"  - If the objection is VALID (objection_valid=true): Examine the clinical note to determine if there is specific evidence that directly resolves, refutes, or satisfies this objection. If resolving evidence exists elsewhere in the note, provide a verbatim quote (defense_quote) DIFFERENT from the original proposed evidence, and explain how it resolves the objection in rationale. If the objection is valid and cannot be refuted by the clinical note, return defense_quote as \"\" and explain why the objection stands.\n\n"
@@ -762,7 +762,7 @@ class ClinicalEquivalenceJudge:
             and (not priority_stems or any(stem in cand_norm for stem in priority_stems))
         )
         query_text = candidate_quote if is_paraphrase_query else req_text
-        min_sim_threshold = 0.60 if is_paraphrase_query else 0.35
+        min_sim_threshold = 0.65 if is_paraphrase_query else 0.35
 
         # Try SapBERT semantic embedding similarity
         try:
@@ -811,8 +811,8 @@ class ClinicalEquivalenceJudge:
         except (ImportError, RuntimeError, ValueError, KeyError, TypeError, OSError) as exc:
             logger.debug(f"SapBERT span search fallback: {exc}")
 
-        # Lexical fallback if SapBERT did not resolve
-        if not best_span:
+        # Lexical fallback if SapBERT did not resolve and no candidate_quote was specified
+        if not best_span and not candidate_quote:
             best_score = 0.0
             for sent in sentences:
                 sent_lower = sent.lower()
