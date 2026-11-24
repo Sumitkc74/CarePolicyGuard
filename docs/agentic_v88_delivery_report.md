@@ -204,7 +204,10 @@ The baseline numbers from `app/data/benchmarks/agentic_v87_three_mode_run.json` 
 
 ## 10. CI Verification
 
-- **Commit**: `e1bc584fb660971696177877bde15d7bb5aa3eac` (`e1bc584`)
-- **CI Run ID**: `45452633454`
-- **Status**: Completed SUCCESS (All 3 jobs green: Unit/Integration/Fuzz, Code Quality & Type Checking, Docker Build & Health Verification).
-- **Subsequent Doc-Pin Commit**: `[PENDING]`
+- **Implementation Commit**: `e1bc584fb660971696177877bde15d7bb5aa3eac` (`e1bc584`)
+  - **CI Run ID**: `45452633454`
+  - **Status**: Completed SUCCESS (All 3 jobs green: Unit/Integration/Fuzz, Code Quality & Type Checking, Docker Build & Health Verification).
+- **Delivery Head Commit**: `33c0cbd2c7fbc3c172e01695d949c3317ff21d74` (`33c0cbd`)
+  - **CI Run ID**: `45454597921`
+  - **Status**: Completed SUCCESS (All 3 jobs green).
+
