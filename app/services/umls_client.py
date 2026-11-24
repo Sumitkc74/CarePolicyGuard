@@ -44,9 +44,10 @@ UMLS_PINNED_VERSION: str = "2024AB"
 UTS_BASE_URL: str = "https://uts-ws.nlm.nih.gov/rest"
 DEFAULT_CACHE_PATH: Path = Path("app/data/umls_cui_cache.json")
 
-# Term validation constants to enforce hard egress boundary
+# Term validation constants to enforce hard egress boundary:
+# Rejects newlines/tabs, sentence punctuation followed by whitespace, or trailing sentence punctuation
 MAX_TERM_LENGTH: int = 100
-_SENTENCE_DELIMITERS = re.compile(r"[\n\r]|(?:\.\s+)|(?:\?\s+)|(?:\!\s+)|(?:\;\s+)")
+_SENTENCE_DELIMITERS = re.compile(r"[\n\r]|(?:\.\s+)|(?:\?\s+)|(?:\!\s+)|(?:\;\s+)|(?:[\.\?\!\;]$)")
 
 
 class UMLSClient:

@@ -13,7 +13,7 @@ import logging
 import re
 import time
 from enum import Enum
-from typing import Any
+from typing import Any, ClassVar
 
 import httpx
 from pydantic import BaseModel, Field
@@ -97,6 +97,10 @@ class ClinicalEquivalenceJudge:
     Evaluates semantic equivalence between a criterion and a deterministically extracted span.
     Enforces local-only inference, budget limits, and strict absence of coverage judgments.
     """
+
+    _global_telemetry: ClassVar[dict[str, int]] = {
+        "equivalence_resolved_by_umls": 0,
+    }
 
     EQUIVALENCE_QUESTION = (
         "Does this candidate evidence span state the same clinical fact (as a synonym, "
@@ -261,6 +265,9 @@ class ClinicalEquivalenceJudge:
                             if is_eq and matched_cui:
                                 elapsed_ms = round((time.perf_counter() - t0) * 1000.0, 2)
                                 self.telemetry["equivalence_resolved_by_umls"] = self.telemetry.get("equivalence_resolved_by_umls", 0) + 1
+                                ClinicalEquivalenceJudge._global_telemetry["equivalence_resolved_by_umls"] = (
+                                    ClinicalEquivalenceJudge._global_telemetry.get("equivalence_resolved_by_umls", 0) + 1
+                                )
                                 self.telemetry["equivalent_count"] += 1
                                 eval_res = JudgeEvaluation(
                                     verdict=EquivalenceVerdict.EQUIVALENT,

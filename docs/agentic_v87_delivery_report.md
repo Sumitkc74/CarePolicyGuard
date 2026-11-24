@@ -2,6 +2,7 @@
 
 **Delivery Date**: 2026-11-23  
 **Head Anchor**: `934c6d1` (`934c6d1fc64e206dcab6a0850609f516ec2c7122`, parent `88de623`)  
+> [!NOTE] **Provenance Correction (Prompt v88)**: The v87 measurement (`app/data/benchmarks/agentic_v87_three_mode_run.json`) ran on uncommitted v87 code before landing; its `metadata.git_head` records `934c6d1` (the parent anchor head), NOT the delivery head `6ecf756`. The measured code landed across commits `f6563bf` (implementation) + `7d42e76` (harness baseline-reuse fix) + `6ecf756` (docs delivery).
 **Sequencing Context**: Suggestion Prompt v87 is a **BUILD** prompt delivering the National Library of Medicine (NLM) Unified Medical Language System (UMLS) UTS REST API integration. This capability serves as the scalable, authoritative foundation to resolve clinical synonymy and replace manual hand-attestation of draft concept-map entries (12 committed concepts vs 119 draft entries).
 
 ---
@@ -43,8 +44,8 @@ The UMLS integration is implemented in [`app/services/umls_client.py`](file:///e
 A strict egress filter is enforced in `validate_term_egress_boundary()`:
 1. **Length Limit**: Terms must be $\le 100$ characters.
 2. **Whitespace**: No newlines (`\n`, `\r`) or tabs (`\t`).
-3. **No Sentence Punctuation**: Characters such as `.`, `?`, `!`, `;` are strictly rejected.
-4. **Failure Behavior**: Any attempt to query a phrase violating these bounds raises `UMLSEgressViolationError` or is refused, ensuring patient clinical notes and narrative paragraphs never leave the boundary.
+3. **Sentence Punctuation & Delimiters**: The boundary regex in `app/services/umls_client.py:49` originally rejected sentence punctuation followed by whitespace or linebreaks (`r"[\n\r]|(?:\.\s+)|(?:\?\s+)|(?:\!\s+)|(?:\;\s+)"`). In Prompt v88, this regex was tightened to `r"[\n\r]|(?:\.\s+)|(?:\?\s+)|(?:\!\s+)|(?:\;\s+)|(?:[\.\?\!\;]$)"` to strictly reject any term that also ends in sentence punctuation (`.`, `?`, `!`, `;`). In practice, clinical notes are blocked from egress; terms sent by `llm_judge.py` are isolated clinical n-grams (≤ 4 words).
+4. **Failure Behavior**: Any attempt to query a phrase violating these bounds is refused (returns `False`), ensuring patient clinical notes and narrative paragraphs never leave the boundary. *(Correction note: Original draft asserted that boundary violations raise a dedicated egress violation exception class; no such exception class exists in `app/services/umls_client.py` — `validate_term_egress_boundary()` returns a `bool` (`False` on violation), and `get_cui()` returns `None` on refusal).*
 
 ### 2.4 Caching Architecture
 - **In-Memory Cache**: LRU/dictionary cache for immediate repeated queries within the same process.
@@ -103,12 +104,19 @@ The full 84-case benchmark measurement was executed and saved to [`app/data/benc
 
 | Metric | v85 Baseline | v87 Delivery | Delta / Impact |
 | :--- | :--- | :--- | :--- |
-| **Total Judge Calls** | 109 | **107** | **-2 calls saved** (pre-judge short circuit) |
+| **Total Judge Calls** | 109 | **107** | **-2 calls saved** (pre-judge short circuit) *(Correction note below)* |
 | **Mean Wall-Clock Time** | 27.70 s | **27.67 s** | -0.03 s |
 | **Mean Judge Latency** | 15,920.41 ms | **16,106.95 ms** | Stable ($\pm 1\%$) |
 | **Cases Exceeding 60 s** | 29 | **29** | Exact parity |
 | **Operational Budget Halts** | 2 | **2** | Exact parity |
 | **Per-Case Decision Diff** | 0 | **0** | **100% decision concordance vs v85** |
+
+> [!NOTE] **Efficiency Attribution Correction (Prompt v88)**: While total judge calls indeed dropped from 109 to 107 in the benchmark run, the parenthesized attribution *"pre-judge short circuit"* is **unsupported by artifact telemetry**. Grepping `app/data/benchmarks/agentic_v87_three_mode_run.json` confirms:
+> - Occurrences of `"CUI"`: **0**
+> - Occurrences of `"EQUIVALENCE_CONFIRMED_VIA_UMLS"`: **0**
+> - Occurrences of `"umls"` (case-insensitive): **1** (solely `metadata.umls_version = "2024AB"`)
+> 
+> Because `UMLS_API_KEY` was not configured in the host environment during the measurement, the UMLS client failed closed as designed and resolved zero equivalences on the dev set. The -2 judge call variation is fully consistent with host-level Ollama sampling / timing nondeterminism and must not be claimed as an empirical UMLS efficiency win. The UMLS integration is validated by its test suite (8 mocked tests in `tests/test_v87_umls_integration.py`).
 
 ### 4.3 Key Vignette & Safety Audits
 - **Target Cases (Revert Status at 0.65)**:
@@ -189,8 +197,9 @@ tests/test_v87_umls_integration.py: 0 errors
 
 ## 7. CI & Build Verification
 
-- **GitHub Actions Workflow Run**: [45340814580](https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/45340814580)
-- **Commit Head**: `7d42e76` (`7d42e76647b1edc30feb7e5b90723081fe3e3d69`, parent `f6563bf`, base `934c6d1`)
+- **GitHub Actions Workflow Run**: [45342033973](https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/45342033973) (also verified parent run [45340814580](https://github.com/Sumitkc74/CarePolicyGuard/actions/runs/45340814580))
+- **Commit Head**: `6ecf756` (`6ecf7568df9c37554748026b405f417f552e0847`, delivery head; parent `7d42e76`, base `934c6d1`)
+  *(Original report draft stated parent commit head `7d42e76`; corrected in place to delivery head `6ecf756`).*
 - **Status**: **ALL GREEN / SUCCESS**
   - `Code Quality & Type Checking`: **SUCCESS**
   - `Unit, Integration & Fuzz Test Suite`: **SUCCESS** (519 tests passed, 0 failures)

@@ -1583,6 +1583,15 @@ def main() -> None:
         is_v63 = "v63" in str(args.output)
         is_v62 = "v62" in str(args.output)
         is_v61 = "v61" in str(args.output)
+        from app.core.llm_judge import ClinicalEquivalenceJudge
+        from app.services.umls_client import get_umls_client
+
+        _umls_client = get_umls_client()
+        _umls_tel = getattr(_umls_client, "telemetry", {})
+        _judge_umls_res = getattr(ClinicalEquivalenceJudge, "_global_telemetry", {}).get(
+            "equivalence_resolved_by_umls", 0
+        )
+
         summary = {
             "metadata": {
                 "execution_timestamp": datetime.now(UTC).isoformat(),
@@ -1616,6 +1625,13 @@ def main() -> None:
                     "agentic": f"Merged Map ({comm_cnt} committed + {draft_cnt} drafts = {merged_map.total_concepts} concepts)",
                 },
                 "umls_version": "2024AB",
+                "umls_lookups_attempted": _umls_tel.get("lookups_attempted", 0),
+                "umls_lookups_resolved": _umls_tel.get("lookups_resolved", 0),
+                "umls_cache_hits": _umls_tel.get("cache_hits", 0),
+                "umls_api_calls": _umls_tel.get("api_calls", 0),
+                "umls_equivalence_checks_evaluated": _umls_tel.get("equivalence_checks_evaluated", 0),
+                "umls_equivalence_confirmed_by_cui": _umls_tel.get("equivalence_confirmed_by_cui", 0),
+                "umls_equivalence_resolved_by_judge": _judge_umls_res,
             },
             "four_number_safety_comparison": {
                 "deterministic": {
