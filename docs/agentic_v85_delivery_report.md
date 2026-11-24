@@ -1,6 +1,6 @@
 # Agentic Adjudication Benchmark Delivery Report — v85 Correction Delivery
 
-**Delivery Git Head:** `d6a505cca8caff8f54d16995d1e24d184f086dfb` (`d6a505c`)  
+**Delivery Git Head:** `ee71d65b582f261d3f1c1edcab0a44f8e507c73c` (`ee71d65`)  
 **Baseline Parent Git Head:** `88de623a8d4308cfdc8768c1d6b7eb09ed0007c8` (v84 delivery)  
 **Parent Chain:** `e9b8ab2` (v75) $\to$ `7db0e18` $\to$ `d96ced5` (v77 implementation) $\to$ `fd33da2` (v77 measurement) $\to$ `f79d755` (v76 release-path fix) $\to$ `853763c` (v78 judge-in-loop) $\to$ `6f4a632` (v80 reviewer build) $\to$ `ad2fd40` (v81 build completion) $\to$ `8a345be` (v82 build fixes) $\to$ `e628ac8` (v83 doc corrections) $\to$ `d64fe21` (v84 implementation) $\to$ `4bda07a` $\to$ `6abc9d1` $\to$ `88de623` (v84 delivery/report)  
 **Execution Timestamp:** 2026-11-23T19:15:00Z  
