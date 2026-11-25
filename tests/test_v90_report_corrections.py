@@ -45,15 +45,19 @@ def test_v90_v88_report_telemetry_and_file_counts() -> None:
     )
 
     # (b) Count test modules in repo at caca385 baseline
-    # Verify using git ls-files if git is available, else fallback to Path
+    # Verify using git ls-tree if git is available, else fallback to Path
     try:
         proc = subprocess.run(
-            ["git", "ls-files", "caca385", "--", "tests/test_*.py"],
+            ["git", "ls-tree", "-r", "--name-only", "caca385", "--", "tests/"],
             capture_output=True,
             text=True,
             check=True,
         )
-        test_files = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+        test_files = [
+            line.strip()
+            for line in proc.stdout.splitlines()
+            if line.strip().startswith("tests/test_") and line.strip().endswith(".py")
+        ]
         test_module_count = len(test_files)
     except (subprocess.SubprocessError, OSError):
         # If git revision query fails, count existing test files excluding v90 test
