@@ -97,9 +97,10 @@ To ensure full transparency and provability in all future measurements, telemetr
 
 1. **`ClinicalEquivalenceJudge` Telemetry Tracking (`app/core/llm_judge.py`)**:
    - Added class-level tracking `_global_telemetry` on `ClinicalEquivalenceJudge` initialized to a single key: `{"equivalence_resolved_by_umls": 0}` (incremented whenever a pre-judge UMLS check resolves equivalence).
-   - The full 7 UMLS client telemetry metrics (`lookups_attempted`, `lookups_resolved`, `cache_hits`, `api_calls`, `equivalence_checks_evaluated`, `equivalence_confirmed_by_cui`, `lookups_rejected_by_egress`) reside in `UMLSClient.telemetry` (`app/services/umls_client.py`).
+   - The 6 UMLS client telemetry metrics (`api_calls`, `cache_hits`, `lookups_attempted`, `lookups_resolved`, `equivalence_checks_evaluated`, `equivalence_confirmed_by_cui`) reside in `UMLSClient.telemetry` (`app/services/umls_client.py:84-91`).
+   *(Correction Note — Prompt v90)*: Removed the non-existent egress-rejection metric. The client's `self.telemetry` dictionary defines exactly 6 metrics. The previously stated 7th key was an unverified identifier introduced during the v89 report edit, belonging to the same error class as the v87 report's egress exception and the v88 report's fabricated validation function name.
 2. **Benchmark Runner Metadata (`scripts/run_agentic_v59_three_mode_measurement.py`)**:
-   - The runner metadata dictionary aggregates the judge's global telemetry and client telemetry, serializing all 7 keys FLAT at the root of `run_metadata` (`umls_lookups_attempted`, `umls_lookups_resolved`, `umls_cache_hits`, `umls_api_calls`, `umls_equivalence_checks_evaluated`, `umls_equivalence_confirmed_by_cui`, `umls_equivalence_resolved_by_judge`).
+   - The runner metadata dictionary aggregates the judge's global telemetry (1 metric: `umls_equivalence_resolved_by_judge`) and the client's telemetry (6 metrics: `umls_lookups_attempted`, `umls_lookups_resolved`, `umls_cache_hits`, `umls_api_calls`, `umls_equivalence_checks_evaluated`, `umls_equivalence_confirmed_by_cui`), serializing all 7 metrics FLAT at the root of `run_metadata`.
    *(Correction note: Corrected description to reflect that judge global tracking holds a single key and the runner writes the seven metrics flat rather than under nested dicts).*
 
 ---
@@ -149,7 +150,7 @@ Comprehensive testing was conducted across all unit, delivery, regression, and s
    - **Total Held-Out Tests: 11 / 11 PASSED**
 
 **Selected Subset Total Across Audited Suites: 102 / 102 PASSED.**  
-*(Full test suite contains 524 collected tests across 75 test files; see Prompt v89 report for full suite execution).*
+*(Full test suite contains 528 collected tests at baseline caca385 / 532 collected tests at v90 head across 95 test modules and 100 total files under tests/; see Prompt v89/v90 reports for full suite execution. Correction Note: Corrected the previously unverified "75 test files" count and 524 collected tests to the actual repository counts verified via git ls-files tests/ and pytest).*
 
 ---
 

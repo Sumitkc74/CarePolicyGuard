@@ -97,10 +97,13 @@ pytest tests/ -q
 ```
 
 ### Breakdown
-- **Total Collected**: **524**
-- **Passed**: **523**
+- **Original Claim**: **524** collected (523 passed, 1 skipped, 0 failed).
+- **Correction Note (Prompt v90)**: The original 524 collected count reflected the `f90decf` suite total measured *before* `tests/test_v89_report_corrections.py` was created, mistakenly excluding the 4 new v89 tests.
+  - At delivery head `caca385`, the verified suite count is **528 collected tests** (525 passed + 2 VM-only ruff-PATH failures + 1 skipped on review VM, or 527 passed + 1 skipped when ruff is on PATH).
+  - With the addition of `tests/test_v90_report_corrections.py` (4 tests), the full repository suite reaches **532 collected tests** (529 passed + 2 VM-only ruff-PATH failures + 1 skipped on review VM, or 531 passed + 1 skipped when ruff is on PATH).
+- **Passed**: **527** (host with ruff on PATH) / **525** (review VM) at `caca385`; **531** / **529** at v90 head
 - **Skipped**: **1** (`tests/test_runtime_conversation_and_synonymy.py:244` — live Ollama daemon test)
-- **Failed**: **0**
+- **Failed**: **0** (development environment) / **2** (review VM due to bare ruff PATH resolution)
 
 ### VM-Only Ruff-PATH Test Context
 In headless Linux review virtual machines where bare `ruff` is not placed on the system PATH, two tests fail (`tests/test_v81_build_completion.py::test_v81_ruff_error_counts_within_baseline_bounds` and `tests/test_v82_build_fixes.py::test_v82_all_eleven_files_within_ruff_bounds`). In the active development environment where ruff is on PATH, both tests pass unconditionally, bringing total passing tests to 523 / 524.
@@ -200,6 +203,10 @@ Preserved exactly from `app/data/benchmarks/agentic_v87_three_mode_run.json`:
 - **Implementation Commit**: `1dfb741f890e01134f991ee7f36e138d94a051ea` (`1dfb741`)
   - **CI Run ID**: `45478145157`
   - **Status**: Completed SUCCESS (All 3 jobs green: Unit/Integration/Fuzz, Code Quality & Type Checking, Docker Build & Health Verification).
-- **Delivery Head Commit**: `d06bb93439ca57f5c918760bed1e2fd952a83313` (`d06bb93`)
+- **Intermediate Docs Commit**: `d06bb93439ca57f5c918760bed1e2fd952a83313` (`d06bb93`)
   - **CI Run ID**: `45479847628`
   - **Status**: Completed SUCCESS (All 3 jobs green: Unit/Integration/Fuzz, Code Quality & Type Checking, Docker Build & Health Verification).
+- **Delivery Head Commit**: `caca385311fd202101f2859e4b8fece655501a32` (`caca385`)
+  - **CI Run ID**: `45481946912`
+  - **Status**: Completed SUCCESS (All 3 jobs green: Unit/Integration/Fuzz, Code Quality & Type Checking, Docker Build & Health Verification).
+  - *(Correction Note — Prompt v90)*: Originally cited `d06bb93` as the delivery head commit. `d06bb93` was the intermediate documentation commit; the true delivery head commit is `caca385311fd202101f2859e4b8fece655501a32` (`caca385`), with passing CI run `45481946912`. Note that this represents the third consecutive delivery that repeated this parent-vs-delivery-head citation mistake (v87 cited 7d42e76 instead of 6ecf756; v88 cited 33c0cbd instead of f90decf; v89 cited d06bb93 instead of caca385).
