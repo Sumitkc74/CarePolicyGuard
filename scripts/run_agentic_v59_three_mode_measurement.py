@@ -166,22 +166,6 @@ def verify_baseline_reuse_validity(reuse_json_path: Path) -> bool:
                             unauthorized_changes.append(cf)
                     except (subprocess.CalledProcessError, OSError):
                         unauthorized_changes.append(cf)
-                elif "mcd_cache" in cf:
-                    # Cache files do not alter policy definitions
-                    continue
-                elif cf.startswith("app/data/policies_extended/") and cf.endswith(".json"):
-                    try:
-                        pol_diff = subprocess.check_output(
-                            ["git", "diff", "-U0", prev_head, "HEAD", "--", cf],
-                            text=True,
-                            stderr=subprocess.DEVNULL,
-                        )
-                        # Check if criteria, rules, or thresholds were modified vs lifecycle metadata status
-                        critical_keys = ["criteria", "coverage_rules", "threshold", "criterion_type", "is_exclusion"]
-                        if any(k in pol_diff for k in critical_keys):
-                            unauthorized_changes.append(cf)
-                    except (subprocess.CalledProcessError, OSError):
-                        unauthorized_changes.append(cf)
                 else:
                     unauthorized_changes.append(cf)
 

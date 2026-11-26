@@ -342,8 +342,6 @@ def test_vii_onboard_policy_no_indications_terminal(tmp_path: Path):
 
 def test_viii_onboard_policy_creates_pending_human_review_queue_records(tmp_path: Path):
     """(viii) onboard_policy creates PENDING_HUMAN_REVIEW queue records for every drafted criterion."""
-    agent = PolicyOnboardingAgent(staging_dir=tmp_path)
-
     doc_text = "The patient must have documented knee instability on clinical exam."
     valid_doc = {
         "mcd_id": "L33318",
@@ -389,8 +387,6 @@ def test_viii_onboard_policy_creates_pending_human_review_queue_records(tmp_path
 
 def test_ix_freshly_onboarded_policy_draft_and_claimed_unverified(tmp_path: Path):
     """(ix) A freshly onboarded policy's criteria carry CLAIMED_UNVERIFIED and policy carries DRAFT status."""
-    agent = PolicyOnboardingAgent(staging_dir=tmp_path)
-
     doc_text = "The patient must have documented knee instability on clinical exam."
     valid_doc = {
         "mcd_id": "L33318",

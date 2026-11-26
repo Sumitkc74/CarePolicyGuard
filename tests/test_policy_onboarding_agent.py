@@ -14,27 +14,24 @@ Verifies:
 
 import json
 from pathlib import Path
-import pytest
 
-from app.agents.policy_onboarding import (
-    PolicyOnboardingAgent,
-    OnboardingResult
-)
+from app.agents.policy_onboarding import PolicyOnboardingAgent
 from app.agents.policy_retriever import PolicyRetrievalAgent
-from app.agents.pipeline import MultiAgentVerificationPipeline
+from app.schemas.contracts import DeterminationStatus
+from app.schemas.declarative_policy import (
+    CriterionType,
+    DeclarativeCriterion,
+    DeclarativePolicy,
+)
 from app.services.declarative_engine import DeclarativePolicyEngine
-from app.services.hybrid_retriever import HybridPolicyRetriever
-from app.schemas.declarative_policy import DeclarativePolicy, DeclarativeCriterion, CriterionType
-from app.schemas.contracts import DeterminationStatus, AdjudicationDecision
-
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURE_PATH = REPO_ROOT / "tests" / "fixtures" / "sample_clinician_notes.json"
 
 
-def test_onboarding_against_known_good_source_reproduces_criteria():
+def test_onboarding_against_known_good_source_reproduces_criteria(tmp_path):
     """Onboarding with a known-good MCD identifier (L36920) produces valid criteria."""
-    agent = PolicyOnboardingAgent()
+    agent = PolicyOnboardingAgent(queue_path=tmp_path / "queue.json")
     result = agent.onboard_policy(
         cms_id="L36920",
         clinical_subject="Epidural Steroid Injections for Pain Management",
@@ -73,9 +70,9 @@ def test_onboarding_with_fake_identifier_stops_with_source_not_found(tmp_path):
     assert list(tmp_path.glob("*.md")) == []
 
 
-def test_non_verbatim_quoted_passage_is_rejected():
+def test_non_verbatim_quoted_passage_is_rejected(tmp_path):
     """A quoted passage that does not appear verbatim in the source document is flagged and rejected."""
-    agent = PolicyOnboardingAgent()
+    agent = PolicyOnboardingAgent(queue_path=tmp_path / "queue.json")
     fake_doc_text = "This policy covers spinal orthoses for scoliosis."
     is_verbatim = agent.verify_verbatim_quote(fake_doc_text, "This policy covers cranial helmets.")
     assert not is_verbatim
