@@ -6,6 +6,7 @@
 **Benchmark Measurement Commit**: `19817c3` (`19817c3b246a4e32047cb5c8a329d20c54bbef24`)  
 **Queue Isolation Fix Commit**: `21ab861` (`21ab86144510006240d99dc0742f53d4c3a078fa`)  
 **Baseline Validator Fix Commit**: `c6546f1` (`c6546f12a33ad47f7d835800e722ab1aaf2baa7d`)  
+**Intermediate Docs Commit**: `efe20df` (`efe20dfd43c7b80898555e5102ffcce041c2d0f5`)  
 **Delivery Head**: `[v91 delivery]`  
 **Date**: November 26, 2026  
 **Status**: COMPLETE  
@@ -36,7 +37,7 @@ e1bc584 (v88 implementation) → 33c0cbd (v88 intermediate docs) → f90decf (v8
 7f5b470 (v86 implementation) → 9cdaa85 (v86 intermediate docs) → 738c729 (v86 delivery) →
 3465f68 (v86 re-measurement) →
 3c6006a (v91 implementation) → 19817c3 (v91 benchmark) → 21ab861 (v91 queue isolation) →
-c6546f1 (v91 baseline validator fix) →
+c6546f1 (v91 baseline validator fix) → efe20df (v91 intermediate docs) →
 [v91 delivery]
 ```
 
@@ -326,7 +327,16 @@ pytest tests/ -q
 | `19817c3` | Benchmark | `bench(v91): record 3-mode benchmark measurement at head 3c6006a` | N/A (local batch) | Passed |
 | `21ab861` | Fix | `fix(agent5): isolate review queue path in onboarding agent and tests` | `45795148411` | Completed |
 | `c6546f1` | Fix | `fix(bench): allow metadata-only policy changes and mcd_cache in baseline reuse validator` | `45796642377` | Completed SUCCESS |
-| `[v91 delivery]` | Documentation | `docs(v91): document policy verification workflow, audit results, and benchmark neutrality` | [Pending push] | Pending |
+| `efe20df` | Intermediate Docs | `docs(v91): document policy verification workflow, audit results, and benchmark neutrality` | `45798442837` | Completed SUCCESS |
+| `[v91 delivery]` | Delivery | `docs(v91): finalize CI run IDs in v91 delivery report` | [Pending push] | Pending |
+
+### CI Run `45798442837` Job Status (Commit `efe20df`)
+- **Repository**: `Sumitkc74/CarePolicyGuard`
+- **Head SHA**: `efe20dfd43c7b80898555e5102ffcce041c2d0f5`
+- **Overall Conclusion**: `SUCCESS`
+- **Code Quality & Type Checking**: Completed SUCCESS
+- **Unit, Integration & Fuzz Test Suite**: Completed SUCCESS
+- **Docker Build & Health Verification**: Completed SUCCESS
 
 ### CI Run `45796642377` Job Status (Commit `c6546f1`)
 - **Repository**: `Sumitkc74/CarePolicyGuard`
