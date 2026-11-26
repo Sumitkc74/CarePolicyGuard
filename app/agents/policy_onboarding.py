@@ -217,11 +217,13 @@ class PolicyOnboardingAgent:
         self,
         local_llm_url: str | None = None,
         mcd_client: httpx.Client | None = None,
-        staging_dir: Path | None = None
+        staging_dir: Path | None = None,
+        queue_path: Path | None = None,
     ):
         self.local_llm_url = local_llm_url or "http://127.0.0.1:11434/v1"
         self.mcd_client = mcd_client or httpx.Client(timeout=10.0)
         self.staging_dir = staging_dir or (Path(__file__).resolve().parent.parent / "data" / "policies_extended" / "drafts")
+        self.queue_path = queue_path
 
     def fetch_mcd_document(self, cms_id: str, clinical_subject: str) -> dict[str, Any] | None:
         """
@@ -753,7 +755,7 @@ class PolicyOnboardingAgent:
                 "created_at": datetime.now(UTC).isoformat()
             })
         if queue_records:
-            add_or_update_queue_records(queue_records)
+            add_or_update_queue_records(queue_records, queue_path=self.queue_path)
 
         status = "DRAFT_ONBOARDED" if failed_verbatim == 0 else "REJECTED_VERBATIM_FAILURE"
         return OnboardingResult(

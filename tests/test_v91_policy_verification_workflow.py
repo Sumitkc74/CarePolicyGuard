@@ -311,9 +311,6 @@ def test_vi_engine_refuses_draft_policy_without_flag():
 
 def test_vii_onboard_policy_no_indications_terminal(tmp_path: Path):
     """(vii) onboard_policy terminates with NO_INDICATIONS_FOUND, writes no policy or queue records."""
-    agent = PolicyOnboardingAgent(staging_dir=tmp_path)
-
-    # Mock fetch_mcd_document returning doc with empty indications
     empty_doc = {
         "mcd_id": "L99991",
         "title": "Document Without Indications",
@@ -328,10 +325,9 @@ def test_vii_onboard_policy_no_indications_terminal(tmp_path: Path):
     with open(queue_file, "w", encoding="utf-8") as f:
         json.dump([], f)
 
-    with (
-        patch.object(agent, "fetch_mcd_document", return_value=empty_doc),
-        patch("scripts.review_policy_queue.DEFAULT_QUEUE_FILE", queue_file),
-    ):
+    agent = PolicyOnboardingAgent(staging_dir=tmp_path, queue_path=queue_file)
+
+    with patch.object(agent, "fetch_mcd_document", return_value=empty_doc):
         result = agent.onboard_policy("L99991", "Test Subject", save_draft=True)
 
     assert result.status == "NO_INDICATIONS_FOUND"
@@ -374,10 +370,9 @@ def test_viii_onboard_policy_creates_pending_human_review_queue_records(tmp_path
     with open(queue_file, "w", encoding="utf-8") as f:
         json.dump([], f)
 
-    with (
-        patch.object(agent, "fetch_mcd_document", return_value=valid_doc),
-        patch("scripts.review_policy_queue.DEFAULT_QUEUE_FILE", queue_file),
-    ):
+    agent = PolicyOnboardingAgent(staging_dir=tmp_path, queue_path=queue_file)
+
+    with patch.object(agent, "fetch_mcd_document", return_value=valid_doc):
         result = agent.onboard_policy("L33318", "Knee Orthoses", save_draft=True)
 
     assert result.status == "DRAFT_ONBOARDED"
@@ -422,10 +417,9 @@ def test_ix_freshly_onboarded_policy_draft_and_claimed_unverified(tmp_path: Path
     with open(queue_file, "w", encoding="utf-8") as f:
         json.dump([], f)
 
-    with (
-        patch.object(agent, "fetch_mcd_document", return_value=valid_doc),
-        patch("scripts.review_policy_queue.DEFAULT_QUEUE_FILE", queue_file),
-    ):
+    agent = PolicyOnboardingAgent(staging_dir=tmp_path, queue_path=queue_file)
+
+    with patch.object(agent, "fetch_mcd_document", return_value=valid_doc):
         result = agent.onboard_policy("L33318", "Knee Orthoses", save_draft=True)
 
     assert result.status == "DRAFT_ONBOARDED"
