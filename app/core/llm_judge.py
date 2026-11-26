@@ -823,11 +823,28 @@ class ClinicalEquivalenceJudge:
 
         best_span = ""
 
-        # If candidate_quote is provided and priority_stems are absent or already satisfied by candidate,
-        # query specifically for candidate_quote to find the nearest verbatim paraphrase span.
-        # Otherwise, if candidate lacks priority stems (e.g. weak fragment), query for the criterion requirement.
+        # Task 1 (v86 Option B): Detect if candidate_quote is the criterion's statutory requirement text
+        cand_clean = cand_norm.strip()
+        desc_norm = str(criterion.get("description", "")).strip().lower()
+        cand_alnum = re.sub(r"[^a-z0-9]+", " ", cand_clean).strip()
+        desc_alnum = re.sub(r"[^a-z0-9]+", " ", desc_norm).strip()
+        req_alnum = re.sub(r"[^a-z0-9]+", " ", req_text).strip()
+        candidate_is_requirement_text = bool(
+            cand_clean
+            and (
+                (desc_norm and (cand_clean in desc_norm or desc_norm in cand_clean))
+                or (req_text and (cand_clean in req_text or req_text in cand_clean))
+                or (desc_alnum and (cand_alnum in desc_alnum or desc_alnum in cand_alnum))
+                or (req_alnum and (cand_alnum in req_alnum or req_alnum in cand_alnum))
+            )
+        )
+
+        # If candidate_quote is provided (and not requirement text regurgitation) and priority_stems
+        # are absent or satisfied by candidate, query specifically for candidate_quote to find paraphrase.
+        # Otherwise, query for the criterion requirement.
         is_paraphrase_query = bool(
             candidate_quote
+            and not candidate_is_requirement_text
             and (not priority_stems or any(stem in cand_norm for stem in priority_stems))
         )
         query_text = candidate_quote if is_paraphrase_query else req_text
@@ -880,8 +897,8 @@ class ClinicalEquivalenceJudge:
         except (ImportError, RuntimeError, ValueError, KeyError, TypeError, OSError) as exc:
             logger.debug(f"SapBERT span search fallback: {exc}")
 
-        # Lexical fallback if SapBERT did not resolve and no candidate_quote was specified
-        if not best_span and not candidate_quote:
+        # Lexical fallback if SapBERT did not resolve and no candidate_quote was specified (or candidate is requirement text)
+        if not best_span and (not candidate_quote or candidate_is_requirement_text):
             best_score = 0.0
             for sent in sentences:
                 sent_lower = sent.lower()

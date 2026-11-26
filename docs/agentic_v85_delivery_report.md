@@ -32,7 +32,8 @@ The table below summarizes the performance across all four evaluation modes on t
 | **False Approvals (FA)** | **0** | **0** | **0** | **0** |
 | **False Denials (FD)** | 2 | **0** | **0** | **0** |
 | **Deferrals to Human Review** | 45 | 45 | 36 | **30** |
-| **Synonymy Resolved Cases** | 0 | 2 | 11 | **17** |
+| **Synonymy Resolved Cases** | 0 | 0 | 10 | **14** |
+*(Note on v86 Correction: The original table listed 0 / 2 / 11 / 17. The recomputed and verified values from `app/data/benchmarks/agentic_v85_three_mode_run.json`'s `four_number_safety_comparison` and `synonymy_resolved_count` are exactly 0 in deterministic, 0 in declarative, 10 in declarative-131, and 14 in agentic mode).*
 | **Total Wall-Clock Time** | 4.7 s | 1596.2 s | 571.0 s | 2327.2 s |
 | **Mean Case Latency** | 0.06 s | 19.00 s | 6.80 s | 27.70 s |
 
@@ -57,6 +58,10 @@ The table below summarizes the performance across all four evaluation modes on t
 
 *\*Note on Wall-Clock Latency & Operational Budget Halts in v85:*  
 The increase in mean wall clock (27.70 s) and cases over 60s (29) during the benchmark measurement run was driven entirely by host-level inference queue contention on the local Ollama server (`qwen2.5:3b`) during the continuous 84-case run, rather than increased algorithmic rounds. Total LLM judge calls **decreased** from 121 to 109 (-12 calls). Two cases (`DEV-LCD-KYPHO-APP` at 60.49 s and `DEV-LCD-MRI-LUMBAR-APP` at 60.83 s) barely breached the strict 60.0 s per-case operational boundary by less than 0.9 seconds, triggering a fail-closed `BudgetExhaustionHalt` to human review.
+
+> **v86 Correction Note on Wall-Clock Latency & Provenance:**  
+> 1. *Wall-Clock & Queue Contention:* While only 2 cases barely breached 60s (`DEV-LCD-KYPHO-APP` at 60.49 s and `DEV-LCD-MRI-LUMBAR-APP` at 60.83 s), a total of **29 cases** exceeded 60s wall-clock time across the run (with the slowest case reaching 80.55 s). The increase in wall-clock time (19.00 s $\to$ 27.70 s) while judge calls decreased (121 $\to$ 109) with mean judge call latency rising to 15,920.41 ms is consistent with host-level inference queue contention, but is unproven without concurrent host telemetry.  
+> 2. *Provenance:* The v85 benchmark measurement was executed against uncommitted v85 code based on parent head `88de623` (`88de623a8d4308cfdc8768c1d6b7eb09ed0007c8`), as recorded in `agentic_v85_three_mode_run.json`'s `metadata.git_head`, rather than the final delivery head `934c6d1`. The v86 measurement records its own verified commit head.
 
 ### 3.2 Guard Cost Audit (Transcript Analysis)
 
@@ -86,8 +91,12 @@ The v85 correction strictly reverted these changes to restore baseline rigor. Ou
 In `DEV-LCD-KYPHO-APP`, the initial quote is fully grounded and passes Gate A. Agent 3 raises a temporal objection demanding 4 weeks of conservative therapy. Agent 2 invalidates this objection because `CRIT-KYPHO-02` contains no duration requirement. In isolated unit execution (`tests/test_v85_threshold_revert.py`), the case adjudicates to `APPROVED`. During the full 84-case benchmark, the case reached 60.49 s, deferring solely due to the 60.0 s wall-clock operational budget limit.
 
 ### 4.3 Preservation of Prior Rescues & Policy Scope
-- **v77 Rescues (5/5 preserved):** `DEV-OPD-BLEPH-APP`, `DEV-LCD-CATARACT-APP`, `DEV-OPD-RHINO-APP`, `DEV-LCD-LUMBAR-DECOMP-APP`, `DEV-NCD-MICRO-APP` all remain approved or cleanly processed.
+- **v77 Rescues (5/5 preserved):** `DEV-LCD-PAD-ATHERO-APP`, `DEV-NCD-PACEMAKER-APP`, `DEV-NCD-SCS-APP`, `DEV-NCD-SGD-APP`, `DEV-OPD-SI-FUSION-APP` all remain approved in the run JSON (5/5 verified).
+  *(Note on v86 Correction: The original list mistakenly cited `DEV-OPD-BLEPH-APP`, `DEV-LCD-CATARACT-APP`, `DEV-OPD-RHINO-APP`, `DEV-LCD-LUMBAR-DECOMP-APP`, `DEV-NCD-MICRO-APP`, two of which do not exist in the run JSON. The 5 real v77 rescues are listed above).*
 - **Policy Modeling Cases (3/3 deferred):** `DEV-LCD-MRI-BRAIN-APP`, `DEV-LCD-MRI-LUMBAR-APP`, and `DEV-NCD-CCTA-APP` remain appropriately deferred to human review pending formal policy modeling.
+
+> **v86 Correction Note on Test (iv) Unit Mocking:**  
+> In §6 / `tests/test_v85_threshold_revert.py`, unit test (iv) (`test_v85_target_cases_rescue_kypho_and_cataract_after_revert`) mocked `judge_criterion_sync`, `generate_adversarial_counter_reading_sync`, `generate_defense_sync`, and `judge_equivalence_sync` to return pre-formed verbatim quotes directly. This bypassed the `select_most_relevant_span` normalization path that failed in the real measurement pipeline on requirement-text regurgitations. Prompt v86 authored unmocked unit tests (`tests/test_v86_span_normalization_fix.py` tests (i), (ii), and (v)) that exercise the live SapBERT span normalization and requirement-text detection directly.
 
 ---
 
