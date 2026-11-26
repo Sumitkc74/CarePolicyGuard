@@ -45,7 +45,7 @@ def test_onboarding_against_known_good_source_reproduces_criteria():
     assert result.policy.status == "DRAFT"
     assert result.policy.policy_version.startswith("DRAFT")
     assert result.report is not None
-    assert result.report.provenance_status == "VERIFIED_FROM_MCD"
+    assert result.report.provenance_status == "CLAIMED_UNVERIFIED"
     assert result.report.verbatim_checks_passed >= 1
     assert result.report.verbatim_checks_failed == 0
 

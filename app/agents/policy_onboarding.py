@@ -12,33 +12,35 @@ Enforces:
 """
 
 from __future__ import annotations
+
 import json
 import logging
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import httpx
 from pydantic import BaseModel, Field
 
 from app.schemas.agent_messages import (
+    AgentConversationAuditBus,
     AgentMessage,
     AgentMessageType,
-    AgentConversationAuditBus
 )
 from app.schemas.declarative_policy import (
-    DeclarativePolicy,
+    CriterionType,
     DeclarativeCriterion,
-    CriterionType
+    DeclarativePolicy,
 )
 from app.services.declarative_engine import DeclarativePolicyEngine
+from scripts.review_policy_queue import add_or_update_queue_records
 
 logger = logging.getLogger(__name__)
 
 # Known verified MCD document store for resilient offline testing and live fallback
-MCD_VERIFIED_FIXTURES: Dict[str, Dict[str, Any]] = {
+MCD_VERIFIED_FIXTURES: dict[str, dict[str, Any]] = {
     "L36920": {
         "mcd_id": "L36920",
         "title": "Epidural Steroid Injections for Pain Management",
@@ -175,34 +177,34 @@ class OnboardingEvaluationRound(BaseModel):
     top1_retrieval_hits: int
     decision_matches: int
     accuracy_percent: float
-    failures_standing: List[Dict[str, Any]] = Field(default_factory=list)
+    failures_standing: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class OnboardingReport(BaseModel):
     """Complete machine-readable audit report for an onboarded policy."""
     policy_id: str
     policy_title: str
-    source_url: Optional[str]
+    source_url: str | None
     checked_date: str
     provenance_status: str
     lifecycle_status: str = "DRAFT"
     criteria_count: int
     verbatim_checks_passed: int
     verbatim_checks_failed: int
-    flagged_ambiguities: List[OnboardingAmbiguityFlag] = Field(default_factory=list)
-    concept_map: Dict[str, List[str]] = Field(default_factory=dict)
-    evaluation_rounds: List[OnboardingEvaluationRound] = Field(default_factory=list)
-    open_defects: List[str] = Field(default_factory=list)
+    flagged_ambiguities: list[OnboardingAmbiguityFlag] = Field(default_factory=list)
+    concept_map: dict[str, list[str]] = Field(default_factory=dict)
+    evaluation_rounds: list[OnboardingEvaluationRound] = Field(default_factory=list)
+    open_defects: list[str] = Field(default_factory=list)
     human_verification_required: bool = True
-    conversation_transcript: List[Dict[str, Any]] = Field(default_factory=list)
+    conversation_transcript: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class OnboardingResult(BaseModel):
     """Outcome container returned by PolicyOnboardingAgent."""
     status: str  # "DRAFT_ONBOARDED", "SOURCE_NOT_FOUND", "REJECTED_VERBATIM_FAILURE"
     message: str
-    policy: Optional[DeclarativePolicy] = None
-    report: Optional[OnboardingReport] = None
+    policy: DeclarativePolicy | None = None
+    report: OnboardingReport | None = None
 
 
 class PolicyOnboardingAgent:
@@ -213,15 +215,15 @@ class PolicyOnboardingAgent:
 
     def __init__(
         self,
-        local_llm_url: Optional[str] = None,
-        mcd_client: Optional[httpx.Client] = None,
-        staging_dir: Optional[Path] = None
+        local_llm_url: str | None = None,
+        mcd_client: httpx.Client | None = None,
+        staging_dir: Path | None = None
     ):
         self.local_llm_url = local_llm_url or "http://127.0.0.1:11434/v1"
         self.mcd_client = mcd_client or httpx.Client(timeout=10.0)
         self.staging_dir = staging_dir or (Path(__file__).resolve().parent.parent / "data" / "policies_extended" / "drafts")
 
-    def fetch_mcd_document(self, cms_id: str, clinical_subject: str) -> Optional[Dict[str, Any]]:
+    def fetch_mcd_document(self, cms_id: str, clinical_subject: str) -> dict[str, Any] | None:
         """
         Step 1: Fetches the live MCD document.
         Returns document metadata dict, or None if the identifier does not resolve.
@@ -266,7 +268,7 @@ class PolicyOnboardingAgent:
                     "text": resp.text[:15000],
                     "indications": []
                 }
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.debug(f"Live MCD lookup for '{clean_id}' encountered: {e}")
 
         return None
@@ -284,12 +286,12 @@ class PolicyOnboardingAgent:
         return norm_passage in norm_doc
 
     @staticmethod
-    def build_concept_map(clinical_subject: str, doc_text: str) -> Dict[str, List[str]]:
+    def build_concept_map(clinical_subject: str, doc_text: str) -> dict[str, list[str]]:
         """
         Builds concept and synonym map from the document's clinical language.
         Maps canonical criteria terms to subtypes, histological variants, paraphrases, and acronyms.
         """
-        concept_map: Dict[str, List[str]] = {}
+        concept_map: dict[str, list[str]] = {}
 
         subj_lower = clinical_subject.lower()
         if "imrt" in subj_lower or "radiation" in subj_lower or "prostate" in subj_lower:
@@ -354,11 +356,11 @@ class PolicyOnboardingAgent:
         return concept_map
 
     @staticmethod
-    def detect_ambiguities(criteria_defs: List[Dict[str, Any]], doc_text: str) -> List[OnboardingAmbiguityFlag]:
+    def detect_ambiguities(criteria_defs: list[dict[str, Any]], doc_text: str) -> list[OnboardingAmbiguityFlag]:
         """
         Flags ambiguous passages whose clinical intent is non-obvious or borders coverage judgment.
         """
-        ambiguities: List[OnboardingAmbiguityFlag] = []
+        ambiguities: list[OnboardingAmbiguityFlag] = []
         doc_lower = doc_text.lower()
 
         for c in criteria_defs:
@@ -391,7 +393,7 @@ class PolicyOnboardingAgent:
     def evaluate_frozen_vignettes(
         self,
         policy: DeclarativePolicy,
-        vignettes: List[Dict[str, Any]],
+        vignettes: list[dict[str, Any]],
         round_number: int
     ) -> OnboardingEvaluationRound:
         """
@@ -443,14 +445,14 @@ class PolicyOnboardingAgent:
     def run_conversation_with_agent1(
         self,
         policy: DeclarativePolicy,
-        frozen_vignettes: List[Dict[str, Any]],
+        frozen_vignettes: list[dict[str, Any]],
         conversation_id: str
-    ) -> Tuple[bool, List[str]]:
+    ) -> tuple[bool, list[str]]:
         """
         Task 2: Onboarding <-> Retrieval Conversation.
         Bounded to 3 rounds. Records every message in AgentConversationAuditBus.
         """
-        open_defects: List[str] = []
+        open_defects: list[str] = []
 
         for round_idx in range(1, 4):
             # 1. Onboarding Agent sends REGISTER_POLICY
@@ -550,7 +552,7 @@ class PolicyOnboardingAgent:
         self,
         cms_id: str,
         clinical_subject: str,
-        test_vignettes: Optional[List[Dict[str, Any]]] = None,
+        test_vignettes: list[dict[str, Any]] | None = None,
         save_draft: bool = True
     ) -> OnboardingResult:
         """
@@ -576,21 +578,14 @@ class PolicyOnboardingAgent:
         doc_text = doc.get("text", "")
         raw_indications = doc.get("indications", [])
         if not raw_indications:
-            raw_indications = [
-                {
-                    "code": f"CRIT-{cms_id.replace('LCD-', '').replace('NCD-', '')}-01",
-                    "name": f"Covered Indications for {clinical_subject}",
-                    "description": f"Mandatory clinical requirement for {clinical_subject}.",
-                    "quoted_passage": doc_text.splitlines()[2] if len(doc_text.splitlines()) > 2 else doc_text[:100],
-                    "section": "Covered Indications",
-                    "paragraph": "Paragraph 1",
-                    "type": "FINDING_PRESENCE",
-                    "synonyms": [clinical_subject]
-                }
-            ]
+            logger.warning(f"No clinical indications found in MCD document for {cms_id}.")
+            return OnboardingResult(
+                status="NO_INDICATIONS_FOUND",
+                message=f"NO_INDICATIONS_FOUND: MCD document for '{cms_id}' yielded no clinical indications. Aborting without creating policy."
+            )
 
         # 2. Parse & Verbatim Check
-        draft_criteria: List[DeclarativeCriterion] = []
+        draft_criteria: list[DeclarativeCriterion] = []
         passed_verbatim = 0
         failed_verbatim = 0
         rejected_passages = []
@@ -645,14 +640,14 @@ class PolicyOnboardingAgent:
             policy_id=policy_slug,
             title=doc.get("title", clinical_subject),
             jurisdiction=doc.get("jurisdiction", "Medicare Administrative Contractor (MAC)"),
-            effective_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            effective_date=datetime.now(UTC).strftime("%Y-%m-%d"),
             category="Specialized Procedures",
             description=f"CMS coverage policy for {clinical_subject} (DRAFT - Pending Independent Verification).",
             policy_version="DRAFT-0.1",
             criteria=draft_criteria,
             cms_reference={
-                "provenance_status": "VERIFIED_FROM_MCD",
-                "checked_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                "provenance_status": "CLAIMED_UNVERIFIED",
+                "checked_date": datetime.now(UTC).strftime("%Y-%m-%d"),
                 "lifecycle_status": "DRAFT",
                 "notes": f"Onboarded by Agent 5 from live CMS MCD. Verified document title: {doc.get('title')}. Awaiting independent audit.",
                 "real_cms_id": doc.get("mcd_id"),
@@ -666,7 +661,7 @@ class PolicyOnboardingAgent:
         )
 
         # 5. Non-Circular Evaluation on Frozen Vignettes (<= 2 rounds)
-        evaluation_rounds: List[OnboardingEvaluationRound] = []
+        evaluation_rounds: list[OnboardingEvaluationRound] = []
         if test_vignettes:
             # Round 1
             r1 = self.evaluate_frozen_vignettes(policy, test_vignettes, round_number=1)
@@ -686,7 +681,7 @@ class PolicyOnboardingAgent:
 
         # 6. Conversation with Agent 1 (Task 2)
         vigs_for_conv = test_vignettes or []
-        reg_success, open_defects = self.run_conversation_with_agent1(policy, vigs_for_conv, conversation_id)
+        _reg_success, open_defects = self.run_conversation_with_agent1(policy, vigs_for_conv, conversation_id)
         conv_msgs = AgentConversationAuditBus.get_conversation(conversation_id)
         transcript = [
             {
@@ -704,8 +699,8 @@ class PolicyOnboardingAgent:
             policy_id=policy.policy_id,
             policy_title=policy.title,
             source_url=doc.get("url"),
-            checked_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-            provenance_status="VERIFIED_FROM_MCD",
+            checked_date=datetime.now(UTC).strftime("%Y-%m-%d"),
+            provenance_status="CLAIMED_UNVERIFIED",
             lifecycle_status="DRAFT",
             criteria_count=len(policy.criteria),
             verbatim_checks_passed=passed_verbatim,
@@ -727,6 +722,38 @@ class PolicyOnboardingAgent:
 
             rep_file = self.staging_dir / f"ONBOARDING_REPORT_{policy.policy_id}.md"
             self._write_markdown_report(rep_file, report)
+
+        # 9. Register criteria in human review queue
+        queue_records = []
+        for c in draft_criteria:
+            verbatim_status = "PASS" if c.source_traceability_status == "CLAIMED_UNVERIFIED" else "FAIL"
+            queue_records.append({
+                "criterion_code": c.criterion_code,
+                "policy_id": policy.policy_id,
+                "policy_title": policy.title,
+                "criterion_name": c.name,
+                "criterion_description": c.description,
+                "criterion_type": c.criterion_type.value if hasattr(c.criterion_type, "value") else str(c.criterion_type),
+                "threshold": c.threshold,
+                "target_unit": c.target_unit,
+                "min_duration_days": c.min_duration_days,
+                "is_exclusion": c.is_exclusion,
+                "cms_document": c.cms_document,
+                "source_section": c.source_section,
+                "source_paragraph": c.source_paragraph,
+                "source_text_excerpt": c.source_text_excerpt,
+                "mcd_passage": c.source_text_excerpt if verbatim_status == "PASS" else None,
+                "verbatim_check": verbatim_status,
+                "policy_status": "DRAFT",
+                "status": "PENDING_HUMAN_REVIEW",
+                "reviewer_decision": None,
+                "reviewer_notes": None,
+                "reviewer_name": None,
+                "review_date": None,
+                "created_at": datetime.now(UTC).isoformat()
+            })
+        if queue_records:
+            add_or_update_queue_records(queue_records)
 
         status = "DRAFT_ONBOARDED" if failed_verbatim == 0 else "REJECTED_VERBATIM_FAILURE"
         return OnboardingResult(

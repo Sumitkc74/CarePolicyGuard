@@ -139,5 +139,6 @@
       "imrt",
       "intensity modulated radiation therapy"
     ]
-  }
+  },
+  "status": "ACTIVE"
 }
