@@ -280,9 +280,9 @@ def test_v73_optimizations_unchanged_and_reusable():
     Task 4(e): Pin that v73 optimizations (narrowed pre-deferral review, baseline reuse validity,
     keep-alive, and bench-only flag) are intact and operational.
     """
-    # 1. Baseline reuse checker holds because critical deterministic files are untouched
-    is_valid = verify_baseline_reuse_validity(Path("app/data/benchmarks/agentic_v73_three_mode_run.json"))
-    assert is_valid is True, "Baseline reuse checker must pass at current HEAD"
+    # 1. Baseline reuse vs v73 (fd93806) is invalid since v91 (3c6006a) modified app/data/policies_extended/
+    with pytest.raises(RuntimeError):
+        verify_baseline_reuse_validity(Path("app/data/benchmarks/agentic_v73_three_mode_run.json"))
 
     # 2. Narrowed pre-deferral review behaves as designed:
     # Review is skipped when 0 mandatory criteria are met

@@ -3,17 +3,22 @@
 **Delivery Version**: v93  
 **Starting Head (v91 Delivery)**: `45be01e` (`45be01e1b036ef91e0951c9028a0c1c46bbc357f`)  
 **v93 Implementation Commit**: `0805e6a` (`0805e6a960ffd9280e0aa8710732e0de921bd4d4`)  
-**v93 Delivery Head Commit**: `docs(v93): add v93 delivery report` (verified via `git rev-parse HEAD` and `git cat-file -t` after commit)  
-**Date**: November 26, 2026  
+**v93 Delivery Head**: `cb8d698` (`cb8d698e10880e88c3950cf4a4bbe83022029d81`)  
+**Date**: November 26, 2026 *(Corrected in v94)*  
 
 ---
 
 ## 0. What Did NOT Hold (Stated Plainly First)
 
-1. **Full Test Suite & CI at `0805e6a` (Expected Consequence of Reverting `c6546f1`)**:
-   - Local full suite (`python -m pytest tests/ -q`): **`553 passed, 1 skipped, 2 failed`** (`556` collected in `284.92s`).
-   - CI Run `45908866701` (commit `0805e6a`): conclusion **`failure`** (`Code Quality & Type Checking`: `success`; `Unit, Integration & Fuzz Test Suite`: `failure`; `Docker Build & Health Verification`: `skipped`).
-   - **Root Cause**: Reverting commit `c6546f1` in `scripts/run_agentic_v59_three_mode_measurement.py` restored the strict pre-`c6546f1` `verify_baseline_reuse_validity` check. Two pre-existing tests (`tests/test_v73_safe_optimizations.py::test_baseline_reuse_validation_mechanism` and `tests/test_v75_deferral_rescue.py::test_v73_optimizations_unchanged_and_reusable`) call `verify_baseline_reuse_validity` against `agentic_v72_three_mode_run.json` and `agentic_v73_three_mode_run.json`, which compare against `HEAD`. Because v91 (`3c6006a`) backfilled `"status": "ACTIVE"` into `app/data/policies_extended/*.json` and added `app/data/policies_extended/mcd_cache/`, the strict validator raises `RuntimeError` as designed.
+1. **Full Test Suite & CI at `0805e6a` and `cb8d698` (Both Commits RED)**:
+   - Local full suite at `cb8d698` (`python -m pytest tests/ -q`): **`556` collected — `553 passed, 1 skipped, 2 failed`** in `284.92s` (suite was NOT green at `cb8d698`).
+   - CI Run `45908866701` (commit `0805e6a`): completed **`failure`** (`Unit, Integration & Fuzz Test Suite`: `failure` on the 2 baseline-reuse tests; `Code Quality & Type Checking`: `success`; `Docker Build & Health Verification`: `skipped`).
+   - CI Run `45909465875` (commit `cb8d698`): completed **`failure`** (`Unit, Integration & Fuzz Test Suite`: `failure` on the same 2 baseline-reuse tests; `Code Quality & Type Checking`: `success`; `Docker Build & Health Verification`: `skipped`). *(Note: the original v93 report was written while `45909465875` was still `in_progress`; it has since completed as `failure`.)*
+   - **The 2 Failing Tests & Governing Distinction**:
+     1. `tests/test_v73_safe_optimizations.py::test_baseline_reuse_validation_mechanism` (baseline head `41350ec`)
+     2. `tests/test_v75_deferral_rescue.py::test_v73_optimizations_unchanged_and_reusable` (baseline head `fd93806`)
+     - Both fail with `RuntimeError` from `verify_baseline_reuse_validity` in `scripts/run_agentic_v59_three_mode_measurement.py` because v91 (`3c6006a`) backfilled `"status": "ACTIVE"` into the 60 policy JSONs under `app/data/policies_extended/` and added `app/data/policies_extended/mcd_cache/` (50 cached documents).
+     - **Governing Distinction**: The strict validator is **correct**; the two v73 tests are **stale** (they encode a contingent fact about the tree that v91 legitimately falsified). Weakening the validator to satisfy them is the `c6546f1` error and is forbidden. Task 2 of v94 fixes the two stale tests.
 2. **v91 Baseline Defects Disclosed in Corrected Report**:
    - **Provenance gap**: v91 benchmark ran at `3c6006a`; delivery head was `45be01e` (4 commits later: `19817c3`, `21ab861`, `c6546f1`, `efe20df`), though no adjudication code changed after `3c6006a`.
    - **Zero-diff bar missed**: `DEV-LCD-KYPHO-APP` flipped DEFERRED&rarr;APPROVED (agentic `56/84` vs v86 `55/84`) due to host timing (`32.37s` vs v86 `64.57s` budget halt).
@@ -25,7 +30,7 @@
 ## 1. Delivery Head & Commit Chain
 
 - **Starting Head**: `45be01e1b036ef91e0951c9028a0c1c46bbc357f` (`45be01e` — v91 delivery)
-- **v93 Chain**: `45be01e` &rarr; `0805e6a` (`fix(v93): correct v91 delivery report, isolate onboarding tests, and revert c6546f1 validator loosening`) &rarr; `docs(v93): add v93 delivery report`
+- **v93 Chain**: `45be01e` (`45be01e1b036ef91e0951c9028a0c1c46bbc357f`, `docs(v91): finalize CI run IDs in v91 delivery report`) &rarr; `0805e6a` (`0805e6a960ffd9280e0aa8710732e0de921bd4d4`, `fix(v93): correct v91 delivery report, isolate onboarding tests, and revert c6546f1 validator loosening`) &rarr; `cb8d698` (`cb8d698e10880e88c3950cf4a4bbe83022029d81`, `docs(v93): add v93 delivery report`)
 
 ---
 
@@ -87,7 +92,7 @@ Executed `PolicyOnboardingAgent(staging_dir=tmp_dir, queue_path=tmp_queue).onboa
 - **BENCH & v1 Guards**: **14 / 14 passed** (`tests/test_benchmark.py` 5/5 + `tests/test_v1_heldout_regressions.py` 9/9).
 - **Ruff (`ruff check` on all touched files)**: `All checks passed!` (`0` errors).
 - **JS Syntax (`node --check app/static/js/app.js`)**: Clean (`exit code 0`).
-- **v93 CI Chain**:
-  - `0805e6a`: Run `45908866701` — **`failure`** (`Code Quality & Type Checking`: `success`; `Unit, Integration & Fuzz Test Suite`: `failure` on the 2 baseline-reuse tests; `Docker Build & Health Verification`: `skipped`).
-  - Delivery docs commit: Pending push.
+- **v93 CI Chain (Both Commits RED)**:
+  - `0805e6a`: Run `45908866701` — **`failure`** (`Unit, Integration & Fuzz Test Suite`: `failure` on the 2 baseline-reuse tests; `Code Quality & Type Checking`: `success`; `Docker Build & Health Verification`: `skipped`).
+  - `cb8d698`: Run `45909465875` — **`failure`** (`Unit, Integration & Fuzz Test Suite`: `failure` on the same 2 baseline-reuse tests; `Code Quality & Type Checking`: `success`; `Docker Build & Health Verification`: `skipped`). *(The original v93 report was written while `45909465875` was still `in_progress`; it has since completed as `failure`.)*
 - **v91 CI Chain (Restated)**: `3c6006a` (NO RUN), `19817c3` (NO RUN), `21ab861` (`45795148411`, `failure`), `c6546f1` (`45796642377`, `success`), `efe20df` (`45798442837`, `success`), `45be01e` (`45800251443`, `success`).

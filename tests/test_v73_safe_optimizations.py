@@ -12,6 +12,8 @@ Tests for Suggestion Prompt v73:
 4. Task 3: Measurement script baseline reuse validity checker.
 """
 
+import json
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
@@ -223,17 +225,27 @@ def test_judge_core_work_unchanged(imrt_narrative):
     assert m_equiv.called, "Advocate span verification must be called"
 
 
-def test_baseline_reuse_validation_mechanism():
+def test_baseline_reuse_validation_mechanism(tmp_path: Path):
     """
     Task 3: Baseline reuse validity check.
-    Passes when diff between previous run commit and HEAD touches no critical files.
+    Reuse vs v72 (41350ec) is invalid since v91 (3c6006a) modified app/data/policies_extended/.
+    Positive case: reuse against the current live HEAD passes (empty diff).
     Fails when previous run JSON does not exist.
     """
     v72_path = Path("app/data/benchmarks/agentic_v72_three_mode_run.json")
     if v72_path.exists():
-        # HEAD vs 41350ec has 0 critical files modified
-        is_valid = verify_baseline_reuse_validity(v72_path)
-        assert is_valid is True
+        # Reuse vs the v72 baseline is invalid since the v91 policy changes under app/data/policies_extended/
+        with pytest.raises(RuntimeError):
+            verify_baseline_reuse_validity(v72_path)
+
+        # Positive case: pin that the reuse mechanism returns True when compared against live HEAD
+        current_head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+        v72_data = json.loads(v72_path.read_text(encoding="utf-8"))
+        v72_data.setdefault("metadata", {})["git_head"] = current_head
+        v72_data["metadata"]["git_head_full"] = current_head
+        tmp_run_path = tmp_path / "live_head_reuse.json"
+        tmp_run_path.write_text(json.dumps(v72_data), encoding="utf-8")
+        assert verify_baseline_reuse_validity(tmp_run_path) is True
 
     # Non-existent file raises FileNotFoundError
     with pytest.raises(FileNotFoundError):
